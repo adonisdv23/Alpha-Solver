@@ -1501,7 +1501,7 @@ class AlphaSolver(BaseSolver):
     6. Accessibility Checks
     """
     
-    def __init__(self, registries_path: str = "registries", k: int = 5, deterministic: bool = False, tools_canon_path: str = ""):
+    def __init__(self, registries_path: str = "registries", k: int = 5, deterministic: bool = False, tools_canon_path: str = "", region: str = "", domain: str = ""):
         # Initialize base solver
         super().__init__()
 
@@ -1510,6 +1510,8 @@ class AlphaSolver(BaseSolver):
         self.k = k
         self.deterministic = deterministic
         self.tools_canon_path = tools_canon_path
+        self.region = region
+        self.domain = domain
         
         # Update version
         self.version = Config.VERSION
@@ -1554,6 +1556,7 @@ class AlphaSolver(BaseSolver):
 
             # Load registries
             registries = loader.load_all(self.registries_path)
+            clusters = registries.get("clusters", {}) or loader.load_file(Path(self.registries_path) / "clusters.yaml")
             # Policy engine checks
             pe = policy.PolicyEngine(registries)
             ctx = {"vendor_id": "demo.vendor", "cost_estimate": 0.05, "data_tags": ["phi"], "op": "select.shortlist"}
@@ -1566,7 +1569,11 @@ class AlphaSolver(BaseSolver):
             self.observability.log_event("data.classification", dc)
 
             pending_questions = core_questions.get_required_questions()
-            if self.tools_canon_path:
+            if self.region and self.tools_canon_path:
+                canon = loader_tools.load_tools_canon(self.tools_canon_path)
+                shortlist = selector.rank_region(canon, region=self.region, top_k=self.k, clusters=clusters)
+                source = "canon+region"
+            elif self.tools_canon_path:
                 canon = loader_tools.load_tools_canon(self.tools_canon_path)
                 shortlist = selector.rank_from(canon, top_k=self.k)
                 source = "canon"
@@ -1575,9 +1582,11 @@ class AlphaSolver(BaseSolver):
                 source = "registry"
             orchestration_plan = orchestrator.plan("tpl.signs365.order.v2", shortlist)
 
+            if self.region:
+                self.observability.log_event("policy.region.applied", {"region": self.region, "k": self.k})
             self.observability.log_event(
-                "selection.rank.v1",
-                {"k": self.k, "tool_ids": [t.get("id") for t in shortlist], "tools.selection.source": source},
+                "selection.rank.v2",
+                {"source": source, "top_ids": [t.get("id") for t in shortlist]},
             )
             self.observability.log_event(
                 "orchestrator.plan.v1",
@@ -1699,6 +1708,8 @@ def main():
     parser.add_argument("--no-benchmark", action="store_true")
     parser.add_argument("--no-telemetry", action="store_true")
     parser.add_argument("--tools-canon", default="")
+    parser.add_argument("--region", default="")
+    parser.add_argument("--domain", default="")
     args = parser.parse_args()
 
     if args.no_benchmark:
@@ -1714,7 +1725,7 @@ def main():
     print(f"  aiohttp   : {'enabled' if HAVE_AIOHTTP else 'fallback nullsink'}")
     print(f"  psutil    : {'enabled' if HAVE_PSUTIL else 'tracemalloc fallback'}")
 
-    solver = AlphaSolver(registries_path=args.registries, k=args.k, deterministic=args.deterministic, tools_canon_path=args.tools_canon)
+    solver = AlphaSolver(registries_path=args.registries, k=args.k, deterministic=args.deterministic, tools_canon_path=args.tools_canon, region=args.region, domain=args.domain)
     result = solver.solve("smoke test query")
 
     acc_score = result.get('accessibility', {}).get('score') if isinstance(result.get('accessibility'), dict) else None

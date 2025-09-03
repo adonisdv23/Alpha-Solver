@@ -1,0 +1,4 @@
+version: "0.1.0"
+regions:
+  - { id: "EU", sovereignty_rules: ["gdpr"], allowed_vendors: ["mistral","aleph_alpha","local_eu"], blocked_endpoints: ["cn_state_cloud"] }
+  - { id: "US", sovereignty_rules: [], allowed_vendors: ["openai","anthropic","mistral"], blocked_endpoints: [] }

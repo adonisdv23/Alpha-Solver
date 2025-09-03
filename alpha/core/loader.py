@@ -19,6 +19,10 @@ FILES = {
     "dependency_graph": "dependency_graph.yaml",
     "circuit_breakers": "circuit_breakers.json",
     "data_classification": "data_classification.yaml",
+    "clusters": "clusters.yaml",
+    "regions": "regions.yaml",
+    "patents": "patents.yaml",
+    "forecasts": "forecasts.json",
 }
 
 
