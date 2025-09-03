@@ -1,0 +1,9 @@
+{
+  "version": "1.0",
+  "sections": [
+    {"id": "sec.root", "title": "Root", "children": ["sec.legal", "sec.operations", "sec.finance"]},
+    {"id": "sec.legal", "title": "Legal", "children": []},
+    {"id": "sec.operations", "title": "Operations", "children": []},
+    {"id": "sec.finance", "title": "Finance", "children": []}
+  ]
+}
