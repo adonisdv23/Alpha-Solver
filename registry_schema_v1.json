@@ -1,0 +1,226 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Alpha Solver Registry Row (v1)",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "type",
+    "bucket",
+    "category",
+    "ecosystem",
+    "product_line",
+    "modality",
+    "semver",
+    "status"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^(tool|model|agent|vendor|tpl|risk|met|q|mode|artifact|evt|err)\\."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "type": {
+      "type": "string"
+    },
+    "bucket": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "ecosystem": {
+      "type": "string"
+    },
+    "product_line": {
+      "type": "string"
+    },
+    "modality": {
+      "type": "string"
+    },
+    "registry_file": {
+      "type": "string"
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "beta",
+        "deprecated"
+      ]
+    },
+    "primary_use_case": {
+      "type": "string"
+    },
+    "high_level_explanation": {
+      "type": "string"
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "core_capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "best_integration_scenarios": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "example_workflow": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "adoption_level": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sentiment_score_0_10": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 10
+    },
+    "community_notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "cost_tier": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "pricing_model": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "best_in_class_strength": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "risk_flags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "compliance_scope": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "data_handling": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "audit_level": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sla_profile_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "breaker_profile_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "p50_latency_ms": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "entrypoints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sdk_langs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "wrapper_requirements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "integration_notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "evidence_sources": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "last_reviewed_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "owner": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": true
+}
