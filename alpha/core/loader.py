@@ -90,9 +90,15 @@ def parse_yaml_lite(text: str):
                 is_list = True
                 item = content[2:].strip()
                 if index + 1 < len(lines) and lines[index + 1][0] > ind:
+                    if result is None:
+                        result = []
                     val, index = parse_block(index + 1, lines[index + 1][0])
                     if item:
-                        base = parse_value(item)
+                        if ':' in item:
+                            k, _, v = item.partition(':')
+                            base = {k.strip(): parse_value(v)}
+                        else:
+                            base = parse_value(item)
                         if isinstance(base, dict) and isinstance(val, dict):
                             base.update(val)
                             val = base

@@ -1,4 +1,16 @@
 version: "0.1.0"
 clusters:
-  - { id: "cl.legal.v1", domain: "legal", members: ["harvey","spellbook","luminance"], router_value_bonus: 0.15 }
-  - { id: "cl.edge.v1", domain: "edge", members: ["nvidia_jetson","intel_openvino","google_coral"], router_value_bonus: 0.12 }
+  - id: "cl.legal.v1"
+    domain: "legal"
+    members:
+      - harvey
+      - spellbook
+      - luminance
+    router_value_bonus: 0.15
+  - id: "cl.edge.v1"
+    domain: "edge"
+    members:
+      - nvidia_jetson
+      - intel_openvino
+      - google_coral
+    router_value_bonus: 0.12
