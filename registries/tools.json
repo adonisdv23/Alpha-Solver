@@ -1,0 +1,8 @@
+{
+  "version": "1.0",
+  "tools": [
+    {"id": "tool.legalcheck", "name": "Legal Checker", "router_value": 0.9, "tier": 2, "notes": "verifies contracts"},
+    {"id": "tool.opsmon", "name": "Ops Monitor", "router_value": 0.8, "tier": 1, "notes": "monitors systems"},
+    {"id": "tool.payments", "name": "Payments API", "router_value": 0.7, "tier": 1, "notes": "processes payments"}
+  ]
+}

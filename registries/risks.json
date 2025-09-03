@@ -1,0 +1,8 @@
+{
+  "version": "1.0",
+  "risks": [
+    {"id": "risk.legal.exposure", "note": "Mitigate with contract review"},
+    {"id": "risk.operational.downtime", "note": "Use redundancy"},
+    {"id": "risk.financial.overrun", "note": "Track expenses"}
+  ]
+}

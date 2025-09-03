@@ -1,0 +1,2 @@
+version: "0.1.0"
+contracts: [{ id: "sla.default", p95_ms: 800, error_rate: 0.02 }]

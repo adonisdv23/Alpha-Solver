@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "vendors": {
+    "signs365": {
+      "routes": {
+        "order": {"endpoint": "/signs365/order"}
+      }
+    }
+  }
+}

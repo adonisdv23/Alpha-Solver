@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "questions": {
+    "legal": [
+      {"id": "q.legal.nda", "text": "Is an NDA required?"},
+      {"id": "q.legal.ip", "text": "Are IP rights clarified?"},
+      {"id": "q.legal.compliance", "text": "Does this comply with regulations?"}
+    ],
+    "ux": [
+      {"id": "q.ux.a11y", "text": "Does the UI meet accessibility guidelines?"},
+      {"id": "q.ux.consistency", "text": "Are components consistent?"},
+      {"id": "q.ux.feedback", "text": "Is user feedback collected?"}
+    ],
+    "operations": [
+      {"id": "q.operations.scale", "text": "Can the system scale?"},
+      {"id": "q.operations.monitoring", "text": "Is monitoring in place?"},
+      {"id": "q.operations.backup", "text": "Are backups configured?"}
+    ],
+    "finance": [
+      {"id": "q.finance.cost", "text": "What is the estimated cost?"},
+      {"id": "q.finance.roi", "text": "What is the ROI?"},
+      {"id": "q.finance.budget", "text": "Is budget approved?"}
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "version": "1.0",
+  "playbooks": {
+    "tpl.signs365.order.v2": {
+      "steps": [
+        {"id": "step.collect", "gates": ["gate.legal"], "block_on": [], "produces": ["doc.requirements"]},
+        {"id": "step.prepare", "gates": ["gate.operations"], "block_on": ["step.collect"], "produces": ["doc.order"]},
+        {"id": "step.sign", "gates": ["gate.finance"], "block_on": ["step.prepare"], "produces": ["doc.signed"]}
+      ]
+    }
+  }
+}
