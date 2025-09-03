@@ -67,6 +67,7 @@ except Exception:  # pragma: no cover - fallback when dependency missing
 import platform
 from alpha.core import loader, questions as core_questions, selector, orchestrator
 from alpha.core import loader_tools
+from alpha.core import policy
 
 # Configure structured logging
 logging.basicConfig(
@@ -1551,8 +1552,19 @@ class AlphaSolver(BaseSolver):
             if self.deterministic:
                 random.seed(42)
 
-            # Load registries and derive plan
+            # Load registries
             registries = loader.load_all(self.registries_path)
+            # Policy engine checks
+            pe = policy.PolicyEngine(registries)
+            ctx = {"vendor_id": "demo.vendor", "cost_estimate": 0.05, "data_tags": ["phi"], "op": "select.shortlist"}
+            b = pe.check_budget(ctx)
+            cb = pe.circuit_guard(ctx["vendor_id"])
+            dc = pe.classify(ctx["data_tags"])
+            pe.audit({"event": "policy.sample", "budget": b, "cb": cb, "dc": dc})
+            self.observability.log_event("budget.check", b)
+            self.observability.log_event("cb.state", cb)
+            self.observability.log_event("data.classification", dc)
+
             pending_questions = core_questions.get_required_questions()
             if self.tools_canon_path:
                 canon = loader_tools.load_tools_canon(self.tools_canon_path)

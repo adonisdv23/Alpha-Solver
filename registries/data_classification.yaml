@@ -1,0 +1,4 @@
+version: "0.1.0"
+rules:
+  - { match: "phi", action: "mask" }
+  - { match: "pii", action: "deny" }

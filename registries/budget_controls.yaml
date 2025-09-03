@@ -1,0 +1,4 @@
+version: "0.1.0"
+limits: { monthly_usd: 1000, per_call_usd: 2 }
+throttle: { per_minute: 60 }
+actions: { on_breach: "halt" }
