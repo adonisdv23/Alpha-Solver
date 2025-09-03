@@ -1,4 +1,4 @@
-.PHONY: smoke canon report test preflight all overnight
+.PHONY: smoke canon report test preflight all overnight overnight-big
 
 smoke:
 	python 'Alpha Solver.py' --no-benchmark --no-telemetry
@@ -13,10 +13,13 @@ test:
 	python -m unittest -q
 
 preflight:
-        python scripts/preflight.py
+	python scripts/preflight.py
 
 all:
-        make preflight && make canon && make report && make test
+	make preflight && make canon && make report && make test
 
 overnight:
-        python scripts/overnight_run.py
+	python scripts/overnight_run.py
+
+overnight-big:
+	python scripts/overnight_run.py --regions "EU,US,''" --k 10 --queries docs/queries.txt

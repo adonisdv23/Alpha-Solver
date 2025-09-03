@@ -5,9 +5,16 @@ import subprocess
 import runpy
 import sys
 import time
+import argparse
 from pathlib import Path
 from datetime import datetime
 import zipfile
+
+parser = argparse.ArgumentParser(description="Alpha Solver overnight pipeline")
+parser.add_argument("--regions", default="EU,''", help="comma-separated regions; '' means no-region")
+parser.add_argument("--k", type=int, default=5, help="top-N tools")
+parser.add_argument("--queries", default="", help="path to queries file")
+args = parser.parse_args()
 
 ART_DIR = Path('artifacts')
 ART_DIR.mkdir(exist_ok=True)
@@ -15,6 +22,25 @@ ART_DIR.mkdir(exist_ok=True)
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+
+regions: list[str] = []
+for r in args.regions.split(','):
+    r = r.strip()
+    if r in ("", "''", '""'):
+        regions.append("")
+    else:
+        regions.append(r)
+
+if args.queries and Path(args.queries).is_file():
+    queries = [line.strip() for line in Path(args.queries).read_text(encoding='utf-8').splitlines() if line.strip()]
+else:
+    queries = [
+        "legal contract review",
+        "edge deployment",
+        "security posture",
+        "healthcare triage",
+        "enterprise SaaS integration",
+    ]
 
 summary = {
     "timestamp": datetime.utcnow().isoformat(),
@@ -52,19 +78,12 @@ if summary['canon_metrics'].get('rows_canon', 0) < 50:
 log("Step C: solver sweeps")
 ns = runpy.run_path('Alpha Solver.py', run_name='alpha_solver_module')
 AlphaSolver = ns['AlphaSolver']
-queries = [
-    "legal contract review",
-    "edge deployment",
-    "security posture",
-    "healthcare triage",
-    "enterprise SaaS integration",
-]
 leaderboard = {}
 
 def run_solver(region: str):
     solver = AlphaSolver(tools_canon_path='artifacts/tools_canon.csv',
                          registries_path='registries',
-                         k=5, deterministic=True, region=region)
+                         k=args.k, deterministic=True, region=region)
     runs = []
     for q in queries:
         start = time.time()
@@ -75,7 +94,7 @@ def run_solver(region: str):
             steps = len(res.get('orchestration_plan', {}).get('steps', []))
             runs.append({
                 "query": q,
-                "shortlist": [t.get('id') for t in res.get('shortlist', [])],
+                "shortlist": [{"id": t.get('id'), "score": t.get('score')} for t in res.get('shortlist', [])],
                 "pending_questions": pq_counts,
                 "plan_steps": steps,
                 "time_ms": elapsed
@@ -101,11 +120,13 @@ def run_solver(region: str):
             })
     return runs
 
-summary['runs']['no_region'] = {"queries": run_solver("")}
-summary['runs']['EU'] = {"queries": run_solver("EU")}
-
-(ART_DIR / 'run_no_region.json').write_text(json.dumps(summary['runs']['no_region'], indent=2), encoding='utf-8')
-(ART_DIR / 'run_EU.json').write_text(json.dumps(summary['runs']['EU'], indent=2), encoding='utf-8')
+run_matrix = {}
+for region in regions:
+    label = region if region else 'none'
+    run_matrix[label] = {"queries": run_solver(region)}
+    summary['runs'][label] = run_matrix[label]
+    (ART_DIR / f'run_{label}.json').write_text(json.dumps(run_matrix[label], indent=2), encoding='utf-8')
+(ART_DIR / 'run_matrix.json').write_text(json.dumps(run_matrix, indent=2), encoding='utf-8')
 
 # Step D
 log("Step D: expansion report")
@@ -148,4 +169,4 @@ with zipfile.ZipFile(bundle_path, 'w') as zf:
         if p.is_file() and p.name != 'overnight_bundle.zip':
             zf.write(p, p.name)
 
-print(json.dumps({"ok": True, "bundle": str(bundle_path)}))
+print(json.dumps({"ok": True, "regions": len(regions), "k": args.k, "queries": len(queries)}))
