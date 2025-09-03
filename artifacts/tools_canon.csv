@@ -1,0 +1,7 @@
+name,category,url,description,capabilities,price,tags,notes,url_domain,id
+AlphaTool,Analytics,https://alpha.example.com,Analyze data fast,"stats,charts",$0,"analytics,data",,alpha.example.com,alphatool:alpha-example-com
+BetaService,DevOps,https://beta.example.com,Deployment service,"deploy,scale",$10,"devops,cloud",stable,beta.example.com,betaservice:beta-example-com
+GammaWidget,,https://gamma.example.com,Real-time dashboard,,,"dashboard,monitoring",,gamma.example.com,gammawidget:gamma-example-com
+DeltaAPI,,https://delta.example.com,Payment processing,,,"finance,payment",,delta.example.com,deltaapi:delta-example-com
+EpsilonApp,Productivity,https://epsilon.example.com,Notes app,"write,organize",free,productivity,beta,epsilon.example.com,epsilonapp:epsilon-example-com
+ZetaLib,AI,https://zeta.example.com,ML library,"train,infer",free,"ai,ml",v1,zeta.example.com,zetalib:zeta-example-com

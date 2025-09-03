@@ -1,0 +1,950 @@
+{
+  "timestamp": "2025-09-03T18:38:48.572188",
+  "preflight": {
+    "ok": true,
+    "registries": {
+      "sections.yaml": 4,
+      "questions.json": 12,
+      "risks.json": 3,
+      "templates.playbooks.yaml": 1,
+      "policy.routes.yaml": 1,
+      "tools.json": 3,
+      "secrets_vault.json": 1,
+      "budget_controls.yaml": 1,
+      "audit_trail.json": 0,
+      "sla_contracts.yaml": 1,
+      "circuit_breakers.json": 1,
+      "data_classification.yaml": 2,
+      "clusters.yaml": 2,
+      "regions.yaml": 2
+    }
+  },
+  "canon_metrics": {
+    "rows_parsed": 6,
+    "rows_canon": 6,
+    "dupes_removed": 0,
+    "coverage": 1.0
+  },
+  "runs": {
+    "EU": {
+      "queries": [
+        {
+          "query": "legal contract review",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        },
+        {
+          "query": "edge deployment",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        },
+        {
+          "query": "security posture",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        },
+        {
+          "query": "healthcare triage",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        },
+        {
+          "query": "enterprise SaaS integration",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        },
+        {
+          "query": "procurement workflow",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        },
+        {
+          "query": "compliance risk assessment",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        },
+        {
+          "query": "product launch checklist",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        }
+      ]
+    },
+    "US": {
+      "queries": [
+        {
+          "query": "legal contract review",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        },
+        {
+          "query": "edge deployment",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        },
+        {
+          "query": "security posture",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        },
+        {
+          "query": "healthcare triage",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        },
+        {
+          "query": "enterprise SaaS integration",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        },
+        {
+          "query": "procurement workflow",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        },
+        {
+          "query": "compliance risk assessment",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        },
+        {
+          "query": "product launch checklist",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        }
+      ]
+    },
+    "none": {
+      "queries": [
+        {
+          "query": "legal contract review",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        },
+        {
+          "query": "edge deployment",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        },
+        {
+          "query": "security posture",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        },
+        {
+          "query": "healthcare triage",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        },
+        {
+          "query": "enterprise SaaS integration",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        },
+        {
+          "query": "procurement workflow",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        },
+        {
+          "query": "compliance risk assessment",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        },
+        {
+          "query": "product launch checklist",
+          "shortlist": [
+            {
+              "id": "alphatool:alpha-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "betaservice:beta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "deltaapi:delta-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "epsilonapp:epsilon-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "gammawidget:gamma-example-com",
+              "score": 0.0
+            },
+            {
+              "id": "zetalib:zeta-example-com",
+              "score": 0.0
+            }
+          ],
+          "pending_questions": {
+            "legal": 3,
+            "ux": 3,
+            "operations": 3,
+            "finance": 3
+          },
+          "plan_steps": 3,
+          "time_ms": 0
+        }
+      ]
+    }
+  },
+  "report": {
+    "clusters": 2,
+    "regions": 2,
+    "patents": 1,
+    "forecasts": 1
+  },
+  "tests": "PASS",
+  "files": [
+    "artifacts/expansion_report.md",
+    "artifacts/leaderboard.md",
+    "artifacts/overnight_summary.json",
+    "artifacts/run_EU.json",
+    "artifacts/run_US.json",
+    "artifacts/run_matrix.json",
+    "artifacts/run_none.json",
+    "artifacts/tools_canon.csv",
+    "artifacts/tools_canon.jsonl",
+    "artifacts/tools_catalog.md",
+    "artifacts/tools_quality.json"
+  ]
+}
