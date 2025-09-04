@@ -1,0 +1,14 @@
+[
+  {
+    "query": "simple",
+    "ok": true
+  },
+  {
+    "query": "complex reasoning needed",
+    "ok": true
+  },
+  {
+    "query": "",
+    "ok": true
+  }
+]

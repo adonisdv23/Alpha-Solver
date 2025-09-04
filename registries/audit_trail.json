@@ -1,1 +1,305 @@
-{"version":"0.1.0","events":[]}
+{
+  "version": "0.1.0",
+  "events": [
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T00:31:46.336156"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T00:31:46.338810"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T00:31:46.340702"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T00:31:46.417772"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T00:31:46.530066"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T00:45:16.666146"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T00:45:16.668580"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T00:45:16.670506"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T00:45:16.733595"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T00:45:16.792702"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T00:53:55.739862Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T00:53:55.742311Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T00:53:55.744452Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T00:53:55.802936Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T00:53:55.868071Z"
+    }
+  ]
+}
