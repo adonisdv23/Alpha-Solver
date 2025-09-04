@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 #!/usr/bin/env python3
 """Overnight pipeline for Alpha Solver"""
 import json
@@ -43,7 +44,7 @@ else:
     ]
 
 summary = {
-    "timestamp": datetime.utcnow().isoformat(),
+    "timestamp": datetime.now(timezone.utc).isoformat().replace('+00:00','Z'),
     "preflight": {},
     "canon_metrics": {},
     "runs": {},
