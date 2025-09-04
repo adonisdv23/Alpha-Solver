@@ -164,7 +164,7 @@ class JSONLLogger:
     Provides machine-readable logs for analysis and debugging
     """
     
-    def __init__(self, log_path: str = None, registry_seed: str = \"\", registry_schema: str = \"schemas/registry_schema_v1.json\", registry_telemetry: str = \"telemetry/registry_usage.jsonl\"):
+    def __init__(self, log_path: str = None, registry_seed: str = "", registry_schema: str = "schemas/registry_schema_v1.json", registry_telemetry: str = "telemetry/registry_usage.jsonl"):
         self.log_path = Path(log_path or Config.JSONL_LOG_PATH)
         self.log_path.parent.mkdir(parents=True, exist_ok=True)
         
@@ -1501,7 +1501,7 @@ class AlphaSolver(BaseSolver):
     6. Accessibility Checks
     """
     
-    def __init__(self, registries_path: str = "registries", k: int = 5, deterministic: bool = False, tools_canon_path: str = "", region: str = "", domain: str = ""):
+    def __init__(self, registries_path: str = "registries", k: int = 5, deterministic: bool = False, tools_canon_path: str = "", region: str = "", domain: str = "", registry_seed: str = "", registry_schema: str = "schemas/registry_schema_v1.json", registry_telemetry: str = "telemetry/registry_usage.jsonl"):
         # Initialize base solver
         super().__init__()
 

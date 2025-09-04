@@ -80,76 +80,28 @@ class RegistryProvider:
                 "id": r.get("id") or r.get("vendor_id") or r.get("name"),
                 "name": r.get("name"),
                 "vendor_id": r.get("vendor_id"),
-PY          passver throw from telemetrynsure_ascii=False) + "\n")-8") as f:","Z"),]],
-@adonisdv23 ➜ /workspaces/Alpha-Solver (main) $ python - <<'PY'
-from pathlib import Path, re
-p = Path("Alpha Solver.py")
-s = p.read_text(encoding="utf-8")
+                "score": sc,
+            })
+        scored.sort(key=lambda x: (-x["score"], x.get("name") or ""))
+        selected = scored[: max(0, int(top_k))]
 
-# Ensure "from pathlib import Path" and timezone import exist
-if "from pathlib import Path" not in s:
-    s = s.replace("from dataclasses import dataclass, field, asdict",
-                  "from dataclasses import dataclass, field, asdict\nfrom pathlib import Path")
-if "from datetime import datetime, timezone" not in s and "from datetime import datetime" in s:
-    s = s.replace("from datetime import datetime", "from datetime import datetime, timezone")
+        self.log_event({
+            "query": query,
+            "candidates": [{"id": c["id"], "score": c["score"]} for c in scored[:50]],
+            "selected":   [{"id": s["id"], "score": s["score"]} for s in selected],
+            "rationale": f"ranked {len(scored)} candidates",
+        })
+        return selected
 
-# Add argparse flags if missing
-if "--registry-seed" not in s and 'parser.add_argument("--domain", default="")' in s:
-    s = s.replace(
-        'parser.add_argument("--domain", default="")',
-        'parser.add_argument("--domain", default="")\n'
-        '    parser.add_argument("--registry-seed", default="")\n'
-        '    parser.add_argument("--registry-schema", default="schemas/registry_schema_v1.json")\n'
-        '    parser.add_argument("--registry-telemetry", default="telemetry/registry_usage.jsonl")'
-    )
-
-# Add ctor params if missing
-if "registry_seed: str" not in s:
-    s = re.sub(
-        r"def __init__\(([^)]*)\):",
-        r"def __init__(\1, registry_seed: str = \"\", registry_schema: str = \"schemas/registry_schema_v1.json\", registry_telemetry: str = \"telemetry/registry_usage.jsonl\"):",
-        s, count=1)
-
-# Add assignments + provider init if missing
-if "self.registry_provider = None" not in s and "self.domain = domain" in s:
-    s = s.replace(
-        "self.domain = domain",
-        ("self.domain = domain\n"
-         "        self.registry_seed = registry_seed\n"
-         "        self.registry_schema = registry_schema\n"
-         "        self.registry_telemetry = registry_telemetry\n"
-         "        self.registry_provider = None\n"
-         "        try:\n"
-         "            if self.registry_seed and Path(self.registry_seed).exists():\n"
-         "                from alpha.core.registry_provider import RegistryProvider\n"
-         "                self.registry_provider = RegistryProvider(self.registry_seed, self.registry_schema, self.registry_telemetry)\n"
-         "                self.registry_provider.load()\n"
-         "        except Exception as e:  # pragma: no cover\n"
-         "            logger.warning(f\"registry provider init failed: {e}\")")
-    )
-
-# Prefer provider before tools_canon
-if "elif self.registry_provider:" not in s and "elif self.tools_canon_path:" in s:
-    s = s.replace(
-        "elif self.tools_canon_path:",
-        ("elif self.registry_provider:\n"
-         "                shortlist = self.registry_provider.rank(query, self.k, region=self.region or None)\n"
-         "                source = \"registry\"\n"
-         "            elif self.tools_canon_path:")
-    )
-
-# Pass new args into AlphaSolver(...) construction
-if "registry_seed=args.registry_seed" not in s:
-    s = s.replace(
-        "solver = AlphaSolver(",
-        "solver = AlphaSolver(")
-    s = s.replace(
-        "domain=args.domain)",
-        "domain=args.domain,\n"
-        "                         registry_seed=args.registry_seed,\n"
-        "                         registry_schema=args.registry_schema,\n"
-        "                         registry_telemetry=args.registry_telemetry)"
-    )
-
-p.write_text(s, encoding="utf-8")
-print("patched Alpha Solver.py")
+    def log_event(self, event: Dict[str, Any]) -> None:
+        try:
+            Path(self.telemetry_path).parent.mkdir(parents=True, exist_ok=True)
+            ev = {
+                "ts": datetime.now(timezone.utc).isoformat().replace("+00:00","Z"),
+                **event,
+            }
+            with Path(self.telemetry_path).open("a", encoding="utf-8") as f:
+                f.write(json.dumps(ev, ensure_ascii=False) + "\n")
+        except Exception:
+            # never throw from telemetry
+            pass
