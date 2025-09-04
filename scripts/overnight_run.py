@@ -83,7 +83,10 @@ leaderboard = {}
 def run_solver(region: str):
     solver = AlphaSolver(tools_canon_path='artifacts/tools_canon.csv',
                          registries_path='registries',
-                         k=args.k, deterministic=True, region=region)
+                         k=args.k, deterministic=True, region=region,
+                         registry_seed='registries/registry_seed_v0_7_0.jsonl',
+                         registry_schema='schemas/registry_schema_v1.json',
+                         registry_telemetry='telemetry/registry_usage.jsonl')
     runs = []
     for q in queries:
         start = time.time()
