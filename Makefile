@@ -23,3 +23,7 @@ overnight:
 
 overnight-big:
 	python scripts/overnight_run.py --regions "EU,US,''" --k 10 --queries docs/queries.txt
+
+
+overnight-registry:
+	python scripts/overnight_run.py --regions "EU,US,APAC,''" --k 10 --queries docs/queries.txt
