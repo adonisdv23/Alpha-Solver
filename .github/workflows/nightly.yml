@@ -1,0 +1,39 @@
+name: nightly
+on:
+  schedule:
+    - cron: '15 7 * * *'  # 07:15 UTC daily — adjust as needed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  run-overnight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - run: python -m pip install -U pip
+      # install whatever your project needs for runtime; add requirements.txt if you have one
+      - run: pip install -r requirements-dev.txt || true
+
+      - name: Run overnight sweep
+        env:
+          PYTHONPATH: .
+        run: |
+          python scripts/overnight_run.py --regions "EU,US,APAC,''" --k 10 --queries docs/queries.txt
+          ls -la artifacts || true
+          ls -la telemetry || true
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: overnight-artifacts
+          path: |
+            artifacts/**
+            telemetry/**
+          if-no-files-found: ignore
