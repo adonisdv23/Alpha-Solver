@@ -7,3 +7,11 @@ artifacts/
 .pytest_cache/
 .venv/
 .pytest_cache/
+
+# runtime artifacts
+artifacts/
+telemetry/
+logs/
+replays/
+__pycache__/
+*.pyc
