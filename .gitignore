@@ -3,3 +3,5 @@
 telemetry/
 artifacts/
 
+.venv/
+.pytest_cache/
