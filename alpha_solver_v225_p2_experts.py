@@ -1,7 +1,7 @@
 """Minimal stub for constrained environment"""
 import uuid
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any
 
 class EnhancedExpertSystem:
@@ -25,7 +25,7 @@ class AlphaSolver:
         return {
             "query": query,
             "session_id": self.session_id,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat().replace('+00:00','Z'),
             "version": self.version,
             "solution": solution,
             "confidence": 0.5,

@@ -1,7 +1,7 @@
 """Simple policy engine for enterprise guardrails"""
 import json
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from collections import deque
 
@@ -75,7 +75,7 @@ class PolicyEngine:
         except Exception:
             data = {"version": "0.1.0", "events": []}
         event = dict(event)
-        event["timestamp"] = datetime.utcnow().isoformat()
+        event["timestamp"] = datetime.now(timezone.utc).isoformat().replace('+00:00','Z')
         data.setdefault("events", []).append(event)
         with path.open('w', encoding='utf-8') as f:
             json.dump(data, f, indent=2)

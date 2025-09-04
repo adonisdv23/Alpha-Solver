@@ -40,7 +40,7 @@ except Exception:  # pragma: no cover - fallback when dependency missing
     HAVE_AIOHTTP = False
 from collections import deque, defaultdict, Counter, OrderedDict
 from dataclasses import dataclass, field, asdict
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from enum import Enum, auto
 from typing import Dict, List, Tuple, Optional, Any, Set, Callable, Protocol, Union
 import sys
@@ -242,7 +242,7 @@ class JSONLLogger:
     def log(self, event_type: str, data: Dict, level: str = "INFO"):
         """Log structured event"""
         entry = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat().replace('+00:00','Z'),
             "level": level,
             "event_type": event_type,
             "session_id": data.get("session_id", "unknown"),
@@ -370,7 +370,7 @@ class TelemetryExporter:
         event = {
             "event": event_name,
             "properties": properties,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat().replace('+00:00','Z'),
             "session_id": properties.get("session_id", "unknown"),
             "version": Config.VERSION
         }
@@ -411,7 +411,7 @@ class TelemetryExporter:
                 # Success
                 self.stats['exports_success'] += 1
                 self.stats['events_exported'] += len(batch)
-                self.stats['last_export'] = datetime.utcnow()
+                self.stats['last_export'] = datetime.now(timezone.utc)
                 break
                 
             except Exception as e:
@@ -472,7 +472,7 @@ class NullTelemetryExporter:
         event = {
             "event": event_name,
             "properties": properties,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat().replace('+00:00','Z'),
             "session_id": properties.get("session_id", "unknown"),
             "version": Config.VERSION,
             "sink": "null"
@@ -533,7 +533,7 @@ class ReplayHarness:
         self.recording = True
         self.current_session = ReplaySession(
             session_id=session_id,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             events=[],
             metadata=metadata or {}
         )
@@ -548,7 +548,7 @@ class ReplayHarness:
         
         event = {
             "event_type": event_type,
-            "timestamp": datetime.utcnow().isoformat() if Config.REPLAY_INCLUDE_TIMESTAMPS else None,
+            "timestamp": datetime.now(timezone.utc).isoformat().replace('+00:00','Z') if Config.REPLAY_INCLUDE_TIMESTAMPS else None,
             "data": data
         }
         
@@ -674,7 +674,7 @@ class ReplayHarness:
         return {
             "event_type": event['event_type'],
             "processed": True,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat().replace('+00:00','Z')
         }
     
     def _cleanup_old_sessions(self):
@@ -1146,7 +1146,7 @@ class PerformanceBenchmark:
     
     def _save_results(self, results: Dict):
         """Save benchmark results"""
-        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
         
         # Save JSON results
         json_path = self.output_path / f"benchmark_{timestamp}.json"
@@ -1655,7 +1655,7 @@ class AlphaSolver(BaseSolver):
             "version": self.version,
             "build": self.build,
             "session_id": self.session_id,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat().replace('+00:00','Z')
         }
         
         # Run tests
