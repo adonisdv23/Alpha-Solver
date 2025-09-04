@@ -1,107 +1,156 @@
-"""Minimal RegistryProvider (stdlib only)."""
+"""RegistryProvider with lexical scoring + priors + telemetry (stdlib only)."""
 from __future__ import annotations
 
 from pathlib import Path
 from datetime import datetime, timezone
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 import json
 
 class RegistryProvider:
-    """
-    Loads a JSONL registry (one JSON object per line), ranks rows for a query, and logs lookups.
-    Scoring:
-        score = fit * sentiment_prior * adoption_prior * (1 - risk_penalty) + cost_bonus
-    If 'fit' is missing, compute lexical fit from name/category/tags/capabilities/description.
-    """
     def __init__(self, seed_path: str, schema_path: str, telemetry_path: Optional[str] = None):
         self.seed_path = seed_path
         self.schema_path = schema_path
         self.telemetry_path = telemetry_path or "telemetry/registry_usage.jsonl"
         self.rows: List[Dict[str, Any]] = []
 
-    # ---- loading ----
+    # ------------ load ------------
     def load(self) -> None:
         p = Path(self.seed_path)
         self.rows = []
         if not p.exists():
             return
         with p.open("r", encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
+            for raw in f:
+                line = (raw or "").strip()
                 if not line:
                     continue
                 try:
                     obj = json.loads(line)
-                    # light normalization (trim strings)
+                    # normalize strings
                     for k, v in list(obj.items()):
                         if isinstance(v, str):
                             obj[k] = v.strip()
+                    # normalize list-like fields
+                    for field in (
+                        "tags","keywords","capabilities","core_capabilities",
+                        "best_integration_scenarios","limitations","risk_flags",
+                        "compliance_scope","regions"
+                    ):
+                        v = obj.get(field)
+                        if isinstance(v, str):
+                            toks = [t.strip() for t in v.replace("|",",").replace(";",",").split(",") if t.strip()]
+                            obj[field] = toks
+                    # precompute lexical bag
+                    obj["_lex_bag"] = self._tokens(" ".join(self._iter_texts(obj) or []))
                     self.rows.append(obj)
                 except Exception:
-                    # ignore malformed lines (keep minimal and stdlib-only)
                     pass
 
-    # ---- scoring helpers ----
+    # ------------ helpers ------------
     @staticmethod
-    def _lex(s: str) -> set:
-        return set("".join(ch.lower() if ch.isalnum() else " " for ch in s).split())
+    def _tokens(text: str) -> set:
+        return set("".join(ch.lower() if ch.isalnum() else " " for ch in text).split())
 
+    @staticmethod
+    def _iter_texts(obj: Any) -> Iterable[str]:
+        if obj is None:
+            return
+        if isinstance(obj, str):
+            yield obj
+        elif isinstance(obj, (list, tuple, set)):
+            for x in obj:
+                for y in RegistryProvider._iter_texts(x):
+                    yield y
+        elif isinstance(obj, dict):
+            for v in obj.values():
+                for y in RegistryProvider._iter_texts(v):
+                    yield y
+
+    def _bag_from_row(self, row: Dict[str, Any]) -> set:
+        bag = row.get("_lex_bag")
+        if isinstance(bag, set):
+            return bag
+        return self._tokens(" ".join(self._iter_texts(row) or []))
+
+    def _derive_priors(self, row: Dict[str, Any]) -> Tuple[float, float, float, float]:
+        # sentiment_prior
+        sp = row.get("sentiment_prior")
+        if isinstance(sp, (int, float)):
+            sentiment = float(sp)
+        else:
+            s10 = row.get("sentiment_score_0_10")
+            try:
+                sentiment = max(0.0, min(1.0, float(s10) / 10.0))
+            except Exception:
+                sentiment = 0.5
+
+        # adoption_prior
+        ap = row.get("adoption_prior")
+        if isinstance(ap, (int, float)):
+            adoption = float(ap)
+        else:
+            level = str(row.get("adoption_level") or "").strip().lower()
+            adoption = {"dominant": 0.9, "established": 0.75, "growing": 0.6, "early": 0.5}.get(level, 0.5)
+
+        # risk penalty (lower is better)
+        rp = row.get("risk_penalty")
+        if isinstance(rp, (int, float)):
+            risk = max(0.0, min(1.0, float(rp)))
+        else:
+            flags = row.get("risk_flags") or []
+            risk = min(0.4, 0.05 * (len(flags) if isinstance(flags, list) else 0))
+
+        # cost bonus (adds directly)
+        cb = row.get("cost_bonus")
+        cost = float(cb) if isinstance(cb, (int, float)) else 0.0
+
+        return (sentiment, adoption, risk, cost)
+
+    # ------------ scoring / ranking ------------
     def score(self, query: str, row: Dict[str, Any]) -> float:
-        fit = row.get("fit")
-        if not isinstance(fit, (int, float)):
-            bag: List[str] = []
-            for k in ("name", "category", "tags", "capabilities", "description"):
-                v = row.get(k)
-                if isinstance(v, str):
-                    bag.append(v)
-                elif isinstance(v, list):
-                    bag.extend(str(x) for x in v)
-            qt, ct = self._lex(query), self._lex(" ".join(bag))
-            overlap = len(qt & ct)
-            fit = min(1.0, overlap / max(1, len(qt)))
+        qt = self._tokens(query or "")
+        bag = self._bag_from_row(row)
+        fit = (len(qt & bag) / max(1, len(qt))) if (qt and bag) else 0.0
+        fit = max(0.0, min(1.0, fit))
+        sentiment, adoption, risk, cost = self._derive_priors(row)
+        return float(max(-1.0, min(1.0, fit * sentiment * adoption * (1.0 - risk) + cost)))
 
-        sentiment = float(row.get("sentiment_prior", 0.5) or 0.5)
-        adoption  = float(row.get("adoption_prior", 0.5) or 0.5)
-        risk_pen  = float(row.get("risk_penalty", 0.0) or 0.0)
-        cost_bonus= float(row.get("cost_bonus", 0.0) or 0.0)
-
-        try:
-            s = fit * sentiment * adoption * (1 - risk_pen) + cost_bonus
-        except Exception:
-            s = 0.0
-        return float(max(-1.0, min(1.0, s)))
-
-    # ---- ranking & telemetry ----
     def rank(self, query: str, top_k: int, region: Optional[str] = None) -> List[Dict[str, Any]]:
-        scored: List[Dict[str, Any]] = []
+        candidates: List[Dict[str, Any]] = []
         for r in self.rows:
             sc = self.score(query, r)
-            scored.append({
+            if region:
+                regions = r.get("regions")
+                if isinstance(regions, list) and regions:
+                    norm = {str(x).strip().upper() for x in regions}
+                    if region.upper() not in norm and "GLOBAL" not in norm:
+                        sc *= 0.8
+            candidates.append({
                 "id": r.get("id") or r.get("vendor_id") or r.get("name"),
                 "name": r.get("name"),
-                "vendor_id": r.get("vendor_id"),
                 "score": sc,
             })
-        scored.sort(key=lambda x: (-x["score"], x.get("name") or ""))
-        selected = scored[: max(0, int(top_k))]
 
-        self.log_event({
-            "query": query,
-            "candidates": [{"id": c["id"], "score": c["score"]} for c in scored[:50]],
-            "selected":   [{"id": s["id"], "score": s["score"]} for s in selected],
-            "rationale": f"ranked {len(scored)} candidates",
-        })
-        return selected
+        candidates.sort(key=lambda x: x["score"], reverse=True)
+        out = candidates[: max(1, int(top_k))]
 
-    def log_event(self, event: Dict[str, Any]) -> None:
         try:
-            Path(self.telemetry_path).parent.mkdir(parents=True, exist_ok=True)
-            ev = {
-                "ts": datetime.now(timezone.utc).isoformat().replace("+00:00","Z"),
-                **event,
-            }
-            with Path(self.telemetry_path).open("a", encoding="utf-8") as f:
-                f.write(json.dumps(ev, ensure_ascii=False) + "\n")
+            self._log(query, candidates[:20], out)
         except Exception:
-            # never throw from telemetry
             pass
+
+        return out
+
+    # ------------ telemetry ------------
+    def _log(self, query: str, candidates: List[Dict[str, Any]], selected: List[Dict[str, Any]]) -> None:
+        rec = {
+            "ts": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "query": query,
+            "candidates": [{"id": c["id"], "score": round(float(c["score"]), 6)} for c in candidates],
+            "selected": [{"id": s["id"], "score": round(float(s["score"]), 6)} for s in selected],
+            "rationale": "lexical_match * sentiment * adoption * (1-risk) + cost_bonus",
+        }
+        tp = Path(self.telemetry_path or "telemetry/registry_usage.jsonl")
+        tp.parent.mkdir(parents=True, exist_ok=True)
+        with tp.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(rec, ensure_ascii=False) + "\n")
