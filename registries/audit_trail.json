@@ -1040,6 +1040,206 @@
         ]
       },
       "timestamp": "2025-09-04T05:54:24.020077Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T05:54:32.968044Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T05:54:32.971145Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T05:54:32.974125Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T05:54:33.083221Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T05:54:33.137014Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T06:05:16.206745Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T06:05:16.209905Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T06:05:16.212958Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T06:05:16.319841Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T06:05:16.374112Z"
     }
   ]
 }
