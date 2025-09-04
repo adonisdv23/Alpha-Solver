@@ -164,7 +164,7 @@ class JSONLLogger:
     Provides machine-readable logs for analysis and debugging
     """
     
-    def __init__(self, log_path: str = None):
+    def __init__(self, log_path: str = None, registry_seed: str = \"\", registry_schema: str = \"schemas/registry_schema_v1.json\", registry_telemetry: str = \"telemetry/registry_usage.jsonl\"):
         self.log_path = Path(log_path or Config.JSONL_LOG_PATH)
         self.log_path.parent.mkdir(parents=True, exist_ok=True)
         
@@ -1512,6 +1512,17 @@ class AlphaSolver(BaseSolver):
         self.tools_canon_path = tools_canon_path
         self.region = region
         self.domain = domain
+        self.registry_seed = registry_seed
+        self.registry_schema = registry_schema
+        self.registry_telemetry = registry_telemetry
+        self.registry_provider = None
+        try:
+            if self.registry_seed and Path(self.registry_seed).exists():
+                from alpha.core.registry_provider import RegistryProvider
+                self.registry_provider = RegistryProvider(self.registry_seed, self.registry_schema, self.registry_telemetry)
+                self.registry_provider.load()
+        except Exception as e:  # pragma: no cover
+            logger.warning(f"registry provider init failed: {e}")
         
         # Update version
         self.version = Config.VERSION
@@ -1573,6 +1584,9 @@ class AlphaSolver(BaseSolver):
                 canon = loader_tools.load_tools_canon(self.tools_canon_path)
                 shortlist = selector.rank_region(canon, region=self.region, top_k=self.k, clusters=clusters)
                 source = "canon+region"
+            elif self.registry_provider:
+                shortlist = self.registry_provider.rank(query, self.k, region=self.region or None)
+                source = "registry"
             elif self.tools_canon_path:
                 canon = loader_tools.load_tools_canon(self.tools_canon_path)
                 shortlist = selector.rank_from(canon, top_k=self.k)
@@ -1710,6 +1724,9 @@ def main():
     parser.add_argument("--tools-canon", default="")
     parser.add_argument("--region", default="")
     parser.add_argument("--domain", default="")
+    parser.add_argument("--registry-seed", default="")
+    parser.add_argument("--registry-schema", default="schemas/registry_schema_v1.json")
+    parser.add_argument("--registry-telemetry", default="telemetry/registry_usage.jsonl")
     args = parser.parse_args()
 
     if args.no_benchmark:
@@ -1725,7 +1742,10 @@ def main():
     print(f"  aiohttp   : {'enabled' if HAVE_AIOHTTP else 'fallback nullsink'}")
     print(f"  psutil    : {'enabled' if HAVE_PSUTIL else 'tracemalloc fallback'}")
 
-    solver = AlphaSolver(registries_path=args.registries, k=args.k, deterministic=args.deterministic, tools_canon_path=args.tools_canon, region=args.region, domain=args.domain)
+    solver = AlphaSolver(registries_path=args.registries, k=args.k, deterministic=args.deterministic, tools_canon_path=args.tools_canon, region=args.region, domain=args.domain,
+                         registry_seed=args.registry_seed,
+                         registry_schema=args.registry_schema,
+                         registry_telemetry=args.registry_telemetry)
     result = solver.solve("smoke test query")
 
     acc_score = result.get('accessibility', {}).get('score') if isinstance(result.get('accessibility'), dict) else None
