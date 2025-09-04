@@ -1240,6 +1240,2646 @@
         ]
       },
       "timestamp": "2025-09-04T06:05:16.374112Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:09.449202Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:09.458747Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:09.466959Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:09.782879Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:09.899400Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.374722Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.379124Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.384633Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.389769Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.395097Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.400617Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.405923Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.411343Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.445016Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.456875Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.462531Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.468264Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.474024Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.482536Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.492981Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.499790Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.537136Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.541042Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.546289Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.550102Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.554124Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.557955Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.562522Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.569641Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.591441Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.643665Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.649356Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.655293Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.661133Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.667055Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.673225Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.683371Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.914562Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.918781Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.922768Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:10.993567Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:11:11.052037Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:30.807663Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:30.816426Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:30.823593Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:30.830862Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:30.838156Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:30.866695Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:30.875789Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:30.885057Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:30.892749Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:30.902316Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:30.925673Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:30.934327Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:30.942317Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:30.950942Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:30.960853Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:30.982855Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:30.994999Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:31.004531Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:31.015315Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:31.024927Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:31.192160Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:31.200694Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:31.209856Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:31.373370Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:31.450131Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:40.889942Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:40.898277Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:40.905803Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:41.138844Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:16:41.223219Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:15.489045Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:15.496890Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:15.504493Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:15.682233Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:15.750627Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:16.276812Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:16.285611Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:16.293410Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:16.465028Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:16.532759Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:16.979744Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:16.990146Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.000891Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.012080Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.024198Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.053298Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.066325Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.075881Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.087662Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.098541Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.128546Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.140789Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.150727Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.162328Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.173661Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.202636Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.217482Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.232603Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.244303Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.255145Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.420160Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.429483Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.437834Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.509571Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:34:17.602542Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:39:33.715523Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:39:33.724084Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:39:33.733065Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:39:34.102955Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:39:34.164405Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:39:34.583627Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:39:34.592949Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:39:34.601464Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:39:34.768056Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:39:34.866870Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:48:11.226520Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:48:11.236526Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:48:11.245307Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:48:11.432427Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:48:11.497953Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:48:11.929477Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:48:11.938976Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:48:11.947849Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:48:12.119214Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:48:12.185926Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:51:28.766557Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:51:28.776459Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:51:28.785346Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:51:28.939298Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-04T18:51:29.017497Z"
     }
   ]
 }
