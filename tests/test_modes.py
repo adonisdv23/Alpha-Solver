@@ -4,7 +4,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[1]
 CLI = ["python", "-m", "alpha.cli"]
 
 
@@ -15,7 +15,8 @@ def write_query(tmp_path):
 
 
 def run_cli(args, tmp_path):
-    env = dict(**os.environ, PYTHONPATH=str(REPO_ROOT))
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(REPO_ROOT)
     return subprocess.run(CLI + args, cwd=REPO_ROOT, env=env, capture_output=True, text=True)
 
 def test_plan_only(tmp_path):
