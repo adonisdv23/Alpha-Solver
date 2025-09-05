@@ -126,3 +126,40 @@ def _extract_ids(obj) -> list:
 
 if __name__ == "__main__":
     sys.exit(main())
+
+import json
+from pathlib import Path
+from typing import Any, Dict
+try:
+    import jsonschema  # optional
+except Exception:
+    jsonschema = None
+
+def _basic_registry_checks(tools: list[Dict[str,Any]]) -> None:
+    seen = set()
+    required = ("tool_id","name","description")
+    for t in tools:
+        for k in required:
+            if not t.get(k):
+                raise SystemExit(f"[preflight] Missing required field '{k}' in {t}")
+        tid = t["tool_id"]
+        if tid in seen:
+            raise SystemExit(f"[preflight] Duplicate tool_id: {tid}")
+        seen.add(tid)
+        for k in ("sentiment","adoption","risk","cost"):
+            v = t.get("priors",{}).get(k)
+            if v is not None and not (0.0 <= float(v) <= 1.0):
+                raise SystemExit(f"[preflight] Prior {k} out of range [0,1]: {v} in {tid}")
+
+def validate_registry(path: str) -> None:
+    data = [json.loads(line) for line in Path(path).read_text(encoding="utf-8").splitlines()]
+    _basic_registry_checks(data)
+    schema_path = Path("schemas/registry_tool.schema.json")
+    if jsonschema and schema_path.exists():
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+        for obj in data:
+            jsonschema.validate(obj, schema)
+    print(f"[preflight] OK. tools={len(data)}")
+
+if __name__ == "__main__":
+    validate_registry("registries/registry_seed_v0_7_0.jsonl")

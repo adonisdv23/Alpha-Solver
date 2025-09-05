@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from telemetry_tools import write_run_header, sha1_query
 #!/usr/bin/env python3
 """Overnight pipeline for Alpha Solver"""
 import json
