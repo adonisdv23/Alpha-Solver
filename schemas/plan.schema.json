@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Plan",
+  "type": "object",
+  "properties": {
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "tool_id": {"type": "string"},
+          "estimated_cost_usd": {"type": "number"},
+          "adapter": {"type": ["string", "null"]}
+        },
+        "required": ["tool_id", "estimated_cost_usd"]
+      }
+    },
+    "estimated_cost_usd": {"type": "number"},
+    "breaker": {"type": "object"},
+    "audit_log": {"type": ["string", "null"]},
+    "instructions_only": {"type": "boolean"}
+  },
+  "required": ["steps", "estimated_cost_usd"]
+}

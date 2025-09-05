@@ -1,0 +1,3 @@
+breakers:
+  default:
+    trip_count: 100
