@@ -1,0 +1,6 @@
+enable_logging: true
+enable_telemetry: false
+enable_replay: true
+enable_accessibility: false
+log_path: artifacts/logs/events.jsonl
+replay_dir: artifacts/replay
