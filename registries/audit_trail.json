@@ -3880,6 +3880,106 @@
         ]
       },
       "timestamp": "2025-09-04T18:51:29.017497Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-05T16:46:18.755213Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-05T16:46:18.767623Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-05T16:46:18.778277Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-05T16:46:19.758567Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-05T16:46:19.848787Z"
     }
   ]
 }

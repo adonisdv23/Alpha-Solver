@@ -2,7 +2,7 @@ preflight: ## Validate IDs & registries
 	python scripts/preflight.py
 
 test: ## Run tests
-pytest -q
+	pytest -q
 
 sweep: ## Rebuild canon & sweep queries
 	python scripts/build_tools_canon.py
