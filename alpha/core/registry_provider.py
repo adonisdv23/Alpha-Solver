@@ -1,5 +1,6 @@
+import os
 """RegistryProvider with lexical scoring + priors + telemetry (stdlib only)."""
-from __future__ import os
+from __future__ import annotations
 from .semantic import hybrid_score
 import annotations
 

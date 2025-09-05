@@ -4340,6 +4340,66 @@
         ]
       },
       "timestamp": "2025-09-05T20:27:49.811989Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-05T20:29:58.819673Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-05T20:29:58.830436Z"
+    },
+    {
+      "event": "policy.sample",
+      "budget": {
+        "ok": true,
+        "action": "allow",
+        "reason": ""
+      },
+      "cb": {
+        "state": "closed",
+        "allow": true
+      },
+      "dc": {
+        "allow": true,
+        "masked": true,
+        "notes": [
+          "masked:phi"
+        ]
+      },
+      "timestamp": "2025-09-05T20:29:58.840096Z"
     }
   ]
 }
