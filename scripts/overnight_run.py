@@ -20,6 +20,16 @@ parser.add_argument("--k", type=int, default=5, help="top-N tools")
 parser.add_argument("--queries", default="", help="path to queries file")
 args = parser.parse_args()
 
+    run_id = None
+    telemetry_path = getattr(args, 'telemetry', None)
+    if telemetry_path:
+        run_id = write_run_header(
+            telemetry_path,
+            regions=[r.strip() for r in args.regions.split(',')] if hasattr(args,'regions') and args.regions else [],
+            queries_source='args',
+            code_version=os.getenv('GIT_COMMIT_SHA','')
+        )
+
 ART_DIR = Path('artifacts')
 ART_DIR.mkdir(exist_ok=True)
 SHORTLIST_DIR = ART_DIR / 'shortlists' / datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
