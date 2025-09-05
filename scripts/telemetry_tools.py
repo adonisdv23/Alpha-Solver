@@ -13,7 +13,7 @@ def write_run_header(path: str, regions: list[str], queries_source: str = "", co
     header = {
         "type": "run_header",
         "run_id": run_id,
-        "started_at": dt.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "started_at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "regions": regions,
         "queries_source": queries_source,
         "code_version": code_version or os.getenv("GIT_COMMIT_SHA","")

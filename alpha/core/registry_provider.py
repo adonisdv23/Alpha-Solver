@@ -2,8 +2,8 @@ from __future__ import annotations
 import os
 from .semantic import hybrid_score
 
+
 """RegistryProvider with lexical scoring + priors + telemetry (stdlib only)."""
-import annotations
 
 from pathlib import Path
 from datetime import datetime, timezone
