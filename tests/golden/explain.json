@@ -1,0 +1,61 @@
+{
+  "version": "1.0",
+  "run": {
+    "timestamp": "TS",
+    "region": "US",
+    "query": "email automation with Gmail",
+    "seed": 1234
+  },
+  "inputs": {
+    "k": 1,
+    "region": "US",
+    "query": "email automation with Gmail",
+    "shortlist_ref": null
+  },
+  "steps": [
+    {
+      "tool_id": "Monday.com",
+      "prompt": "",
+      "adapter": "openai",
+      "reasons": {
+        "region_filter": "allowed",
+        "synergy_notes": "clusters bonus applied",
+        "ties": []
+      },
+      "confidence": 1.0,
+      "estimated_cost_usd": 0.0
+    }
+  ],
+  "guards": {
+    "budget": {
+      "version": "0.1.0",
+      "limits": {
+        "monthly_usd": 1000,
+        "per_call_usd": 2
+      },
+      "throttle": {
+        "per_minute": 60
+      },
+      "actions": {
+        "on_breach": "halt"
+      }
+    },
+    "circuit_breakers": {
+      "version": "0.1.0",
+      "rules": [
+        {
+          "key": "vendor:demo.vendor",
+          "open_after": 5,
+          "cooldown_s": 60
+        }
+      ]
+    },
+    "audit": {}
+  },
+  "fallbacks": [],
+  "artifacts": {
+    "shortlist_snapshot": "PATH",
+    "plan_path": "PATH"
+  },
+  "estimated_cost_usd": 0.0
+}

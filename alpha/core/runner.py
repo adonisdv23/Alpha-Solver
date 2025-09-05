@@ -2,6 +2,8 @@
 from __future__ import annotations
 from typing import Dict, List
 
+from .plan import Plan
+
 from .governance import CircuitBreaker, AuditLogger
 from .prompt_writer import PromptWriter
 from alpha.adapters import ADAPTERS
@@ -28,4 +30,15 @@ def run(plan: Dict, *, execute: bool = False) -> List[Dict]:
         else:
             trace.append({"tool_id": step.get("tool_id"), "executed": True})
     plan["audit_log"] = str(audit.path)
+    return trace
+
+
+def run_plan(plan: Plan, local_only: bool = True) -> List[Dict]:
+    """Execute a Plan dataclass; external steps skipped when local_only."""
+    wrapper = {
+        "steps": [s.to_dict() for s in plan.steps],
+        "breaker": plan.guards.circuit_breakers,
+    }
+    trace = run(wrapper, execute=not local_only)
+    plan.guards.audit = {"log_path": wrapper.get("audit_log")}
     return trace
