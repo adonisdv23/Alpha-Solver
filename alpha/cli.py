@@ -4,37 +4,66 @@ import sys
 from pathlib import Path
 from typing import List
 
+from . import __version__
 from .core import loader, selector, orchestrator, runner
+from .core.determinism import apply_seed
 from .core.paths import ensure_dir, write_json_atomic, timestamp_rfc3339z
 
 
 def parse_queries(path: str) -> List[str]:
     p = Path(path)
-    if p.is_file():
-        return [line.strip() for line in p.read_text(encoding="utf-8").splitlines() if line.strip()]
-    return []
+    if not p.is_file():
+        raise FileNotFoundError(path)
+    return [line.strip() for line in p.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
 def main(argv: List[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Alpha Solver CLI")
+    parser = argparse.ArgumentParser(
+        description="Alpha Solver CLI",
+        epilog=(
+            "Examples:\n"
+            "  python -m alpha.cli --plan-only --queries docs/queries.txt\n"
+            "  python -m alpha.cli --execute --regions 'US' --queries docs/queries.txt\n"
+            "  python -m alpha.cli --explain --regions 'EU' --queries docs/queries.txt"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
     modes = parser.add_mutually_exclusive_group()
-    modes.add_argument("--plan-only", action="store_true", help="build plan only")
+    modes.add_argument("--plan-only", "--dry-run", action="store_true", dest="plan_only", help="build plan only")
     modes.add_argument("--explain", action="store_true", help="build plan with explanations")
     modes.add_argument("--execute", action="store_true", help="build and execute plan")
     parser.add_argument("--regions", default="US", help="comma-separated regions")
     parser.add_argument("--k", type=int, default=5, help="top-N tools")
     parser.add_argument("--queries", default="docs/queries.txt", help="queries file")
+    parser.add_argument("--outdir", default="artifacts", help="output directory")
     parser.add_argument("--seed", type=int, default=None, help="optional seed")
+    parser.add_argument("--version", action="store_true", help="print version and exit")
+    parser.add_argument("--policy-dryrun", action="store_true", help="policy dry run (no enforcement)")
     args = parser.parse_args(argv)
+
+    if args.version:
+        print(f"Alpha Solver {__version__}")
+        return 0
+
+    seed = apply_seed(args.seed)
+    print(f"Using seed: {seed}")
 
     loader.load_all("registries")
 
     regions = [r.strip() for r in args.regions.split(',') if r.strip()]
     if not regions:
-        regions = [""]
-    queries = parse_queries(args.queries)
+        print("No regions specified", file=sys.stderr)
+        return 2
+    try:
+        queries = parse_queries(args.queries)
+    except FileNotFoundError:
+        print(f"Queries file not found: {args.queries}", file=sys.stderr)
+        return 2
+    if not queries:
+        print("No queries found", file=sys.stderr)
+        return 2
 
-    artifact_dir = ensure_dir("artifacts")
+    artifact_dir = ensure_dir(args.outdir)
 
     exit_code = 0
     for region in regions:
@@ -52,9 +81,15 @@ def main(argv: List[str] | None = None) -> int:
                 args.k,
                 clusters=loader.REGISTRY_CACHE.get("clusters"),
             )
-            plan = orchestrator.build_plan(query, region, args.k, shortlist, loader.REGISTRY_CACHE.get("budget_controls"))
-            if args.seed is not None:
-                plan.run["seed"] = args.seed
+            plan = orchestrator.build_plan(
+                query,
+                region,
+                args.k,
+                shortlist,
+                loader.REGISTRY_CACHE.get("budget_controls"),
+                seed=seed,
+                policy_dryrun=args.policy_dryrun,
+            )
 
             ts = plan.run.get("timestamp") or timestamp_rfc3339z()
             plan_dir = ensure_dir(Path(artifact_dir) / "plans" / ts)

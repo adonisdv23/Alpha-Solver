@@ -2,6 +2,7 @@ import json
 import os
 import shutil
 import subprocess
+import json
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -25,6 +26,11 @@ def normalize_plan(data):
     data["run"]["timestamp"] = "TS"
     data["artifacts"]["plan_path"] = "PATH"
     data["artifacts"]["shortlist_snapshot"] = "PATH"
+    for step in data.get("steps", []):
+        step.pop("mode", None)
+        step.pop("enrichment", None)
+    data["guards"].pop("policy_dryrun", None)
+    data["guards"].pop("policy_notes", None)
     return data
 
 

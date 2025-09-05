@@ -1,0 +1,3 @@
+rules:
+  - match: "pii|secret|token"
+    action: "instructions_only"

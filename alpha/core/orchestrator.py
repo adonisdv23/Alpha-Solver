@@ -5,7 +5,7 @@ from typing import Dict, List, Any
 from .loader import REGISTRY_CACHE
 from .plan import Plan, PlanStep, Guardrails
 from .paths import timestamp_rfc3339z
-from .governance import BudgetControls
+from .governance import BudgetControls, DataClassifier
 
 
 def _tool_cost(tool_id: str) -> float:
@@ -21,7 +21,16 @@ def _tool_cost(tool_id: str) -> float:
     return 0.0
 
 
-def build_plan(query: str, region: str, k: int, shortlist: List[Dict[str, Any]], budget_cfg: Dict[str, Any] | None) -> Plan:
+def build_plan(
+    query: str,
+    region: str,
+    k: int,
+    shortlist: List[Dict[str, Any]],
+    budget_cfg: Dict[str, Any] | None,
+    *,
+    seed: int | None = None,
+    policy_dryrun: bool = False,
+) -> Plan:
     """Construct a Plan from selector shortlist without executing."""
     timestamp = timestamp_rfc3339z()
 
@@ -35,6 +44,7 @@ def build_plan(query: str, region: str, k: int, shortlist: List[Dict[str, Any]],
         prompt = item.get("prompt", "")
         adapter = item.get("family") or default_adapter
         reasons = item.get("reasons", {})
+        enrichment = item.get("enrichment", {})
         confidence = item.get("confidence")
         cost = _tool_cost(tool_id)
         steps.append(
@@ -45,6 +55,7 @@ def build_plan(query: str, region: str, k: int, shortlist: List[Dict[str, Any]],
                 reasons=reasons,
                 confidence=confidence,
                 estimated_cost_usd=cost,
+                enrichment=enrichment,
             )
         )
 
@@ -57,7 +68,7 @@ def build_plan(query: str, region: str, k: int, shortlist: List[Dict[str, Any]],
 
     plan = Plan(
         version="1.0",
-        run={"timestamp": timestamp, "region": region, "query": query, "seed": None},
+        run={"timestamp": timestamp, "region": region, "query": query, "seed": seed},
         inputs={"k": k, "region": region, "query": query, "shortlist_ref": None},
         steps=steps,
         guards=guards,
@@ -65,6 +76,13 @@ def build_plan(query: str, region: str, k: int, shortlist: List[Dict[str, Any]],
         artifacts={"shortlist_snapshot": None, "plan_path": None},
         estimated_cost_usd=total,
     )
+
+    classifier = DataClassifier.load()
+    report = classifier.enforce(plan, dryrun=policy_dryrun)
+    if policy_dryrun:
+        plan.guards.policy_dryrun = True
+    if report.notes:
+        plan.guards.policy_notes.extend(report.notes)
     return plan
 
 
