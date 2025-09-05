@@ -4,6 +4,9 @@ preflight: ## Validate IDs & registries
 test: ## Run tests
 	pytest -q
 
+regression: ## Run regression suite
+	PYTHONPATH=. python -m alpha.core.regression
+
 sweep: ## Rebuild canon & sweep queries
 	python scripts/build_tools_canon.py
 	PYTHONPATH=. python scripts/overnight_run.py --regions "US,EU,APAC" --k 5 --queries docs/queries.txt

@@ -39,16 +39,39 @@ def main(argv: List[str] | None = None) -> int:
     parser.add_argument("--seed", type=int, default=None, help="optional seed")
     parser.add_argument("--version", action="store_true", help="print version and exit")
     parser.add_argument("--policy-dryrun", action="store_true", help="policy dry run (no enforcement)")
+    parser.add_argument("--benchmark", action="store_true", help="run benchmark suite")
+    parser.add_argument("--replay", help="replay a saved session id")
     args = parser.parse_args(argv)
 
     if args.version:
         print(f"Alpha Solver {__version__}")
         return 0
 
+    if args.replay:
+        from .core.replay import ReplayHarness
+
+        harness = ReplayHarness()
+        session = harness.load(args.replay)
+        for ev in session.events:
+            print(ev)
+        return 0
+
+    if args.benchmark:
+        from .core.benchmark import benchmark
+
+        queries = parse_queries(args.queries)
+        benchmark(lambda q: None, queries)
+        return 0
+
     seed = apply_seed(args.seed)
     print(f"Using seed: {seed}")
 
     loader.load_all("registries")
+
+    from .core.observability import ObservabilityManager
+
+    obs = ObservabilityManager()
+    obs.log_event({"event": "start", "seed": seed})
 
     regions = [r.strip() for r in args.regions.split(',') if r.strip()]
     if not regions:
@@ -90,6 +113,7 @@ def main(argv: List[str] | None = None) -> int:
                 seed=seed,
                 policy_dryrun=args.policy_dryrun,
             )
+            obs.log_event({"event": "plan", "region": region, "query": query})
 
             ts = plan.run.get("timestamp") or timestamp_rfc3339z()
             plan_dir = ensure_dir(Path(artifact_dir) / "plans" / ts)
@@ -117,6 +141,9 @@ def main(argv: List[str] | None = None) -> int:
                 if any("error" in t for t in trace):
                     exit_code = 1
 
+    session_id = obs.close()
+    if session_id:
+        print(f"Replay session saved: {session_id}")
     return exit_code
 
 
