@@ -3,22 +3,64 @@
   "title": "Plan",
   "type": "object",
   "properties": {
+    "version": {"type": "string"},
+    "run": {
+      "type": "object",
+      "properties": {
+        "timestamp": {"type": "string"},
+        "region": {"type": "string"},
+        "query": {"type": "string"},
+        "seed": {"type": ["number", "string", "null"]}
+      },
+      "required": ["timestamp", "region", "query"]
+    },
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "k": {"type": "number"},
+        "region": {"type": "string"},
+        "query": {"type": "string"},
+        "shortlist_ref": {"type": ["string", "null"]}
+      },
+      "required": ["k", "region", "query"]
+    },
     "steps": {
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
           "tool_id": {"type": "string"},
-          "estimated_cost_usd": {"type": "number"},
-          "adapter": {"type": ["string", "null"]}
+          "prompt": {"type": "string"},
+          "adapter": {"type": ["string", "null"]},
+          "reasons": {"type": "object"},
+          "confidence": {"type": ["number", "null"]},
+          "estimated_cost_usd": {"type": "number"}
         },
-        "required": ["tool_id", "estimated_cost_usd"]
+        "required": ["tool_id", "prompt", "estimated_cost_usd"]
       }
     },
-    "estimated_cost_usd": {"type": "number"},
-    "breaker": {"type": "object"},
-    "audit_log": {"type": ["string", "null"]},
-    "instructions_only": {"type": "boolean"}
+    "guards": {
+      "type": "object",
+      "properties": {
+        "budget": {"type": "object"},
+        "circuit_breakers": {"type": "object"},
+        "audit": {"type": "object"}
+      },
+      "required": ["budget", "circuit_breakers", "audit"]
+    },
+    "fallbacks": {
+      "type": "array",
+      "items": {"type": "object"}
+    },
+    "artifacts": {
+      "type": "object",
+      "properties": {
+        "shortlist_snapshot": {"type": ["string", "null"]},
+        "plan_path": {"type": ["string", "null"]}
+      },
+      "required": ["shortlist_snapshot", "plan_path"]
+    },
+    "estimated_cost_usd": {"type": "number"}
   },
-  "required": ["steps", "estimated_cost_usd"]
+  "required": ["version", "run", "inputs", "steps", "guards", "fallbacks", "artifacts", "estimated_cost_usd"]
 }

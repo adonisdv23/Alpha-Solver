@@ -10,6 +10,9 @@ import argparse
 from pathlib import Path
 import zipfile
 
+from alpha.core import orchestrator, loader
+from alpha.core.paths import ensure_dir, write_json_atomic
+
 parser = argparse.ArgumentParser(description="Alpha Solver overnight pipeline")
 parser.add_argument("--regions", default="EU,''", help="comma-separated regions; '' means no-region")
 parser.add_argument("--k", type=int, default=5, help="top-N tools")
@@ -24,6 +27,8 @@ SHORTLIST_DIR.mkdir(parents=True, exist_ok=True)
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+
+loader.load_all('registries')
 
 regions: list[str] = []
 for r in args.regions.split(','):
@@ -118,6 +123,15 @@ def run_solver(region: str):
             fname = f"{label_region}_{slugify(q)}.json"
             path = SHORTLIST_DIR / fname
             path.write_text(json.dumps(payload, indent=2), encoding='utf-8')
+
+            plan = orchestrator.build_plan(q, region, args.k, res.get('shortlist', []), loader.REGISTRY_CACHE.get('budget_controls'))
+            plan.artifacts['shortlist_snapshot'] = str(path)
+            ts = plan.run.get('timestamp')
+            plan_dir = ensure_dir(Path('artifacts') / 'plans' / ts)
+            plan_path = plan_dir / 'plan.json'
+            plan.artifacts['plan_path'] = str(plan_path)
+            write_json_atomic(plan_path, plan.to_dict())
+            write_json_atomic(Path('artifacts') / 'last_plan.json', plan.to_dict())
             for t in res.get('shortlist', []):
                 tid = t.get('id')
                 if not tid:
