@@ -8,7 +8,6 @@ import sys
 import time
 import argparse
 from pathlib import Path
-from datetime import datetime
 import zipfile
 
 parser = argparse.ArgumentParser(description="Alpha Solver overnight pipeline")
@@ -19,6 +18,8 @@ args = parser.parse_args()
 
 ART_DIR = Path('artifacts')
 ART_DIR.mkdir(exist_ok=True)
+SHORTLIST_DIR = ART_DIR / 'shortlists' / datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
+SHORTLIST_DIR.mkdir(parents=True, exist_ok=True)
 
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
@@ -65,6 +66,10 @@ def run_json(cmd):
         log(f"ERROR: {' '.join(cmd)} -> {e}")
         return {"error": str(e)}
 
+
+def slugify(txt: str) -> str:
+    return ''.join(c if c.isalnum() else '_' for c in txt)[:50]
+
 # Step A
 log("Step A: preflight")
 summary['preflight'] = run_json([sys.executable, 'scripts/preflight.py'])
@@ -103,6 +108,16 @@ def run_solver(region: str):
                 "plan_steps": steps,
                 "time_ms": elapsed
             })
+            payload = {
+                "timestamp": datetime.now(timezone.utc).isoformat().replace('+00:00','Z'),
+                "region": region,
+                "query": q,
+                "shortlist": res.get('shortlist', [])
+            }
+            label_region = region if region else 'none'
+            fname = f"{label_region}_{slugify(q)}.json"
+            path = SHORTLIST_DIR / fname
+            path.write_text(json.dumps(payload, indent=2), encoding='utf-8')
             for t in res.get('shortlist', []):
                 tid = t.get('id')
                 if not tid:

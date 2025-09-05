@@ -71,7 +71,10 @@ def build():
         writer.writeheader()
         writer.writerows(rows)
     print(f'wrote {len(rows)} rows to {out_path}')
+    return {"rows_canon": len(rows), "path": str(out_path)}
 
 
 if __name__ == '__main__':
-    build()
+    metrics = build()
+    # Emit JSON on the last line for automation hooks
+    print(json.dumps(metrics))

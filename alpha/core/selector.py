@@ -44,10 +44,10 @@ def rank_region(
     clusters: Dict[str, Any] | None = None,
 ) -> List[Dict[str, Any]]:
     """
-    Region-aware ranking for smoke tests:
+    Region-aware ranking with simple explanations:
       • In EU, exclude vendor_id 'cn_state_cloud'.
       • Add a small positive synergy_bonus when a clusters map is provided.
-      • Expose a public 'score' field = base router_value + synergy_bonus.
+      • Return detailed scoring fields and reason annotations.
     """
     region = (region or "").upper()
     banned_vendors_in_eu = {"cn_state_cloud"}
@@ -67,17 +67,40 @@ def rank_region(
     for t in eligible:
         base = _as_float(t.get("router_value", 0))
         item = dict(t)  # shallow copy
+        item["score_base"] = base
+        item["synergy_bonus"] = bonus
+        final = base + bonus
+        item["final_score"] = final
+        item["score"] = final  # backwards compatible
         reasons = dict(item.get("reasons", {}))
-        reasons["synergy_bonus"] = bonus
+        reasons["region_filter"] = "allowed"
+        reasons["synergy_notes"] = "clusters bonus applied" if bonus else ""
         item["reasons"] = reasons
-        item["score"] = base + bonus           # <-- keep a public score
         enriched.append(item)
 
     ranked = sorted(
         enriched,
-        key=lambda t: (-_as_float(t.get("score", 0)), str(t.get("id", "")))
+        key=lambda t: (-_as_float(t.get("final_score", 0)), str(t.get("id", "")))
     )
-    return ranked[:top_k]
+    top = ranked[:top_k]
+
+    # Annotate ties among returned items
+    score_groups: Dict[float, List[Dict[str, Any]]] = {}
+    for item in top:
+        score_groups.setdefault(item["final_score"], []).append(item)
+    for group in score_groups.values():
+        ids = sorted(t.get("id", "") for t in group)
+        for item in group:
+            item.setdefault("reasons", {})
+            item["reasons"]["ties"] = [i for i in ids if i != item.get("id", "")]
+
+    # Confidence scaled to top score
+    max_score = max((t["final_score"] for t in top), default=0.0)
+    for item in top:
+        conf = (item["final_score"] / max_score) if max_score > 0 else 0.0
+        item["confidence"] = max(0.0, min(1.0, conf))
+
+    return top
 
 def rank(top_k: int = 5) -> List[Dict[str, Any]]:
     """
