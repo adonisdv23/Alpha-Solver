@@ -1,10 +1,11 @@
 """Governance helpers: budget controls, circuit breakers, audit logging"""
 from __future__ import annotations
 import json
-from dataclasses import dataclass
+import re
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 from .loader import parse_yaml_lite
 
@@ -77,3 +78,43 @@ class AuditLogger:
         event["ts"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
         with self.path.open("a", encoding="utf-8") as f:
             f.write(json.dumps(event, ensure_ascii=False) + "\n")
+
+
+# ---------------- Data Classification ----------------
+
+
+@dataclass
+class EnforcementReport:
+    downgraded: List[int] = field(default_factory=list)
+    notes: List[str] = field(default_factory=list)
+
+
+class DataClassifier:
+    def __init__(self, rules: List[Dict[str, str]]):
+        self.rules = rules
+
+    @staticmethod
+    def load(path: str = "config/data_classification.yaml") -> "DataClassifier":
+        p = Path(path)
+        rules: List[Dict[str, str]] = []
+        if p.exists():
+            data = parse_yaml_lite(p.read_text(encoding="utf-8"))
+            if isinstance(data, dict):
+                rules = data.get("rules", []) or []
+        return DataClassifier(rules)
+
+    def enforce(self, plan, *, dryrun: bool = False) -> EnforcementReport:
+        report = EnforcementReport()
+        for idx, step in enumerate(plan.steps):
+            prompt = step.prompt.lower()
+            for rule in self.rules:
+                pattern = rule.get("match", "")
+                action = rule.get("action", "")
+                if pattern and re.search(pattern, prompt):
+                    note = f"step{idx}:{action}:{pattern}"
+                    report.notes.append(note)
+                    if action == "instructions_only" and not dryrun:
+                        step.mode = "instructions_only"
+                        report.downgraded.append(idx)
+                    break
+        return report

@@ -1,2 +1,18 @@
-test:
-	PYTHONPATH=. python -m pytest -q
+preflight: ## Validate IDs & registries
+	python scripts/preflight.py
+
+test: ## Run tests
+pytest -q
+
+sweep: ## Rebuild canon & sweep queries
+	python scripts/build_tools_canon.py
+	PYTHONPATH=. python scripts/overnight_run.py --regions "US,EU,APAC" --k 5 --queries docs/queries.txt
+
+plan: ## Plan only (CLI)
+	PYTHONPATH=. python -m alpha.cli --plan-only --regions "US" --k 3 --queries docs/queries.txt
+
+explain: ## Explain mode (CLI)
+	PYTHONPATH=. python -m alpha.cli --explain --regions "US" --k 3 --queries docs/queries.txt
+
+exec: ## Execute local-only (CLI)
+	PYTHONPATH=. python -m alpha.cli --execute --regions "US" --k 3 --queries docs/queries.txt

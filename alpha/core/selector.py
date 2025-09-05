@@ -1,4 +1,7 @@
 from __future__ import annotations
+import csv
+import json
+from pathlib import Path
 from typing import Any, Dict, List
 
 # REGISTRY_CACHE is populated elsewhere; we only read from it here.
@@ -25,6 +28,60 @@ def _as_float(x) -> float:
         return float(x)
     except Exception:
         return 0.0
+
+
+_WEIGHTS_CACHE: Dict[str, Dict[str, float]] | None = None
+_PRIORS_CACHE: Dict[str, float] | None = None
+_CANON_CACHE: Dict[str, Dict[str, Any]] | None = None
+
+
+def _load_weights() -> Dict[str, Dict[str, float]]:
+    global _WEIGHTS_CACHE
+    if _WEIGHTS_CACHE is not None:
+        return _WEIGHTS_CACHE
+    path = Path("config/scoring_weights.json")
+    data = {}
+    if path.exists():
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            data = {}
+    _WEIGHTS_CACHE = {k: {kk: float(vv) for kk, vv in v.items()} for k, v in data.items()} if isinstance(data, dict) else {}
+    return _WEIGHTS_CACHE
+
+
+def _load_priors() -> Dict[str, float]:
+    global _PRIORS_CACHE
+    if _PRIORS_CACHE is not None:
+        return _PRIORS_CACHE
+    path = Path("config/priors.yaml")
+    data = {}
+    if path.exists():
+        from .loader import parse_yaml_lite
+        data = parse_yaml_lite(path.read_text(encoding="utf-8"))
+    boosts = data.get("boosts", {}) if isinstance(data, dict) else {}
+    _PRIORS_CACHE = {k: float(v) for k, v in boosts.items()}
+    return _PRIORS_CACHE
+
+
+def _load_canon() -> Dict[str, Dict[str, Any]]:
+    global _CANON_CACHE
+    if _CANON_CACHE is not None:
+        return _CANON_CACHE
+    canon: Dict[str, Dict[str, Any]] = {}
+    for p in [Path("registries/tools_canon.csv"), Path("artifacts/tools_canon.csv")]:
+        if p.exists():
+            try:
+                with p.open(newline="", encoding="utf-8") as f:
+                    for row in csv.DictReader(f):
+                        key = row.get("key")
+                        if key:
+                            canon[key] = row
+            except Exception:
+                pass
+            break
+    _CANON_CACHE = canon
+    return _CANON_CACHE
 
 def rank_from(rows: List[Dict[str, Any]], top_k: int = 5) -> List[Dict[str, Any]]:
     """
@@ -60,21 +117,59 @@ def rank_region(
 
     eligible = [t for t in _ensure_list(tools) if allowed(t)]
 
-    # Minimal synergy signal the test expects.
+    weights = _load_weights()
+    priors = _load_priors()
+    w_cfg = weights.get(region, weights.get("default", {}))
+    w_base = _as_float(w_cfg.get("base", 1.0))
+    w_syn = _as_float(w_cfg.get("synergy", 1.0))
+    w_conf = _as_float(w_cfg.get("confidence", 0.0))
+    vendor_penalty = _as_float(w_cfg.get("vendor_penalty", 0.0))
+
     bonus = 0.1 if clusters else 0.0
+    canon = _load_canon()
 
     enriched: List[Dict[str, Any]] = []
     for t in eligible:
         base = _as_float(t.get("router_value", 0))
-        item = dict(t)  # shallow copy
+        confidence = _as_float(t.get("confidence", 0))
+        item = dict(t)
         item["score_base"] = base
         item["synergy_bonus"] = bonus
-        final = base + bonus
-        item["final_score"] = final
-        item["score"] = final  # backwards compatible
+        score = base * w_base + bonus * w_syn + confidence * w_conf - vendor_penalty
+        tags = t.get("tags") or []
+        boost = 0.0
+        matched = []
+        for tag in tags:
+            if tag in priors:
+                boost += priors[tag]
+                matched.append(tag)
+        if boost > 0.1:
+            boost = 0.1
+        score += boost
         reasons = dict(item.get("reasons", {}))
         reasons["region_filter"] = "allowed"
         reasons["synergy_notes"] = "clusters bonus applied" if bonus else ""
+        if matched:
+            reasons["priors"] = {m: priors[m] for m in matched}
+        if boost:
+            reasons["prior_boost"] = boost
+
+        key = f"{t.get('id', '')}:{t.get('vendor_id', '')}"
+        canon_row = canon.get(key)
+        if canon_row:
+            enrichment = {
+                k: canon_row.get(k)
+                for k in ("category", "popularity", "sentiment")
+                if canon_row.get(k) is not None
+            }
+            item["enrichment"] = enrichment
+            pop = _as_float(canon_row.get("popularity", 0))
+            pop_bonus = min(pop, 0.1)
+            if pop_bonus:
+                score += pop_bonus
+                reasons["popularity_bonus"] = pop_bonus
+        item["final_score"] = score
+        item["score"] = score
         item["reasons"] = reasons
         enriched.append(item)
 

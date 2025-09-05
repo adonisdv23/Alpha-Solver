@@ -1,0 +1,5 @@
+{
+  "default": { "base": 1.0, "synergy": 1.0, "confidence": 0.1, "vendor_penalty": 0.0 },
+  "US":      { "base": 1.0, "synergy": 1.2, "confidence": 0.15 },
+  "EU":      { "base": 1.0, "synergy": 1.1, "vendor_penalty": 0.1 }
+}

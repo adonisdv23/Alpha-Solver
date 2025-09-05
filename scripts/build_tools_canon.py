@@ -7,7 +7,7 @@ REGISTRY_SEED = Path('registries/registry_seed_v0_7_0.jsonl')
 ARTIFACT_DIR = Path('artifacts')
 ARTIFACT_DIR.mkdir(exist_ok=True)
 
-COLUMNS = ['id', 'router_value', 'tier', 'vendor_id']
+COLUMNS = ['key', 'id', 'vendor_id', 'router_value', 'tier', 'category', 'popularity', 'sentiment']
 
 
 def _load_tools_file(path: Path):
@@ -34,11 +34,17 @@ def _load_seed_file(path: Path):
 
 
 def _as_row(item: dict) -> dict:
+    vid = item.get('vendor_id', '') or ''
+    rid = item.get('id', '')
     return {
-        'id': item.get('id', ''),
+        'key': f"{rid}:{vid}",
+        'id': rid,
+        'vendor_id': vid,
         'router_value': item.get('router_value', 0.1) or 0.1,
         'tier': item.get('tier', 1) or 1,
-        'vendor_id': item.get('vendor_id', '') or '',
+        'category': item.get('category'),
+        'popularity': item.get('adoption_prior'),
+        'sentiment': item.get('sentiment_prior'),
     }
 
 
