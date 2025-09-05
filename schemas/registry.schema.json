@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "entry": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": {"type": "string"}
+      }
+    }
+  },
+  "oneOf": [
+    {"$ref": "#/definitions/entry"},
+    {"type": "array", "items": {"$ref": "#/definitions/entry"}}
+  ]
+}

@@ -1,0 +1,4 @@
+budgets:
+  default:
+    limit: 100.0
+    over_budget_action: instructions_only
