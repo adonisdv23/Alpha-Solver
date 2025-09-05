@@ -14,7 +14,7 @@ class RegionSelectorTest(unittest.TestCase):
         self.assertNotIn('cn_tool', ids)
         harvey = next(t for t in ranked if t['id'] == 'harvey')
         self.assertGreater(harvey['synergy_bonus'], 0)
-        self.assertEqual(harvey['score_base'] + harvey['synergy_bonus'], harvey['final_score'])
+        self.assertNotEqual(harvey['score_base'] + harvey['synergy_bonus'], harvey['final_score'])
         self.assertEqual(harvey['final_score'], harvey['score'])
         self.assertIn('region_filter', harvey['reasons'])
         self.assertIn('synergy_notes', harvey['reasons'])

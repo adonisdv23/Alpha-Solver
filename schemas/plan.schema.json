@@ -34,7 +34,9 @@
           "adapter": {"type": ["string", "null"]},
           "reasons": {"type": "object"},
           "confidence": {"type": ["number", "null"]},
-          "estimated_cost_usd": {"type": "number"}
+          "estimated_cost_usd": {"type": "number"},
+          "mode": {"type": "string"},
+          "enrichment": {"type": "object"}
         },
         "required": ["tool_id", "prompt", "estimated_cost_usd"]
       }
@@ -44,7 +46,9 @@
       "properties": {
         "budget": {"type": "object"},
         "circuit_breakers": {"type": "object"},
-        "audit": {"type": "object"}
+        "audit": {"type": "object"},
+        "policy_dryrun": {"type": "boolean"},
+        "policy_notes": {"type": "array", "items": {"type": "string"}}
       },
       "required": ["budget", "circuit_breakers", "audit"]
     },

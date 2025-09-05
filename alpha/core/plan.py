@@ -12,6 +12,8 @@ class PlanStep:
     reasons: Dict[str, Any] = field(default_factory=dict)
     confidence: Optional[float] = None
     estimated_cost_usd: float = 0.0
+    mode: str = "execute"
+    enrichment: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -21,6 +23,8 @@ class PlanStep:
             "reasons": self.reasons,
             "confidence": self.confidence,
             "estimated_cost_usd": self.estimated_cost_usd,
+            "mode": self.mode,
+            "enrichment": self.enrichment,
         }
 
 
@@ -29,12 +33,16 @@ class Guardrails:
     budget: Dict[str, Any] = field(default_factory=dict)
     circuit_breakers: Dict[str, Any] = field(default_factory=dict)
     audit: Dict[str, Any] = field(default_factory=dict)
+    policy_dryrun: bool = False
+    policy_notes: List[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
             "budget": self.budget,
             "circuit_breakers": self.circuit_breakers,
             "audit": self.audit,
+            "policy_dryrun": self.policy_dryrun,
+            "policy_notes": self.policy_notes,
         }
 
 
