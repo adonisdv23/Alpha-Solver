@@ -1,3 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "alpha-solver"
+version = "1.0.0b1"
+description = "Alpha-Solver: deterministic offline-first tool selection & planning"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [{name = "Alpha Solver Team"}]
+license = {text = "MIT"}
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+]
+dependencies = []
+
+[project.scripts]
+alpha-solver = "alpha.cli:main"
+
+[tool.setuptools]
+packages = ["alpha", "alpha.core", "alpha.adapters", "alpha.executors", "scripts"]
+
+[tool.setuptools.package-data]
+alpha = ["**/*.json", "**/*.md"]
+
 [tool.black]
 line-length = 100
 target-version = ["py312"]

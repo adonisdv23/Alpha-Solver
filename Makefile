@@ -35,3 +35,20 @@ dev-venv:
 
 release-notes:
         @cat RELEASE.md
+
+build:
+	python -m build
+
+dist:
+	@ls -l dist || true
+
+tag:
+	@[ -n "$$V" ] || (echo "Usage: make tag V=1.0.0"; exit 2)
+	git tag -a v$$V -m "Release v$$V"
+
+version-bump:
+	@[ -n "$$PART" ] || (echo "Usage: make version-bump PART=patch|minor|major|prerelease"; exit 2)
+	python scripts/bump_version.py --part $$PART
+
+release:
+	@echo "See RELEASE.md for steps. Push tag to trigger CI release."

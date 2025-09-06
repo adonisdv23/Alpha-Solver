@@ -1,0 +1,6 @@
+# Exclude runtime noise from source archives
+artifacts/ export-ignore
+telemetry/ export-ignore
+logs/ export-ignore
+.github/ export-ignore
+
