@@ -18,4 +18,7 @@ explain: ## Explain mode (CLI)
 	PYTHONPATH=. python -m alpha.cli --explain --regions "US" --k 3 --queries docs/queries.txt
 
 exec: ## Execute local-only (CLI)
-	PYTHONPATH=. python -m alpha.cli --execute --regions "US" --k 3 --queries docs/queries.txt
+        PYTHONPATH=. python -m alpha.cli --execute --regions "US" --k 3 --queries docs/queries.txt
+
+telemetry: ## Generate telemetry leaderboard
+	python scripts/telemetry_leaderboard.py --paths telemetry/*.jsonl --topk 5 --format md --out artifacts/leaderboard.md
