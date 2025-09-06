@@ -1,0 +1,17 @@
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+py_version = 312
+skip = ["artifacts", "telemetry", "logs", ".venv", ".pytest_cache", ".ruff_cache"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+exclude = ["artifacts", "telemetry", "logs", ".venv", ".pytest_cache", ".ruff_cache"]
+lint.select = ["E", "F"]
+lint.ignore = []
+

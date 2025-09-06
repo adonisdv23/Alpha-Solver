@@ -38,4 +38,4 @@ fmt-check:
 	black --check .
 
 lint:
-	ruff .
+	ruff check .

@@ -29,9 +29,7 @@ def _run_telemetry(since: str | None, topk: int, out: str | None) -> int:
             if cutoff and datetime.fromtimestamp(Path(path).stat().st_mtime) < cutoff:
                 continue
         files.append(path)
-    counts = telemetry_leaderboard.build_leaderboard(
-        telemetry_leaderboard.iter_rows(files)
-    )
+    counts = telemetry_leaderboard.build_leaderboard(telemetry_leaderboard.iter_rows(files))
     content = telemetry_leaderboard.to_markdown(counts, topk)
     if out:
         out_path = Path(out)
@@ -51,11 +49,7 @@ def parse_queries(path: str) -> List[str]:
     p = Path(path)
     if not p.is_file():
         raise FileNotFoundError(path)
-    return [
-        line.strip()
-        for line in p.read_text(encoding="utf-8").splitlines()
-        if line.strip()
-    ]
+    return [line.strip() for line in p.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
 def main(argv: List[str] | None = None) -> int:
@@ -85,9 +79,7 @@ def main(argv: List[str] | None = None) -> int:
         dest="plan_only",
         help="build plan only",
     )
-    modes.add_argument(
-        "--explain", action="store_true", help="build plan with explanations"
-    )
+    modes.add_argument("--explain", action="store_true", help="build plan with explanations")
     modes.add_argument("--execute", action="store_true", help="build and execute plan")
     parser.add_argument("--regions", default="US", help="comma-separated regions")
     parser.add_argument("--k", type=int, default=5, help="top-N tools")

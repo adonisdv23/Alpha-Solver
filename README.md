@@ -98,10 +98,13 @@ export ALPHA_TELEMETRY_SCRUB_FIELDS="query_text,raw_prompt"
 
 ## Formatting & Linting
 
+We use `ruff check .` in CI and `ruff check --fix .` locally via pre-commit. Use the make
+targets below to keep style consistent.
+
 ```bash
 make fmt       # format with isort and black
 make fmt-check # check formatting
-make lint      # run ruff
+make lint      # run ruff check
 ```
 
 Optional: install pre-commit hooks locally:
