@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import subprocess
 import sys
+from importlib import metadata
 from typing import List
 
 from alpha.core import runner
@@ -38,6 +39,15 @@ def _add_common_args(p: argparse.ArgumentParser) -> None:
     mode.add_argument("--plan-only", action="store_true", help="Emit plan and exit (no execution).")
     mode.add_argument("--explain", action="store_true", help="Emit plan + explanations, no execution.")
     mode.add_argument("--execute", action="store_true", help="Execute actions (default).")
+
+
+def _resolve_version() -> str:
+    try:
+        return metadata.version("alpha-solver")
+    except metadata.PackageNotFoundError:
+        from alpha import __version__
+
+        return __version__
 
 
 def main(argv: List[str] | None = None) -> int:
@@ -106,14 +116,7 @@ def main(argv: List[str] | None = None) -> int:
         if args.cmd == "quick-audit":
             return run_quick_audit()
         if args.cmd == "version":
-            from importlib.metadata import PackageNotFoundError, version
-
-            try:
-                ver = version("alpha-solver")
-            except PackageNotFoundError:
-                from alpha import __version__ as ver
-
-            print("alpha-solver", ver)
+            print("alpha-solver", _resolve_version())
             return 0
     except UserInputError as e:
         print(f"error: {e}", file=sys.stderr)
