@@ -102,6 +102,21 @@ def main() -> int:
             if missing:
                 parts.append("unknown tool_ids: " + ", ".join(missing))
             raise SystemExit("[preflight] recency priors invalid: " + "; ".join(parts))
+    region_path = os.getenv("ALPHA_REGION_WEIGHTS_PATH")
+    if region_path:
+        try:
+            raw = json.loads(Path(region_path).read_text(encoding="utf-8"))
+        except Exception:
+            raise SystemExit(f"[preflight] cannot read region weights: {region_path}")
+        if not isinstance(raw, dict):
+            raise SystemExit("[preflight] region weights must be a JSON object")
+        for k, v in raw.items():
+            if isinstance(k, str) and k.startswith("_"):
+                continue
+            try:
+                float(v)
+            except Exception:
+                raise SystemExit(f"[preflight] non-numeric weight for region {k}: {v}")
     ids_canon = []
     canon = ART_DIR / "tools_canon.csv"
     if canon.exists():

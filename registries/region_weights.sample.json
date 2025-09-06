@@ -1,0 +1,6 @@
+{
+  "_comment": "Optional region multipliers applied to final score before tie-breaks.",
+  "US": 1.00,
+  "EU": 0.95,
+  "APAC": 0.92
+}
