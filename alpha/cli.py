@@ -109,9 +109,11 @@ def main(argv: List[str] | None = None) -> int:
             from importlib.metadata import PackageNotFoundError, version
 
             try:
-                print("alpha-solver", version("alpha-solver"))
+                ver = version("alpha-solver")
             except PackageNotFoundError:
-                print("alpha-solver (dev)")
+                from alpha import __version__ as ver
+
+            print("alpha-solver", ver)
             return 0
     except UserInputError as e:
         print(f"error: {e}", file=sys.stderr)
@@ -122,5 +124,5 @@ def main(argv: List[str] | None = None) -> int:
 
 
 if __name__ == "__main__":  # pragma: no cover
-    raise SystemExit(main())
+    main()
 

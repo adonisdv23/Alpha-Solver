@@ -31,6 +31,12 @@ jobs:
       - env:
           PYTHONPATH: .
         run: python -m pytest -q
+      - name: Packaging smoke build (non-blocking)
+        if: always()
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build
+        continue-on-error: true
       - if: failure()
         uses: actions/upload-artifact@v4
         with:

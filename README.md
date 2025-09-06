@@ -2,6 +2,13 @@
 
 Alpha Solver is a lightweight planning and execution engine for tool selection.
 
+## Install & Run
+
+```bash
+pip install -e .
+alpha-solver run --queries "demo" --plan-only
+```
+
 ## CLI & Quick Start
 See [docs/RUN_GUIDE.md](docs/RUN_GUIDE.md) for more examples and details.
 
@@ -179,3 +186,7 @@ Optional: install pre-commit hooks locally:
 ```bash
 pip install pre-commit && pre-commit install
 ```
+
+## Release process
+
+See [RELEASE.md](RELEASE.md).
