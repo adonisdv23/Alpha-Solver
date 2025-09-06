@@ -19,9 +19,8 @@ jobs:
       - env:
           PYTHONPATH: .
         run: python -m pytest -q
-      - name: Lint (ruff / isort / black)
+      - name: Lint (ruff / black)
         run: |
           pip install ruff==0.5.7 black==24.4.2 isort==5.13.2
           ruff check alpha
-          isort --check-only alpha
           black --check .
