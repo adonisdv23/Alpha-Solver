@@ -15,3 +15,8 @@ exclude = ["artifacts", "telemetry", "logs", ".venv", ".pytest_cache", ".ruff_ca
 lint.select = ["E", "F"]
 lint.ignore = []
 
+# Tests often use convenience imports and multi-import lines for fixtures/mocks.
+# Keep source strict, relax tests to avoid noise blocking CI.
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*" = ["F401", "E401"]
+
