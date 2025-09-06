@@ -23,11 +23,30 @@ def sha1_query(q: str) -> str:
         return ""
 
 
+def _scrub_record(d: dict) -> dict:
+    import os as _os
+    if not d or _os.getenv("ALPHA_TELEMETRY_SCRUB", "0") != "1":
+        return d
+    fields = _os.getenv("ALPHA_TELEMETRY_SCRUB_FIELDS", "")
+    deny = [s.strip() for s in fields.split(",") if s.strip()] or [
+        "query_text",
+        "raw_prompt",
+        "user_input",
+        "notes",
+    ]
+    out = dict(d)
+    for k in deny:
+        if k in out:
+            v = out[k]
+            out[k] = "***SCRUBBED***" if isinstance(v, str) else None
+    return out
+
+
 def _append_jsonl(path: str, obj: Dict[str, Any]) -> None:
     p = Path(path)
     p.parent.mkdir(parents=True, exist_ok=True)
     with p.open("a", encoding="utf-8") as f:
-        f.write(json.dumps(obj, ensure_ascii=False) + "\n")
+        f.write(json.dumps(_scrub_record(obj), ensure_ascii=False) + "\n")
 
 
 def rotate_if_too_big(path: str, max_mb: int = 5) -> None:
@@ -95,7 +114,10 @@ def ensure_run_header(path: str,
         "queries_source": queries_source,
         "code_version": code_version or os.getenv("GIT_COMMIT_SHA", ""),
     }
-    p.write_text(json.dumps(hdr, ensure_ascii=False) + "\n" + "\n".join(lines) + "\n", encoding="utf-8")
+    p.write_text(
+        json.dumps(_scrub_record(hdr), ensure_ascii=False) + "\n" + "\n".join(lines) + "\n",
+        encoding="utf-8",
+    )
 
 
 def enrich_telemetry_file(path: str, run_id: str) -> None:
@@ -125,6 +147,10 @@ def enrich_telemetry_file(path: str, run_id: str) -> None:
                 obj["query_hash"] = sha1_query(obj.get("query", ""))
             obj.setdefault("ts", now_rfc3339_z())
 
-        rows.append(obj)
+        rows.append(_scrub_record(obj))
 
-    p.write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in rows) + "\n", encoding="utf-8")
+    p.write_text(
+        "\n".join(json.dumps(_scrub_record(r), ensure_ascii=False) for r in rows)
+        + "\n",
+        encoding="utf-8",
+    )

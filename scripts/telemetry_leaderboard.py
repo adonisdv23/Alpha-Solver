@@ -56,6 +56,18 @@ def to_csv(counts: Counter[str], topk: int) -> str:
     return "\n".join(out_lines)
 
 
+def collect(paths: Iterable[str]) -> Counter:
+    """Convenience wrapper for building a leaderboard from paths."""
+    return build_leaderboard(iter_rows(paths))
+
+
+def render_markdown(counts: Counter[str], topk: int) -> str:
+    """Render markdown with a small header for regression locking."""
+    header = ["# Telemetry Leaderboard", "", "## Global Top Tools", ""]
+    header.append(to_markdown(counts, topk))
+    return "\n".join(header)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Offline telemetry leaderboard")
     parser.add_argument("--paths", nargs="+", required=True, help="Glob(s) for telemetry jsonl files")
