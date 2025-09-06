@@ -134,6 +134,24 @@ python scripts/preflight.py --fix-ids
 Set `ALPHA_DETERMINISM=1` to lock a global seed and a single UTC
 timestamp in session traces for reproducible runs.
 
+## Governance (MVP)
+
+The lightweight policy engine enforces step/time budgets and a simple
+circuit breaker, with optional data classification.  Decisions are logged to
+`artifacts/policy_audit.jsonl`.
+
+CLI flags:
+
+```bash
+--policy-dry-run
+--budget-max-steps INT
+--budget-max-seconds FLOAT
+--breaker-max-fails INT
+--data-policy PATH
+```
+
+See [docs/POLICY.md](docs/POLICY.md) for details.
+
 ## Governance v1
 
 ```bash

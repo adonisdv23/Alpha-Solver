@@ -23,6 +23,7 @@ from .prompt_writer import PromptWriter
 from alpha.adapters import ADAPTERS
 from .session_trace import write_session_trace
 from .determinism import apply_seed
+from alpha.policy.engine import PolicyEngine
 
 
 def snapshot_shortlist(region: str, query_hash: str, shortlist: List[Dict[str, Any]]) -> str:
@@ -178,10 +179,22 @@ def _execute_step(step: PlanStep) -> Dict[str, Any]:
     return {"ok": True}
 
 
-def execute_plan(plan: Plan) -> None:
+def execute_plan(plan: Plan, policy: PolicyEngine | None = None) -> None:
     """Execute steps with bounded retry and populate results."""
     for s in plan.steps:
+        if policy:
+            dec = policy.decide(
+                query=plan.query,
+                region=plan.region,
+                tool_id=s.tool_id,
+                family=s.enrichment.get("family", ""),
+                tags=s.enrichment.get("tags", []),
+            )
+            if dec.decision == "block" and not policy.dry_run:
+                raise RuntimeError(f"policy blocked: {dec.reason}")
         bounded_retry(s, lambda: _execute_step(s), max_retries=plan.retries)
+        if policy:
+            policy.record_step_result(s.status == "ok")
 
 
 def _write_last_plan(plan: Plan) -> Path:
@@ -200,15 +213,27 @@ def run_cli(
     seed: int = 0,
     topk: int = 5,
     mode: str = "execute",
+    policy_dry_run: bool = False,
+    budget_max_steps: int = 0,
+    budget_max_seconds: float = 0.0,
+    breaker_max_fails: int = 0,
+    data_policy: str | None = None,
 ) -> int:
     """Minimal CLI helper used by tests and the alpha CLI."""
     _ = seed, topk  # presently unused, kept for API completeness
+    policy = PolicyEngine(
+        max_steps=budget_max_steps,
+        max_seconds=budget_max_seconds,
+        breaker_max_fails=breaker_max_fails,
+        dry_run=policy_dry_run,
+        data_policy_path=data_policy,
+    )
     for region in regions:
         for query in queries:
             plan = _build_plan(query, region)
             if mode != "plan-only":
                 if mode in ("execute", "explain"):
-                    execute_plan(plan)
+                    execute_plan(plan, policy)
                 if mode == "explain":
                     print(plan.human_summary())
                     for s in plan.steps:
