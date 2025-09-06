@@ -62,3 +62,16 @@ Weights (if any) are applied to scores before tie-breaks.
 
 Keep shortlist snapshots under `artifacts/shortlists/` and run `make telemetry`
 to collect usage logs for later review.
+
+## Further Reading
+
+- [Leaderboard Guide](docs/LEADERBOARD_GUIDE.md)
+- [Adding Tools](docs/ADDING_TOOLS.md)
+
+## Telemetry Scrubbing
+
+```bash
+export ALPHA_TELEMETRY_SCRUB=1
+# optional override
+export ALPHA_TELEMETRY_SCRUB_FIELDS="query_text,raw_prompt"
+```
