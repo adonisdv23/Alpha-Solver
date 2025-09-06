@@ -44,6 +44,14 @@ To produce CSV output instead:
 python scripts/telemetry_leaderboard.py --paths telemetry/*.jsonl --topk 5 --format csv --out artifacts/leaderboard.csv
 ```
 
+## Observability & Nightly
+
+- `make telemetry` – generate leaderboards and overview
+- `make replay` – replay the last plan deterministically
+- `make bench` – benchmark sample queries
+
+See [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md) for details.
+
 ## Artifacts & Repro
 
 See [docs/ARTIFACTS.md](docs/ARTIFACTS.md) for details on artifact schema
