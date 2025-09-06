@@ -1,23 +1,30 @@
-name: nightly
+name: Nightly sweep + artifacts
 on:
+  workflow_dispatch: {}
   schedule:
-    - cron: "0 7 * * *"
-  workflow_dispatch:
-
+    - cron: "17 7 * * *"  # daily 07:17 UTC
 jobs:
-  bundle:
+  nightly:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Install dev deps
+        run: pip install -r requirements-dev.txt || true
+      - name: Nightly sweep (deterministic)
+        env:
+          ALPHA_DETERMINISM: "1"
+          GIT_COMMIT_SHA: ${{ github.sha }}
+        run: |
+          python -m alpha.cli run --queries-file docs/queries.sample.txt --regions US --seed 1234 --plan-only
+          python scripts/telemetry_leaderboard.py --paths telemetry/*.jsonl --format all || true
+          python scripts/overview_md.py || true
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          python-version: "3.12"
-      - run: python -m pip install -U pip
-      - run: pip install "pytest>=8,<9"
-      - run: python scripts/telemetry_leaderboard.py --paths telemetry/*.jsonl --topk 5 --format md --out artifacts/leaderboard.md
-      - run: python scripts/bundle_artifacts.py
-      - uses: actions/upload-artifact@v4
-        with:
-          name: nightly-bundle
-          path: artifacts/bundles/*.zip
-          if-no-files-found: ignore
+          name: nightly-artifacts
+          path: |
+            artifacts/**
+            telemetry/**
