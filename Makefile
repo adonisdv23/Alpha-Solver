@@ -34,7 +34,7 @@ dev-venv:
         python -m venv .venv && .venv/bin/pip install -r requirements.txt -r requirements-dev.txt
 
 release-notes:
-        @cat RELEASE.md
+        python scripts/gen_release_notes.py
 
 build:
 	python -m build
@@ -42,13 +42,13 @@ build:
 dist:
 	@ls -l dist || true
 
-tag:
-	@[ -n "$$V" ] || (echo "Usage: make tag V=1.0.0"; exit 2)
-	git tag -a v$$V -m "Release v$$V"
+tag-release:
+        @[ -n "$$V" ] || (echo "Usage: make tag-release V=1.0.1"; exit 2)
+        python scripts/tag_release.py --version $$V
 
 version-bump:
-	@[ -n "$$PART" ] || (echo "Usage: make version-bump PART=patch|minor|major|prerelease"; exit 2)
-	python scripts/bump_version.py --part $$PART
+        @[ -n "$$PART" ] || (echo "Usage: make version-bump PART=patch|minor|major|prerelease"; exit 2)
+        python scripts/bump_version.py --part $$PART
 
 release:
 	@echo "See RELEASE.md for steps. Push tag to trigger CI release."

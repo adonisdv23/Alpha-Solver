@@ -31,6 +31,9 @@ jobs:
       - env:
           PYTHONPATH: .
         run: python -m pytest -q
+      - name: Check release notes parse
+        run: python scripts/gen_release_notes.py --check
+        continue-on-error: true
       - name: Packaging smoke build (non-blocking)
         if: always()
         run: |
