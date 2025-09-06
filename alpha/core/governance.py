@@ -1,13 +1,20 @@
-"""Governance helpers: budget controls, circuit breakers, audit logging"""
+"""Governance helpers: budget controls, policy gates, audit logging"""
 from __future__ import annotations
 import json
+import logging
 import re
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Dict, Optional, List
+from typing import Dict, List
+import uuid
 
 from .loader import parse_yaml_lite
+
+
+class GovernanceError(RuntimeError):
+    """Raised when a governance policy blocks execution."""
+
 
 # ---------------- Budget Controls ----------------
 
@@ -37,47 +44,65 @@ class BudgetControls:
         }
         return result
 
-# ---------------- Circuit Breaker ----------------
 
-@dataclass
+class BudgetCapGate:
+    """Enforce a maximum number of steps in a run."""
+
+    def __init__(self, max_steps: int):
+        self.max_steps = int(max_steps)
+
+    def check(self, step_count: int) -> None:
+        if step_count > self.max_steps:
+            raise GovernanceError(f"budget exceeded: {step_count} > {self.max_steps}")
+
+
 class CircuitBreaker:
-    trip_count: int
-    count: int = 0
-    tripped: bool = False
+    """Trip after too many errors within a time window."""
 
-    @classmethod
-    def load(cls, path: str = "config/circuit_breakers.yaml") -> "CircuitBreaker":
-        p = Path(path)
-        data = {}
-        if p.exists():
-            data = parse_yaml_lite(p.read_text(encoding="utf-8"))
-        conf = data.get("breakers", {}).get("default", {})
-        return cls(trip_count=int(conf.get("trip_count", 0)))
+    def __init__(self, max_errors: int, window: int = 60):
+        self.max_errors = int(max_errors)
+        self.window = int(window)
+        self._errors: List[datetime] = []
 
-    def allow(self) -> bool:
-        if self.tripped:
-            return False
-        self.count += 1
-        if self.trip_count and self.count > self.trip_count:
-            self.tripped = True
-            return False
-        return True
+    def record_error(self) -> None:
+        now = datetime.now(timezone.utc)
+        cutoff = now - timedelta(seconds=self.window)
+        self._errors = [t for t in self._errors if t >= cutoff]
+        self._errors.append(now)
+        if self.max_errors and len(self._errors) > self.max_errors:
+            raise GovernanceError("circuit breaker tripped")
 
-# ---------------- Audit Logger ----------------
 
 class AuditLogger:
-    """Write audit events as JSON lines"""
+    """Append governance audit events as JSON lines."""
 
-    def __init__(self, base_dir: str = "artifacts/audit"):
-        ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-        self.path = Path(base_dir) / f"run_{ts}.jsonl"
+    def __init__(self, path: str):
+        self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.session_id = str(uuid.uuid4())
 
-    def log(self, event: Dict[str, object]):
-        event = dict(event)
-        event["ts"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    def log_event(self, event: str, data: Dict[str, object] | None = None) -> None:
+        rec = {
+            "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "session_id": self.session_id,
+            "event": event,
+            "data": data or {},
+        }
         with self.path.open("a", encoding="utf-8") as f:
-            f.write(json.dumps(event, ensure_ascii=False) + "\n")
+            f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+
+
+class PolicyDryRun:
+    """When enabled, governance errors are logged but not raised."""
+
+    def __init__(self, enabled: bool = False):
+        self.enabled = bool(enabled)
+
+    def handle(self, err: GovernanceError) -> None:
+        if self.enabled:
+            logging.warning("policy dry-run: %s", err)
+        else:
+            raise err
 
 
 # ---------------- Data Classification ----------------

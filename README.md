@@ -58,6 +58,17 @@ python scripts/preflight.py  # validates file if set
 
 Weights (if any) are applied to scores before tie-breaks.
 
+## Governance v1
+
+```bash
+export ALPHA_BUDGET_STEPS=100
+export ALPHA_MAX_ERRORS=5
+# optional dry-run mode
+export ALPHA_POLICY_DRYRUN=1
+```
+
+See [docs/GOVERNANCE.md](docs/GOVERNANCE.md) for full details.
+
 ## Audit reminder
 
 Keep shortlist snapshots under `artifacts/shortlists/` and run `make telemetry`

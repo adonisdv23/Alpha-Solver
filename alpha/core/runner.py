@@ -1,14 +1,20 @@
-"""Execute plan steps with circuit breaker and audit logging"""
+"""Execute plan steps with governance checks"""
 from __future__ import annotations
+
 import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 from .plan import Plan
-
-from .governance import CircuitBreaker, AuditLogger
+from .governance import (
+    AuditLogger,
+    BudgetCapGate,
+    CircuitBreaker,
+    GovernanceError,
+    PolicyDryRun,
+)
 from .prompt_writer import PromptWriter
 from alpha.adapters import ADAPTERS
 
@@ -38,27 +44,58 @@ def snapshot_shortlist(region: str, query_hash: str, shortlist: List[Dict[str, A
     return str(path)
 
 
+class Runner:
+    def __init__(self) -> None:
+        self.budget_gate = BudgetCapGate(
+            max_steps=int(os.getenv("ALPHA_BUDGET_STEPS", "100"))
+        )
+        self.circuit_breaker = CircuitBreaker(
+            max_errors=int(os.getenv("ALPHA_MAX_ERRORS", "5"))
+        )
+        self.audit_logger = AuditLogger("logs/governance_audit.jsonl")
+        self.dryrun = PolicyDryRun(
+            enabled=os.getenv("ALPHA_POLICY_DRYRUN", "0") == "1"
+        )
+        self.writer = PromptWriter()
+
+    def solve(self, plan: Dict, *, execute: bool = False) -> List[Dict]:
+        trace: List[Dict] = []
+        self.audit_logger.log_event("query", {"steps": len(plan.get("steps", []))})
+        for idx, step in enumerate(plan.get("steps", []), 1):
+            try:
+                self.budget_gate.check(idx)
+            except GovernanceError as err:
+                self.audit_logger.log_event("budget.exceeded", {"step": idx})
+                self.dryrun.handle(err)
+                if not self.dryrun.enabled:
+                    break
+            self.audit_logger.log_event("step.start", {"tool_id": step.get("tool_id")})
+            try:
+                adapter_name = step.get("adapter")
+                if adapter_name in ADAPTERS and not execute:
+                    adapter = ADAPTERS[adapter_name]()
+                    prompt = adapter.render_prompt(step)
+                    path = self.writer.write(idx - 1, prompt)
+                    trace.append({"tool_id": step.get("tool_id"), "prompt_path": str(path)})
+                else:
+                    trace.append({"tool_id": step.get("tool_id"), "executed": True})
+            except Exception as e:
+                try:
+                    self.circuit_breaker.record_error()
+                except GovernanceError as err:
+                    self.audit_logger.log_event("breaker.tripped", {})
+                    self.dryrun.handle(err)
+                    if not self.dryrun.enabled:
+                        break
+                if not self.dryrun.enabled:
+                    raise e
+        return trace
+
+
 def run(plan: Dict, *, execute: bool = False) -> List[Dict]:
-    breaker_conf = plan.get("breaker", {})
-    trip_count = breaker_conf.get("trip_count", 0)
-    breaker = CircuitBreaker(trip_count=trip_count)
-    audit = AuditLogger()
-    writer = PromptWriter()
-    trace: List[Dict] = []
-    for idx, step in enumerate(plan.get("steps", [])):
-        audit.log({"event": "step.start", "tool_id": step.get("tool_id")})
-        if not breaker.allow():
-            audit.log({"event": "breaker.tripped"})
-            break
-        adapter_name = step.get("adapter")
-        if adapter_name in ADAPTERS and not execute:
-            adapter = ADAPTERS[adapter_name]()
-            prompt = adapter.render_prompt(step)
-            path = writer.write(idx, prompt)
-            trace.append({"tool_id": step.get("tool_id"), "prompt_path": str(path)})
-        else:
-            trace.append({"tool_id": step.get("tool_id"), "executed": True})
-    plan["audit_log"] = str(audit.path)
+    runner = Runner()
+    trace = runner.solve(plan, execute=execute)
+    plan["audit_log"] = str(runner.audit_logger.path)
     return trace
 
 
@@ -71,3 +108,4 @@ def run_plan(plan: Plan, local_only: bool = True) -> List[Dict]:
     trace = run(wrapper, execute=not local_only)
     plan.guards.audit = {"log_path": wrapper.get("audit_log")}
     return trace
+
