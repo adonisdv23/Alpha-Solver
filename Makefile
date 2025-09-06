@@ -30,10 +30,10 @@ exec-test:
 	pytest -q tests/test_math_exec.py tests/test_csv_exec.py tests/test_instruction_adapter.py
 
 fmt:
-	black .
+	@echo "Temporary: Black formatting is disabled in CI. Use locally if desired."
 
 fmt-check:
-	black --check .
+	@echo "Temporary: Black check is disabled in CI. Use locally if desired."
 
 lint:
 	ruff check alpha

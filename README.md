@@ -100,8 +100,11 @@ export ALPHA_TELEMETRY_SCRUB_FIELDS="query_text,raw_prompt"
 
 We lint the **core library** with `ruff` (scoped to `alpha/`) in CI and pre-commit:
 `ruff check alpha` (CI) and `ruff check --fix alpha` locally.
-We lint the core library with Ruff and format with Black. isort is not enforced in CI right now to avoid noisy rewrites; a one-time format PR will re-enable it for `alpha/`.
+We lint the core library with Ruff. Black is temporarily **not** enforced in CI to avoid a noisy repo-wide rewrite; a one-time format PR will re-enable `black --check`. You can still run Black locally.
+
 The `scripts/` and `tests/` trees are covered by `black` only to keep CI fast and noise-free.
+
+CLI: `quick-audit` now invokes the audit script via `python -m scripts.quick_audit`, so it works both from the repo and when installed.
 Use the make targets below to keep style consistent.
 
 ```bash

@@ -40,9 +40,17 @@ def _run_telemetry(since: str | None, topk: int, out: str | None) -> int:
     return 0
 
 
-def _run_quick_audit() -> int:
-    subprocess.run([sys.executable, "scripts/quick_audit.py"], check=True)
-    return 0
+def run_quick_audit() -> int:
+    """
+    Invoke quick audit in a way that also works when alpha is installed
+    (i.e., not running from repo root). Prefer module execution.
+    """
+    try:
+        # Try to run as a module (works when installed)
+        return subprocess.run([sys.executable, "-m", "scripts.quick_audit"], check=True).returncode
+    except Exception:
+        # Fallback for in-repo usage if module is not importable
+        return subprocess.run([sys.executable, "scripts/quick_audit.py"], check=True).returncode
 
 
 def parse_queries(path: str) -> List[str]:
@@ -99,7 +107,7 @@ def main(argv: List[str] | None = None) -> int:
     if args.command == "telemetry":
         return _run_telemetry(args.since, args.topk, args.out)
     if args.command == "quick-audit":
-        return _run_quick_audit()
+        return run_quick_audit()
 
     if args.replay:
         from .core.replay import ReplayHarness
