@@ -16,13 +16,6 @@ repos:
     rev: 24.4.2
     hooks:
       - id: black
-# Optional: enable locally if you want auto-import sorting
-# - repo: https://github.com/PyCQA/isort
-#   rev: 5.13.2
-#   hooks:
-#     - id: isort
-#       name: isort (fix on core)
-#       args: [alpha]
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:

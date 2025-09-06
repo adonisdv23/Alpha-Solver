@@ -100,7 +100,6 @@ export ALPHA_TELEMETRY_SCRUB_FIELDS="query_text,raw_prompt"
 
 We lint the **core library** with `ruff` (scoped to `alpha/`) in CI and pre-commit:
 `ruff check alpha` (CI) and `ruff check --fix alpha` locally.
-We ignore line-length (E501) and import style (E401/E402), since `black` handles formatting.
 We lint the core library with Ruff and format with Black. isort is not enforced in CI right now to avoid noisy rewrites; a one-time format PR will re-enable it for `alpha/`.
 The `scripts/` and `tests/` trees are covered by `black` only to keep CI fast and noise-free.
 Use the make targets below to keep style consistent.
