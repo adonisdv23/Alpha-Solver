@@ -38,3 +38,27 @@ artifacts/shortlists/<region>/<query_hash>.json
 
 contains rank, tool_id, score, prior; useful for audits and diffs
 ```
+
+## Reasons & Confidence
+
+Each shortlist item now includes:
+
+- `confidence`: normalized 0-1 score relative to other items in the shortlist.
+- `explain`: component scores (lexical, semantic, priors, recency, total).
+- `reason`: plain text summary of the score parts.
+
+## Optional region weights
+
+Provide a JSON file mapping region codes to multipliers:
+
+```bash
+export ALPHA_REGION_WEIGHTS_PATH=registries/region_weights.sample.json
+python scripts/preflight.py  # validates file if set
+```
+
+Weights (if any) are applied to scores before tie-breaks.
+
+## Audit reminder
+
+Keep shortlist snapshots under `artifacts/shortlists/` and run `make telemetry`
+to collect usage logs for later review.

@@ -1,40 +1,41 @@
 from __future__ import annotations
-import os
-from .semantic import hybrid_score
 
+import json
+import os
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Dict, Iterable, List, Optional, Tuple
+
+from .semantic import hybrid_score
 
 """RegistryProvider with lexical scoring + priors + telemetry (stdlib only)."""
 
-from pathlib import Path
-from datetime import datetime, timezone
-from typing import Any, Dict, Iterable, List, Optional, Tuple
-import json
-
 try:
-    from . import freshness
+    from alpha.core import freshness
 except Exception:  # pragma: no cover - safety
     freshness = None
 
 class RegistryProvider:
-    def __init__(self, seed_path: str, schema_path: str, telemetry_path: Optional[str] = None):
-        self.seed_path = seed_path
+    def __init__(
+        self,
+        seed_path: str | None = None,
+        schema_path: str | None = None,
+        telemetry_path: Optional[str] = None,
+    ) -> None:
+        self.seed_path = seed_path or "registries/registry_seed_v0_7_0.jsonl"
         self.schema_path = schema_path
         self.telemetry_path = telemetry_path or "telemetry/registry_usage.jsonl"
         self.rows: List[Dict[str, Any]] = []
-        # optional recency priors
         path = os.getenv("ALPHA_RECENCY_PRIORS_PATH")
         if freshness and path:
             self._dated = freshness.load_dated_priors(path)
         else:
             self._dated = {}
-        try:
-            self._recency_weight = float(os.getenv("ALPHA_RECENCY_WEIGHT", "0.15"))
-        except Exception:
-            self._recency_weight = 0.15
-        try:
-            self._recency_halflife = float(os.getenv("ALPHA_RECENCY_HALFLIFE_DAYS", "90"))
-        except Exception:
-            self._recency_halflife = 90.0
+        self._now_utc = getattr(self, "_now_utc", datetime.now(timezone.utc))
+        self._recency_weight = float(os.getenv("ALPHA_RECENCY_WEIGHT", "0.15"))
+        self._recency_halflife_days = float(
+            os.getenv("ALPHA_RECENCY_HALFLIFE_DAYS", "90")
+        )
 
     # ------------ load ------------
     def load(self) -> None:
@@ -130,47 +131,105 @@ class RegistryProvider:
         return (sentiment, adoption, risk, cost)
 
     # ------------ scoring / ranking ------------
-    def score(self, query: str, row: Dict[str, Any]) -> float:
-        qt = self._tokens(query or "")
-        bag = self._bag_from_row(row)
-        fit = (len(qt & bag) / max(1, len(qt))) if (qt and bag) else 0.0
-        fit = max(0.0, min(1.0, fit))
-        sentiment, adoption, risk, cost = self._derive_priors(row)
-        return float(max(-1.0, min(1.0, fit * sentiment * adoption * (1.0 - risk) + cost)))
+    def _apply_region_weight(self, score: float, region: str) -> float:
+        import json
+        import os
 
-    def rank(self, query: str, top_k: int, region: Optional[str] = None) -> List[Dict[str, Any]]:
+        path = os.getenv("ALPHA_REGION_WEIGHTS_PATH")
+        if not path:
+            return score
+        try:
+            cache = getattr(self, "_region_weights_cache", None)
+            if cache is None:
+                with open(path, "r", encoding="utf-8") as f:
+                    cache = json.load(f)
+                setattr(self, "_region_weights_cache", cache)
+            w = float(cache.get(region, 1.0))
+            return score * w
+        except Exception:
+            return score
+
+    def shortlist(self, query: str, region: Optional[str] = None, k: int = 5) -> List[Dict[str, Any]]:
+        if not self.rows:
+            self.load()
+        qt = self._tokens(query or "")
         candidates: List[Dict[str, Any]] = []
-        utc_now = datetime.now(timezone.utc)
         for r in self.rows:
-            sc = self.score(query, r)
+            bag = self._bag_from_row(r)
+            lexical_score = (len(qt & bag) / max(1, len(qt))) if (qt and bag) else 0.0
+            candidate_text = " ".join(self._iter_texts(r) or [])
+            semantic_score = hybrid_score(query or "", candidate_text, lexical_score)
+            sentiment, adoption, risk, cost = self._derive_priors(r)
+            prior = sentiment * adoption * (1.0 - risk) + cost
+            hybrid = semantic_score * prior
+            parts = {
+                "lexical": float(lexical_score),
+                "semantic": float(semantic_score),
+                "priors": float(prior or 0.0),
+                "recency": 0.0,
+            }
+            final_score = hybrid
+            tool_id = r.get("id") or r.get("vendor_id") or r.get("name")
+            rdt = (
+                getattr(self, "_dated", None).get(tool_id)
+                if (getattr(self, "_dated", None) and freshness)
+                else None
+            )
+            if rdt:
+                rf = freshness.recency_factor(
+                    rdt, now=self._now_utc, half_life_days=self._recency_halflife_days
+                )
+                parts["recency"] = float(rf)
+                final_score = freshness.blend(hybrid, rf, self._recency_weight)
             if region:
                 regions = r.get("regions")
                 if isinstance(regions, list) and regions:
                     norm = {str(x).strip().upper() for x in regions}
                     if region.upper() not in norm and "GLOBAL" not in norm:
-                        sc *= 0.8
-            tid = r.get("id") or r.get("vendor_id") or r.get("name")
-            if tid and self._dated:
-                rdt = self._dated.get(str(tid))
-                if rdt and freshness:
-                    rfac = freshness.recency_factor(
-                        rdt, now=utc_now, half_life_days=self._recency_halflife
-                    )
-                    sc = freshness.blend(sc, rfac, self._recency_weight)
-            candidates.append({
-                "id": tid,
+                        final_score *= 0.8
+            final_score = self._apply_region_weight(final_score, region or "")
+            row = {
+                "tool_id": tool_id,
                 "name": r.get("name"),
-                "score": sc,
-            })
+                "score": final_score,
+                "_parts": parts,
+            }
+            candidates.append(row)
 
-        candidates.sort(key=lambda x: x["score"], reverse=True)
-        out = candidates[: max(1, int(top_k))]
+        candidates.sort(key=lambda x: (-x["score"], str(x["tool_id"])) )
+        ranked = candidates[: max(1, int(k))]
 
         try:
-            self._log(query, candidates[:20], out)
+            self._log(query, candidates[:20], ranked)
         except Exception:
             pass
 
+        if ranked:
+            scores = [r["score"] for r in ranked]
+            lo, hi = min(scores), max(scores)
+            span = (hi - lo) or 1.0
+            for r in ranked:
+                r["confidence"] = (r["score"] - lo) / span
+                p = r.get("_parts")
+                if p:
+                    r["explain"] = {
+                        "lexical": round(p["lexical"], 6),
+                        "semantic": round(p["semantic"], 6),
+                        "priors": round(p["priors"], 6),
+                        "recency": round(p["recency"], 6),
+                        "total": round(r["score"], 6),
+                    }
+                    r["reason"] = (
+                        f"lex {p['lexical']:.2f} + sem {p['semantic']:.2f} + "
+                        f"pri {p['priors']:.2f} + rec {p['recency']:.2f}"
+                    )
+        return ranked
+
+    def rank(self, query: str, top_k: int, region: Optional[str] = None) -> List[Dict[str, Any]]:
+        res = self.shortlist(query=query, region=region, k=top_k)
+        out: List[Dict[str, Any]] = []
+        for r in res:
+            out.append({"id": r.get("tool_id"), "name": r.get("name"), "score": r.get("score")})
         return out
 
     # ------------ telemetry ------------
@@ -178,9 +237,15 @@ class RegistryProvider:
         rec = {
             "ts": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
             "query": query,
-            "candidates": [{"id": c["id"], "score": round(float(c["score"]), 6)} for c in candidates],
-            "selected": [{"id": s["id"], "score": round(float(s["score"]), 6)} for s in selected],
-            "rationale": "lexical_match * sentiment * adoption * (1-risk) + cost_bonus",
+            "candidates": [
+                {"id": c.get("tool_id") or c.get("id"), "score": round(float(c["score"]), 6)}
+                for c in candidates
+            ],
+            "selected": [
+                {"id": s.get("tool_id") or s.get("id"), "score": round(float(s["score"]), 6)}
+                for s in selected
+            ],
+            "rationale": "lex + sem + priors + recency",
         }
         tp = Path(self.telemetry_path or "telemetry/registry_usage.jsonl")
         tp.parent.mkdir(parents=True, exist_ok=True)
