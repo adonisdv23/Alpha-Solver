@@ -19,3 +19,7 @@ jobs:
       - env:
           PYTHONPATH: .
         run: python -m pytest -q
+      - name: Lint (ruff only)
+        run: |
+          pip install ruff==0.5.7
+          ruff check alpha

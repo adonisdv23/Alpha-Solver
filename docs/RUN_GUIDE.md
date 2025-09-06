@@ -1,39 +1,33 @@
 # Run Guide
 
-This guide shows how to set up the Alpha Solver in a few minutes and run it.
+## Quick Start
 
-## Setup
-1. Install Python 3.12.
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. (Optional) Build the tools canon:
-   ```bash
-   python scripts/build_tools_canon.py
-   ```
-
-## Determinism
-Use `--seed` to make runs reproducible. The CLI prints the effective seed and
-records it in plan artifacts. If omitted, a seed is derived from the clock.
-
-## Example Runs
 ```bash
-# Plan only
-python -m alpha.cli --plan-only --regions "US" --queries docs/queries.txt
-
-# Explain mode
-python -m alpha.cli --explain --regions "US" --queries docs/queries.txt
-
-# Execute locally
-python -m alpha.cli --execute --regions "US" --queries docs/queries.txt
+make test
+make telemetry
+make quick-audit
 ```
 
-Artifacts such as plans and traces are written under `artifacts/` by default or
-under the directory provided via `--outdir`.
+## Environment Variables
 
-## Troubleshooting
-- Missing queries file: ensure the path passed to `--queries` exists.
-- Empty regions list: pass `--regions "US,EU"` or similar.
-- To inspect determinism, run twice with the same `--seed` and compare plan
-  outputs.
+| Name | Description |
+|------|-------------|
+| `ALPHA_RECENCY` | Optional recency weight (e.g. `0.15`) |
+| `ALPHA_REGION_WEIGHTS` | Path to region weights JSON |
+| `ALPHA_POLICY_DRYRUN` | Set `1` to disable policy enforcement |
+| `ALPHA_BUDGET` | Maximum allowed tool steps |
+| `ALPHA_MAX_ERRORS` | Fail fast after this many errors |
+| `ALPHA_TELEMETRY_SCRUB` | Scrub sensitive fields from telemetry |
+
+## Short Sweep
+
+```bash
+python scripts/overnight_run.py --regions "US,EU" --k 5 --queries docs/queries.txt
+```
+
+Artifacts are written under `artifacts/` by default:
+
+- `artifacts/leaderboard.md`
+- `artifacts/shortlists/<region>/<query_hash>.json`
+
+Set `ALPHA_ARTIFACTS_DIR` to override the output root.

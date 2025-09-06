@@ -4,7 +4,8 @@ Alpha Solver is a lightweight planning and execution engine for tool selection.
 
 ## Quick Start
 See [docs/RUN_GUIDE.md](docs/RUN_GUIDE.md) for setup instructions and example
-commands to run the CLI.
+commands to run the CLI. For development guidelines see
+[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
 
 ## Local executors
 
@@ -93,4 +94,27 @@ to collect usage logs for later review.
 export ALPHA_TELEMETRY_SCRUB=1
 # optional override
 export ALPHA_TELEMETRY_SCRUB_FIELDS="query_text,raw_prompt"
+```
+
+## Formatting & Linting
+
+We lint the **core library** with `ruff` (scoped to `alpha/`) in CI and pre-commit:
+`ruff check alpha` (CI) and `ruff check --fix alpha` locally.
+We lint the core library with Ruff. Black is temporarily **not** enforced in CI to avoid a noisy repo-wide rewrite; a one-time format PR will re-enable `black --check`. You can still run Black locally.
+
+The `scripts/` and `tests/` trees are covered by `black` only to keep CI fast and noise-free.
+
+CLI: `quick-audit` now invokes the audit script via `python -m scripts.quick_audit`, so it works both from the repo and when installed.
+Use the make targets below to keep style consistent.
+
+```bash
+make fmt       # format with black
+make fmt-check # check formatting
+make lint      # run ruff check
+```
+
+Optional: install pre-commit hooks locally:
+
+```bash
+pip install pre-commit && pre-commit install
 ```

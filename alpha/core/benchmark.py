@@ -1,6 +1,5 @@
 from __future__ import annotations
 import json
-import os
 import time
 from pathlib import Path
 from typing import Callable, Iterable, Dict
@@ -8,7 +7,9 @@ from typing import Callable, Iterable, Dict
 import resource
 
 
-def benchmark(fn: Callable[[str], None], queries: Iterable[str], out_dir: str | Path = "artifacts/benchmarks") -> Dict[str, float]:
+def benchmark(
+    fn: Callable[[str], None], queries: Iterable[str], out_dir: str | Path = "artifacts/benchmarks"
+) -> Dict[str, float]:
     out_p = Path(out_dir)
     out_p.mkdir(parents=True, exist_ok=True)
     results = []

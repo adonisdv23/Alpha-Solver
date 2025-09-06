@@ -1,4 +1,5 @@
 """Simple policy engine for enterprise guardrails"""
+
 import json
 import time
 from datetime import datetime, timezone
@@ -24,14 +25,18 @@ class PolicyEngine:
         reason = ""
         if per_call is not None and cost > per_call:
             ok = False
-            action = self.registries.get("budget_controls", {}).get("actions", {}).get("on_breach", "halt")
+            action = (
+                self.registries.get("budget_controls", {})
+                .get("actions", {})
+                .get("on_breach", "halt")
+            )
             reason = "cost estimate exceeds per-call limit"
         return {"ok": ok, "action": action, "reason": reason}
 
     def get_secret(self, vendor_id: str) -> str:
         secrets = self.registries.get("secrets_vault", {}).get("secrets", [])
         for s in secrets:
-            if vendor_id.split('.')[0] in s.get("id", ""):
+            if vendor_id.split(".")[0] in s.get("id", ""):
                 return s.get("token", "<redacted-token>")
         return "<redacted-token>"
 
@@ -54,7 +59,7 @@ class PolicyEngine:
 
     def circuit_guard(self, key: str) -> dict:
         full_key = key if key.startswith("vendor:") else f"vendor:{key}"
-        rule = self.circuit_rules.get(full_key)
+        _rule = self.circuit_rules.get(full_key)  # retained for future logic
         state = self.cb_state.get(full_key, {"state": "closed"})
         allow = state.get("state") != "open"
         return {"state": state.get("state"), "allow": allow}
@@ -68,14 +73,14 @@ class PolicyEngine:
         self.sla_active.pop(op, None)
 
     def audit(self, event: dict):
-        path = Path('registries/audit_trail.json')
+        path = Path("registries/audit_trail.json")
         try:
-            with path.open('r', encoding='utf-8') as f:
+            with path.open("r", encoding="utf-8") as f:
                 data = json.load(f)
         except Exception:
             data = {"version": "0.1.0", "events": []}
         event = dict(event)
-        event["timestamp"] = datetime.now(timezone.utc).isoformat().replace('+00:00','Z')
+        event["timestamp"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
         data.setdefault("events", []).append(event)
-        with path.open('w', encoding='utf-8') as f:
+        with path.open("w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)

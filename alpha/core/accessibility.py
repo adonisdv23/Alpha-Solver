@@ -2,7 +2,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict
 
 from .loader import parse_yaml_lite
 
@@ -28,13 +28,14 @@ def luminance(rgb: tuple[int, int, int]) -> float:
     def channel(c: int) -> float:
         c = c / 255.0
         return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+
     r, g, b = rgb
     return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b)
 
 
 def hex_to_rgb(color: str) -> tuple[int, int, int]:
     color = color.lstrip("#")
-    return tuple(int(color[i:i+2], 16) for i in (0, 2, 4))
+    return tuple(int(color[i : i + 2], 16) for i in (0, 2, 4))
 
 
 def contrast_ratio(fg: str, bg: str) -> float:
