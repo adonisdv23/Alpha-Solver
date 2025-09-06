@@ -24,4 +24,7 @@ telemetry: ## Generate telemetry leaderboard
 	python scripts/telemetry_leaderboard.py --paths telemetry/*.jsonl --topk 5 --format md --out artifacts/leaderboard.md
 
 quick-audit:
-	python scripts/quick_audit.py
+        python scripts/quick_audit.py
+
+exec-test:
+	pytest -q tests/test_math_exec.py tests/test_csv_exec.py tests/test_instruction_adapter.py

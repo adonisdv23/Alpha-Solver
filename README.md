@@ -6,6 +6,14 @@ Alpha Solver is a lightweight planning and execution engine for tool selection.
 See [docs/RUN_GUIDE.md](docs/RUN_GUIDE.md) for setup instructions and example
 commands to run the CLI.
 
+## Local executors
+
+See [docs/EXECUTORS.md](docs/EXECUTORS.md) for built-in math and CSV executors.
+
+```bash
+python -m alpha.executors.math_exec "2+2"
+```
+
 ## Telemetry Leaderboard (offline, stdlib-only)
 
 Generate a Markdown leaderboard from telemetry JSONL files:
