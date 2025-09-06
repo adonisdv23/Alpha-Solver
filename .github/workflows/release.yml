@@ -19,10 +19,16 @@ jobs:
         with:
           name: alpha-solver-dist
           path: dist/*
+      - name: Generate release notes
+        id: notes
+        run: |
+          python scripts/gen_release_notes.py --version ${{ github.ref_name }}
+          echo "path=artifacts/release_notes/release_notes.md" >> "$GITHUB_OUTPUT"
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: dist/*
+          body_path: ${{ steps.notes.outputs.path }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

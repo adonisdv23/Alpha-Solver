@@ -18,7 +18,6 @@ python -m alpha.cli run --queries-file docs/queries.sample.txt --regions US EU -
 python -m alpha.cli --examples  # show sample commands
 ```
 
-For development guidelines see [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
 
 ## Local executors
 
@@ -187,6 +186,10 @@ Optional: install pre-commit hooks locally:
 pip install pre-commit && pre-commit install
 ```
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Release process
 
-See [RELEASE.md](RELEASE.md).
+See [RELEASE.md](RELEASE.md). Release notes are generated with `make release-notes`.
