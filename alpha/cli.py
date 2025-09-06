@@ -18,6 +18,13 @@ def run_quick_audit() -> int:
         return subprocess.run([sys.executable, "scripts/quick_audit.py"], check=True).returncode
 
 
+EXAMPLES = """
+alpha-solver run --queries "demo query" --regions US --plan-only --seed 1234
+alpha-solver run --queries-file docs/queries.sample.txt --regions US EU --explain
+alpha-solver telemetry --paths telemetry/*.jsonl --topk 5 --format md
+"""
+
+
 def _add_common_args(p: argparse.ArgumentParser) -> None:
     p.add_argument("--queries", nargs="*", default=[], help="Inline queries (space-separated).")
     p.add_argument(
@@ -35,7 +42,20 @@ def _add_common_args(p: argparse.ArgumentParser) -> None:
 
 def main(argv: List[str] | None = None) -> int:
     argv = argv or sys.argv[1:]
-    ap = argparse.ArgumentParser(prog="alpha-solver", description="Alpha Solver CLI")
+    commands = {"run", "sweep", "telemetry", "quick-audit", "version"}
+    if argv and not argv[0].startswith("-") and argv[0] not in commands:
+        print(f"error: unknown command '{argv[0]}'", file=sys.stderr)
+        return 2
+    if "--examples" in argv:
+        print(EXAMPLES)
+        return 0
+
+    ap = argparse.ArgumentParser(
+        prog="alpha-solver",
+        description="Alpha Solver command-line interface",
+        epilog="Use --examples to see sample commands.",
+    )
+    ap.add_argument("--examples", action="store_true", help="Show usage examples and exit.")
     sp = ap.add_subparsers(dest="cmd", required=True)
 
     p_run = sp.add_parser("run", help="Run a single pass over queries and regions.")
@@ -84,8 +104,6 @@ def main(argv: List[str] | None = None) -> int:
             cmd += ["--topk", str(args.topk), "--format", args.format]
             return subprocess.run(cmd, check=True).returncode
         if args.cmd == "quick-audit":
-            from . import cli as _self  # reuse our earlier helper if present
-
             return run_quick_audit()
         if args.cmd == "version":
             from importlib.metadata import PackageNotFoundError, version
