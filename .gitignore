@@ -19,3 +19,6 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# top-level logs
+*.log

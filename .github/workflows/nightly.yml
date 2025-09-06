@@ -1,7 +1,7 @@
 name: nightly
 on:
   schedule:
-    - cron: '15 7 * * *'  # 07:15 UTC daily — adjust as needed
+    - cron: '15 7 * * *'  # 07:15 UTC daily
   workflow_dispatch:
 
 permissions:
@@ -17,14 +17,18 @@ jobs:
           python-version: '3.12'
           cache: 'pip'
       - run: python -m pip install -U pip
-      # install whatever your project needs for runtime; add requirements.txt if you have one
       - run: pip install -r requirements-dev.txt || true
 
       - name: Run overnight sweep
         env:
           PYTHONPATH: .
+          GIT_COMMIT_SHA: ${{ github.sha }}
         run: |
-          python scripts/overnight_run.py --regions "EU,US,APAC,''" --k 10 --queries docs/queries.txt
+          python scripts/overnight_run.py \
+            --regions "EU,US,APAC,''" \
+            --k 10 \
+            --queries docs/queries.txt \
+            --telemetry telemetry/registry_usage.jsonl
           ls -la artifacts || true
           ls -la telemetry || true
 
