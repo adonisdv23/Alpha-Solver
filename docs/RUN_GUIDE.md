@@ -1,33 +1,30 @@
 # Run Guide
 
-## Quick Start
-
+## Quick start
 ```bash
-make test
-make telemetry
-make quick-audit
+python -m alpha.cli run --queries "find calendar tools" --regions US --plan-only --seed 1234
+python -m alpha.cli run --queries-file docs/queries.sample.txt --regions US EU --explain
 ```
 
-## Environment Variables
-
-| Name | Description |
-|------|-------------|
-| `ALPHA_RECENCY` | Optional recency weight (e.g. `0.15`) |
-| `ALPHA_REGION_WEIGHTS` | Path to region weights JSON |
-| `ALPHA_POLICY_DRYRUN` | Set `1` to disable policy enforcement |
-| `ALPHA_BUDGET` | Maximum allowed tool steps |
-| `ALPHA_MAX_ERRORS` | Fail fast after this many errors |
-| `ALPHA_TELEMETRY_SCRUB` | Scrub sensitive fields from telemetry |
-
-## Short Sweep
-
+## CLI usage
 ```bash
-python scripts/overnight_run.py --regions "US,EU" --k 5 --queries docs/queries.txt
+python -m alpha.cli --examples           # show sample commands
+python -m alpha.cli run --queries "demo" --regions US
+python -m alpha.cli sweep --queries-file docs/queries.sample.txt --regions US EU
+python -m alpha.cli telemetry --paths telemetry/*.jsonl --topk 5 --format md
+python -m alpha.cli quick-audit          # repository audit
 ```
 
-Artifacts are written under `artifacts/` by default:
+## Queries file format
+- Lines starting with `#` are comments
+- Blank lines ignored
+- `@file path/to/other.txt` includes content (recursive, cycle-safe)
 
-- `artifacts/leaderboard.md`
-- `artifacts/shortlists/<region>/<query_hash>.json`
+## Modes
+- `--plan-only`: emit `artifacts/last_plan.json`
+- `--explain`: plan + explanations, no execution
+- `--execute`: default
 
-Set `ALPHA_ARTIFACTS_DIR` to override the output root.
+## Troubleshooting
+- `error: No queries provided.` → pass `--queries` or `--queries-file`
+- `error: unknown command` → run `python -m alpha.cli --help`

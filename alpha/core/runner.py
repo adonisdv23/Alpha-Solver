@@ -185,6 +185,30 @@ def _write_last_plan(plan: Plan) -> Path:
     return path
 
 
+def run_cli(
+    *,
+    queries: List[str],
+    regions: List[str],
+    seed: int = 0,
+    topk: int = 5,
+    mode: str = "execute",
+) -> int:
+    """Minimal CLI helper used by tests and the alpha CLI."""
+    _ = seed, topk  # presently unused, kept for API completeness
+    for region in regions:
+        for query in queries:
+            plan = _build_plan(query, region)
+            if mode != "plan-only":
+                if mode in ("execute", "explain"):
+                    execute_plan(plan)
+                if mode == "explain":
+                    print(plan.human_summary())
+                    for s in plan.steps:
+                        print(f"{s.step_id}: {s.description}")
+            _write_last_plan(plan)
+    return 0
+
+
 def main(argv: List[str] | None = None) -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--query", default="")

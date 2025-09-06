@@ -2,10 +2,16 @@
 
 Alpha Solver is a lightweight planning and execution engine for tool selection.
 
-## Quick Start
-See [docs/RUN_GUIDE.md](docs/RUN_GUIDE.md) for setup instructions and example
-commands to run the CLI. For development guidelines see
-[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
+## CLI & Quick Start
+See [docs/RUN_GUIDE.md](docs/RUN_GUIDE.md) for more examples and details.
+
+```bash
+python -m alpha.cli run --queries "demo query" --regions US --plan-only --seed 1234
+python -m alpha.cli run --queries-file docs/queries.sample.txt --regions US EU --explain
+python -m alpha.cli --examples  # show sample commands
+```
+
+For development guidelines see [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
 
 ## Local executors
 
