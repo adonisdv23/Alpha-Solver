@@ -82,6 +82,17 @@ def main() -> int:
             except Exception:
                 pass
     ids_set = {slugify_tool_id(x) for x in ids_reg}
+    steps_env = os.getenv("ALPHA_BUDGET_STEPS")
+    errors_env = os.getenv("ALPHA_MAX_ERRORS")
+    dry_env = os.getenv("ALPHA_POLICY_DRYRUN")
+    if steps_env:
+        if int(steps_env) <= 0:
+            raise SystemExit("[preflight] ALPHA_BUDGET_STEPS must be >0")
+    if errors_env:
+        if int(errors_env) <= 0:
+            raise SystemExit("[preflight] ALPHA_MAX_ERRORS must be >0")
+    if dry_env == "1":
+        print("[preflight] warning: dry-run mode enabled")
     priors_path = os.getenv("ALPHA_RECENCY_PRIORS_PATH")
     if priors_path:
         loaded = freshness.load_dated_priors(priors_path)
