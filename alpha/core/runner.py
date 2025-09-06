@@ -22,6 +22,7 @@ from .governance import (
 from .prompt_writer import PromptWriter
 from alpha.adapters import ADAPTERS
 from .session_trace import write_session_trace
+from .determinism import apply_seed
 
 
 def snapshot_shortlist(region: str, query_hash: str, shortlist: List[Dict[str, Any]]) -> str:
@@ -121,12 +122,19 @@ def run_plan(plan: Plan, local_only: bool = True) -> List[Dict]:
         ).strip()
     except Exception:
         env_path = ""
-    started = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    deterministic = os.getenv("ALPHA_DETERMINISM") == "1"
+    if deterministic:
+        seed = plan.run.get("seed", 0)
+        plan.run["seed"] = apply_seed(int(seed))
+        now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+        started = now
+    else:
+        started = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     try:
         trace = run(wrapper, execute=not local_only)
         return trace
     finally:
-        ended = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+        ended = now if deterministic else datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
         write_session_trace(
             {
                 "queries_source": plan.run.get("queries_source"),

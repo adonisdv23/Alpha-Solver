@@ -1,16 +1,32 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "definitions": {
-    "entry": {
-      "type": "object",
-      "required": ["id"],
-      "properties": {
-        "id": {"type": "string"}
+  "title": "Alpha Registry Tools Schema",
+  "type": "object",
+  "required": ["tools"],
+  "properties": {
+    "tools": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["tool_id", "name", "description"],
+        "properties": {
+          "tool_id": {"type": "string"},
+          "name": {"type": "string"},
+          "description": {"type": "string"},
+          "priors": {
+            "type": "object",
+            "properties": {
+              "sentiment": {"type": "number", "minimum": 0, "maximum": 1},
+              "adoption": {"type": "number", "minimum": 0, "maximum": 1},
+              "risk": {"type": "number", "minimum": 0, "maximum": 1},
+              "cost": {"type": "number", "minimum": 0, "maximum": 1}
+            },
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": true
       }
     }
   },
-  "oneOf": [
-    {"$ref": "#/definitions/entry"},
-    {"type": "array", "items": {"$ref": "#/definitions/entry"}}
-  ]
+  "additionalProperties": false
 }
