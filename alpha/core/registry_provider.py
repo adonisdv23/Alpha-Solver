@@ -10,12 +10,31 @@ from datetime import datetime, timezone
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 import json
 
+try:
+    from . import freshness
+except Exception:  # pragma: no cover - safety
+    freshness = None
+
 class RegistryProvider:
     def __init__(self, seed_path: str, schema_path: str, telemetry_path: Optional[str] = None):
         self.seed_path = seed_path
         self.schema_path = schema_path
         self.telemetry_path = telemetry_path or "telemetry/registry_usage.jsonl"
         self.rows: List[Dict[str, Any]] = []
+        # optional recency priors
+        path = os.getenv("ALPHA_RECENCY_PRIORS_PATH")
+        if freshness and path:
+            self._dated = freshness.load_dated_priors(path)
+        else:
+            self._dated = {}
+        try:
+            self._recency_weight = float(os.getenv("ALPHA_RECENCY_WEIGHT", "0.15"))
+        except Exception:
+            self._recency_weight = 0.15
+        try:
+            self._recency_halflife = float(os.getenv("ALPHA_RECENCY_HALFLIFE_DAYS", "90"))
+        except Exception:
+            self._recency_halflife = 90.0
 
     # ------------ load ------------
     def load(self) -> None:
@@ -121,6 +140,7 @@ class RegistryProvider:
 
     def rank(self, query: str, top_k: int, region: Optional[str] = None) -> List[Dict[str, Any]]:
         candidates: List[Dict[str, Any]] = []
+        utc_now = datetime.now(timezone.utc)
         for r in self.rows:
             sc = self.score(query, r)
             if region:
@@ -129,8 +149,16 @@ class RegistryProvider:
                     norm = {str(x).strip().upper() for x in regions}
                     if region.upper() not in norm and "GLOBAL" not in norm:
                         sc *= 0.8
+            tid = r.get("id") or r.get("vendor_id") or r.get("name")
+            if tid and self._dated:
+                rdt = self._dated.get(str(tid))
+                if rdt and freshness:
+                    rfac = freshness.recency_factor(
+                        rdt, now=utc_now, half_life_days=self._recency_halflife
+                    )
+                    sc = freshness.blend(sc, rfac, self._recency_weight)
             candidates.append({
-                "id": r.get("id") or r.get("vendor_id") or r.get("name"),
+                "id": tid,
                 "name": r.get("name"),
                 "score": sc,
             })

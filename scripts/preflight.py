@@ -1,5 +1,5 @@
 from __future__ import annotations
-import csv, json, sys
+import csv, json, sys, os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -10,6 +10,7 @@ sys.path.insert(0, str(ROOT))
 
 from alpha.core.ids import slugify_tool_id, validate_tool_id
 from scripts.validate_registry import validate_all as validate_registries
+from alpha.core import freshness
 
 def _safe_load_json(p: Path):
     try:
@@ -80,6 +81,27 @@ def main() -> int:
                 ids_reg.extend(_extract_ids(obj))
             except Exception:
                 pass
+    ids_set = {slugify_tool_id(x) for x in ids_reg}
+    priors_path = os.getenv("ALPHA_RECENCY_PRIORS_PATH")
+    if priors_path:
+        loaded = freshness.load_dated_priors(priors_path)
+        try:
+            raw_obj = json.loads(Path(priors_path).read_text(encoding="utf-8"))
+        except Exception:
+            raise SystemExit(f"[preflight] cannot read recency priors: {priors_path}")
+        if isinstance(raw_obj, dict):
+            raw_ids = {k for k in raw_obj.keys() if isinstance(k, str) and not k.startswith("_")}
+        else:
+            raw_ids = {r.get("tool_id") for r in raw_obj if isinstance(r, dict) and r.get("tool_id")}
+        bad_dates = sorted(raw_ids - set(loaded.keys()))
+        missing = sorted(t for t in loaded.keys() if slugify_tool_id(t) not in ids_set)
+        if bad_dates or missing:
+            parts = []
+            if bad_dates:
+                parts.append("bad dates for: " + ", ".join(bad_dates))
+            if missing:
+                parts.append("unknown tool_ids: " + ", ".join(missing))
+            raise SystemExit("[preflight] recency priors invalid: " + "; ".join(parts))
     ids_canon = []
     canon = ART_DIR / "tools_canon.csv"
     if canon.exists():

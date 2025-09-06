@@ -1,0 +1,6 @@
+{
+  "_comment": "Sample dated priors: tool_id -> last_updated date (ISO). Copy & edit; wire via ALPHA_RECENCY_PRIORS_PATH.",
+  "zapier.actions": "2025-08-15",
+  "sheets.local.csv": "2025-07-20",
+  "github.local.repo": "2025-06-30"
+}

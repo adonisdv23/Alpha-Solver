@@ -1,12 +1,41 @@
 """Execute plan steps with circuit breaker and audit logging"""
 from __future__ import annotations
-from typing import Dict, List
+import json
+import os
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Dict, List, Any
 
 from .plan import Plan
 
 from .governance import CircuitBreaker, AuditLogger
 from .prompt_writer import PromptWriter
 from alpha.adapters import ADAPTERS
+
+
+def snapshot_shortlist(region: str, query_hash: str, shortlist: List[Dict[str, Any]]) -> str:
+    """Persist top-k shortlist snapshot for audits; returns file path."""
+    topk = int(os.getenv("ALPHA_SNAPSHOT_TOPK", "5"))
+    art_root = os.getenv("ALPHA_ARTIFACTS_DIR", "artifacts")
+    path = Path(art_root) / "shortlists" / str(region) / f"{query_hash}.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    items = []
+    for rank, item in enumerate(shortlist[:topk], 1):
+        items.append({
+            "rank": rank,
+            "tool_id": str(item.get("id") or item.get("tool_id")),
+            "score": float(item.get("score", 0.0)),
+            "prior": float(item.get("prior", 0.0)),
+        })
+    rec = {
+        "region": region,
+        "query_hash": query_hash,
+        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "items": items,
+    }
+    with path.open("w", encoding="utf-8") as f:
+        json.dump(rec, f, ensure_ascii=False)
+    return str(path)
 
 
 def run(plan: Dict, *, execute: bool = False) -> List[Dict]:
