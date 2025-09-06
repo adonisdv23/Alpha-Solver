@@ -1,0 +1,62 @@
+[
+  {
+    "tool_id": "tool.cdp.mparticle",
+    "name": "mParticle",
+    "score": 0.18357142857142855,
+    "_parts": {
+      "lexical": 1.0,
+      "semantic": 0.6119047619047618,
+      "priors": 0.3,
+      "recency": 0.0
+    },
+    "confidence": 0.0,
+    "explain": {
+      "lexical": 1.0,
+      "semantic": 0.611905,
+      "priors": 0.3,
+      "recency": 0.0,
+      "total": 0.183571
+    },
+    "reason": "lex 1.00 + sem 0.61 + pri 0.30 + rec 0.00"
+  },
+  {
+    "tool_id": "tool.cdp.rudderstack",
+    "name": "RudderStack",
+    "score": 0.18357142857142855,
+    "_parts": {
+      "lexical": 1.0,
+      "semantic": 0.6119047619047618,
+      "priors": 0.3,
+      "recency": 0.0
+    },
+    "confidence": 0.0,
+    "explain": {
+      "lexical": 1.0,
+      "semantic": 0.611905,
+      "priors": 0.3,
+      "recency": 0.0,
+      "total": 0.183571
+    },
+    "reason": "lex 1.00 + sem 0.61 + pri 0.30 + rec 0.00"
+  },
+  {
+    "tool_id": "tool.cdp.segment",
+    "name": "Segment",
+    "score": 0.18357142857142855,
+    "_parts": {
+      "lexical": 1.0,
+      "semantic": 0.6119047619047618,
+      "priors": 0.3,
+      "recency": 0.0
+    },
+    "confidence": 0.0,
+    "explain": {
+      "lexical": 1.0,
+      "semantic": 0.611905,
+      "priors": 0.3,
+      "recency": 0.0,
+      "total": 0.183571
+    },
+    "reason": "lex 1.00 + sem 0.61 + pri 0.30 + rec 0.00"
+  }
+]

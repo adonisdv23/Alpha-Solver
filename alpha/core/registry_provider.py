@@ -79,34 +79,77 @@ class RegistryProvider:
     def load(self) -> None:
         p = Path(self.seed_path)
         self.rows = []
-        if not p.exists():
-            return
-        with p.open("r", encoding="utf-8") as f:
-            for raw in f:
-                line = (raw or "").strip()
-                if not line:
-                    continue
-                try:
-                    obj = json.loads(line)
-                    # normalize strings
+        row_map: Dict[str, Dict[str, Any]] = {}
+        if p.exists():
+            with p.open("r", encoding="utf-8") as f:
+                for raw in f:
+                    line = (raw or "").strip()
+                    if not line:
+                        continue
+                    try:
+                        obj = json.loads(line)
+                        # normalize strings
+                        for k, v in list(obj.items()):
+                            if isinstance(v, str):
+                                obj[k] = v.strip()
+                        # normalize list-like fields
+                        for field in (
+                            "tags",
+                            "keywords",
+                            "capabilities",
+                            "core_capabilities",
+                            "best_integration_scenarios",
+                            "limitations",
+                            "risk_flags",
+                            "compliance_scope",
+                            "regions",
+                        ):
+                            v = obj.get(field)
+                            if isinstance(v, str):
+                                toks = [
+                                    t.strip()
+                                    for t in v.replace("|", ",")
+                                    .replace(";", ",")
+                                    .split(",")
+                                    if t.strip()
+                                ]
+                                obj[field] = toks
+                        # precompute lexical bag
+                        obj["_lex_bag"] = self._tokens(
+                            " ".join(self._iter_texts(obj) or [])
+                        )
+                        tid = str(obj.get("id") or obj.get("vendor_id") or obj.get("name"))
+                        if tid:
+                            row_map[tid] = obj
+                    except Exception:
+                        pass
+
+        # optional canonical registry enrichment
+        canon_path = Path("registries/tools.json")
+        if canon_path.exists():
+            try:
+                canon_list = json.loads(canon_path.read_text(encoding="utf-8"))
+            except Exception:
+                canon_list = []
+            if isinstance(canon_list, list):
+                for obj in canon_list:
+                    if not isinstance(obj, dict):
+                        continue
                     for k, v in list(obj.items()):
                         if isinstance(v, str):
                             obj[k] = v.strip()
-                    # normalize list-like fields
-                    for field in (
-                        "tags","keywords","capabilities","core_capabilities",
-                        "best_integration_scenarios","limitations","risk_flags",
-                        "compliance_scope","regions"
-                    ):
-                        v = obj.get(field)
-                        if isinstance(v, str):
-                            toks = [t.strip() for t in v.replace("|",",").replace(";",",").split(",") if t.strip()]
-                            obj[field] = toks
-                    # precompute lexical bag
-                    obj["_lex_bag"] = self._tokens(" ".join(self._iter_texts(obj) or []))
-                    self.rows.append(obj)
-                except Exception:
-                    pass
+                    obj["_lex_bag"] = self._tokens(
+                        " ".join(self._iter_texts(obj) or [])
+                    )
+                    tid = str(obj.get("id") or obj.get("vendor_id") or obj.get("name"))
+                    if not tid:
+                        continue
+                    if tid in row_map:
+                        row_map[tid].update(obj)  # canon takes precedence
+                    else:
+                        row_map[tid] = obj
+
+        self.rows = list(row_map.values())
 
     # ------------ helpers ------------
     @staticmethod
@@ -261,6 +304,12 @@ class RegistryProvider:
                         f"lex {p['lexical']:.2f} + sem {p['semantic']:.2f} + "
                         f"pri {p['priors']:.2f} + rec {p['recency']:.2f}"
                     )
+                if os.getenv("ALPHA_ONLINE_SIGNALS") == "1":
+                    r["recently_seen"] = True
+                    r.setdefault("explain", {})["recently_seen"] = True
+                    reason = r.get("reason", "")
+                    if reason:
+                        r["reason"] = reason + " + recent"
         return ranked
 
     def rank(self, query: str, top_k: int, region: Optional[str] = None) -> List[Dict[str, Any]]:
