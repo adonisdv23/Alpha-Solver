@@ -36,4 +36,8 @@ fmt-check:
 	@echo "Temporary: Black check is disabled in CI. Use locally if desired."
 
 lint:
-	ruff check alpha
+        ruff check alpha
+
+artifacts:
+	python scripts/env_snapshot.py >/dev/null || true
+	python scripts/bundle_artifacts.py

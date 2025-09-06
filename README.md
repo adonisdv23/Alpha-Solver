@@ -29,6 +29,16 @@ To produce CSV output instead:
 python scripts/telemetry_leaderboard.py --paths telemetry/*.jsonl --topk 5 --format csv --out artifacts/leaderboard.csv
 ```
 
+## Artifacts & Repro
+
+See [docs/ARTIFACTS.md](docs/ARTIFACTS.md) for details on artifact schema
+versioning and run snapshots.
+
+```bash
+python scripts/env_snapshot.py
+python scripts/bundle_artifacts.py
+```
+
 ## Recency priors (optional)
 
 ```markdown

@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import hashlib
 import os
+import atexit
 from pathlib import Path
 import datetime as dt
 from typing import Iterable, Dict, Any
@@ -154,3 +155,29 @@ def enrich_telemetry_file(path: str, run_id: str) -> None:
         + "\n",
         encoding="utf-8",
     )
+
+
+def _normalize_at_exit() -> None:
+    path = os.getenv("TELEMETRY_PATH", "telemetry/registry_usage.jsonl")
+    p = Path(path)
+    if not p.exists():
+        return
+    ensure_run_header(path, run_id="", queries_source="atexit")
+    lines = [x for x in p.read_text(encoding="utf-8").splitlines() if x.strip()]
+    rows: list[dict] = []
+    for raw in lines:
+        try:
+            obj = json.loads(raw)
+        except Exception:
+            continue
+        if obj.get("type") != "run_header" and not obj.get("ts"):
+            obj["ts"] = now_rfc3339_z()
+        rows.append(_scrub_record(obj))
+    rows.append(_scrub_record({"event": "normalized", "ts": now_rfc3339_z()}))
+    p.write_text(
+        "\n".join(json.dumps(r, ensure_ascii=False) for r in rows) + "\n",
+        encoding="utf-8",
+    )
+
+
+atexit.register(_normalize_at_exit)

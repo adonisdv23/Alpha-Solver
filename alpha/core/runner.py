@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
@@ -17,6 +19,7 @@ from .governance import (
 )
 from .prompt_writer import PromptWriter
 from alpha.adapters import ADAPTERS
+from .session_trace import write_session_trace
 
 
 def snapshot_shortlist(region: str, query_hash: str, shortlist: List[Dict[str, Any]]) -> str:
@@ -105,7 +108,33 @@ def run_plan(plan: Plan, local_only: bool = True) -> List[Dict]:
         "steps": [s.to_dict() for s in plan.steps],
         "breaker": plan.guards.circuit_breakers,
     }
-    trace = run(wrapper, execute=not local_only)
-    plan.guards.audit = {"log_path": wrapper.get("audit_log")}
-    return trace
+    shortlist_paths: List[str] = []
+    sl = plan.artifacts.get("shortlist_snapshot")
+    if isinstance(sl, str):
+        shortlist_paths.append(sl)
+    env_path = ""
+    try:
+        env_path = subprocess.check_output(
+            [sys.executable, "-m", "scripts.env_snapshot"], text=True
+        ).strip()
+    except Exception:
+        env_path = ""
+    started = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    try:
+        trace = run(wrapper, execute=not local_only)
+        return trace
+    finally:
+        ended = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+        write_session_trace(
+            {
+                "queries_source": plan.run.get("queries_source"),
+                "regions": [plan.run.get("region")] if plan.run.get("region") else [],
+                "seed": plan.run.get("seed"),
+                "shortlist_paths": shortlist_paths,
+                "env_snapshot_path": env_path,
+                "started_at": started,
+                "ended_at": ended,
+            }
+        )
+        plan.guards.audit = {"log_path": wrapper.get("audit_log")}
 
