@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
@@ -14,6 +15,43 @@ try:
     from alpha.core import freshness
 except Exception:  # pragma: no cover - safety
     freshness = None
+
+
+def write_shortlist_snapshot(
+    query: str, region: str, k: int, items: List[Dict[str, Any]]
+) -> Path:
+    """Write shortlist snapshot with schema_version and return path."""
+    art_root = os.getenv("ALPHA_ARTIFACTS_DIR", "artifacts")
+    qhash = hashlib.sha1((query or "").encode("utf-8")).hexdigest()
+    path = Path(art_root) / "shortlists" / str(region) / f"{qhash}.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    snap_items: List[Dict[str, Any]] = []
+    for it in items[: int(k)]:
+        rec: Dict[str, Any] = {
+            "tool_id": str(it.get("tool_id") or it.get("id")),
+            "score": float(it.get("score", 0.0)),
+            "confidence": float(it.get("confidence", 0.0)),
+        }
+        reason = it.get("reason")
+        if isinstance(reason, str) and reason:
+            rec["reason"] = reason
+        explain = it.get("explain")
+        if isinstance(explain, dict) and explain:
+            rec["explain"] = explain
+        snap_items.append(rec)
+    rec = {
+        "schema_version": "v1",
+        "query": query,
+        "region": region,
+        "k": int(k),
+        "created_at": datetime.now(timezone.utc)
+        .isoformat()
+        .replace("+00:00", "Z"),
+        "items": snap_items,
+    }
+    with path.open("w", encoding="utf-8") as f:
+        json.dump(rec, f, ensure_ascii=False, sort_keys=True)
+    return path
 
 class RegistryProvider:
     def __init__(
