@@ -1,6 +1,8 @@
 from __future__ import annotations
 import argparse
 import sys
+import os
+import hashlib
 from pathlib import Path
 from typing import List
 
@@ -104,6 +106,9 @@ def main(argv: List[str] | None = None) -> int:
                 args.k,
                 clusters=loader.REGISTRY_CACHE.get("clusters"),
             )
+            qhash = hashlib.sha256(query.encode("utf-8")).hexdigest()[:12]
+            os.environ.setdefault("ALPHA_ARTIFACTS_DIR", str(artifact_dir))
+            snapshot_path = runner.snapshot_shortlist(region, qhash, shortlist)
             plan = orchestrator.build_plan(
                 query,
                 region,
@@ -119,7 +124,7 @@ def main(argv: List[str] | None = None) -> int:
             plan_dir = ensure_dir(Path(artifact_dir) / "plans" / ts)
             shortlist_path = artifact_dir / "last_shortlist.json"
             write_json_atomic(shortlist_path, shortlist)
-            plan.artifacts["shortlist_snapshot"] = str(shortlist_path)
+            plan.artifacts["shortlist_snapshot"] = snapshot_path
             plan_path = plan_dir / "plan.json"
             plan.artifacts["plan_path"] = str(plan_path)
             write_json_atomic(plan_path, plan.to_dict())
