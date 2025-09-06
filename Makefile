@@ -30,12 +30,12 @@ exec-test:
 	pytest -q tests/test_math_exec.py tests/test_csv_exec.py tests/test_instruction_adapter.py
 
 fmt:
-        isort .
-        black .
+	isort alpha
+	black .
 
 fmt-check:
-        isort --check-only .
-        black --check .
+	isort --check-only alpha
+	black --check .
 
 lint:
         ruff check alpha

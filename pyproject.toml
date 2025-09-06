@@ -6,7 +6,7 @@ target-version = ["py312"]
 profile = "black"
 line_length = 100
 py_version = 312
-skip = ["artifacts", "telemetry", "logs", ".venv", ".pytest_cache", ".ruff_cache"]
+skip = ["artifacts", "telemetry", "logs", "scripts", "tests", ".venv", ".pytest_cache", ".ruff_cache"]
 
 [tool.ruff]
 line-length = 100
