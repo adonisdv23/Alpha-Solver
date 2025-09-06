@@ -1,4 +1,8 @@
 from datetime import datetime, timezone
+from telemetry_tools import write_run_header, sha1_query
+import os
+import atexit
+from telemetry_tools import ensure_run_header, enrich_telemetry_file
 #!/usr/bin/env python3
 """Overnight pipeline for Alpha Solver"""
 import json
@@ -17,7 +21,57 @@ parser = argparse.ArgumentParser(description="Alpha Solver overnight pipeline")
 parser.add_argument("--regions", default="EU,''", help="comma-separated regions; '' means no-region")
 parser.add_argument("--k", type=int, default=5, help="top-N tools")
 parser.add_argument("--queries", default="", help="path to queries file")
+parser.add_argument('--telemetry', default=None, help='Path to telemetry jsonl (optional)')
 args = parser.parse_args()
+# ##_ALPHA_TELEM_BLOCK begin
+run_id = None
+telemetry_path = getattr(args, 'telemetry', None)
+if telemetry_path:
+    run_id = write_run_header(
+        telemetry_path,
+        regions=[r.strip() for r in getattr(args,'regions','').split(',')] if getattr(args,'regions',None) else [],
+        queries_source='args',
+        code_version=os.getenv('GIT_COMMIT_SHA','')
+    )
+    os.environ['ALPHA_RUN_ID'] = run_id or ''
+    def _alpha_post_run():
+        try:
+            ensure_run_header(telemetry_path, run_id=run_id or '', regions=[r.strip() for r in getattr(args,'regions','').split(',')] if getattr(args,'regions',None) else [], queries_source='args', code_version=os.getenv('GIT_COMMIT_SHA',''))
+            if run_id:
+                enrich_telemetry_file(telemetry_path, run_id)
+        except Exception as _e:
+            pass
+    atexit.register(_alpha_post_run)
+# ##_ALPHA_TELEM_BLOCK end
+run_id = None
+telemetry_path = getattr(args, 'telemetry', None)
+if telemetry_path:
+    run_id = write_run_header(
+        telemetry_path,
+        regions=[r.strip() for r in getattr(args,'regions','').split(',')] if getattr(args,'regions',None) else [],
+        queries_source='args',
+        code_version=os.getenv('GIT_COMMIT_SHA','')
+    )
+
+run_id = None
+telemetry_path = getattr(args, 'telemetry', None)
+if telemetry_path:
+    run_id = write_run_header(
+        telemetry_path,
+        regions=[r.strip() for r in args.regions.split(',')] if hasattr(args,'regions') and args.regions else [],
+        queries_source='args',
+        code_version=os.getenv('GIT_COMMIT_SHA','')
+    )
+
+    run_id = None
+    telemetry_path = getattr(args, 'telemetry', None)
+    if telemetry_path:
+        run_id = write_run_header(
+            telemetry_path,
+            regions=[r.strip() for r in args.regions.split(',')] if hasattr(args,'regions') and args.regions else [],
+            queries_source='args',
+            code_version=os.getenv('GIT_COMMIT_SHA','')
+        )
 
 ART_DIR = Path('artifacts')
 ART_DIR.mkdir(exist_ok=True)
@@ -203,3 +257,55 @@ with zipfile.ZipFile(bundle_path, 'w') as zf:
             zf.write(p, p.name)
 
 print(json.dumps({"ok": True, "regions": len(regions), "k": args.k, "queries": len(queries)}))
+
+# --- robust exit-time telemetry normalization (works without accessing local variables) ---
+def _normalize_telemetry_at_exit():
+    try:
+        # find --telemetry <path> from argv
+        tp = None
+        if "--telemetry" in sys.argv:
+            idx = sys.argv.index("--telemetry")
+            if idx+1 < len(sys.argv):
+                tp = sys.argv[idx+1]
+        if not tp:
+            return
+
+        # try to read existing header to reuse its run_id
+        rid = ""
+        try:
+            with open(tp, "r", encoding="utf-8") as f:
+                for line in f:
+                    line=line.strip()
+                    if not line: 
+                        continue
+                    import json as _json
+                    first = _json.loads(line)
+                    if first.get("type")=="run_header" and first.get("run_id"):
+                        rid = first.get("run_id")
+                    break
+        except Exception:
+            pass
+
+        ensure_run_header(tp, rid)
+        if not rid:
+            # read back the header we just wrote to get its run_id
+            try:
+                import json as _json
+                with open(tp, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line=line.strip()
+                        if not line: 
+                            continue
+                        hdr = _json.loads(line)
+                        rid = hdr.get("run_id","")
+                        break
+            except Exception:
+                pass
+
+        if rid:
+            enrich_telemetry_file(tp, rid)
+    except Exception:
+        # never crash the run over telemetry maintenance
+        pass
+
+atexit.register(_normalize_telemetry_at_exit)
