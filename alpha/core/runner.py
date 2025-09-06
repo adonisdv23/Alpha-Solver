@@ -1,15 +1,17 @@
 """Execute plan steps with governance checks"""
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import subprocess
 import sys
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
-from .plan import Plan
+from .plan import Plan, PlanStep, bounded_retry
 from .governance import (
     AuditLogger,
     BudgetCapGate,
@@ -137,4 +139,83 @@ def run_plan(plan: Plan, local_only: bool = True) -> List[Dict]:
             }
         )
         plan.guards.audit = {"log_path": wrapper.get("audit_log")}
+
+
+# ---------------------------------------------------------------------------
+# Plan spine / CLI helpers
+
+
+def _build_plan(query: str, region: str) -> Plan:
+    """Construct a minimal Plan instance for the given query/region."""
+    step = PlanStep(
+        tool_id="noop",
+        step_id="step-1",
+        description=f"demo step for {query}",
+        contract={"ok": True},
+    )
+    return Plan(
+        run_id=uuid.uuid4().hex,
+        query=query,
+        region=region,
+        steps=[step],
+        retries=1,
+    )
+
+
+def _execute_step(step: PlanStep) -> Dict[str, Any]:
+    """Demo executor used for CLI runs."""
+    # If description hints failure, return failing result for retry tests.
+    if "fail" in (step.description or "").lower():
+        return {"ok": False}
+    return {"ok": True}
+
+
+def execute_plan(plan: Plan) -> None:
+    """Execute steps with bounded retry and populate results."""
+    for s in plan.steps:
+        bounded_retry(s, lambda: _execute_step(s), max_retries=plan.retries)
+
+
+def _write_last_plan(plan: Plan) -> Path:
+    art_root = Path(os.getenv("ALPHA_ARTIFACTS_DIR", "artifacts"))
+    art_root.mkdir(parents=True, exist_ok=True)
+    path = art_root / "last_plan.json"
+    with path.open("w", encoding="utf-8") as f:
+        json.dump(plan.to_json(), f, ensure_ascii=False, sort_keys=True)
+    return path
+
+
+def main(argv: List[str] | None = None) -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--query", default="")
+    parser.add_argument("--region", default="US")
+    parser.add_argument("--plan-only", action="store_true")
+    parser.add_argument("--explain", action="store_true")
+    parser.add_argument("--execute", action="store_true")
+    args = parser.parse_args(argv)
+
+    # default behaviour is execute unless plan-only or explain is set
+    do_execute = args.execute or (not args.plan_only and not args.explain)
+
+    plan = _build_plan(args.query, args.region)
+
+    if args.plan_only:
+        _write_last_plan(plan)
+        return
+
+    if args.explain:
+        _write_last_plan(plan)
+        print(plan.human_summary())
+        for s in plan.steps:
+            print(f"{s.step_id}: {s.description}")
+        if not do_execute:
+            return
+
+    if do_execute:
+        execute_plan(plan)
+        _write_last_plan(plan)
+
+
+if __name__ == "__main__":  # pragma: no cover - CLI entry
+    main()
 

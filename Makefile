@@ -39,5 +39,8 @@ lint:
         ruff check alpha
 
 artifacts:
-	python scripts/env_snapshot.py >/dev/null || true
-	python scripts/bundle_artifacts.py
+        python scripts/env_snapshot.py >/dev/null || true
+        python scripts/bundle_artifacts.py
+
+plan:
+	python -m alpha.core.runner --plan-only --query "demo query" || true

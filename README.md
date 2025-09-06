@@ -39,6 +39,19 @@ python scripts/env_snapshot.py
 python scripts/bundle_artifacts.py
 ```
 
+## Plan Spine & Transparency
+
+The runner can emit a minimal *plan spine* showing how a query will be solved.
+
+```bash
+python -m alpha.core.runner --plan-only --query "Test"
+python -m alpha.core.runner --explain --query "Test"
+```
+
+`--plan-only` writes `artifacts/last_plan.json` without executing any steps.
+`--explain` adds human readable summaries; omit both flags (or use `--execute`)
+to run the plan and emit the same artifact with results.
+
 ## Recency priors (optional)
 
 ```markdown
