@@ -17,6 +17,15 @@ For development guidelines see [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
 
 See [docs/EXECUTORS.md](docs/EXECUTORS.md) for built-in math and CSV executors.
 
+The sandbox executor can run tiny subprocesses with resource limits:
+
+```bash
+python - <<'PY'
+from alpha.executors.sandbox import run_subprocess
+print(run_subprocess(["echo", "hi"], timeout_s=1))
+PY
+```
+
 ```bash
 python -m alpha.executors.math_exec "2+2"
 ```
@@ -95,6 +104,21 @@ python scripts/preflight.py  # validates file if set
 ```
 
 Weights (if any) are applied to scores before tie-breaks.
+
+## Preflight
+
+Validate the registry and basic settings:
+
+```bash
+make preflight
+# or
+python scripts/preflight.py --fix-ids
+```
+
+## Determinism switch
+
+Set `ALPHA_DETERMINISM=1` to lock a global seed and a single UTC
+timestamp in session traces for reproducible runs.
 
 ## Governance v1
 

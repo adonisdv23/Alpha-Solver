@@ -5,4 +5,5 @@ __pycache__/
 logs/
 artifacts/
 telemetry/*.jsonl
+.DS_Store
 

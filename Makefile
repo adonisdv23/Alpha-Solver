@@ -1,5 +1,5 @@
 help:
-	@echo "Targets: run, sweep, telemetry, golden, test"
+        @echo "Targets: run, sweep, telemetry, golden, test, preflight, dev-venv, release-notes"
 
 run:
 	python -m alpha.cli run --queries "demo query" --regions US --plan-only --seed 1234 || true
@@ -14,4 +14,13 @@ golden:
 	pytest -q tests/test_golden_scenarios.py
 
 test:
-	pytest -q
+        pytest -q
+
+preflight:
+        python scripts/preflight.py
+
+dev-venv:
+        python -m venv .venv && .venv/bin/pip install -r requirements.txt -r requirements-dev.txt
+
+release-notes:
+        @cat RELEASE.md
