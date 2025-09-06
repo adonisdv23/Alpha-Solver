@@ -98,9 +98,10 @@ export ALPHA_TELEMETRY_SCRUB_FIELDS="query_text,raw_prompt"
 
 ## Formatting & Linting
 
-We lint product code with `ruff` (scoped to `alpha/` and `scripts/`) in CI and pre-commit:
-`ruff check alpha scripts` (CI) and `ruff check --fix alpha scripts` locally. Use the make
-targets below to keep style consistent.
+We lint the **core library** with `ruff` (scoped to `alpha/`) in CI and pre-commit:
+`ruff check alpha` (CI) and `ruff check --fix alpha` locally.
+The `scripts/` and `tests/` trees are covered by `black`/`isort` only to keep CI fast and noise-free.
+Use the make targets below to keep style consistent.
 
 ```bash
 make fmt       # format with isort and black

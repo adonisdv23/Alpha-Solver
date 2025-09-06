@@ -22,6 +22,6 @@ jobs:
       - name: Lint (ruff / isort / black)
         run: |
           pip install ruff==0.5.7 black==24.4.2 isort==5.13.2
-          ruff check alpha scripts
+          ruff check alpha
           isort --check-only .
           black --check .

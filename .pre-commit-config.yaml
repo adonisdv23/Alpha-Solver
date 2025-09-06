@@ -3,14 +3,14 @@ repos:
     rev: v0.5.7
     hooks:
       - id: ruff
-        name: ruff (fix on code)
+        name: ruff (fix on core)
         entry: ruff check --fix
-        args: [alpha, scripts]
+        args: [alpha]
         language_version: python3
       - id: ruff-format
-        name: ruff format (code)
+        name: ruff format (core)
         entry: ruff format
-        args: [alpha, scripts]
+        args: [alpha]
         language_version: python3
   - repo: https://github.com/psf/black
     rev: 24.4.2

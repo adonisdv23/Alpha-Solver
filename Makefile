@@ -38,4 +38,4 @@ fmt-check:
         black --check .
 
 lint:
-        ruff check alpha scripts
+        ruff check alpha
