@@ -98,7 +98,8 @@ export ALPHA_TELEMETRY_SCRUB_FIELDS="query_text,raw_prompt"
 
 ## Formatting & Linting
 
-We use `ruff check .` in CI and `ruff check --fix .` locally via pre-commit. Use the make
+We lint product code with `ruff` (scoped to `alpha/` and `scripts/`) in CI and pre-commit:
+`ruff check alpha scripts` (CI) and `ruff check --fix alpha scripts` locally. Use the make
 targets below to keep style consistent.
 
 ```bash
