@@ -5,7 +5,10 @@ run:
 	python -m alpha.cli run --queries "demo query" --regions US --plan-only --seed 1234 || true
 
 sweep:
-	python -m alpha.cli run --queries-file docs/queries.sample.txt --regions US EU --explain || true
+        python -m alpha.cli run --queries-file docs/queries.sample.txt --regions US EU --explain || true
+
+policy-dry-run:
+	python -m alpha.cli run --queries "demo" --policy-dry-run --budget-max-steps 3 --breaker-max-fails 1 || true
 
 telemetry:
         python scripts/telemetry_leaderboard.py --paths telemetry/*.jsonl --format all || true

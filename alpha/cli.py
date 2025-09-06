@@ -39,6 +39,29 @@ def _add_common_args(p: argparse.ArgumentParser) -> None:
     mode.add_argument("--plan-only", action="store_true", help="Emit plan and exit (no execution).")
     mode.add_argument("--explain", action="store_true", help="Emit plan + explanations, no execution.")
     mode.add_argument("--execute", action="store_true", help="Execute actions (default).")
+    p.add_argument("--policy-dry-run", action="store_true", help="Log policy warnings but never block.")
+    p.add_argument(
+        "--budget-max-steps",
+        type=int,
+        default=0,
+        help="Maximum allowed steps (0 = unlimited).",
+    )
+    p.add_argument(
+        "--budget-max-seconds",
+        type=float,
+        default=0.0,
+        help="Maximum wall-clock seconds (0 = unlimited).",
+    )
+    p.add_argument(
+        "--breaker-max-fails",
+        type=int,
+        default=0,
+        help="Consecutive failures before breaker trips (0 = disabled).",
+    )
+    p.add_argument(
+        "--data-policy",
+        help="Path to data_policy.json controlling family/tag allow/deny.",
+    )
 
 
 def _resolve_version() -> str:
@@ -104,6 +127,11 @@ def main(argv: List[str] | None = None) -> int:
                 seed=args.seed,
                 topk=args.topk,
                 mode=mode,
+                policy_dry_run=args.policy_dry_run,
+                budget_max_steps=args.budget_max_steps,
+                budget_max_seconds=args.budget_max_seconds,
+                breaker_max_fails=args.breaker_max_fails,
+                data_policy=args.data_policy,
             )
         if args.cmd == "telemetry":
             import subprocess, sys as _sys
