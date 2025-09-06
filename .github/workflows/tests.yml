@@ -19,3 +19,8 @@ jobs:
       - env:
           PYTHONPATH: .
         run: python -m pytest -q
+      - run: |
+          pip install ruff==0.5.7 black==24.4.2 isort==5.13.2
+          ruff .
+          isort --check-only .
+          black --check .

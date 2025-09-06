@@ -1,24 +1,7 @@
-
-# local run artifacts
-telemetry/
-artifacts/
-
 .venv/
+__pycache__/
 .pytest_cache/
-.venv/
-.pytest_cache/
-
-# runtime artifacts
-artifacts/
-telemetry/
+.ruff_cache/
 logs/
-replays/
-__pycache__/
-*.pyc
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# top-level logs
-*.log
+artifacts/
+telemetry/*.jsonl

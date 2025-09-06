@@ -4,7 +4,8 @@ Alpha Solver is a lightweight planning and execution engine for tool selection.
 
 ## Quick Start
 See [docs/RUN_GUIDE.md](docs/RUN_GUIDE.md) for setup instructions and example
-commands to run the CLI.
+commands to run the CLI. For development guidelines see
+[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
 
 ## Local executors
 
@@ -93,4 +94,18 @@ to collect usage logs for later review.
 export ALPHA_TELEMETRY_SCRUB=1
 # optional override
 export ALPHA_TELEMETRY_SCRUB_FIELDS="query_text,raw_prompt"
+```
+
+## Formatting & Linting
+
+```bash
+make fmt       # format with isort and black
+make fmt-check # check formatting
+make lint      # run ruff
+```
+
+Optional: install pre-commit hooks locally:
+
+```bash
+pip install pre-commit && pre-commit install
 ```

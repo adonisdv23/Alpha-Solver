@@ -1,22 +1,61 @@
 from __future__ import annotations
+
 import argparse
-import sys
-import os
+import glob
 import hashlib
+import os
+import subprocess
+import sys
+from datetime import datetime
 from pathlib import Path
 from typing import List
 
 from . import __version__
-from .core import loader, selector, orchestrator, runner
+from .core import loader, orchestrator, runner, selector
 from .core.determinism import apply_seed
-from .core.paths import ensure_dir, write_json_atomic, timestamp_rfc3339z
+from .core.paths import ensure_dir, timestamp_rfc3339z, write_json_atomic
+
+
+def _run_telemetry(since: str | None, topk: int, out: str | None) -> int:
+    from scripts import telemetry_leaderboard
+
+    files = []
+    for path in glob.glob("telemetry/*.jsonl"):
+        if since:
+            try:
+                cutoff = datetime.fromisoformat(since)
+            except ValueError:
+                cutoff = None
+            if cutoff and datetime.fromtimestamp(Path(path).stat().st_mtime) < cutoff:
+                continue
+        files.append(path)
+    counts = telemetry_leaderboard.build_leaderboard(
+        telemetry_leaderboard.iter_rows(files)
+    )
+    content = telemetry_leaderboard.to_markdown(counts, topk)
+    if out:
+        out_path = Path(out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(content, encoding="utf-8")
+    else:
+        print(content)
+    return 0
+
+
+def _run_quick_audit() -> int:
+    subprocess.run([sys.executable, "scripts/quick_audit.py"], check=True)
+    return 0
 
 
 def parse_queries(path: str) -> List[str]:
     p = Path(path)
     if not p.is_file():
         raise FileNotFoundError(path)
-    return [line.strip() for line in p.read_text(encoding="utf-8").splitlines() if line.strip()]
+    return [
+        line.strip()
+        for line in p.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
 
 
 def main(argv: List[str] | None = None) -> int:
@@ -25,22 +64,39 @@ def main(argv: List[str] | None = None) -> int:
         epilog=(
             "Examples:\n"
             "  python -m alpha.cli --plan-only --queries docs/queries.txt\n"
-            "  python -m alpha.cli --execute --regions 'US' --queries docs/queries.txt\n"
-            "  python -m alpha.cli --explain --regions 'EU' --queries docs/queries.txt"
+            "  python -m alpha.cli telemetry --topk 5\n"
+            "  python -m alpha.cli quick-audit"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
+    parser.add_argument("--version", action="store_true", help="print version and exit")
+    sub = parser.add_subparsers(dest="command")
+    tele = sub.add_parser("telemetry", help="render telemetry leaderboard")
+    tele.add_argument("--since", help="filter files modified after YYYY-MM-DD")
+    tele.add_argument("--topk", type=int, default=5, help="top N solvers")
+    tele.add_argument("--out", help="output file path")
+    sub.add_parser("quick-audit", help="leaderboard and snapshot counts")
+
     modes = parser.add_mutually_exclusive_group()
-    modes.add_argument("--plan-only", "--dry-run", action="store_true", dest="plan_only", help="build plan only")
-    modes.add_argument("--explain", action="store_true", help="build plan with explanations")
+    modes.add_argument(
+        "--plan-only",
+        "--dry-run",
+        action="store_true",
+        dest="plan_only",
+        help="build plan only",
+    )
+    modes.add_argument(
+        "--explain", action="store_true", help="build plan with explanations"
+    )
     modes.add_argument("--execute", action="store_true", help="build and execute plan")
     parser.add_argument("--regions", default="US", help="comma-separated regions")
     parser.add_argument("--k", type=int, default=5, help="top-N tools")
     parser.add_argument("--queries", default="docs/queries.txt", help="queries file")
     parser.add_argument("--outdir", default="artifacts", help="output directory")
     parser.add_argument("--seed", type=int, default=None, help="optional seed")
-    parser.add_argument("--version", action="store_true", help="print version and exit")
-    parser.add_argument("--policy-dryrun", action="store_true", help="policy dry run (no enforcement)")
+    parser.add_argument(
+        "--policy-dryrun", action="store_true", help="policy dry run (no enforcement)"
+    )
     parser.add_argument("--benchmark", action="store_true", help="run benchmark suite")
     parser.add_argument("--replay", help="replay a saved session id")
     args = parser.parse_args(argv)
@@ -48,6 +104,10 @@ def main(argv: List[str] | None = None) -> int:
     if args.version:
         print(f"Alpha Solver {__version__}")
         return 0
+    if args.command == "telemetry":
+        return _run_telemetry(args.since, args.topk, args.out)
+    if args.command == "quick-audit":
+        return _run_quick_audit()
 
     if args.replay:
         from .core.replay import ReplayHarness
@@ -75,7 +135,7 @@ def main(argv: List[str] | None = None) -> int:
     obs = ObservabilityManager()
     obs.log_event({"event": "start", "seed": seed})
 
-    regions = [r.strip() for r in args.regions.split(',') if r.strip()]
+    regions = [r.strip() for r in args.regions.split(",") if r.strip()]
     if not regions:
         print("No regions specified", file=sys.stderr)
         return 2
