@@ -1,33 +1,23 @@
 # Run Guide
 
-## Quick Start
+## Quick start
 
 ```bash
-make test
-make telemetry
-make quick-audit
+python -m alpha.cli run --queries "find calendar tools" --regions US --plan-only --seed 1234
+python -m alpha.cli run --queries-file docs/queries.sample.txt --regions US EU --explain
 ```
 
-## Environment Variables
+## Queries file format
 
-| Name | Description |
-|------|-------------|
-| `ALPHA_RECENCY` | Optional recency weight (e.g. `0.15`) |
-| `ALPHA_REGION_WEIGHTS` | Path to region weights JSON |
-| `ALPHA_POLICY_DRYRUN` | Set `1` to disable policy enforcement |
-| `ALPHA_BUDGET` | Maximum allowed tool steps |
-| `ALPHA_MAX_ERRORS` | Fail fast after this many errors |
-| `ALPHA_TELEMETRY_SCRUB` | Scrub sensitive fields from telemetry |
+Lines starting with `#` are comments
 
-## Short Sweep
+Blank lines ignored
 
-```bash
-python scripts/overnight_run.py --regions "US,EU" --k 5 --queries docs/queries.txt
-```
+`@file path/to/other.txt` includes content (recursive, cycle-safe)
 
-Artifacts are written under `artifacts/` by default:
+## Modes
 
-- `artifacts/leaderboard.md`
-- `artifacts/shortlists/<region>/<query_hash>.json`
+- `--plan-only`: emit `artifacts/last_plan.json`
+- `--explain`: plan + explanations, no execution
+- `--execute`: default
 
-Set `ALPHA_ARTIFACTS_DIR` to override the output root.

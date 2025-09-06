@@ -19,6 +19,13 @@ jobs:
       - env:
           PYTHONPATH: .
         run: python -m pytest -q
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts
+          path: |
+            artifacts/**
+            tests/**/diff*.txt
       - name: Lint (ruff only)
         run: |
           pip install ruff==0.5.7

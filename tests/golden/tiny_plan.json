@@ -1,0 +1,24 @@
+{
+  "schema_version": "v1",
+  "run_id": "RUN_ID",
+  "query": "demo query",
+  "region": "US",
+  "retries": 1,
+  "created_at": "TS",
+  "steps": [
+    {
+      "tool_id": "noop",
+      "prompt": "",
+      "adapter": null,
+      "reasons": {},
+      "confidence": null,
+      "estimated_cost_usd": 0.0,
+      "mode": "execute",
+      "enrichment": {},
+      "step_id": "step-1",
+      "description": "demo step for demo query",
+      "contract": {"ok": true}
+    }
+  ]
+}
+
