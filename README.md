@@ -39,9 +39,61 @@ python -m alpha.executors.math_exec "2+2"
 ## Using Tree-of-Thought
 
 ```python
-from alpha_solver_v91_python import _tree_of_thought
+from alpha_solver_entry import _tree_of_thought
 result = _tree_of_thought("solve x")
-print(result["answer"], result["confidence"])
+print(result["final_answer"], result["confidence"])
+```
+
+Note: `_tree_of_thought` is imported from `alpha_solver_entry` (a small shim)
+because the canonical file name is hyphenated for historical reasons.
+
+```python
+_tree_of_thought(
+    query: str,
+    *,
+    seed: int = 42,
+    branching_factor: int = 3,
+    score_threshold: float = 0.70,
+    max_depth: int = 5,
+    timeout_s: int = 10,
+    dynamic_prune_margin: float = 0.15,
+    low_conf_threshold: float = 0.60,        # SAFE-OUT policy
+    enable_cot_fallback: bool = True,        # SAFE-OUT policy
+) -> dict
+```
+
+### Safety: Low-Confidence Fallback (SAFE-OUT)
+
+Tree-of-Thought exposes two thresholds:
+
+- `score_threshold` – accept a path inside the solver (default `0.70`); if no path ≥ threshold, ToT returns best-so-far with reason `"below_threshold"`.
+- `low_conf_threshold` – trigger SAFE-OUT policy (default `0.60`); if final confidence < this, the policy routes to `cot_fallback` (when enabled) or `best_effort`.
+
+Returned policy output schema:
+
+```python
+{
+  "final_answer": "...",
+  "route": "tot" | "cot_fallback" | "best_effort",
+  "confidence": 0.0,
+  "reason": "ok" | "low_confidence" | "timeout" | "below_threshold",
+  "notes": "...",
+  "tot": { "answer": "...", "confidence": 0.0, "path": [], "explored_nodes": 0, "config": {...}, "reason": "ok|timeout|below_threshold" },
+  "cot": { "answer": "...", "confidence": 0.0, "steps": [] }  # present only if fallback executed
+}
+```
+
+Usage:
+
+```python
+from alpha_solver_entry import _tree_of_thought
+
+result = _tree_of_thought(
+    "vague query",
+    score_threshold=0.70,
+    low_conf_threshold=0.60,
+)
+print(result["route"], result["final_answer"])
 ```
 
 ## Telemetry Leaderboard (offline, stdlib-only)

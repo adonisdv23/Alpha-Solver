@@ -1,6 +1,8 @@
 """Alpha Solver v91 entrypoints."""
 
 from alpha.reasoning.tot import TreeOfThoughtSolver
+from alpha.policy.safe_out import SafeOutPolicy
+from alpha.reasoning.logging import log_safe_out_decision
 
 
 def _tree_of_thought(
@@ -12,6 +14,8 @@ def _tree_of_thought(
     max_depth: int = 5,
     timeout_s: int = 10,
     dynamic_prune_margin: float = 0.15,
+    low_conf_threshold: float = 0.60,
+    enable_cot_fallback: bool = True,
 ) -> dict:
     """Solve ``query`` via deterministic Tree-of-Thought reasoning."""
     solver = TreeOfThoughtSolver(
@@ -22,4 +26,16 @@ def _tree_of_thought(
         timeout_s=timeout_s,
         dynamic_prune_margin=dynamic_prune_margin,
     )
-    return solver.solve(query)
+    tot_result = solver.solve(query)
+    policy = SafeOutPolicy(
+        low_conf_threshold=low_conf_threshold,
+        enable_cot_fallback=enable_cot_fallback,
+    )
+    decision = policy.apply(tot_result, query)
+    log_safe_out_decision(
+        route=decision["route"],
+        conf=float(tot_result.get("confidence", 0.0)),
+        threshold=low_conf_threshold,
+        reason=decision["reason"],
+    )
+    return decision

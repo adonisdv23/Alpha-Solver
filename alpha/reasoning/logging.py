@@ -10,3 +10,8 @@ def log_event(event: str, **data: Any) -> None:
     """Log a structured JSON event."""
     payload = {"event": event, **data, "ts": time.time()}
     LOGGER.info(json.dumps(payload))
+
+
+def log_safe_out_decision(*, route: str, conf: float, threshold: float, reason: str) -> None:
+    """Convenience wrapper for SAFE-OUT policy decisions."""
+    log_event("safe_out_decision", route=route, conf=conf, threshold=threshold, reason=reason)
