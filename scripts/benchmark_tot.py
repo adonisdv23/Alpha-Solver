@@ -1,4 +1,4 @@
-from alpha_solver_v91_python import _tree_of_thought
+from alpha_solver_entry import _tree_of_thought
 
 
 def main() -> None:
@@ -7,7 +7,7 @@ def main() -> None:
     total_conf = 0.0
     for q in queries:
         result = _tree_of_thought(q)
-        total_nodes += result["explored_nodes"]
+        total_nodes += result["tot"]["explored_nodes"]
         total_conf += result["confidence"]
     avg_conf = total_conf / len(queries)
     print(f"explored_nodes={total_nodes}")
