@@ -45,7 +45,17 @@ skip = ["artifacts", "telemetry", "logs", "scripts", "tests", ".venv", ".pytest_
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-exclude = ["artifacts", "telemetry", "logs", "scripts", "tests", ".venv", ".pytest_cache", ".ruff_cache"]
+exclude = [
+    "artifacts",
+    "telemetry",
+    "logs",
+    "scripts",
+    "tests",
+    ".venv",
+    ".pytest_cache",
+    ".ruff_cache",
+    "Alpha Solver.py",
+]
 lint.select = ["E", "F"]
 # Ignore style-only errors; enforce only correctness
 lint.ignore = ["E501", "E402", "E401"]

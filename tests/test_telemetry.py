@@ -14,8 +14,15 @@ async def _run_exporter(tmp_path):
         batches.append(batch)
 
     exporter = TelemetryExporter(sender, batch_size=2, retry_seconds=0)
-    await exporter.emit({"a": 1})
-    await exporter.emit({"b": 2})
+    base = {
+        "session_id": "s",
+        "event": "test",
+        "timestamp": 0,
+        "version": "1.0",
+        "data": {},
+    }
+    await exporter.emit(base)
+    await exporter.emit({**base, "event": "test2"})
     await exporter.close()
     assert calls["count"] >= 2
     assert batches and len(batches[0]) == 2

@@ -2,11 +2,25 @@ from __future__ import annotations
 import asyncio
 from typing import Any, Awaitable, Callable, Dict, List
 
+REQUIRED_FIELDS = {"session_id", "event", "timestamp", "version", "data"}
+
+
+def validate_event(event: Dict[str, Any]) -> None:
+    """Validate telemetry event against the required schema."""
+    missing = REQUIRED_FIELDS - event.keys()
+    if missing:
+        raise ValueError(f"missing telemetry fields: {sorted(missing)}")
+
 
 class TelemetryExporter:
-    """Asynchronous telemetry exporter with batching and retry."""
+    """Asynchronous telemetry exporter with batching, retry and validation."""
 
-    def __init__(self, sender: Callable[[List[Dict[str, Any]]], Awaitable[None]], batch_size: int = 10, retry_seconds: float = 0.1):
+    def __init__(
+        self,
+        sender: Callable[[List[Dict[str, Any]]], Awaitable[None]],
+        batch_size: int = 10,
+        retry_seconds: float = 0.1,
+    ):
         self.sender = sender
         self.batch_size = batch_size
         self.retry_seconds = retry_seconds
@@ -35,6 +49,7 @@ class TelemetryExporter:
                 await asyncio.sleep(self.retry_seconds)
 
     async def emit(self, event: Dict[str, Any]) -> None:
+        validate_event(event)
         await self.queue.put(event)
 
     async def close(self) -> None:

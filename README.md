@@ -264,6 +264,15 @@ Optional: install pre-commit hooks locally:
 pip install pre-commit && pre-commit install
 ```
 
+## Observability & Testing
+
+Alpha Solver ships with a ReplayHarness, telemetry exporter and accessibility checks.
+
+- Use `--record <session>` / `--replay <session>` to capture and validate deterministic runs.
+- Telemetry events are validated and can be sent to custom endpoints via `--telemetry-endpoint`.
+- `--strict-accessibility` enforces readability targets and writes JSON/CSV reports under `reports/`.
+- `alpha.core.benchmark.benchmark` exports both JSON and Markdown summaries and can stress-test replay and telemetry pipelines.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
