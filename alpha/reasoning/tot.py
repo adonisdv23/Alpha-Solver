@@ -1,193 +1,193 @@
 from __future__ import annotations
 
-"""Deterministic Tree-of-Thought reasoning utilities."""
+"""Deterministic Tree-of-Thought solver."""
 
 from dataclasses import dataclass, field, replace
-from types import MappingProxyType
-from typing import Any, Dict, List, Mapping, Tuple
+from typing import Dict, List, Tuple
 import heapq
-import logging
+import random
 import time
 
-from .cot import guidance_score
+from .logging import log_event
 
 
 @dataclass(frozen=True)
 class Node:
-    """Represents a node in the reasoning tree."""
+    """Immutable node in the reasoning tree."""
 
-    id: int
-    subquery: str
+    content: str
     path: Tuple[str, ...]
-    score: float
     depth: int
-    context: Mapping[str, Any] = field(default_factory=dict, compare=False)
+    score: float = field(default=0.0, compare=False)
+    id: int = field(default=0, compare=False)
 
-    def __post_init__(self) -> None:  # pragma: no cover - trivial
-        object.__setattr__(self, "context", MappingProxyType(dict(self.context)))
+
+TEMPLATE_FUNCS = (
+    lambda q: f"Rephrase: {q}",
+    lambda q: f"Decompose: {q}",
+    lambda q: f"Edge cases: {q}",
+    lambda q: f"Counterpoints: {q}",
+    lambda q: f"Summarize: {q}",
+)
 
 
 class TreeOfThoughtSolver:
-    """Simple deterministic Tree-of-Thought solver.
-
-    The solver performs a greedy best-first traversal of a reasoning tree with
-    deterministic branching and scoring. It stops when the score threshold,
-    maximum depth, or timeout is reached.
-    """
+    """Greedy deterministic Tree-of-Thought solver."""
 
     def __init__(
         self,
         *,
-        branching_factor: int = 2,
-        score_threshold: float = 0.9,
-        max_depth: int = 3,
-        timeout: float = 1.0,
-        max_nodes: int = 100,
-        prune_ratio: float = 0.8,
+        seed: int = 42,
+        branching_factor: int = 3,
+        score_threshold: float = 0.70,
+        max_depth: int = 5,
+        timeout_s: int = 10,
+        dynamic_prune_margin: float = 0.15,
     ) -> None:
+        self.seed = seed
         self.branching_factor = branching_factor
         self.score_threshold = score_threshold
         self.max_depth = max_depth
-        self.timeout = timeout
-        self.max_nodes = max_nodes
-        self.prune_ratio = prune_ratio
-        self.visited: set[tuple[str, Tuple[Tuple[str, Any], ...]]] = set()
-        self.logger = logging.getLogger(__name__)
-        self._counter = 0
+        self.timeout_s = timeout_s
+        self.dynamic_prune_margin = dynamic_prune_margin
+        self.rng = random.Random(seed)
+        self.visited: Dict[Node, float] = {}
+        self._id_counter = 0
+        self._query_tokens: set[str] = set()
+        self._frontier: List[Tuple[float, int, Tuple[str, ...], int, Node]] = []
+        self._explored_nodes = 0
+        self._timed_out = False
 
+    # ------------------------------------------------------------------
+    # Utilities
+    # ------------------------------------------------------------------
     def _next_id(self) -> int:
-        self._counter += 1
-        return self._counter
+        self._id_counter += 1
+        return self._id_counter
+
+    def _priority(self, node: Node) -> Tuple[float, int, Tuple[str, ...], int, Node]:
+        return (-node.score, node.depth, node.path, node.id, node)
+
+    def _config_dict(self) -> Dict[str, float | int]:
+        return {
+            "seed": self.seed,
+            "branching_factor": self.branching_factor,
+            "score_threshold": self.score_threshold,
+            "max_depth": self.max_depth,
+            "timeout_s": self.timeout_s,
+            "dynamic_prune_margin": self.dynamic_prune_margin,
+        }
 
     # ------------------------------------------------------------------
     # Core components
     # ------------------------------------------------------------------
-    def branch_generator(self, node: Node) -> List[Node]:
-        """Generate deterministic child branches for ``node``."""
-
-        branches: List[Node] = []
-        for i in range(self.branching_factor):
-            subquery = f"{node.subquery}.{i + 1}"
-            child = Node(
+    def branch_generator(self, parent: Node) -> List[Node]:
+        """Generate deterministic child branches for ``parent``."""
+        children: List[Node] = []
+        for tmpl in TEMPLATE_FUNCS[: self.branching_factor]:
+            text = tmpl(parent.content)
+            node = Node(
+                content=text,
+                path=parent.path + (text,),
+                depth=parent.depth + 1,
                 id=self._next_id(),
-                subquery=subquery,
-                path=node.path + (subquery,),
-                score=0.0,
-                depth=node.depth + 1,
-                context=dict(node.context),
             )
-            score = self.path_scorer(child)
-            child = replace(child, score=score)
-            self.logger.info(
-                {
-                    "event": "branch",
-                    "parent": node.id,
-                    "child": child.id,
-                    "step": i,
-                    "subquery": child.subquery,
-                    "score": child.score,
-                }
-            )
-            branches.append(child)
-        return branches
+            score = self.path_scorer(node)
+            node = replace(node, score=score)
+            children.append(node)
+        children.sort(key=lambda n: n.content)
+        return children
 
     def path_scorer(self, node: Node) -> float:
-        """Score ``node`` using path and context guidance.
+        """Score ``node`` using simple deterministic heuristics."""
+        tokens = set(node.content.lower().split())
+        relevance = len(self._query_tokens & tokens) / max(len(self._query_tokens), 1)
 
-        The score combines deterministic path metrics, depth, path length, and
-        Chain-of-Thought guidance hints stored in ``node.context``. The result is
-        normalized to ``[0, 1]``.
-        """
+        progress = max(0.0, 1 - (node.depth / max(self.max_depth, 1)))
 
-        path_total = sum((i + 1) * ord(ch) for i, ch in enumerate("".join(node.path)))
-        path_score = (path_total % 50) / 50
-        depth_score = 1.0 - (node.depth / max(self.max_depth, 1))
-        length_score = len(node.path) / (self.max_depth + 1)
-        guidance = guidance_score(node.context)
-        return max(0.0, min(1.0, (path_score + depth_score + length_score + guidance) / 4))
+        text = " ".join(node.path).lower()
+        contradictions = {"contradiction", "inconsistent", "impossible"}
+        consistency = 0.0 if any(term in text for term in contradictions) else 1.0
 
-    def best_path_selector(self, frontier: List[Tuple[float, Tuple[str, ...], int, Node]]) -> Node:
-        """Pop and return the highest scoring node from ``frontier``."""
+        score = 0.4 * relevance + 0.3 * progress + 0.3 * consistency
+        return round(max(0.0, min(1.0, score)), 3)
 
-        return heapq.heappop(frontier)[3]
-
-    def _retrace_and_prune(
-        self, node: Node, best_score: float, *, threshold: float | None = None
-    ) -> bool:
-        """Return ``True`` if ``node`` should be pruned.
-
-        ``threshold`` is the multiplier applied to ``best_score`` for pruning. If not
-        provided, ``self.prune_ratio`` is used. Paths already visited are also
-        pruned.
-        """
-
-        key = (node.subquery, tuple(sorted(node.context.items())))
-        if key in self.visited:
-            self.logger.info(
-                {
-                    "event": "prune",
-                    "reason": "visited",
-                    "node": node.id,
-                    "score": node.score,
-                }
-            )
-            return True
-
-        ratio = threshold if threshold is not None else self.prune_ratio
-        if node.score < best_score * ratio:
-            self.logger.info(
-                {
-                    "event": "prune",
-                    "reason": "threshold",
-                    "node": node.id,
-                    "score": node.score,
-                    "best": best_score,
-                    "ratio": ratio,
-                }
-            )
-            return True
-
-        self.visited.add(key)
-        return False
-
-    # ------------------------------------------------------------------
-    # Solver entry point
-    # ------------------------------------------------------------------
-    def solve(self, query: str) -> Dict[str, Any]:
-        """Solve ``query`` using deterministic Tree-of-Thought reasoning."""
-
-        start = time.monotonic()
-        root = Node(id=self._next_id(), subquery=query, path=(query,), score=0.0, depth=0)
-        root = replace(root, score=self.path_scorer(root))
-        frontier: List[Tuple[float, Tuple[str, ...], int, Node]] = [
-            (-root.score, root.path, root.id, root)
-        ]
+    def best_path_selector(self, root: Node) -> Node:
+        """Greedy best-first search starting from ``root``."""
+        start = time.time()
+        self._frontier = [self._priority(root)]
+        self.visited = {root: root.score}
         best = root
-        nodes_expanded = 0
-
-        while frontier:
-            if time.monotonic() - start > self.timeout:
-                self.logger.warning(
-                    {"event": "abort", "reason": "timeout", "nodes": nodes_expanded}
-                )
+        while self._frontier:
+            if time.time() - start > self.timeout_s:
+                self._timed_out = True
                 break
-            if nodes_expanded >= self.max_nodes:
-                self.logger.warning(
-                    {"event": "abort", "reason": "max_nodes", "nodes": nodes_expanded}
-                )
-                break
-
-            current = self.best_path_selector(frontier)
-            best = current
-
+            current = heapq.heappop(self._frontier)[-1]
+            log_event(
+                "expand",
+                node_id=current.id,
+                depth=current.depth,
+                score=current.score,
+                path=list(current.path),
+                seed=self.seed,
+            )
+            if current.score > best.score:
+                best = current
+                self._retrace_and_prune(best.score)
             if current.score >= self.score_threshold or current.depth >= self.max_depth:
-                break
-
+                continue
             for child in self.branch_generator(current):
-                if self._retrace_and_prune(child, best.score):
+                prev = self.visited.get(child)
+                if prev is not None and prev >= child.score:
                     continue
-                heapq.heappush(frontier, (-child.score, child.path, child.id, child))
+                self.visited[child] = child.score
+                heapq.heappush(self._frontier, self._priority(child))
+            self._explored_nodes += 1
+        return best
 
-            nodes_expanded += 1
+    def _retrace_and_prune(self, active_best_score: float) -> None:
+        """Prune frontier nodes far from ``active_best_score``."""
+        threshold = active_best_score - self.dynamic_prune_margin
+        kept = [item for item in self._frontier if item[-1].score >= threshold]
+        if len(kept) != len(self._frontier):
+            self._frontier[:] = kept
+            heapq.heapify(self._frontier)
 
-        return {"solution": best.subquery, "path": list(best.path), "score": best.score}
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
+    def solve(self, query: str) -> Dict[str, object]:
+        """Solve ``query`` using deterministic Tree-of-Thought search."""
+        self._query_tokens = set(query.lower().split())
+        self._explored_nodes = 0
+        self._timed_out = False
+
+        root = Node(content=query, path=(query,), depth=0, id=self._next_id())
+        root = replace(root, score=self.path_scorer(root))
+
+        log_event("config", config=self._config_dict(), seed=self.seed)
+
+        best = self.best_path_selector(root)
+
+        reason = (
+            "timeout"
+            if self._timed_out
+            else ("ok" if best.score >= self.score_threshold else "below_threshold")
+        )
+
+        log_event(
+            "summary",
+            reason=reason,
+            explored=self._explored_nodes,
+            best_score=best.score,
+            seed=self.seed,
+        )
+
+        return {
+            "answer": best.content,
+            "confidence": best.score,
+            "path": list(best.path),
+            "explored_nodes": self._explored_nodes,
+            "config": self._config_dict(),
+            "reason": reason,
+        }

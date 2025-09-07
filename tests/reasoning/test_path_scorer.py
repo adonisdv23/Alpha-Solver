@@ -1,26 +1,24 @@
 from alpha.reasoning.tot import TreeOfThoughtSolver, Node
 
 
-def test_path_scorer_context_and_normalization():
+def test_path_scorer_deterministic_and_bounds():
     solver = TreeOfThoughtSolver()
-    base = Node(id=0, subquery="q", path=("q",), score=0.0, depth=0)
-    hinted = Node(
-        id=1,
-        subquery="q",
-        path=("q",),
-        score=0.0,
-        depth=0,
-        context={"hint": "because"},
-    )
-    base_score = solver.path_scorer(base)
-    hinted_score = solver.path_scorer(hinted)
-    assert 0 <= base_score <= 1
-    assert 0 <= hinted_score <= 1
-    assert hinted_score > base_score
+    solver._query_tokens = {"solve", "x"}
+    node = Node(content="Rephrase: solve x", path=("solve x", "Rephrase: solve x"), depth=1)
+    score1 = solver.path_scorer(node)
+    score2 = solver.path_scorer(node)
+    assert 0 <= score1 <= 1
+    assert score1 == score2 == round(score1, 3)
 
 
-def test_path_scorer_deterministic_with_context():
+def test_path_scorer_penalizes_irrelevant_and_contradiction():
     solver = TreeOfThoughtSolver()
-    node1 = Node(id=0, subquery="q", path=("q",), score=0.0, depth=0, context={"hint": "thus"})
-    node2 = Node(id=1, subquery="q", path=("q",), score=0.0, depth=0, context={"hint": "thus"})
-    assert solver.path_scorer(node1) == solver.path_scorer(node2)
+    solver._query_tokens = {"solve", "x"}
+    relevant = Node(content="Rephrase: solve x", path=("solve x", "Rephrase: solve x"), depth=1)
+    irrelevant = Node(content="unrelated", path=("solve x", "unrelated"), depth=1)
+    contradiction = Node(content="This is impossible", path=("solve x", "This is impossible"), depth=1)
+    score_rel = solver.path_scorer(relevant)
+    score_irrel = solver.path_scorer(irrelevant)
+    score_contra = solver.path_scorer(contradiction)
+    assert score_rel > score_irrel
+    assert score_contra < score_rel
