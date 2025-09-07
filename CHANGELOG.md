@@ -1,11 +1,14 @@
 # Changelog
 
 ## [Unreleased]
-### Fixed
-- Remove duplicate entrypoint module; normalize imports to a single `_tree_of_thought` API.
+### Added
+- Multi-branch Tree-of-Thought exploration with beam-like search.
+- Progressive complexity router with deterministic escalation.
+- Agents v12 scaffolding and flags.
+- Deterministic benchmarking script `bench_reasoners.py`.
 
-### Docs
-- Clarified `score_threshold` vs `low_conf_threshold` and documented SAFE-OUT output schema.
+### Changed
+- Entrypoint accepts new routing and multi-branch parameters and returns diagnostics.
 
 ## [2025-09-07]
 ### Added

@@ -96,6 +96,36 @@ result = _tree_of_thought(
 print(result["route"], result["final_answer"])
 ```
 
+### ToT Multi-Branch
+
+Enable breadth-limited exploration:
+
+```python
+_tree_of_thought("q", multi_branch=True, max_width=3, max_nodes=200)
+```
+
+| Config | Default | Description |
+| --- | --- | --- |
+| `multi_branch` | `True` | Enable beam search |
+| `max_width` | `3` | Nodes kept per layer |
+| `max_nodes` | `200` | Total exploration cap |
+
+### Progressive Router
+
+Escalates prompt complexity when early progress is low. Profiles: `basic` → `structured` → `constrained`.
+
+### Agents v12 (groundwork)
+
+Flags for future multi-agent routing. Default implementations are deterministic no-ops.
+
+### Benchmarks
+
+Run deterministic benchmarks comparing CoT vs ToT variants:
+
+```bash
+python scripts/bench_reasoners.py
+```
+
 ## Telemetry Leaderboard (offline, stdlib-only)
 
 Generate a Markdown leaderboard from telemetry JSONL files:
