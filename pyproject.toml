@@ -20,7 +20,14 @@ dependencies = []
 alpha-solver = "alpha.cli:main"
 
 [tool.setuptools]
-packages = ["alpha", "alpha.core", "alpha.adapters", "alpha.executors", "scripts"]
+packages = [
+    "alpha",
+    "alpha.core",
+    "alpha.adapters",
+    "alpha.executors",
+    "alpha.reasoning",
+    "scripts",
+]
 
 [tool.setuptools.package-data]
 alpha = ["**/*.json", "**/*.md"]
