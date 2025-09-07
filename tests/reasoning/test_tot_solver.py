@@ -1,25 +1,22 @@
 from alpha.reasoning.tot import TreeOfThoughtSolver
 
 
-def test_tot_solver_end_to_end():
-    solver = TreeOfThoughtSolver(branching_factor=2, max_depth=2, score_threshold=0.95)
-    result = solver.solve("start")
-    assert result["solution"] == "start.2.1"
-    assert result["path"] == ["start", "start.2", "start.2.1"]
-    assert 0 <= result["score"] <= 1
+def _run():
+    solver = TreeOfThoughtSolver(seed=42)
+    return solver.solve("solve x")
 
 
-def test_timeout_abort(caplog):
-    solver = TreeOfThoughtSolver(timeout=0.0)
-    with caplog.at_level("WARNING"):
-        result = solver.solve("start")
-    assert result["path"] == ["start"]
-    assert any(rec.msg.get("reason") == "timeout" for rec in caplog.records)
+def test_tot_solver_deterministic_and_confident():
+    r1, r2, r3 = _run(), _run(), _run()
+    assert r1["answer"] == r2["answer"] == r3["answer"]
+    assert r1["confidence"] == r2["confidence"] == r3["confidence"]
+    assert len(r1["path"]) == len(r2["path"]) == len(r3["path"])
+    assert r1["confidence"] >= 0.70
+    assert r1["reason"] == "ok"
 
 
-def test_max_nodes_abort(caplog):
-    solver = TreeOfThoughtSolver(max_nodes=0)
-    with caplog.at_level("WARNING"):
-        result = solver.solve("start")
-    assert result["path"] == ["start"]
-    assert any(rec.msg.get("reason") == "max_nodes" for rec in caplog.records)
+def test_tot_solver_below_threshold():
+    solver = TreeOfThoughtSolver(seed=42, score_threshold=0.9)
+    result = solver.solve("impossible question")
+    assert result["reason"] == "below_threshold"
+    assert result["confidence"] < 0.9

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """Alpha Solver v91 entrypoints."""
 
 from alpha.reasoning.tot import TreeOfThoughtSolver
@@ -8,15 +6,20 @@ from alpha.reasoning.tot import TreeOfThoughtSolver
 def _tree_of_thought(
     query: str,
     *,
-    timeout: float = 1.0,
-    max_nodes: int = 100,
-    **kwargs,
-):
-    """Solve ``query`` using the deterministic Tree-of-Thought solver.
-
-    Parameters ``timeout`` and ``max_nodes`` provide safeguards against runaway
-    searches and are forwarded to :class:`TreeOfThoughtSolver`.
-    """
-
-    solver = TreeOfThoughtSolver(timeout=timeout, max_nodes=max_nodes, **kwargs)
+    seed: int = 42,
+    branching_factor: int = 3,
+    score_threshold: float = 0.70,
+    max_depth: int = 5,
+    timeout_s: int = 10,
+    dynamic_prune_margin: float = 0.15,
+) -> dict:
+    """Solve ``query`` via deterministic Tree-of-Thought reasoning."""
+    solver = TreeOfThoughtSolver(
+        seed=seed,
+        branching_factor=branching_factor,
+        score_threshold=score_threshold,
+        max_depth=max_depth,
+        timeout_s=timeout_s,
+        dynamic_prune_margin=dynamic_prune_margin,
+    )
     return solver.solve(query)

@@ -36,6 +36,14 @@ PY
 python -m alpha.executors.math_exec "2+2"
 ```
 
+## Using Tree-of-Thought
+
+```python
+from alpha_solver_v91_python import _tree_of_thought
+result = _tree_of_thought("solve x")
+print(result["answer"], result["confidence"])
+```
+
 ## Telemetry Leaderboard (offline, stdlib-only)
 
 Generate a Markdown leaderboard from telemetry JSONL files:
