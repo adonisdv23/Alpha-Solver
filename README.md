@@ -96,6 +96,37 @@ result = _tree_of_thought(
 print(result["route"], result["final_answer"])
 ```
 
+### SAFE-OUT v1.1 (State Machine & Structured Recovery)
+
+SAFE-OUT now uses a tiny deterministic state machine to assess results and, when needed, run a bounded Chain-of-Thought fallback.
+_tree_of_thought maintains backward compatibility: existing keys are unchanged; phases and enriched notes are additive.
+
+```python
+from alpha_solver_entry import _tree_of_thought
+
+result = _tree_of_thought(
+    "ambiguous prompt",
+    seed=123,
+    low_conf_threshold=0.75,
+    enable_cot_fallback=True,
+)
+
+print(result["route"])
+print(result["phases"])
+print(result["notes"])
+```
+
+Output (truncated):
+
+```json
+{
+  "final_answer": "...",
+  "route": "cot_fallback",
+  "phases": ["init", "assess", "fallback", "finalize"],
+  "notes": "path=init->assess->fallback->finalize"
+}
+```
+
 ## Telemetry Leaderboard (offline, stdlib-only)
 
 Generate a Markdown leaderboard from telemetry JSONL files:

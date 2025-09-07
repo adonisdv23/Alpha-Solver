@@ -1,6 +1,12 @@
 # Changelog
 
 ## [Unreleased]
+### Added
+- SAFE-OUT v1.1 state machine with structured recovery and phase logging.
+
+### Changed
+- `_tree_of_thought` entrypoint returns phase traces and richer notes.
+
 ### Fixed
 - Remove duplicate entrypoint module; normalize imports to a single `_tree_of_thought` API.
 
