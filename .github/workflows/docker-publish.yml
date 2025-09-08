@@ -1,0 +1,15 @@
+name: Docker Publish
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build image
+        run: docker build -f infrastructure/Dockerfile -t alpha-solver-api .
+      - name: Push image
+        if: startsWith(github.ref, 'refs/tags/')
+        run: echo "Pushing image..." # placeholder for registry login/push

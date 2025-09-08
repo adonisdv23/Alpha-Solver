@@ -41,6 +41,17 @@ print(run_subprocess(["echo", "hi"], timeout_s=1))
 PY
 ```
 
+## API Service
+
+An experimental FastAPI wrapper is available for running the solver as a web
+service. Start the stack (API + telemetry + monitoring) with:
+
+```bash
+docker compose -f infrastructure/docker-compose.yml up --build
+```
+
+See [docs/api.md](docs/api.md) for usage details.
+
 ```bash
 python -m alpha.executors.math_exec "2+2"
 ```
