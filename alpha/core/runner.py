@@ -24,6 +24,48 @@ from alpha.adapters import ADAPTERS
 from .session_trace import write_session_trace
 from .determinism import apply_seed
 from alpha.policy.governance import GovernanceEngine
+from alpha.reasoning.cot_self_validate import validate_answer
+from alpha.core.config import ValidationConfig
+
+# simple in-memory telemetry log used in tests
+TELEMETRY_EVENTS: List[Dict[str, Any]] = []
+
+
+def run_reasoning(
+    query: str,
+    *,
+    strategy: str = "CoT",
+    seed: int = 0,
+    config: ValidationConfig | None = None,
+    cot_steps: List[str] | None = None,
+    answer: str | None = None,
+    confidence: float = 0.0,
+) -> Dict[str, Any]:
+    """Run a reasoning strategy optionally applying self-validation."""
+
+    from alpha.reasoning.cot import run_cot
+
+    if cot_steps is None or answer is None:
+        result = run_cot(query, seed=seed, max_steps=3)
+    else:
+        result = {"steps": cot_steps, "answer": answer, "confidence": confidence}
+    cfg = config or ValidationConfig()
+    if strategy == "CoT" and cfg.enabled:
+        ok, reasons = validate_answer(result.get("steps", []), result.get("answer", ""))
+        result["validation"] = {"ok": ok, "reasons": reasons}
+        result["post_validate_confidence"] = result.get("confidence", 0.0)
+        if not ok and result.get("confidence", 0.0) < cfg.min_conf:
+            from alpha.reasoning.cot_self_validate import _eval_simple_arithmetic
+
+            expected = _eval_simple_arithmetic("\n".join(result.get("steps", [])))
+            if expected is not None:
+                corrected = str(int(expected)) if float(expected).is_integer() else str(expected)
+                if corrected != result.get("answer"):
+                    result["answer"] = corrected
+                    result["post_validate_confidence"] = cfg.min_conf
+                    result["validation"] = {"ok": True, "reasons": reasons}
+                    TELEMETRY_EVENTS.append({"event": "cot_validate_correction"})
+    return result
 
 
 def snapshot_shortlist(region: str, query_hash: str, shortlist: List[Dict[str, Any]]) -> str:

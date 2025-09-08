@@ -19,6 +19,7 @@ python -m alpha.cli --examples  # show sample commands
 python -m alpha.cli replay --session SESSION_ID
 python -m alpha.cli bench --quick
 python -m alpha.cli a11y-check --input artifacts/replays/SESSION_ID.jsonl
+python -m alpha.cli router simulate --dataset datasets/mvp_golden.jsonl --seed 42 --compare-baseline
 ```
 
 Governance limits:
