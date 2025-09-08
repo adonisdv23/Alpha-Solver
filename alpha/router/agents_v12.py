@@ -53,3 +53,12 @@ class NoOpCalculator:
     def run(self, expr: str) -> float:
         return 0.0
 
+
+# Registry of deterministic no-op agents for v12 scaffolding.
+AGENTS_V12 = {
+    "decomposer": NoOpDecomposer(),
+    "checker": NoOpChecker(),
+    "calculator": NoOpCalculator(),
+}
+
+

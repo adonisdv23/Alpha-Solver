@@ -1,4 +1,5 @@
-from alpha.router import ProgressiveRouter, ProgressiveRouterConfig
+from alpha.router import ProgressiveRouter
+from alpha.router.config import ProgressiveRouterConfig
 
 
 def test_progressive_router_escalates():

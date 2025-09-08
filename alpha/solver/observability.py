@@ -7,8 +7,12 @@ from typing import Any, Dict, Tuple
 
 from alpha.core.observability import ObservabilityManager
 from alpha.reasoning.tot import TreeOfThoughtSolver
-from alpha.router import AgentsV12Config, ProgressiveRouter
+from alpha.router import ProgressiveRouter
+from alpha.router.config import AgentsV12Config
 from alpha.policy.safe_out_sm import SOConfig, SafeOutStateMachine
+
+
+__all__ = ["AlphaSolver"]
 
 
 @dataclass
