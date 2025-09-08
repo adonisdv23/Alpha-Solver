@@ -17,4 +17,14 @@ _spec.loader.exec_module(_module)  # type: ignore[attr-defined]
 AlphaSolver = _module.AlphaSolver  # type: ignore[attr-defined]
 _tree_of_thought = _module._tree_of_thought  # type: ignore[attr-defined]
 
-__all__ = ["AlphaSolver", "_tree_of_thought"]
+
+def get_solver() -> AlphaSolver:
+    """Return a new :class:`AlphaSolver` instance.
+
+    This helper mirrors the minimal factory expected by tests and scripts
+    while deferring all heavy lifting to the lazily-loaded implementation.
+    """
+
+    return AlphaSolver()
+
+__all__ = ["AlphaSolver", "_tree_of_thought", "get_solver"]
