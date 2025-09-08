@@ -9,19 +9,13 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
-import unittest
-
-
-# Skip eagerly if optional dependencies are missing.  We try importing them
-# directly so environments without ``build`` or ``packaging`` don't error during
-# collection.
-try:  # pragma: no cover - exercised implicitly when deps are missing
-    import build  # type: ignore  # noqa: F401
-    import packaging  # type: ignore  # noqa: F401
-except ModuleNotFoundError:  # pragma: no cover - exercised when deps absent
-    raise unittest.SkipTest("build/packaging modules required for packaging test")
 
 import pytest
+
+# Skip eagerly if optional dependencies are missing so environments without
+# ``build`` or ``packaging`` don't error during collection.
+pytest.importorskip("build")
+pytest.importorskip("packaging")
 
 
 def test_packaging_build(tmp_path: Path) -> None:
@@ -49,4 +43,3 @@ def test_packaging_build(tmp_path: Path) -> None:
         pytest.skip("build module missing or build failed")
 
     assert any((work / "dist").glob("*"))
-
