@@ -1,0 +1,66 @@
+[
+  {
+    "prompt": "What is 2+2?",
+    "method": "cot",
+    "explored_nodes": 0,
+    "top_score": 0.5,
+    "elapsed_ms": 0,
+    "route": "cot"
+  },
+  {
+    "prompt": "What is 2+2?",
+    "method": "tot_single",
+    "explored_nodes": 0,
+    "top_score": 1.0,
+    "elapsed_ms": 0,
+    "route": "tot"
+  },
+  {
+    "prompt": "What is 2+2?",
+    "method": "tot_multi",
+    "explored_nodes": 0,
+    "top_score": 1.0,
+    "elapsed_ms": 0,
+    "route": "tot"
+  },
+  {
+    "prompt": "What is 2+2?",
+    "method": "tot_router",
+    "explored_nodes": 0,
+    "top_score": 1.0,
+    "elapsed_ms": 0,
+    "route": "basic"
+  },
+  {
+    "prompt": "Name three colors.",
+    "method": "cot",
+    "explored_nodes": 0,
+    "top_score": 0.5,
+    "elapsed_ms": 0,
+    "route": "cot"
+  },
+  {
+    "prompt": "Name three colors.",
+    "method": "tot_single",
+    "explored_nodes": 0,
+    "top_score": 1.0,
+    "elapsed_ms": 0,
+    "route": "tot"
+  },
+  {
+    "prompt": "Name three colors.",
+    "method": "tot_multi",
+    "explored_nodes": 0,
+    "top_score": 1.0,
+    "elapsed_ms": 0,
+    "route": "tot"
+  },
+  {
+    "prompt": "Name three colors.",
+    "method": "tot_router",
+    "explored_nodes": 0,
+    "top_score": 1.0,
+    "elapsed_ms": 0,
+    "route": "basic"
+  }
+]

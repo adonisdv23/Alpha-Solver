@@ -32,7 +32,7 @@ TEMPLATE_FUNCS = (
 
 
 class TreeOfThoughtSolver:
-    """Greedy deterministic Tree-of-Thought solver."""
+    """Deterministic Tree-of-Thought solver with optional multi-branch search."""
 
     def __init__(
         self,
@@ -43,6 +43,9 @@ class TreeOfThoughtSolver:
         max_depth: int = 5,
         timeout_s: int = 10,
         dynamic_prune_margin: float = 0.15,
+        multi_branch: bool = False,
+        max_width: int = 3,
+        max_nodes: int = 100,
     ) -> None:
         self.seed = seed
         self.branching_factor = branching_factor
@@ -50,6 +53,9 @@ class TreeOfThoughtSolver:
         self.max_depth = max_depth
         self.timeout_s = timeout_s
         self.dynamic_prune_margin = dynamic_prune_margin
+        self.multi_branch = multi_branch
+        self.max_width = max_width
+        self.max_nodes = max_nodes
         self.rng = random.Random(seed)
         self.visited: Dict[Node, float] = {}
         self._id_counter = 0
@@ -76,6 +82,9 @@ class TreeOfThoughtSolver:
             "max_depth": self.max_depth,
             "timeout_s": self.timeout_s,
             "dynamic_prune_margin": self.dynamic_prune_margin,
+            "multi_branch": int(self.multi_branch),
+            "max_width": self.max_width,
+            "max_nodes": self.max_nodes,
         }
 
     # ------------------------------------------------------------------
@@ -145,6 +154,50 @@ class TreeOfThoughtSolver:
             self._explored_nodes += 1
         return best
 
+    def beam_search(self, root: Node, *, router: "ProgressiveRouter" | None = None) -> Node:
+        """Deterministic breadth-limited multi-branch exploration."""
+        start = time.time()
+        frontier: List[Node] = [root]
+        best = root
+        explored = 0
+        while frontier and explored < self.max_nodes:
+            if time.time() - start > self.timeout_s:
+                self._timed_out = True
+                break
+            depth = frontier[0].depth
+            route = router.stage if router else "basic"
+            log_event("tot_layer", depth=depth, size=len(frontier), route=route, seed=self.seed)
+            frontier.sort(key=lambda n: (-round(n.score, 3), n.path))
+            layer = frontier[: self.max_width]
+            for node in layer:
+                log_event(
+                    "tot_candidate",
+                    depth=node.depth,
+                    score=node.score,
+                    path=list(node.path),
+                    route=route,
+                    seed=self.seed,
+                )
+            next_frontier: List[Node] = []
+            for node in layer:
+                if node.score > best.score:
+                    best = node
+                if node.score >= self.score_threshold or node.depth >= self.max_depth:
+                    continue
+                for child in self.branch_generator(node):
+                    next_frontier.append(child)
+                explored += 1
+                if explored >= self.max_nodes:
+                    break
+                if time.time() - start > self.timeout_s:
+                    self._timed_out = True
+                    break
+            frontier = next_frontier
+            if router:
+                router.route(best.score)
+        self._explored_nodes = explored
+        return best
+
     def _retrace_and_prune(self, active_best_score: float) -> None:
         """Prune frontier nodes far from ``active_best_score``."""
         threshold = active_best_score - self.dynamic_prune_margin
@@ -156,7 +209,7 @@ class TreeOfThoughtSolver:
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
-    def solve(self, query: str) -> Dict[str, object]:
+    def solve(self, query: str, *, router: "ProgressiveRouter" | None = None) -> Dict[str, object]:
         """Solve ``query`` using deterministic Tree-of-Thought search."""
         self._query_tokens = set(query.lower().split())
         self._explored_nodes = 0
@@ -167,7 +220,10 @@ class TreeOfThoughtSolver:
 
         log_event("config", config=self._config_dict(), seed=self.seed)
 
-        best = self.best_path_selector(root)
+        if self.multi_branch:
+            best = self.beam_search(root, router=router)
+        else:
+            best = self.best_path_selector(root)
 
         reason = (
             "timeout"
