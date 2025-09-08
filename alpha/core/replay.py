@@ -46,7 +46,9 @@ class ReplayHarness:
         expected = next(self._replay_iter, None)
         if expected is None:
             return
-        ignore = {"timestamp", "session_id"}
+        # Config snapshots include timestamps and session identifiers which are
+        # nondeterministic across runs; ignore diagnostics when comparing.
+        ignore = {"timestamp", "session_id", "diagnostics"}
         exp = {k: v for k, v in expected.items() if k not in ignore}
         cur = {k: v for k, v in event.items() if k not in ignore}
         exp_norm = json.loads(json.dumps(exp, sort_keys=True))

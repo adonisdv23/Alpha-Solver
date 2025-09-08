@@ -7,6 +7,10 @@
 - Agents v12 scaffold and configuration flags.
 - Deterministic benchmark suite comparing CoT, single-path ToT, multi-branch ToT and routed ToT.
 - JSONL events for `tot_layer`, `tot_candidate`, and `router_escalate`.
+- Deterministic agents v12 behaviors (decomposer/checker/calculator).
+- SAFE-OUT v1.2 with reasons, evidence and recovery notes.
+- Config defaults and loader with env/CLI layering.
+- Telemetry schema v1 with validation helper and tiny web viz.
 
 ### Changed
 - `_tree_of_thought` entrypoint now surfaces router and agent diagnostics and exposes new flags.

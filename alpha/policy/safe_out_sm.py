@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-"""SAFE-OUT v1.1 state machine and configuration."""
+"""SAFE-OUT v1.2 state machine and configuration."""
 
 from dataclasses import asdict, dataclass
 from typing import Any, Dict, List, Optional
 
-from alpha.reasoning.logging import log_event, log_safe_out_phase
+from alpha.reasoning.logging import log_event, log_safe_out_decision, log_safe_out_phase
 
 try:  # Optional deterministic CoT import
     from alpha.reasoning.cot import run_cot  # type: ignore
@@ -40,6 +40,8 @@ class SafeOutStateMachine:
 
         phases: List[str] = ["init"]
         confidence = float(tot_result.get("confidence", 0.0))
+        evidence: List[str] = list(tot_result.get("evidence", []))
+        recovery_notes = ""
         log_event("safe_out_config", layer="safe_out", config=asdict(self.config))
         log_safe_out_phase(
             phase="init",
@@ -78,6 +80,7 @@ class SafeOutStateMachine:
                 notes = (
                     f"Confidence below {self.config.low_conf_threshold:.2f}; used chain-of-thought fallback."
                 )
+                recovery_notes = "used chain-of-thought fallback"
                 log_safe_out_phase(
                     phase="fallback",
                     route=route,
@@ -90,6 +93,7 @@ class SafeOutStateMachine:
                 notes = (
                     f"Confidence below {self.config.low_conf_threshold:.2f}; recommending clarification or narrower query."
                 )
+                recovery_notes = "escalated to constrained profile"
                 log_safe_out_phase(
                     phase="fallback",
                     route=route,
@@ -104,8 +108,12 @@ class SafeOutStateMachine:
             conf=confidence,
             threshold=self.config.low_conf_threshold,
         )
-
-        reason = tot_result.get("reason", "ok") if route == "tot" else "low_confidence"
+        if route == "tot":
+            reason = tot_result.get("reason", "ok")
+        else:
+            reason = tot_result.get("reason")
+            if not reason or reason == "ok":
+                reason = "low_confidence"
         notes = f"{notes} | phases: {'->'.join(phases)}"
         envelope = {
             "final_answer": (cot_result or tot_result).get("answer", ""),
@@ -116,7 +124,12 @@ class SafeOutStateMachine:
             "tot": tot_result,
             "cot": cot_result,
             "phases": phases,
+            "evidence": evidence,
+            "recovery_notes": recovery_notes if route != "tot" else "",
         }
+        log_safe_out_decision(
+            route=route, conf=confidence, threshold=self.config.low_conf_threshold, reason=reason
+        )
         return envelope
 
 

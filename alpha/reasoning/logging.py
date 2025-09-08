@@ -18,10 +18,22 @@ from typing import Any, Dict
 LOGGER = logging.getLogger(__name__)
 
 
+SCHEMA_VERSION = "1.0.0"
 _DETERMINISTIC = os.getenv("ALPHA_DETERMINISM") == "1"
 _RUN_ID = os.environ.get("ALPHA_RUN_ID", uuid.uuid4().hex)
 _START_TS = 0.0 if _DETERMINISTIC else time.time()
 _TS_COUNTER = 0
+
+
+# Required fields for each event type.  Tests can import and validate payloads
+EVENT_FIELDS: Dict[str, set[str]] = {
+    "tot_layer": {"layer", "depth"},
+    "tot_candidate": {"candidate", "score"},
+    "router_escalate": {"from", "to"},
+    "safe_out_decision": {"route", "conf", "threshold", "reason"},
+    "run_summary": {"counts", "final_route", "final_confidence"},
+    "error": {"type", "message"},
+}
 
 
 def _now() -> float:
@@ -59,10 +71,21 @@ def log_event(event: str, *, layer: str | None = None, **data: Any) -> None:
         **data,
         "ts": _now(),
         "run_id": _RUN_ID,
+        "schema_version": SCHEMA_VERSION,
     }
     if layer is not None:
         payload["layer"] = layer
     LOGGER.info(json.dumps(payload, sort_keys=True))
+
+
+def validate_event(payload: Dict[str, Any]) -> bool:
+    """Return ``True`` when ``payload`` contains required schema fields."""
+
+    base = {"event", "ts", "run_id", "schema_version"}
+    if not base.issubset(payload):
+        return False
+    required = EVENT_FIELDS.get(payload["event"], set())
+    return required.issubset(payload)
 
 
 def log_safe_out_decision(*, route: str, conf: float, threshold: float, reason: str) -> None:
@@ -119,4 +142,6 @@ __all__ = [
     "log_event",
     "log_safe_out_decision",
     "log_safe_out_phase",
+    "validate_event",
+    "SCHEMA_VERSION",
 ]

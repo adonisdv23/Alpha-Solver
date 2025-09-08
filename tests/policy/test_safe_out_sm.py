@@ -28,6 +28,8 @@ EXPECTED_KEYS = {
     "tot",
     "cot",
     "phases",
+    "evidence",
+    "recovery_notes",
 }
 
 
