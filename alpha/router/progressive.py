@@ -47,6 +47,7 @@ class ProgressiveRouter:
             self.stage_index += 1
             log_event(
                 "router_escalate",
+                layer="router",
                 previous=prev,
                 new=self.stage,
                 progress=progress,

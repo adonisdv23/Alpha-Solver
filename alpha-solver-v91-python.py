@@ -21,6 +21,7 @@ def _tree_of_thought(
     max_nodes: int = 100,
     enable_progressive_router: bool = False,
     router_min_progress: float = 0.3,
+    router_escalation: tuple[str, ...] = ("basic", "structured", "constrained"),
     enable_agents_v12: bool = False,
     agents_v12_order: tuple[str, ...] = (
         "decomposer",
@@ -61,6 +62,7 @@ def _tree_of_thought(
         max_nodes=max_nodes,
         enable_progressive_router=enable_progressive_router,
         router_min_progress=router_min_progress,
+        router_escalation=router_escalation,
         enable_agents_v12=enable_agents_v12,
         agents_v12_order=agents_v12_order,
     )
@@ -71,6 +73,13 @@ def _tree_of_thought(
     session_id = solver.observability.close(record)
     if session_id:
         envelope.setdefault("diagnostics", {})["replay_session"] = session_id
+    from alpha.reasoning.logging import emit_run_summary
+
+    emit_run_summary(
+        counts={"explored_nodes": envelope.get("tot", {}).get("explored_nodes", 0)},
+        final_route=envelope.get("route", ""),
+        final_confidence=float(envelope.get("confidence", 0.0)),
+    )
     return envelope
 
 
