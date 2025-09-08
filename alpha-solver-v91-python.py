@@ -37,11 +37,18 @@ def _tree_of_thought(
         max_width=max_width,
         max_nodes=max_nodes,
     )
-    router = ProgressiveRouter(min_progress=router_min_progress) if enable_progressive_router else None
+    router = (
+        ProgressiveRouter(min_progress=router_min_progress)
+        if enable_progressive_router
+        else None
+    )
     agents_cfg = AgentsV12Config(
         enable_agents_v12=enable_agents_v12, agents_v12_order=agents_v12_order
     )
-    tot_result = solver.solve(query, router=router)
+    if router is None:
+        tot_result = solver.solve(query)
+    else:
+        tot_result = solver.solve(query, router=router)
     cfg = SOConfig(
         low_conf_threshold=low_conf_threshold,
         enable_cot_fallback=enable_cot_fallback,
