@@ -22,6 +22,10 @@ python -m alpha.cli a11y-check --input artifacts/replays/SESSION_ID.jsonl
 python -m alpha.cli router simulate --dataset datasets/mvp_golden.jsonl --seed 42 --compare-baseline
 ```
 
+The router simulation prints the token-savings percentage, pruned-branch
+count and a determinism verdict while writing
+`artifacts/eval/router_compare.json`.
+
 Governance limits:
 
 ```bash
