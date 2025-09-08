@@ -4,8 +4,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - name: Install deps
@@ -21,7 +21,7 @@ jobs:
       - name: Gate check
         run: python -m alpha.cli.main gate check --report artifacts/eval/latest_report.json
       - name: Upload eval report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: eval-report
           path: artifacts/eval/latest_report.json

@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-from __future__ import annotations
-
-from dataclasses import dataclass
 from typing import Dict, Iterable, List, Tuple
 
 
@@ -25,13 +22,6 @@ def compute_percentiles(values: Iterable[float]) -> Dict[str, float]:
 def compute_cost_per_call(costs: Iterable[float]) -> float:
     costs = list(costs)
     return sum(costs) / len(costs) if costs else 0.0
-
-
-@dataclass
-class GateDecision:
-    passed: bool
-    reasons: List[str]
-
 
 def gate_decision(report: Dict, config) -> Tuple[bool, List[str]]:
     reasons: List[str] = []
