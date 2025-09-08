@@ -4,14 +4,27 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - name: Install deps
         run: pip install -r requirements.txt
       - name: Run tests
         run: pytest -q
+      - name: Install eval deps
+        run: |
+          python -m pip install -U pip
+          pip install -r requirements-dev.txt || true
+      - name: Run evaluation
+        run: python -m alpha.cli.main eval run --dataset datasets/mvp_golden.jsonl --scorers em,f1 --seed 1337
+      - name: Gate check
+        run: python -m alpha.cli.main gate check --report artifacts/eval/latest_report.json
+      - name: Upload eval report
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: artifacts/eval/latest_report.json
       - name: Build API image
         run: docker build -f infrastructure/Dockerfile -t alpha-solver-api .
       - name: Smoke test API

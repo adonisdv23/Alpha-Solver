@@ -6,6 +6,11 @@ from pathlib import Path
 import pytest
 
 
+# Skip this test entirely if optional packaging dependencies are missing
+pytest.importorskip("build")
+pytest.importorskip("packaging")
+
+
 def test_packaging_build(tmp_path: Path) -> None:
     repo_root = Path(__file__).resolve().parents[1]
     work = tmp_path / "pkg"

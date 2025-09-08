@@ -17,17 +17,20 @@ classifiers = [
 dependencies = []
 
 [project.scripts]
-alpha-solver = "alpha.cli:main"
+alpha-solver = "alpha.cli.main:main"
+alpha = "alpha.cli.main:main"
 
 [tool.setuptools]
 packages = [
-    "alpha",
+    "alpha", 
     "alpha.core",
     "alpha.adapters",
     "alpha.executors",
     "alpha.reasoning",
     "alpha.router",
     "alpha.config",
+    "alpha.cli",
+    "alpha.eval",
     "scripts",
 ]
 
