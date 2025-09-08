@@ -17,9 +17,9 @@ jobs:
           python -m pip install -U pip
           pip install -r requirements-dev.txt || true
       - name: Run evaluation
-        run: alpha eval run --dataset datasets/mvp_golden.jsonl --scorers em,f1 --seed 1337
+        run: python -m alpha.cli.main eval run --dataset datasets/mvp_golden.jsonl --scorers em,f1 --seed 1337
       - name: Gate check
-        run: alpha gate check --report artifacts/eval/latest_report.json
+        run: python -m alpha.cli.main gate check --report artifacts/eval/latest_report.json
       - name: Upload eval report
         uses: actions/upload-artifact@v3
         with:

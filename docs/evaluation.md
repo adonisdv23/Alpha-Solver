@@ -21,7 +21,7 @@ Available scorers:
 ## Running
 
 ```bash
-alpha eval run --dataset datasets/mvp_golden.jsonl --scorers em,f1 --seed 1337
+python -m alpha.cli.main eval run --dataset datasets/mvp_golden.jsonl --scorers em,f1 --seed 1337
 ```
 
 Reports are written to `artifacts/eval/latest_report.json` and include

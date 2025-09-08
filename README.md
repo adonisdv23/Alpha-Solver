@@ -30,8 +30,8 @@ alpha-solver run --queries demo --budget-max-steps 5 --budget-max-seconds 2 --br
 ## MVP Quality Gates
 
 ```bash
-alpha eval run --dataset datasets/mvp_golden.jsonl --scorers em,f1 --seed 1337
-alpha gate check --report artifacts/eval/latest_report.json
+python -m alpha.cli.main eval run --dataset datasets/mvp_golden.jsonl --scorers em,f1 --seed 1337
+python -m alpha.cli.main gate check --report artifacts/eval/latest_report.json
 ```
 
 See [docs/evaluation.md](docs/evaluation.md) and
