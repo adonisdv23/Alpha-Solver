@@ -4,6 +4,8 @@ from . import FastAPI, Request, JSONResponse, HTTPException
 from opentelemetry import trace
 
 class TestResponse:
+    __test__ = False
+
     def __init__(self, response):
         self.status_code = getattr(response, "status_code", 200)
         self.headers = getattr(response, "headers", {})
@@ -14,6 +16,8 @@ class TestResponse:
         return self._response
 
 class TestClient:
+    __test__ = False
+
     def __init__(self, app: FastAPI):
         self.app = app
     def _build_request(self, path, headers):
