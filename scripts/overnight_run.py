@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from telemetry_tools import write_run_header, sha1_query
+from telemetry_tools import write_run_header
 import os
 import atexit
 from telemetry_tools import ensure_run_header, enrich_telemetry_file
@@ -9,7 +9,6 @@ import json
 import subprocess
 import runpy
 import sys
-import time
 import argparse
 from pathlib import Path
 import zipfile
@@ -154,7 +153,6 @@ def run_solver(region: str):
                          registry_telemetry='telemetry/registry_usage.jsonl')
     runs = []
     for q in queries:
-        start = time.time()
         try:
             res = solver.solve(q)
             elapsed = res.get('response_time_ms')
