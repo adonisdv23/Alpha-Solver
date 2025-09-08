@@ -5,8 +5,14 @@ from __future__ import annotations
 import csv
 import json
 import os
+import sys
 import time
+from pathlib import Path
 from typing import Dict, List
+
+# Ensure repository root on sys.path when executed directly
+if __package__ is None or __package__ == "":
+    sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from alpha.reasoning.cot import run_cot
 from alpha.reasoning.tot import TreeOfThoughtSolver

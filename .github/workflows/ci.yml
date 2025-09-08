@@ -17,8 +17,10 @@ jobs:
       - name: Install deps
         run: |
           pip install -r requirements.txt || true
-          pip install pytest jsonschema pyyaml
-      - name: Run tests
-        run: pytest -q
-      - name: Preflight
-        run: python scripts/preflight.py
+          pip install pytest jsonschema pyyaml ruff
+      - name: Ruff
+        run: ruff check alpha
+      - name: Pytest
+        run: pytest tests -q
+      - name: Bench
+        run: python scripts/bench_reasoners.py

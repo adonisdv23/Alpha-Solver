@@ -19,6 +19,8 @@ async def _run_exporter(tmp_path):
     await exporter.close()
     assert calls["count"] >= 2
     assert batches and len(batches[0]) == 2
+    for item in batches[0]:
+        assert {"event", "properties", "timestamp", "session_id", "version"} <= item.keys()
 
 
 def test_telemetry(tmp_path):
