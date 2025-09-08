@@ -32,10 +32,13 @@ class APISettings:
 
 @dataclass
 class QualityGateConfig:
-    """Simple configuration used for quality gating."""
+    """Configuration used for quality gating."""
 
-    min_score: float = 0.0
-    max_latency_ms: int = 1000
+    min_accuracy: float = 0.85
+    max_p95_ms: int = 750
+    max_p99_ms: int = 1200
+    max_cost_per_call: float = 0.01
+    primary_metric: str = "em"
 
 
 def _parse_simple_yaml(text: str) -> dict[str, Any]:
@@ -80,8 +83,11 @@ def get_quality_gate(path: Path | str = Path("config/quality_gate.yaml")) -> Qua
     except Exception:
         loaded = {}
     return QualityGateConfig(
-        min_score=float(loaded.get("min_score", defaults.min_score)),
-        max_latency_ms=int(loaded.get("max_latency_ms", defaults.max_latency_ms)),
+        min_accuracy=float(loaded.get("min_accuracy", defaults.min_accuracy)),
+        max_p95_ms=int(loaded.get("max_p95_ms", defaults.max_p95_ms)),
+        max_p99_ms=int(loaded.get("max_p99_ms", defaults.max_p99_ms)),
+        max_cost_per_call=float(loaded.get("max_cost_per_call", defaults.max_cost_per_call)),
+        primary_metric=str(loaded.get("primary_metric", defaults.primary_metric)),
     )
 
 

@@ -1,0 +1,3 @@
+{"id": 1, "prediction": "alpha", "expected": "alpha", "latency_ms": 50}
+{"id": 2, "prediction": "beta", "expected": "beta", "latency_ms": 60}
+{"id": 3, "prediction": "gamma", "expected": "gamma", "latency_ms": 70}

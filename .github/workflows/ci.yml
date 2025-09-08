@@ -12,6 +12,10 @@ jobs:
         run: pip install -r requirements.txt
       - name: Run tests
         run: pytest -q
+      - name: Run eval harness
+        run: python -m alpha.cli.main eval run --dataset datasets/mvp_golden.jsonl --scorers em,f1 --seed 1337 --limit 2
+      - name: Run quality gate check
+        run: python -m alpha.cli.main gate check --report artifacts/eval/latest_report.json
       - name: Build API image
         run: docker build -f infrastructure/Dockerfile -t alpha-solver-api .
       - name: Smoke test API

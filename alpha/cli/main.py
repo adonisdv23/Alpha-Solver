@@ -14,6 +14,9 @@ from alpha.core.replay import ReplayHarness
 from alpha.core.accessibility import AccessibilityChecker
 from alpha.core.errors import UserInputError, hint
 from alpha.core.queries_loader import load_queries
+from alpha.eval import harness as eval_harness
+from alpha.core.config import get_quality_gate
+from alpha.core.budgets import load_budgets
 
 
 def run_quick_audit() -> int:
@@ -80,7 +83,7 @@ def _resolve_version() -> str:
 
 def main(argv: List[str] | None = None) -> int:
     argv = argv or sys.argv[1:]
-    commands = {"run", "sweep", "telemetry", "quick-audit", "version", "replay", "bench", "a11y-check"}
+    commands = {"run", "sweep", "telemetry", "quick-audit", "version", "replay", "bench", "a11y-check", "eval", "gate", "budgets"}
     if argv and not argv[0].startswith("-") and argv[0] not in commands:
         print(f"error: unknown command '{argv[0]}'", file=sys.stderr)
         return 2
@@ -119,6 +122,23 @@ def main(argv: List[str] | None = None) -> int:
     p_a11y = sp.add_parser("a11y-check", help="Run accessibility checks over JSONL events.")
     p_a11y.add_argument("--input", required=True, help="Input JSONL file to scan.")
 
+    p_eval = sp.add_parser("eval", help="Evaluation harness commands.")
+    sp_eval = p_eval.add_subparsers(dest="eval_cmd", required=True)
+    p_eval_run = sp_eval.add_parser("run", help="Run evaluation harness")
+    p_eval_run.add_argument("--dataset", required=True, help="Path to dataset JSONL")
+    p_eval_run.add_argument("--scorers", default="em", help="Comma separated scorers")
+    p_eval_run.add_argument("--seed", type=int, default=0)
+    p_eval_run.add_argument("--limit", type=int, default=0)
+
+    p_gate = sp.add_parser("gate", help="Quality gate commands.")
+    sp_gate = p_gate.add_subparsers(dest="gate_cmd", required=True)
+    p_gate_check = sp_gate.add_parser("check", help="Check evaluation report against gate")
+    p_gate_check.add_argument("--report", required=True, help="Path to evaluation report")
+
+    p_bud = sp.add_parser("budgets", help="Budget configuration commands.")
+    sp_bud = p_bud.add_subparsers(dest="bud_cmd", required=True)
+    sp_bud.add_parser("show", help="Show budget configuration")
+
     args = ap.parse_args(argv)
     try:
         if args.cmd in ("run", "sweep"):
@@ -156,7 +176,8 @@ def main(argv: List[str] | None = None) -> int:
             cmd += ["--topk", str(args.topk), "--format", args.format]
             return subprocess.run(cmd, check=True).returncode
         if args.cmd == "quick-audit":
-            return run_quick_audit()
+            from . import run_quick_audit as _run
+            return _run()
         if args.cmd == "version":
             print("alpha-solver", _resolve_version())
             return 0
@@ -168,7 +189,7 @@ def main(argv: List[str] | None = None) -> int:
             return 0
         if args.cmd == "bench":
             if args.quick:
-                root = Path(__file__).resolve().parent.parent
+                root = Path(__file__).resolve().parent.parent.parent
                 env = os.environ.copy()
                 existing = env.get("PYTHONPATH", "")
                 env["PYTHONPATH"] = (
@@ -204,6 +225,35 @@ def main(argv: List[str] | None = None) -> int:
             (out_dir / "summary.json").write_text(
                 json.dumps(summary, ensure_ascii=False), encoding="utf-8"
             )
+            return 0
+        if args.cmd == "eval" and args.eval_cmd == "run":
+            scorers = [s.strip() for s in args.scorers.split(",") if s.strip()]
+            res = eval_harness.run(args.dataset, scorers, seed=args.seed, limit=args.limit or None)
+            print(json.dumps({"metrics": res.metrics, "latency": res.latency, "cost_per_call": res.cost_per_call}, indent=2))
+            return 0
+        if args.cmd == "gate" and args.gate_cmd == "check":
+            cfg = get_quality_gate()
+            report = json.loads(Path(args.report).read_text(encoding="utf-8"))
+            metrics = report.get("metrics", {})
+            latency = report.get("latency", {})
+            cost = float(report.get("cost_per_call", 0.0))
+            if metrics.get(cfg.primary_metric, 0.0) < cfg.min_accuracy:
+                print("primary metric below threshold", file=sys.stderr)
+                return 1
+            if latency.get("p95_ms", 0) > cfg.max_p95_ms:
+                print("p95 latency above threshold", file=sys.stderr)
+                return 1
+            if latency.get("p99_ms", 0) > cfg.max_p99_ms:
+                print("p99 latency above threshold", file=sys.stderr)
+                return 1
+            if cost > cfg.max_cost_per_call:
+                print("cost per call above threshold", file=sys.stderr)
+                return 1
+            print("quality gate passed")
+            return 0
+        if args.cmd == "budgets" and args.bud_cmd == "show":
+            data = load_budgets()
+            print(json.dumps(data, indent=2))
             return 0
     except UserInputError as e:
         print(f"error: {e}", file=sys.stderr)
