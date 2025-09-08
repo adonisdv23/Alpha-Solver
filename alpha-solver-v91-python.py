@@ -2,6 +2,7 @@
 
 from alpha.core.observability import ObservabilityConfig
 from alpha.solver.observability import AlphaSolver
+from alpha.config.loader import load_config
 
 
 def _tree_of_thought(
@@ -45,9 +46,7 @@ def _tree_of_thought(
     from alpha.core.observability import ObservabilityManager
 
     obs = ObservabilityManager(cfg, replay_session=replay)
-    solver = AlphaSolver(observability=obs)
-    envelope = solver.solve(
-        query,
+    cfg_dict = load_config(
         seed=seed,
         branching_factor=branching_factor,
         score_threshold=score_threshold,
@@ -66,6 +65,28 @@ def _tree_of_thought(
         enable_agents_v12=enable_agents_v12,
         agents_v12_order=agents_v12_order,
     )
+    solver = AlphaSolver(observability=obs)
+    envelope = solver.solve(
+        query,
+        seed=cfg_dict["seed"],
+        branching_factor=cfg_dict["branching_factor"],
+        score_threshold=cfg_dict["score_threshold"],
+        max_depth=cfg_dict["max_depth"],
+        timeout_s=cfg_dict["timeout_s"],
+        dynamic_prune_margin=cfg_dict["dynamic_prune_margin"],
+        low_conf_threshold=cfg_dict["low_conf_threshold"],
+        enable_cot_fallback=cfg_dict["enable_cot_fallback"],
+        max_cot_steps=cfg_dict["max_cot_steps"],
+        multi_branch=cfg_dict["multi_branch"],
+        max_width=cfg_dict["max_width"],
+        max_nodes=cfg_dict["max_nodes"],
+        enable_progressive_router=cfg_dict["enable_progressive_router"],
+        router_min_progress=cfg_dict["router_min_progress"],
+        router_escalation=tuple(cfg_dict["router_escalation"]),
+        enable_agents_v12=cfg_dict["enable_agents_v12"],
+        agents_v12_order=tuple(cfg_dict["agents_v12_order"]),
+    )
+    envelope.setdefault("diagnostics", {})["config"] = cfg_dict
     a11y = solver.observability.check_text(envelope.get("solution", ""))
     if strict_accessibility and a11y and not a11y.get("ok", True):
         raise ValueError("accessibility check failed")

@@ -27,6 +27,7 @@ packages = [
     "alpha.executors",
     "alpha.reasoning",
     "alpha.router",
+    "alpha.config",
     "scripts",
 ]
 

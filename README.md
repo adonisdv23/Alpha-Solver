@@ -376,6 +376,30 @@ Optional: install pre-commit hooks locally:
 pip install pre-commit && pre-commit install
 ```
 
+## Agents v12: what’s enabled by the flag
+
+Setting `enable_agents_v12=True` wires deterministic helper agents
+(`decomposer`, `checker`, `calculator`) used for simple arithmetic reasoning.
+The flag is off by default and enabling it only affects branch ordering and scoring.
+
+## SAFE-OUT v1.2: richer reasons & evidence
+
+SAFE-OUT now emits additional reason codes and an `evidence` list summarising
+why a result was considered low confidence. Fallback routes include
+`recovery_notes` describing any escalations.
+
+## Config layering (defaults/env/CLI)
+
+Configuration is now loaded via `alpha.config.loader.load_config`. Defaults are
+stored centrally and can be overridden by environment variables (`ALPHA_*`) or
+explicit keyword arguments.
+
+## Telemetry schema v1 + Tiny Web Viz
+
+Telemetry events carry a `schema_version` (`1.0.0`) and can be validated with
+`alpha.reasoning.logging.validate_event`. The `viz/index.html` viewer renders
+JSONL telemetry logs without external dependencies.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
