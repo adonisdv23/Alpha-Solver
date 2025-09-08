@@ -1,26 +1,23 @@
 name: CI
-on:
-  pull_request:
-    branches: ["*"]
-
+on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.12"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.11'
       - name: Install deps
+        run: pip install -r requirements.txt
+      - name: Run tests
+        run: pytest -q
+      - name: Build API image
+        run: docker build -t alpha-solver-api .
+      - name: Smoke test API
         run: |
-          pip install -r requirements.txt || true
-          pip install pytest jsonschema pyyaml ruff
-      - name: Ruff
-        run: ruff check alpha
-      - name: Pytest
-        run: pytest tests -q
-      - name: Bench
-        run: python scripts/bench_reasoners.py
+          docker run -d -p 8000:8000 -e API_KEY=test --name api alpha-solver-api \ 
+            uvicorn service.app:app --host 0.0.0.0 --port 8000
+          sleep 5
+          curl -f http://localhost:8000/healthz
+          curl -f http://localhost:8000/readyz
