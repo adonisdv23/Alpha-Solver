@@ -3,7 +3,7 @@ from __future__ import annotations
 """Deterministic progressive complexity router."""
 
 from dataclasses import dataclass
-from typing import Tuple
+from typing import Tuple, Optional
 
 from alpha.reasoning.logging import log_event
 from .config import ProgressiveRouterConfig
@@ -18,8 +18,16 @@ class ProgressiveRouter:
     stage_index: int = 0
 
     @classmethod
-    def from_config(cls, config: ProgressiveRouterConfig) -> "ProgressiveRouter":
-        """Construct a router from ``ProgressiveRouterConfig``."""
+    def from_config(
+        cls, config: ProgressiveRouterConfig
+    ) -> Optional["ProgressiveRouter"]:
+        """Construct a router from ``ProgressiveRouterConfig``.
+
+        Returns ``None`` when ``enable_progressive_router`` is ``False`` to allow
+        callers to gate creation behind a single configuration object.
+        """
+        if not config.enable_progressive_router:
+            return None
         return cls(
             escalation=config.router_escalation,
             min_progress=config.router_min_progress,

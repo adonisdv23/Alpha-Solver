@@ -1,9 +1,0 @@
-prompt,method,explored_nodes,top_score,elapsed_ms,route
-What is 2+2?,cot,0,0.5,0,cot
-What is 2+2?,tot_single,0,1.0,0,tot
-What is 2+2?,tot_multi,0,1.0,0,tot
-What is 2+2?,tot_router,0,1.0,0,basic
-Name three colors.,cot,0,0.5,0,cot
-Name three colors.,tot_single,0,1.0,0,tot
-Name three colors.,tot_multi,0,1.0,0,tot
-Name three colors.,tot_router,0,1.0,0,basic
