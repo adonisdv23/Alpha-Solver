@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Tuple
 
 from alpha.reasoning.logging import log_event
+from .config import ProgressiveRouterConfig
 
 
 @dataclass
@@ -15,6 +16,14 @@ class ProgressiveRouter:
     escalation: Tuple[str, ...] = ("basic", "structured", "constrained")
     min_progress: float = 0.3
     stage_index: int = 0
+
+    @classmethod
+    def from_config(cls, config: ProgressiveRouterConfig) -> "ProgressiveRouter":
+        """Construct a router from ``ProgressiveRouterConfig``."""
+        return cls(
+            escalation=config.router_escalation,
+            min_progress=config.router_min_progress,
+        )
 
     @property
     def stage(self) -> str:
