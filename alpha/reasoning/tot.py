@@ -7,6 +7,7 @@ from typing import Dict, List, Tuple, Any
 import heapq
 import random
 import time
+import hashlib
 
 from .logging import log_event
 from .scoring import SCORERS, PathScorer
@@ -122,6 +123,11 @@ class TreeOfThoughtSolver:
             "max_width": self.max_width,
             "max_nodes": self.max_nodes,
         }
+
+    def _path_hash(self, path: Tuple[str, ...]) -> str:
+        """Return a stable hash for ``path``."""
+        joined = "||".join(path)
+        return hashlib.sha256(joined.encode("utf-8")).hexdigest()
 
     # ------------------------------------------------------------------
     # Core components
@@ -277,13 +283,19 @@ class TreeOfThoughtSolver:
         if cache is not None:
             hit = cache_get(cache, key)
             if hit is not None:
+                path = hit.get("path", [query])
+                hash_val = hit.get("hash") or self._path_hash(tuple(path))
                 return {
                     "answer": hit.get("answer", query),
                     "confidence": float(hit.get("score", 0.0)),
-                    "path": [query],
+                    "path": path,
+                    "steps": path,
+                    "best_path_hash": hash_val,
+                    "best_path": {"hash": hash_val, "steps": path},
                     "explored_nodes": 0,
                     "config": self._config_dict(),
                     "reason": "ok",
+                    "cache_hit": True,
                 }
 
         root = Node(content=query, path=(query,), depth=0, id=self._next_id())
@@ -311,20 +323,32 @@ class TreeOfThoughtSolver:
             seed=self.seed,
         )
 
+        steps = list(best.path)
+        hash_val = self._path_hash(best.path)
         result = {
             "answer": best.content,
             "confidence": best.score,
-            "path": list(best.path),
+            "path": steps,
+            "steps": steps,
+            "best_path_hash": hash_val,
+            "best_path": {"hash": hash_val, "steps": steps},
             "explored_nodes": self._explored_nodes,
             "config": self._config_dict(),
             "reason": reason,
+            "cache_hit": False,
         }
 
         if cache is not None:
             cache_put(
                 cache,
                 key,
-                {"score": best.score, "answer": best.content, "ts": 0},
+                {
+                    "score": best.score,
+                    "answer": best.content,
+                    "path": steps,
+                    "hash": result["best_path_hash"],
+                    "ts": 0,
+                },
             )
 
         return result

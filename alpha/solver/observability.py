@@ -131,6 +131,11 @@ class AlphaSolver:
         envelope.setdefault("eligibility_analysis", {})
         envelope.setdefault("requirements_analysis", {})
         envelope.setdefault("safe_out_state", envelope.get("route", ""))
+        envelope.setdefault("steps", tot_result.get("steps", []))
+        envelope.setdefault("best_path_hash", tot_result.get("best_path_hash"))
+        envelope.setdefault("cache_hit", tot_result.get("cache_hit", False))
+        if "best_path" in tot_result:
+            envelope.setdefault("best_path", tot_result["best_path"])
 
         envelope.setdefault("run_summary", {})["accounting"] = solver.accounting.summary()
         self.observability.log_event(
