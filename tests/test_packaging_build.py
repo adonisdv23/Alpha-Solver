@@ -6,19 +6,19 @@ this test during collection rather than raising an ``ImportError``.
 """
 
 from pathlib import Path
-import importlib.util
 import shutil
 import subprocess
 import sys
 import unittest
 
 
-def _has_module(name: str) -> bool:
-    return importlib.util.find_spec(name) is not None
-
-
-# Skip eagerly if either dependency is unavailable.
-if not (_has_module("build") and _has_module("packaging")):
+# Skip eagerly if optional dependencies are missing.  We try importing them
+# directly so environments without ``build`` or ``packaging`` don't error during
+# collection.
+try:  # pragma: no cover - exercised implicitly when deps are missing
+    import build  # type: ignore  # noqa: F401
+    import packaging  # type: ignore  # noqa: F401
+except ModuleNotFoundError:  # pragma: no cover - exercised when deps absent
     raise unittest.SkipTest("build/packaging modules required for packaging test")
 
 import pytest
