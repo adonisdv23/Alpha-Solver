@@ -27,6 +27,16 @@ Governance limits:
 alpha-solver run --queries demo --budget-max-steps 5 --budget-max-seconds 2 --breaker-max-fails 1
 ```
 
+## MVP Quality Gates
+
+```bash
+alpha eval run --dataset datasets/mvp_golden.jsonl --scorers em,f1 --seed 1337
+alpha gate check --report artifacts/eval/latest_report.json
+```
+
+See [docs/evaluation.md](docs/evaluation.md) and
+[docs/quality-gates.md](docs/quality-gates.md) for details.
+
 
 ## Local executors
 

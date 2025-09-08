@@ -1,0 +1,30 @@
+{"id": 1, "prompt": "What is 1+1?", "expected": "2"}
+{"id": 2, "prompt": "What is 2+3?", "expected": "5"}
+{"id": 3, "prompt": "What is 4*2?", "expected": "8"}
+{"id": 4, "prompt": "What is 10-3?", "expected": "7"}
+{"id": 5, "prompt": "What is 6/3?", "expected": "2"}
+{"id": 6, "prompt": "What is the capital of France?", "expected": "Paris"}
+{"id": 7, "prompt": "Spell the word 'hello' backwards.", "expected": "olleh"}
+{"id": 8, "prompt": "What is 3 squared?", "expected": "9"}
+{"id": 9, "prompt": "What color is the sky on a clear day?", "expected": "blue"}
+{"id": 10, "prompt": "What is 5+7?", "expected": "12"}
+{"id": 11, "prompt": "What is 9-4?", "expected": "5"}
+{"id": 12, "prompt": "What is 7+6?", "expected": "13"}
+{"id": 13, "prompt": "What is 8/2?", "expected": "4"}
+{"id": 14, "prompt": "What is 3*5?", "expected": "15"}
+{"id": 15, "prompt": "What is 14-9?", "expected": "5"}
+{"id": 16, "prompt": "Name the largest planet in our solar system.", "expected": "Jupiter"}
+{"id": 17, "prompt": "What is 2 to the power of 3?", "expected": "8"}
+{"id": 18, "prompt": "How many letters are in the word 'cat'?", "expected": "3"}
+{"id": 19, "prompt": "What is 11+13?", "expected": "24"}
+{"id": 20, "prompt": "What is 20-5?", "expected": "15"}
+{"id": 21, "prompt": "What is the boiling point of water in Celsius?", "expected": "100"}
+{"id": 22, "prompt": "What is the first letter of the English alphabet?", "expected": "A"}
+{"id": 23, "prompt": "What is 7*7?", "expected": "49"}
+{"id": 24, "prompt": "What is 81/9?", "expected": "9"}
+{"id": 25, "prompt": "What is the square root of 16?", "expected": "4"}
+{"id": 26, "prompt": "What is 100-1?", "expected": "99"}
+{"id": 27, "prompt": "What is 12+15?", "expected": "27"}
+{"id": 28, "prompt": "What is 30/5?", "expected": "6"}
+{"id": 29, "prompt": "What is 4+4?", "expected": "8"}
+{"id": 30, "prompt": "What is 3+14?", "expected": "17"}

@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import os
+from pathlib import Path
+from typing import Any, Dict
+
+import yaml
 
 
 @dataclass
@@ -24,3 +28,45 @@ class APISettings:
 
 
 __all__ = ["APISettings"]
+
+
+@dataclass
+class QualityGateConfig:
+    min_accuracy: float = 0.85
+    max_p95_ms: float = 750
+    max_p99_ms: float = 1200
+    max_cost_per_call: float = 0.01
+    primary_metric: str = "em"
+
+
+def get_quality_gate(overrides: Dict[str, Any] | None = None) -> QualityGateConfig:
+    cfg = QualityGateConfig()
+    path = Path("config/quality_gate.yaml")
+    if path.exists():
+        data = yaml.safe_load(path.read_text()) or {}
+        section = data.get("quality_gate", data)
+        for k, v in section.items():
+            if hasattr(cfg, k):
+                setattr(cfg, k, v)
+    env_map = {
+        "min_accuracy": "QUALITY_GATE_MIN_ACCURACY",
+        "max_p95_ms": "QUALITY_GATE_MAX_P95_MS",
+        "max_p99_ms": "QUALITY_GATE_MAX_P99_MS",
+        "max_cost_per_call": "QUALITY_GATE_MAX_COST_PER_CALL",
+        "primary_metric": "QUALITY_GATE_PRIMARY_METRIC",
+    }
+    for field, env_name in env_map.items():
+        val = os.getenv(env_name)
+        if val is not None:
+            if field == "primary_metric":
+                setattr(cfg, field, val)
+            else:
+                setattr(cfg, field, float(val))
+    if overrides:
+        for k, v in overrides.items():
+            if hasattr(cfg, k):
+                setattr(cfg, k, v)
+    return cfg
+
+
+__all__ += ["QualityGateConfig", "get_quality_gate"]
