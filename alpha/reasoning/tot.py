@@ -7,6 +7,7 @@ from typing import Callable, Dict, List, Tuple, Optional
 import heapq
 import random
 import time
+import logging
 
 from .logging import log_event
 
@@ -48,6 +49,7 @@ class TreeOfThoughtSolver:
         max_nodes: int = 200,
         router: Optional[object] = None,
         agents_v12: Optional[List[Callable[[str], str]]] = None,
+        logger: Optional[logging.Logger] = None,
     ) -> None:
         self.seed = seed
         self.branching_factor = branching_factor
@@ -60,6 +62,7 @@ class TreeOfThoughtSolver:
         self.max_nodes = max_nodes
         self.router = router
         self.agents_v12 = agents_v12 or []
+        self.logger = logger
         self.rng = random.Random(seed)
         self.visited: Dict[Node, float] = {}
         self._id_counter = 0
@@ -149,6 +152,7 @@ class TreeOfThoughtSolver:
                 score=current.score,
                 path=list(current.path),
                 seed=self.seed,
+                logger=self.logger,
             )
             if current.score > best.score:
                 best = current
@@ -192,7 +196,13 @@ class TreeOfThoughtSolver:
             children.sort(key=lambda n: (-n.score, n.path))
             kept = children[: self.max_width]
             for cand in kept:
-                log_event("tot_candidate", node_id=cand.id, score=cand.score, depth=cand.depth)
+                log_event(
+                    "tot_candidate",
+                    node_id=cand.id,
+                    score=cand.score,
+                    depth=cand.depth,
+                    logger=self.logger,
+                )
                 if cand.score > best.score:
                     best = cand
             log_event(
@@ -201,6 +211,7 @@ class TreeOfThoughtSolver:
                 expanded=len(children),
                 kept=len(kept),
                 best_score=best.score,
+                logger=self.logger,
             )
             active = kept
             depth += 1
@@ -232,7 +243,7 @@ class TreeOfThoughtSolver:
         root = Node(content=query, path=(query,), depth=0, id=self._next_id())
         root = replace(root, score=self.path_scorer(root))
 
-        log_event("config", config=self._config_dict(), seed=self.seed)
+        log_event("config", config=self._config_dict(), seed=self.seed, logger=self.logger)
 
         if self.multi_branch:
             best = self.beam_search(root)
@@ -251,6 +262,7 @@ class TreeOfThoughtSolver:
             explored=self._explored_nodes,
             best_score=best.score,
             seed=self.seed,
+            logger=self.logger,
         )
 
         return {

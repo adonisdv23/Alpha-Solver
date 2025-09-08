@@ -87,9 +87,9 @@ Usage:
 
 ```python
 from alpha_solver_entry import _tree_of_thought
-import logging
+from alpha.reasoning.logging import JsonlLogger
 
-log = logging.getLogger("alpha.tot")
+log = JsonlLogger("tot.log")
 result = _tree_of_thought(
     "vague query",
     score_threshold=0.70,
@@ -105,10 +105,12 @@ Enable breadth-limited exploration:
 
 ```python
 from alpha_solver_entry import _tree_of_thought
+from alpha.reasoning.logging import JsonlLogger
 import json
 from pathlib import Path
 
 # run multi-branch ToT with logging
+log = JsonlLogger("tot.log")
 result = _tree_of_thought(
     "2+3?",
     seed=42,
@@ -116,6 +118,7 @@ result = _tree_of_thought(
     max_width=2,
     max_nodes=10,
     enable_progressive_router=True,
+    logger=log,
 )
 
 print(result["final_answer"])

@@ -2,7 +2,6 @@
 
 from alpha.reasoning.tot import TreeOfThoughtSolver
 from alpha.policy.safe_out import SafeOutPolicy
-from alpha.reasoning.logging import log_safe_out_decision
 from alpha.router import ProgressiveRouter, AGENTS_V12
 import logging
 
@@ -48,6 +47,7 @@ def _tree_of_thought(
         max_nodes=max_nodes,
         router=router,
         agents_v12=agents,
+        logger=logger,
     )
     tot_result = solver.solve(query)
     policy = SafeOutPolicy(
@@ -66,11 +66,4 @@ def _tree_of_thought(
             "agents_v12": bool(enable_agents_v12),
         },
     }
-    log_safe_out_decision(
-        route=decision["route"],
-        conf=float(tot_result.get("confidence", 0.0)),
-        threshold=low_conf_threshold,
-        reason=decision["reason"],
-        logger=logger,
-    )
     return decision

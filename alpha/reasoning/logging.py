@@ -1,9 +1,30 @@
+"""Structured JSON logging utilities."""
+
 import json
 import logging
 import time
+from dataclasses import dataclass
 from typing import Any, Optional
 
 LOGGER = logging.getLogger(__name__)
+
+
+@dataclass
+class JsonlLogger:
+    """Tiny logger that appends raw messages to a JSONL file.
+
+    Parameters
+    ----------
+    path:
+        Location of the log file. Each call to :meth:`info` writes a line.
+    """
+
+    path: str
+
+    def info(self, message: str) -> None:
+        """Append ``message`` to ``path`` with a newline."""
+        with open(self.path, "a", encoding="utf-8") as fh:
+            fh.write(f"{message}\n")
 
 
 def log_event(event: str, *, logger: Optional[logging.Logger] = None, **data: Any) -> None:

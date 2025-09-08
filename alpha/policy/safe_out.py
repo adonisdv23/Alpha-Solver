@@ -5,6 +5,8 @@ from __future__ import annotations
 from typing import Any, Dict, Optional
 import logging
 
+from alpha.reasoning.logging import log_safe_out_decision
+
 try:  # Best-effort optional CoT import
     from alpha.reasoning.cot import run_cot  # type: ignore
 except Exception:  # pragma: no cover - fallback when CoT unavailable
@@ -41,6 +43,13 @@ class SafeOutPolicy:
 
         confidence = float(tot_result.get("confidence", 0.0))
         if confidence >= self.low_conf_threshold:
+            log_safe_out_decision(
+                route="tot",
+                conf=confidence,
+                threshold=self.low_conf_threshold,
+                reason="ok",
+                logger=logger,
+            )
             return {
                 "final_answer": tot_result.get("answer", ""),
                 "route": "tot",
@@ -54,6 +63,13 @@ class SafeOutPolicy:
         if self.enable_cot_fallback:
             cot_fn = run_cot or _run_cot_fallback
             cot_result: Dict[str, Any] = cot_fn(original_query)
+            log_safe_out_decision(
+                route="cot_fallback",
+                conf=float(cot_result.get("confidence", 0.0)),
+                threshold=self.low_conf_threshold,
+                reason="low_confidence",
+                logger=logger,
+            )
             return {
                 "final_answer": cot_result.get("answer", ""),
                 "route": "cot_fallback",
@@ -64,6 +80,13 @@ class SafeOutPolicy:
                 "cot": cot_result,
             }
 
+        log_safe_out_decision(
+            route="best_effort",
+            conf=confidence,
+            threshold=self.low_conf_threshold,
+            reason="low_confidence",
+            logger=logger,
+        )
         return {
             "final_answer": tot_result.get("answer", ""),
             "route": "best_effort",
