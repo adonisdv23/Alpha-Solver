@@ -11,10 +11,14 @@
 - SAFE-OUT v1.2 with reasons, evidence and recovery notes.
 - Config defaults and loader with env/CLI layering.
 - Telemetry schema v1 with validation helper and tiny web viz.
+- Pluggable path scorers with registry and composite weights.
+- Persistent JSON cache for Tree-of-Thought.
+- Lightweight accounting of expansions and simulated tokens.
 
 ### Changed
 - `_tree_of_thought` entrypoint now surfaces router and agent diagnostics and exposes new flags.
 - AlphaSolver v2.2.6 P3 moved to `alpha.solver.observability` and is wrapped by the single `alpha-solver-v91-python` entrypoint.
+- Diagnostics now include scorer details, config snapshot and accounting summary.
 
 ## [2025-09-09]
 ### Added

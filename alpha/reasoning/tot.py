@@ -3,12 +3,15 @@ from __future__ import annotations
 """Deterministic Tree-of-Thought solver."""
 
 from dataclasses import dataclass, field, replace
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Any
 import heapq
 import random
 import time
 
 from .logging import log_event
+from .scoring import SCORERS, PathScorer
+from .cache import make_key, get as cache_get, put as cache_put
+from alpha.observability.accounting import Accountant
 
 # --- Router type guard for lint/type checking (avoid F821) ---
 # We want a symbol named `ProgressiveRouter` in module scope so Ruff doesn't flag it,
@@ -64,6 +67,8 @@ class TreeOfThoughtSolver:
         multi_branch: bool = False,
         max_width: int = 3,
         max_nodes: int = 100,
+        scorer: str = "composite",
+        scorer_weights: Dict[str, float] | None = None,
     ) -> None:
         self.seed = seed
         self.branching_factor = branching_factor
@@ -74,6 +79,14 @@ class TreeOfThoughtSolver:
         self.multi_branch = multi_branch
         self.max_width = max_width
         self.max_nodes = max_nodes
+        self.scorer_name = scorer
+        self.scorer_weights = scorer_weights or {"lexical": 0.6, "constraint": 0.4}
+        factory = SCORERS.get(self.scorer_name, SCORERS["lexical"])
+        self._scorer: PathScorer = (
+            factory(self.scorer_weights)  # type: ignore[misc]
+            if self.scorer_name == "composite"
+            else factory()
+        )
         self.rng = random.Random(seed)
         self.visited: Dict[Node, float] = {}
         self._id_counter = 0
@@ -83,6 +96,7 @@ class TreeOfThoughtSolver:
         ] = []
         self._explored_nodes = 0
         self._timed_out = False
+        self.accounting = Accountant()
 
     # ------------------------------------------------------------------
     # Utilities
@@ -117,6 +131,7 @@ class TreeOfThoughtSolver:
         children: List[Node] = []
         for tmpl in TEMPLATE_FUNCS[: self.branching_factor]:
             text = tmpl(parent.content)
+            self.accounting.record(text)
             node = Node(
                 content=text,
                 path=parent.path + (text,),
@@ -130,22 +145,14 @@ class TreeOfThoughtSolver:
         return children
 
     def path_scorer(self, node: Node) -> float:
-        """Score ``node`` using simple deterministic heuristics."""
-        tokens = set(node.content.lower().split())
-        relevance = len(self._query_tokens & tokens) / max(
-            len(self._query_tokens), 1
-        )
+        """Score ``node`` using the configured scorer."""
 
-        progress = max(0.0, 1 - (node.depth / max(self.max_depth, 1)))
-
-        text = " ".join(node.path).lower()
-        contradictions = {"contradiction", "inconsistent", "impossible"}
-        consistency = (
-            0.0 if any(term in text for term in contradictions) else 1.0
-        )
-
-        score = 0.4 * relevance + 0.3 * progress + 0.3 * consistency
-        return round(max(0.0, min(1.0, score)), 3)
+        context = {
+            "query_tokens": self._query_tokens,
+            "depth": node.depth,
+            "max_depth": self.max_depth,
+        }
+        return self._scorer.score(node_text=node.content, context=context)
 
     def best_path_selector(self, root: Node) -> Node:
         """Greedy best-first search starting from ``root``."""
@@ -253,12 +260,31 @@ class TreeOfThoughtSolver:
     # Public API
     # ------------------------------------------------------------------
     def solve(
-        self, query: str, *, router: "ProgressiveRouter" | None = None
+        self,
+        query: str,
+        *,
+        router: "ProgressiveRouter" | None = None,
+        cache: Dict[str, Any] | None = None,
     ) -> Dict[str, object]:
         """Solve ``query`` using deterministic Tree-of-Thought search."""
+
+        self.accounting = Accountant()
         self._query_tokens = set(query.lower().split())
         self._explored_nodes = 0
         self._timed_out = False
+
+        key = make_key(query, 0, (), "0")
+        if cache is not None:
+            hit = cache_get(cache, key)
+            if hit is not None:
+                return {
+                    "answer": hit.get("answer", query),
+                    "confidence": float(hit.get("score", 0.0)),
+                    "path": [query],
+                    "explored_nodes": 0,
+                    "config": self._config_dict(),
+                    "reason": "ok",
+                }
 
         root = Node(content=query, path=(query,), depth=0, id=self._next_id())
         root = replace(root, score=self.path_scorer(root))
@@ -273,11 +299,7 @@ class TreeOfThoughtSolver:
         reason = (
             "timeout"
             if self._timed_out
-            else (
-                "ok"
-                if best.score >= self.score_threshold
-                else "below_threshold"
-            )
+            else ("ok" if best.score >= self.score_threshold else "below_threshold")
         )
 
         log_event(
@@ -289,7 +311,7 @@ class TreeOfThoughtSolver:
             seed=self.seed,
         )
 
-        return {
+        result = {
             "answer": best.content,
             "confidence": best.score,
             "path": list(best.path),
@@ -297,3 +319,12 @@ class TreeOfThoughtSolver:
             "config": self._config_dict(),
             "reason": reason,
         }
+
+        if cache is not None:
+            cache_put(
+                cache,
+                key,
+                {"score": best.score, "answer": best.content, "ts": 0},
+            )
+
+        return result

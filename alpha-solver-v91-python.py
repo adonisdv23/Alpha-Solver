@@ -29,6 +29,10 @@ def _tree_of_thought(
         "checker",
         "calculator",
     ),
+    scorer: str = "composite",
+    scorer_weights: dict[str, float] | None = None,
+    enable_cache: bool = True,
+    cache_path: str | None = None,
     replay: str | None = None,
     record: str | None = None,
     strict_accessibility: bool = False,
@@ -64,8 +68,19 @@ def _tree_of_thought(
         router_escalation=router_escalation,
         enable_agents_v12=enable_agents_v12,
         agents_v12_order=agents_v12_order,
+        scorer=scorer,
+        scorer_weights=scorer_weights,
+        enable_cache=enable_cache,
+        cache_path=cache_path,
     )
     solver = AlphaSolver(observability=obs)
+    cache_obj = None
+    if cfg_dict.get("enable_cache", True):
+        from alpha.reasoning.cache import load_cache
+
+        cache_obj = load_cache(
+            cfg_dict.get("cache_path") or "artifacts/cache/tot_cache.json"
+        )
     envelope = solver.solve(
         query,
         seed=cfg_dict["seed"],
@@ -85,6 +100,9 @@ def _tree_of_thought(
         router_escalation=tuple(cfg_dict["router_escalation"]),
         enable_agents_v12=cfg_dict["enable_agents_v12"],
         agents_v12_order=tuple(cfg_dict["agents_v12_order"]),
+        scorer=cfg_dict["scorer"],
+        scorer_weights=cfg_dict.get("scorer_weights"),
+        cache=cache_obj,
     )
     envelope.setdefault("diagnostics", {})["config"] = cfg_dict
     a11y = solver.observability.check_text(envelope.get("solution", ""))
@@ -101,6 +119,13 @@ def _tree_of_thought(
         final_route=envelope.get("route", ""),
         final_confidence=float(envelope.get("confidence", 0.0)),
     )
+    if cache_obj is not None:
+        from alpha.reasoning.cache import save_cache
+
+        save_cache(
+            cache_obj,
+            cfg_dict.get("cache_path") or "artifacts/cache/tot_cache.json",
+        )
     return envelope
 
 

@@ -52,6 +52,9 @@ class AlphaSolver:
             "checker",
             "calculator",
         ),
+        scorer: str = "composite",
+        scorer_weights: Dict[str, float] | None = None,
+        cache: Dict[str, Any] | None = None,
     ) -> Dict[str, Any]:
         """Solve ``query`` and return an envelope with diagnostics."""
 
@@ -67,6 +70,8 @@ class AlphaSolver:
             multi_branch=multi_branch,
             max_width=max_width,
             max_nodes=max_nodes,
+            scorer=scorer,
+            scorer_weights=scorer_weights,
         )
         router = (
             ProgressiveRouter(
@@ -79,11 +84,14 @@ class AlphaSolver:
             enable_agents_v12=enable_agents_v12, agents_v12_order=agents_v12_order
         )
 
-        tot_result = (
-            solver.solve(query, router=router)
-            if router is not None
-            else solver.solve(query)
-        )
+        solve_kwargs: Dict[str, Any] = {"cache": cache}
+        if router is not None:
+            solve_kwargs["router"] = router
+        try:
+            tot_result = solver.solve(query, **solve_kwargs)
+        except TypeError:
+            solve_kwargs.pop("cache", None)
+            tot_result = solver.solve(query, **solve_kwargs)
 
         cfg = SOConfig(
             low_conf_threshold=low_conf_threshold,
@@ -105,6 +113,7 @@ class AlphaSolver:
                 "low_conf_threshold": low_conf_threshold,
                 "enable_cot_fallback": enable_cot_fallback,
             },
+            "scorer": {"name": solver.scorer_name, "weights": solver.scorer_weights},
         }
 
         # Basic fields for legacy smoke tests
@@ -123,6 +132,7 @@ class AlphaSolver:
         envelope.setdefault("requirements_analysis", {})
         envelope.setdefault("safe_out_state", envelope.get("route", ""))
 
+        envelope.setdefault("run_summary", {})["accounting"] = solver.accounting.summary()
         self.observability.log_event(
             {"event": "solve_end", "diagnostics": envelope["diagnostics"]}
         )
