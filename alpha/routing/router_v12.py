@@ -72,7 +72,7 @@ class RouterV12:
         disabled to emulate an unoptimised system.
         """
         path = Path(dataset)
-        lines = [json.loads(l) for l in path.read_text().splitlines() if l.strip()]
+        lines = [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
         tokens_per_example = 100
         tokens = tokens_per_example * len(lines)
         pruned_total = 0
