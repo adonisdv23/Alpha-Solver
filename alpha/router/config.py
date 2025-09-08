@@ -2,7 +2,7 @@ from __future__ import annotations
 
 """Configuration flags for router components."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Tuple
 
 
@@ -19,6 +19,8 @@ class ProgressiveRouterConfig:
     """Flags controlling the progressive complexity router."""
 
     enable_progressive_router: bool = False
-    router_escalation: Tuple[str, ...] = ("basic", "structured", "constrained")
+    router_escalation: Tuple[str, ...] = field(
+        default_factory=lambda: ("basic", "structured", "constrained")
+    )
     router_min_progress: float = 0.3
 
