@@ -1,15 +1,27 @@
+"""Smoke test for building the package.
+
+The project doesn't require the optional ``build`` and ``packaging`` modules in
+all environments (for example, some CI runners).  If they're missing we skip
+this test during collection rather than raising an ``ImportError``.
+"""
+
+from pathlib import Path
+import importlib.util
 import shutil
 import subprocess
 import sys
-from pathlib import Path
+import unittest
+
+
+def _has_module(name: str) -> bool:
+    return importlib.util.find_spec(name) is not None
+
+
+# Skip eagerly if either dependency is unavailable.
+if not (_has_module("build") and _has_module("packaging")):
+    raise unittest.SkipTest("build/packaging modules required for packaging test")
 
 import pytest
-
-# Skip if optional packaging dependencies are missing. Using
-# ``pytest.importorskip`` ensures the test is marked as skipped during
-# collection rather than erroring out when the modules are absent.
-pytest.importorskip("build")
-pytest.importorskip("packaging")
 
 
 def test_packaging_build(tmp_path: Path) -> None:
