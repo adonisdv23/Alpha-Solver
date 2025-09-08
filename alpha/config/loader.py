@@ -18,6 +18,13 @@ def _coerce(value: str, target: Any) -> Any:
         return value.lower() in {"1", "true", "yes"}
     if isinstance(target, tuple):
         return tuple(v.strip() for v in value.split(",") if v.strip())
+    if isinstance(target, dict):
+        import json
+
+        try:
+            return json.loads(value)
+        except json.JSONDecodeError:
+            return target
     return type(target)(value)
 
 

@@ -24,5 +24,9 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     "router_escalation": ("basic", "structured", "constrained"),
     "enable_agents_v12": False,
     "agents_v12_order": ("decomposer", "checker", "calculator"),
+    "scorer": "composite",
+    "scorer_weights": {"lexical": 0.6, "constraint": 0.4},
+    "enable_cache": True,
+    "cache_path": "artifacts/cache/tot_cache.json",
 }
 

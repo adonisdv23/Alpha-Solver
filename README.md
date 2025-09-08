@@ -90,8 +90,21 @@ _tree_of_thought(
     router_min_progress: float = 0.3,
     enable_agents_v12: bool = False,
     agents_v12_order: tuple[str, ...] = ("decomposer", "checker", "calculator"),
+    scorer: str = "composite",
+    scorer_weights: dict[str, float] | None = None,
+    enable_cache: bool = True,
+    cache_path: str | None = None,
 ) -> dict
 ```
+
+Configuration highlights:
+
+| key | default | description |
+|---|---|---|
+| `scorer` | `"composite"` | Path scoring strategy (`lexical`, `constraint`, `composite`). |
+| `scorer_weights` | `{\"lexical\": 0.6, \"constraint\": 0.4}` | Weights for composite scorer. |
+| `enable_cache` | `True` | Enable persistent ToT cache. |
+| `cache_path` | `artifacts/cache/tot_cache.json` | Location for cache file. |
 
 ### Safety: Low-Confidence Fallback (SAFE-OUT)
 
