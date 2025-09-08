@@ -23,6 +23,7 @@ class ObservabilityConfig:
     enable_accessibility: bool = False
     telemetry_endpoint: Optional[str] = None
     replay_dir: str = "artifacts/replay"
+    offline_mode: bool = False
 
     @classmethod
     def load(cls, path: str | Path = "config/observability.yaml") -> "ObservabilityConfig":
@@ -47,7 +48,11 @@ class ObservabilityManager:
             self.logger = JSONLLogger(self.config.log_path)
 
         self.telemetry: Optional[TelemetryExporter] = None
-        if self.config.enable_telemetry and self.config.telemetry_endpoint:
+        if (
+            self.config.enable_telemetry
+            and self.config.telemetry_endpoint
+            and not self.config.offline_mode
+        ):
             async def sender(batch):
                 # placeholder sender that writes to a file
                 path = Path(self.config.log_path).with_name("telemetry.jsonl")

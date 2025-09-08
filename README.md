@@ -16,6 +16,15 @@ See [docs/RUN_GUIDE.md](docs/RUN_GUIDE.md) for more examples and details.
 python -m alpha.cli run --queries "demo query" --regions US --plan-only --seed 1234
 python -m alpha.cli run --queries-file docs/queries.sample.txt --regions US EU --explain
 python -m alpha.cli --examples  # show sample commands
+python -m alpha.cli replay --session SESSION_ID
+python -m alpha.cli bench --quick
+python -m alpha.cli a11y-check --input artifacts/replays/SESSION_ID.jsonl
+```
+
+Governance limits:
+
+```bash
+alpha-solver run --queries demo --budget-max-steps 5 --budget-max-seconds 2 --breaker-max-fails 1
 ```
 
 

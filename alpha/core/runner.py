@@ -23,7 +23,7 @@ from .prompt_writer import PromptWriter
 from alpha.adapters import ADAPTERS
 from .session_trace import write_session_trace
 from .determinism import apply_seed
-from alpha.policy.engine import PolicyEngine
+from alpha.policy.governance import GovernanceEngine
 
 
 def snapshot_shortlist(region: str, query_hash: str, shortlist: List[Dict[str, Any]]) -> str:
@@ -179,7 +179,7 @@ def _execute_step(step: PlanStep) -> Dict[str, Any]:
     return {"ok": True}
 
 
-def execute_plan(plan: Plan, policy: PolicyEngine | None = None) -> None:
+def execute_plan(plan: Plan, policy: GovernanceEngine | None = None) -> None:
     """Execute steps with bounded retry and populate results."""
     for s in plan.steps:
         if policy:
@@ -220,13 +220,12 @@ def run_cli(
     data_policy: str | None = None,
 ) -> int:
     """Minimal CLI helper used by tests and the alpha CLI."""
-    _ = seed, topk  # presently unused, kept for API completeness
-    policy = PolicyEngine(
+    _ = seed, topk, data_policy  # presently unused, kept for API completeness
+    policy = GovernanceEngine(
         max_steps=budget_max_steps,
         max_seconds=budget_max_seconds,
         breaker_max_fails=breaker_max_fails,
         dry_run=policy_dry_run,
-        data_policy_path=data_policy,
     )
     for region in regions:
         for query in queries:

@@ -1,12 +1,17 @@
 from __future__ import annotations
 
 import argparse
+import json
+import os
 import subprocess
 import sys
+from pathlib import Path
 from importlib import metadata
 from typing import List
 
 from alpha.core import runner
+from alpha.core.replay import ReplayHarness
+from alpha.core.accessibility import AccessibilityChecker
 from alpha.core.errors import UserInputError, hint
 from alpha.core.queries_loader import load_queries
 
@@ -75,7 +80,7 @@ def _resolve_version() -> str:
 
 def main(argv: List[str] | None = None) -> int:
     argv = argv or sys.argv[1:]
-    commands = {"run", "sweep", "telemetry", "quick-audit", "version"}
+    commands = {"run", "sweep", "telemetry", "quick-audit", "version", "replay", "bench", "a11y-check"}
     if argv and not argv[0].startswith("-") and argv[0] not in commands:
         print(f"error: unknown command '{argv[0]}'", file=sys.stderr)
         return 2
@@ -104,6 +109,15 @@ def main(argv: List[str] | None = None) -> int:
 
     sp.add_parser("quick-audit", help="Run repository quick audit.")
     sp.add_parser("version", help="Show version and exit.")
+
+    p_replay = sp.add_parser("replay", help="Replay a recorded observability session.")
+    p_replay.add_argument("--session", required=True, help="Replay session id.")
+
+    p_bench = sp.add_parser("bench", help="Run benchmark harness.")
+    p_bench.add_argument("--quick", action="store_true", help="Run quick benchmark suite.")
+
+    p_a11y = sp.add_parser("a11y-check", help="Run accessibility checks over JSONL events.")
+    p_a11y.add_argument("--input", required=True, help="Input JSONL file to scan.")
 
     args = ap.parse_args(argv)
     try:
@@ -134,7 +148,7 @@ def main(argv: List[str] | None = None) -> int:
                 data_policy=args.data_policy,
             )
         if args.cmd == "telemetry":
-            import subprocess, sys as _sys
+            import sys as _sys
 
             cmd = [_sys.executable, "scripts/telemetry_leaderboard.py"]
             if args.paths:
@@ -145,6 +159,51 @@ def main(argv: List[str] | None = None) -> int:
             return run_quick_audit()
         if args.cmd == "version":
             print("alpha-solver", _resolve_version())
+            return 0
+        if args.cmd == "replay":
+            harness = ReplayHarness("artifacts/replays")
+            session = harness.load(args.session)
+            for ev in harness.replay(session):
+                print(json.dumps(ev))
+            return 0
+        if args.cmd == "bench":
+            if args.quick:
+                root = Path(__file__).resolve().parent.parent
+                env = os.environ.copy()
+                existing = env.get("PYTHONPATH", "")
+                env["PYTHONPATH"] = (
+                    f"{existing}{os.pathsep}{root}" if existing else str(root)
+                )
+                cmd = [sys.executable, "scripts/bench_reasoners.py"]
+                return subprocess.run(cmd, check=True, env=env, cwd=root).returncode
+            return 0
+        if args.cmd == "a11y-check":
+            checker = AccessibilityChecker.from_config()
+            path = Path(args.input)
+            results = []
+            with path.open("r", encoding="utf-8") as fh:
+                for line in fh:
+                    try:
+                        obj = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    text = obj.get("text") or obj.get("content")
+                    if isinstance(text, str):
+                        results.append(checker.check_text(text))
+            summary = {
+                "count": len(results),
+                "fail": sum(1 for r in results if not r["ok"]),
+                "avg_readability": round(
+                    sum(r["readability"] for r in results) / len(results), 3
+                )
+                if results
+                else 0.0,
+            }
+            out_dir = Path("artifacts/a11y")
+            out_dir.mkdir(parents=True, exist_ok=True)
+            (out_dir / "summary.json").write_text(
+                json.dumps(summary, ensure_ascii=False), encoding="utf-8"
+            )
             return 0
     except UserInputError as e:
         print(f"error: {e}", file=sys.stderr)

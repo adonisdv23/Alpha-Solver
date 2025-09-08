@@ -8,6 +8,7 @@ from alpha.core.telemetry import validate_event
 from alpha.policy.safe_out_sm import SOConfig, SafeOutStateMachine
 from alpha.reasoning.tot import TreeOfThoughtSolver
 from alpha_solver_entry import _tree_of_thought
+from alpha.core.observability import ObservabilityConfig, ObservabilityManager
 
 
 def test_safe_out_threshold_edge_case() -> None:
@@ -45,7 +46,7 @@ def test_telemetry_schema_validator() -> None:
         "event": "x",
         "timestamp": "t",
         "version": 1,
-        "data": {},
+        "properties": {},
     }
     assert validate_event(event)
 
@@ -53,6 +54,17 @@ def test_telemetry_schema_validator() -> None:
 def test_telemetry_schema_validator_missing() -> None:
     with pytest.raises(ValueError):
         validate_event({"event": "x"})
+
+
+def test_offline_mode_disables_telemetry(tmp_path) -> None:
+    cfg = ObservabilityConfig(
+        enable_telemetry=True,
+        telemetry_endpoint="http://example",
+        offline_mode=True,
+        log_path=str(tmp_path / "log.jsonl"),
+    )
+    manager = ObservabilityManager(cfg)
+    assert manager.telemetry is None
 
 
 def test_strict_accessibility_failure(monkeypatch) -> None:
