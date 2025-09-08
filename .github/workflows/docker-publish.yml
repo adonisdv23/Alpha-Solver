@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build image
-        run: docker build -t alpha-solver-api .
+        run: docker build -f infrastructure/Dockerfile -t alpha-solver-api .
       - name: Push image
         if: startsWith(github.ref, 'refs/tags/')
         run: echo "Pushing image..." # placeholder for registry login/push

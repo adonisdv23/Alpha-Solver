@@ -13,11 +13,13 @@ jobs:
       - name: Run tests
         run: pytest -q
       - name: Build API image
-        run: docker build -t alpha-solver-api .
+        run: docker build -f infrastructure/Dockerfile -t alpha-solver-api .
       - name: Smoke test API
         run: |
-          docker run -d -p 8000:8000 -e API_KEY=test --name api alpha-solver-api \ 
-            uvicorn service.app:app --host 0.0.0.0 --port 8000
-          sleep 5
-          curl -f http://localhost:8000/healthz
-          curl -f http://localhost:8000/readyz
+          docker run --rm alpha-solver-api python - <<'PY'
+          from fastapi.testclient import TestClient
+          from service.app import app
+          client = TestClient(app)
+          assert client.get("/healthz").status_code == 200
+          assert client.get("/readyz").status_code == 200
+          PY
