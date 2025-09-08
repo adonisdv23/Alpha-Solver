@@ -7,7 +7,10 @@ import os
 from pathlib import Path
 from typing import Any, Dict
 
-import yaml
+try:  # optional dependency
+    import yaml  # type: ignore
+except ModuleNotFoundError:  # pragma: no cover - exercised in tests via monkeypatch
+    yaml = None  # type: ignore
 
 
 @dataclass
@@ -42,8 +45,36 @@ class QualityGateConfig:
 def get_quality_gate(overrides: Dict[str, Any] | None = None) -> QualityGateConfig:
     cfg = QualityGateConfig()
     path = Path("config/quality_gate.yaml")
+
+    def _fallback_parse(p: Path) -> Dict[str, Dict[str, Any]]:
+        """Very small YAML subset parser for `key: value` pairs.
+
+        Only handles the structure used in ``config/quality_gate.yaml`` and is
+        sufficient when PyYAML isn't available."""
+        result: Dict[str, Dict[str, Any]] = {}
+        current: str | None = None
+        for raw in p.read_text().splitlines():
+            line = raw.strip()
+            if not line or line.startswith("#"):
+                continue
+            if not raw.startswith(" ") and line.endswith(":"):
+                current = line[:-1]
+                result[current] = {}
+            elif ":" in line and current:
+                k, v = line.split(":", 1)
+                v = v.strip()
+                try:
+                    val: Any = float(v)
+                except ValueError:
+                    val = v
+                result[current][k.strip()] = val
+        return result
+
     if path.exists():
-        data = yaml.safe_load(path.read_text()) or {}
+        if yaml is not None:
+            data = yaml.safe_load(path.read_text()) or {}
+        else:
+            data = _fallback_parse(path)
         section = data.get("quality_gate", data)
         for k, v in section.items():
             if hasattr(cfg, k):
