@@ -96,8 +96,9 @@ result = _tree_of_thought(
 print(result["route"], result["final_answer"])
 ```
 
-### ToT Multi-Branch
+---
 
+## ToT Multi-Branch
 Enable breadth-limited exploration:
 
 ```python
@@ -117,6 +118,7 @@ result = _tree_of_thought(
 
 print(result["final_answer"])
 print(json.dumps(result["diagnostics"], indent=2))
+# last JSONL log line (example)
 print(Path("tot.log").read_text().splitlines()[-1])
 ```
 
@@ -135,27 +137,58 @@ Example output:
 }
 ```
 
-| Config | Default | Description |
-| --- | --- | --- |
-| `multi_branch` | `True` | Enable beam search |
-| `max_width` | `3` | Nodes kept per layer |
-| `max_nodes` | `200` | Total exploration cap |
+**Config (selected):**
+
+| Config        | Default | Description                 |
+|---------------|---------|-----------------------------|
+| `multi_branch`| `True`  | Enable beam-style search    |
+| `max_width`   | `3`     | Nodes kept per layer        |
+| `max_nodes`   | `200`   | Total exploration cap       |
 
 ### Progressive Router
-
 Escalates prompt complexity when early progress is low. Profiles: `basic` → `structured` → `constrained`.
 
 ### Agents v12 (groundwork)
-
 Flags for future multi-agent routing. Default implementations are deterministic no-ops.
 
 ### Benchmarks
-
 Run deterministic benchmarks comparing CoT vs ToT variants:
 
 ```bash
 python scripts/bench_reasoners.py
 ```
+
+---
+
+## SAFE-OUT v1.1 (State Machine & Structured Recovery)
+
+```python
+from alpha_solver_entry import _tree_of_thought
+
+result = _tree_of_thought("unclear query")
+print(result["route"])
+print(result["phases"])
+print(result["notes"])
+```
+
+Example output (low-confidence fallback):
+
+```json
+{
+  "final_answer": "To proceed, clarify: unclear query …",
+  "route": "cot_fallback",
+  "confidence": 0.5,
+  "reason": "low_confidence",
+  "notes": "Confidence below 0.60; used chain-of-thought fallback.",
+  "tot": {"confidence": 0.55, "reason": "ok"},
+  "cot": {"confidence": 0.5, "steps": []},
+  "phases": ["init", "assess", "fallback", "finalize"]
+}
+```
+
+_note_: `_tree_of_thought` maintains backward compatibility. Existing keys are unchanged; new fields (`phases`, `diagnostics`, enriched `notes`) are additive.
+
+---
 
 ## Telemetry Leaderboard (offline, stdlib-only)
 

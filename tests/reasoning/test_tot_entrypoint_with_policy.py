@@ -31,5 +31,7 @@ def test_tree_of_thought_policy(monkeypatch, caplog, enable_cot):
             enable_cot_fallback=enable_cot,
         )
     assert result["route"] == ("cot_fallback" if enable_cot else "best_effort")
+    assert result["phases"] == ["init", "assess", "fallback", "finalize"]
+    assert "init->assess" in result["notes"]
     assert json.dumps(result)
-    assert any("safe_out_decision" in r.message for r in caplog.records)
+    assert any("safe_out_phase" in r.message for r in caplog.records)
