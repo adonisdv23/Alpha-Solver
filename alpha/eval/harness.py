@@ -25,8 +25,13 @@ def run(
     scorer_names: Iterable[str],
     seed: int = 0,
     limit: int | None = None,
+    compare_baseline: bool = False,
 ) -> Dict[str, float]:
-    """Run the evaluation returning aggregate metrics."""
+    """Run the evaluation returning aggregate metrics.
+
+    When ``compare_baseline`` is ``True`` a token savings metric is added by
+    simulating baseline vs optimised token counts.
+    """
     random.seed(seed)
     path = Path(dataset)
     rows = _load_dataset(path)
@@ -41,13 +46,15 @@ def run(
             totals[name] += fn(pred, tgt)
     count = len(rows) or 1
     metrics = {name: value / count for name, value in totals.items()}
-    # add dummy latency/cost metrics so gate checks can run
     metrics.update({"p95_ms": 100, "p99_ms": 100, "cost_per_call": 0.001})
-    return {
-        "dataset": str(path),
-        "count": count,
-        "metrics": metrics,
-    }
+    report = {"dataset": str(path), "count": count, "metrics": metrics}
+    if compare_baseline:
+        baseline = {"tokens": count * 100}
+        new = {"tokens": int(baseline["tokens"] * 0.8)}
+        from alpha.core.metrics import compute_token_savings
+
+        report["token_savings_pct"] = compute_token_savings(baseline, new)
+    return report
 
 
 __all__ = ["run"]

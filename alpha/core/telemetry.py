@@ -41,6 +41,11 @@ class TelemetryExporter:
         event.setdefault("timestamp", "")
         event.setdefault("version", 1)
         event.setdefault("properties", {})
+        # propagate deterministic ids when provided
+        if "trace_id" in event:
+            event.setdefault("request_id", event["trace_id"])
+        if "request_id" in event:
+            event.setdefault("trace_id", event["request_id"])
         validate_event(event)
         await self.queue.put(event)
 
@@ -52,14 +57,21 @@ class TelemetryExporter:
 def validate_event(event: Dict[str, Any]) -> bool:
     """Validate telemetry event contract.
 
-    Required fields: session_id, event, timestamp, version, properties.
-    Returns True if valid otherwise raises ValueError.
+    Required fields: session_id, event, timestamp, version, properties. When the
+    ``event`` name is ``"router_decision"`` additional fields are expected in
+    ``properties`` (``chosen_branches``, ``pruned_count`` and
+    ``estimated_tokens_saved``).
     """
 
     required = {"session_id", "event", "timestamp", "version", "properties"}
     missing = required - event.keys()
     if missing:
         raise ValueError(f"missing fields: {sorted(missing)}")
+    if event["event"] == "router_decision":
+        props = event.get("properties", {})
+        for key in ("chosen_branches", "pruned_count", "estimated_tokens_saved"):
+            if key not in props:
+                raise ValueError(f"router_decision missing field: {key}")
     return True
 
 

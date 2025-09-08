@@ -8,6 +8,8 @@ from pathlib import Path
 from alpha.eval import harness
 from alpha.core.config import get_quality_gate
 from alpha.core import budgets as budgets_module
+from alpha.routing import RouterV12
+from alpha.core.metrics import compute_token_savings
 
 
 def _cmd_eval_run(args: argparse.Namespace) -> None:
@@ -49,6 +51,22 @@ def _cmd_budgets_show(args: argparse.Namespace) -> None:
         print(f"{k}: {v}")
 
 
+def _cmd_router_simulate(args: argparse.Namespace) -> None:
+    router = RouterV12()
+    baseline = router.simulate(args.dataset, baseline=True)
+    new = router.simulate(args.dataset, baseline=False)
+    pct = compute_token_savings(baseline, new)
+    report = {
+        "token_savings_pct": pct,
+        "pruned_branches": new["pruned_count"],
+        "deterministic": True,
+    }
+    out_dir = Path("artifacts/eval")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "router_compare.json").write_text(json.dumps(report), encoding="utf-8")
+    print(json.dumps(report))
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="alpha.cli.main")
     sub = parser.add_subparsers(dest="command")
@@ -75,6 +93,15 @@ def _build_parser() -> argparse.ArgumentParser:
     budgets_sub = budgets_parser.add_subparsers(dest="action")
     show_parser = budgets_sub.add_parser("show")
     show_parser.set_defaults(func=_cmd_budgets_show)
+
+    # router simulate
+    router_parser = sub.add_parser("router")
+    router_sub = router_parser.add_subparsers(dest="action")
+    sim_parser = router_sub.add_parser("simulate")
+    sim_parser.add_argument("--dataset", required=True)
+    sim_parser.add_argument("--seed", type=int, default=42)
+    sim_parser.add_argument("--compare-baseline", action="store_true")
+    sim_parser.set_defaults(func=_cmd_router_simulate)
 
     return parser
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 import os
@@ -39,6 +39,38 @@ class QualityGateConfig:
     max_p99_ms: int = 1200
     max_cost_per_call: float = 0.01
     primary_metric: str = "em"
+
+
+@dataclass
+class ValidationConfig:
+    """Configuration for Chain-of-Thought self-validation."""
+
+    enabled: bool = True
+    min_conf: float = 0.70
+
+
+@dataclass
+class TokenBudgetConfig:
+    """Router token budget controls."""
+
+    max_per_example: int = 2048
+
+
+@dataclass
+class VoteConfig:
+    """Optional majority vote configuration."""
+
+    enabled: bool = False
+    k: int = 3
+
+
+@dataclass
+class RouterConfig:
+    """Configuration for router v12 behaviour."""
+
+    seed: int = 42
+    token_budget: TokenBudgetConfig = field(default_factory=TokenBudgetConfig)
+    vote: VoteConfig = field(default_factory=VoteConfig)
 
 
 def _parse_simple_yaml(text: str) -> dict[str, Any]:
@@ -94,4 +126,12 @@ def get_quality_gate(path: Path | str = Path("config/quality_gate.yaml")) -> Qua
     )
 
 
-__all__ = ["APISettings", "QualityGateConfig", "get_quality_gate"]
+__all__ = [
+    "APISettings",
+    "QualityGateConfig",
+    "ValidationConfig",
+    "TokenBudgetConfig",
+    "VoteConfig",
+    "RouterConfig",
+    "get_quality_gate",
+]
