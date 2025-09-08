@@ -87,13 +87,77 @@ Usage:
 
 ```python
 from alpha_solver_entry import _tree_of_thought
+import logging
 
+log = logging.getLogger("alpha.tot")
 result = _tree_of_thought(
     "vague query",
     score_threshold=0.70,
     low_conf_threshold=0.60,
+    logger=log,
 )
 print(result["route"], result["final_answer"])
+```
+
+### ToT Multi-Branch
+
+Enable breadth-limited exploration:
+
+```python
+from alpha_solver_entry import _tree_of_thought
+import json
+from pathlib import Path
+
+# run multi-branch ToT with logging
+result = _tree_of_thought(
+    "2+3?",
+    seed=42,
+    multi_branch=True,
+    max_width=2,
+    max_nodes=10,
+    enable_progressive_router=True,
+)
+
+print(result["final_answer"])
+print(json.dumps(result["diagnostics"], indent=2))
+print(Path("tot.log").read_text().splitlines()[-1])
+```
+
+Example output:
+
+```json
+{
+  "final_answer": "5",
+  "confidence": 1.0,
+  "route": "tot",
+  "reason": "ok",
+  "diagnostics": {
+    "tot": {"mode": "multi", "max_width": 2, "max_nodes": 10},
+    "router": {"progressive": true, "agents_v12": false}
+  }
+}
+```
+
+| Config | Default | Description |
+| --- | --- | --- |
+| `multi_branch` | `True` | Enable beam search |
+| `max_width` | `3` | Nodes kept per layer |
+| `max_nodes` | `200` | Total exploration cap |
+
+### Progressive Router
+
+Escalates prompt complexity when early progress is low. Profiles: `basic` → `structured` → `constrained`.
+
+### Agents v12 (groundwork)
+
+Flags for future multi-agent routing. Default implementations are deterministic no-ops.
+
+### Benchmarks
+
+Run deterministic benchmarks comparing CoT vs ToT variants:
+
+```bash
+python scripts/bench_reasoners.py
 ```
 
 ## Telemetry Leaderboard (offline, stdlib-only)

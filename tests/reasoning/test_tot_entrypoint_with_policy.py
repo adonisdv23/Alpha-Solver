@@ -24,11 +24,13 @@ def _low_confidence(self, query: str) -> Dict[str, Any]:  # pragma: no cover - u
 @pytest.mark.parametrize("enable_cot", [True, False])
 def test_tree_of_thought_policy(monkeypatch, caplog, enable_cot):
     monkeypatch.setattr(TreeOfThoughtSolver, "solve", _low_confidence)
-    with caplog.at_level(logging.INFO):
+    test_logger = logging.getLogger("tot_entrypoint")
+    with caplog.at_level(logging.INFO, logger=test_logger.name):
         result = _tree_of_thought(
             "query",
             low_conf_threshold=0.60,
             enable_cot_fallback=enable_cot,
+            logger=test_logger,
         )
     assert result["route"] == ("cot_fallback" if enable_cot else "best_effort")
     assert json.dumps(result)

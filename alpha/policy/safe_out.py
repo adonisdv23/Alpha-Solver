@@ -2,7 +2,8 @@ from __future__ import annotations
 
 """SAFE-OUT policy for low-confidence Tree-of-Thought results."""
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
+import logging
 
 try:  # Best-effort optional CoT import
     from alpha.reasoning.cot import run_cot  # type: ignore
@@ -22,7 +23,12 @@ class SafeOutPolicy:
         self.low_conf_threshold = low_conf_threshold
         self.enable_cot_fallback = enable_cot_fallback
 
-    def apply(self, tot_result: Dict[str, Any], original_query: str) -> Dict[str, Any]:
+    def apply(
+        self,
+        tot_result: Dict[str, Any],
+        original_query: str,
+        logger: Optional[logging.Logger] = None,
+    ) -> Dict[str, Any]:
         """Apply SAFE-OUT logic to ``tot_result``.
 
         Parameters
