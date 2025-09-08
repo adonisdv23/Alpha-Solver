@@ -32,10 +32,13 @@ class APISettings:
 
 @dataclass
 class QualityGateConfig:
-    """Simple configuration used for quality gating."""
+    """Configuration for quality gates and evaluation budgets."""
 
-    min_score: float = 0.0
-    max_latency_ms: int = 1000
+    min_accuracy: float = 0.85
+    max_p95_ms: int = 750
+    max_p99_ms: int = 1200
+    max_cost_per_call: float = 0.01
+    primary_metric: str = "em"
 
 
 def _parse_simple_yaml(text: str) -> dict[str, Any]:
@@ -65,23 +68,29 @@ def _parse_simple_yaml(text: str) -> dict[str, Any]:
 def get_quality_gate(path: Path | str = Path("config/quality_gate.yaml")) -> QualityGateConfig:
     """Load the quality gate configuration.
 
-    Falls back to a minimal parser if :mod:`yaml` is unavailable. Missing files
-    or parsing errors simply return the default configuration.
+    Uses :mod:`yaml` when available, otherwise falls back to a tiny inline
+    parser that understands ``key: value`` pairs. Any failures result in the
+    default :class:`QualityGateConfig` being returned.
     """
 
     path = Path(path)
     defaults = QualityGateConfig()
     try:
         text = path.read_text(encoding="utf-8")
-        if yaml is not None:
+        if yaml is not None:  # pragma: no branch - exercised in tests
             loaded = yaml.safe_load(text) or {}
         else:
             loaded = _parse_simple_yaml(text)
     except Exception:
         loaded = {}
     return QualityGateConfig(
-        min_score=float(loaded.get("min_score", defaults.min_score)),
-        max_latency_ms=int(loaded.get("max_latency_ms", defaults.max_latency_ms)),
+        min_accuracy=float(loaded.get("min_accuracy", defaults.min_accuracy)),
+        max_p95_ms=int(loaded.get("max_p95_ms", defaults.max_p95_ms)),
+        max_p99_ms=int(loaded.get("max_p99_ms", defaults.max_p99_ms)),
+        max_cost_per_call=float(
+            loaded.get("max_cost_per_call", defaults.max_cost_per_call)
+        ),
+        primary_metric=str(loaded.get("primary_metric", defaults.primary_metric)),
     )
 
 

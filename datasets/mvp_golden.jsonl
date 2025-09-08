@@ -1,0 +1,3 @@
+{"id": 1, "input": "What is 2+2?", "target": "4", "prediction": "4"}
+{"id": 2, "input": "Capital of France", "target": "Paris", "prediction": "Paris"}
+{"id": 3, "input": "Opposite of hot", "target": "cold", "prediction": "cold"}

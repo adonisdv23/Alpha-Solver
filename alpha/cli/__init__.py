@@ -168,7 +168,7 @@ def main(argv: List[str] | None = None) -> int:
             return 0
         if args.cmd == "bench":
             if args.quick:
-                root = Path(__file__).resolve().parent.parent
+                root = Path(__file__).resolve().parent.parent.parent
                 env = os.environ.copy()
                 existing = env.get("PYTHONPATH", "")
                 env["PYTHONPATH"] = (
