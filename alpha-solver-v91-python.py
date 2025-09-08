@@ -1,7 +1,6 @@
 """Alpha Solver v91 entrypoints."""
 
-from alpha.reasoning.tot import TreeOfThoughtSolver
-from alpha.policy.safe_out_sm import SOConfig, SafeOutStateMachine
+from alpha.solver.observability import AlphaSolver
 
 
 def _tree_of_thought(
@@ -16,22 +15,40 @@ def _tree_of_thought(
     low_conf_threshold: float = 0.60,
     enable_cot_fallback: bool = True,
     max_cot_steps: int = 4,
+    multi_branch: bool = False,
+    max_width: int = 3,
+    max_nodes: int = 100,
+    enable_progressive_router: bool = False,
+    router_min_progress: float = 0.3,
+    enable_agents_v12: bool = False,
+    agents_v12_order: tuple[str, ...] = (
+        "decomposer",
+        "checker",
+        "calculator",
+    ),
 ) -> dict:
     """Solve ``query`` via deterministic Tree-of-Thought reasoning."""
-    solver = TreeOfThoughtSolver(
+
+    solver = AlphaSolver()
+    return solver.solve(
+        query,
         seed=seed,
         branching_factor=branching_factor,
         score_threshold=score_threshold,
         max_depth=max_depth,
         timeout_s=timeout_s,
         dynamic_prune_margin=dynamic_prune_margin,
-    )
-    tot_result = solver.solve(query)
-    cfg = SOConfig(
         low_conf_threshold=low_conf_threshold,
         enable_cot_fallback=enable_cot_fallback,
-        seed=seed,
         max_cot_steps=max_cot_steps,
+        multi_branch=multi_branch,
+        max_width=max_width,
+        max_nodes=max_nodes,
+        enable_progressive_router=enable_progressive_router,
+        router_min_progress=router_min_progress,
+        enable_agents_v12=enable_agents_v12,
+        agents_v12_order=agents_v12_order,
     )
-    sm = SafeOutStateMachine(cfg)
-    return sm.run(tot_result, query)
+
+
+__all__ = ["_tree_of_thought", "AlphaSolver"]

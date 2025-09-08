@@ -47,6 +47,10 @@ print(result["final_answer"], result["confidence"])
 Note: `_tree_of_thought` is imported from `alpha_solver_entry` (a small shim)
 because the canonical file name is hyphenated for historical reasons.
 
+`_tree_of_thought` is the stable public API. Advanced users may import
+`AlphaSolver` from `alpha_solver_entry`, which wraps the P3 observability
+implementation in `alpha.solver.observability`.
+
 ```python
 _tree_of_thought(
     query: str,
@@ -59,6 +63,13 @@ _tree_of_thought(
     dynamic_prune_margin: float = 0.15,
     low_conf_threshold: float = 0.60,        # SAFE-OUT policy
     enable_cot_fallback: bool = True,        # SAFE-OUT policy
+    multi_branch: bool = False,
+    max_width: int = 3,
+    max_nodes: int = 100,
+    enable_progressive_router: bool = False,
+    router_min_progress: float = 0.3,
+    enable_agents_v12: bool = False,
+    agents_v12_order: tuple[str, ...] = ("decomposer", "checker", "calculator"),
 ) -> dict
 ```
 
@@ -95,6 +106,36 @@ result = _tree_of_thought(
 )
 print(result["route"], result["final_answer"])
 ```
+
+### Multi-Branch ToT & Progressive Router
+
+```python
+from alpha_solver_entry import _tree_of_thought
+
+env = _tree_of_thought(
+    "color puzzle",
+    seed=42,
+    multi_branch=True,
+    max_width=2,
+    max_nodes=4,
+    enable_progressive_router=True,
+    router_min_progress=0.8,
+)
+print(env["final_answer"])
+print(env["diagnostics"]["router"]["stage"])
+print(env["diagnostics"]["tot"]["explored_nodes"])
+# deterministic multi-branch example
+```
+
+Sample output:
+
+```text
+To proceed, clarify: color puzzle
+structured
+2
+```
+
+Determinism: beam expansion sorts candidates by score (rounded to 3 decimals) and lexical path.
 
 ### SAFE-OUT v1.1 (State Machine & Structured Recovery)
 

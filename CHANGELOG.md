@@ -1,11 +1,16 @@
 # Changelog
 
 ## [Unreleased]
-### Fixed
-- Remove duplicate entrypoint module; normalize imports to a single `_tree_of_thought` API.
+### Added
+- Multi-branch Tree-of-Thought with deterministic beam expansion and logging.
+- Progressive Complexity Router with deterministic escalation and observability.
+- Agents v12 scaffold and configuration flags.
+- Deterministic benchmark suite comparing CoT, single-path ToT, multi-branch ToT and routed ToT.
+- JSONL events for `tot_layer`, `tot_candidate`, and `router_escalate`.
 
-### Docs
-- Clarified `score_threshold` vs `low_conf_threshold` and documented SAFE-OUT output schema.
+### Changed
+- `_tree_of_thought` entrypoint now surfaces router and agent diagnostics and exposes new flags.
+- AlphaSolver v2.2.6 P3 moved to `alpha.solver.observability` and is wrapped by the single `alpha-solver-v91-python` entrypoint.
 
 ## [2025-09-09]
 ### Added
