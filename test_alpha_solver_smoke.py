@@ -1,9 +1,8 @@
-import runpy
 import json
 from pathlib import Path
 
-ns = runpy.run_path('Alpha Solver.py')
-AlphaSolver = ns['AlphaSolver']
+from alpha_solver_entry import AlphaSolver
+
 solver = AlphaSolver()
 
 queries = ['simple', 'complex reasoning needed', '']
@@ -19,13 +18,13 @@ for q in queries:
         if 'accessibility' in res:
             assert 'score' in res['accessibility']
         report.append({'query': q, 'ok': True})
-    except Exception as e:
+    except Exception as e:  # pragma: no cover - diagnostic script
         success = False
         report.append({'query': q, 'ok': False, 'error': str(e)})
 
 log_dir = Path('logs')
 log_dir.mkdir(exist_ok=True)
-with open(log_dir / 'smoke_results.json', 'w') as f:
+with open(log_dir / 'smoke_results.json', 'w', encoding='utf-8') as f:
     json.dump(report, f, indent=2)
 
 print('SMOKE TEST', 'PASS' if success else 'FAIL')

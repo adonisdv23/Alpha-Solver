@@ -10,6 +10,7 @@
 
 ### Changed
 - `_tree_of_thought` entrypoint now surfaces router and agent diagnostics and exposes new flags.
+- AlphaSolver v2.2.6 P3 moved to `alpha.solver.observability` and is wrapped by the single `alpha-solver-v91-python` entrypoint.
 
 ## [2025-09-09]
 ### Added

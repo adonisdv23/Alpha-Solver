@@ -1,8 +1,7 @@
-import runpy
 import unittest
 
-ns = runpy.run_path('Alpha Solver.py')
-AlphaSolver = ns['AlphaSolver']
+from alpha_solver_entry import AlphaSolver
+
 
 class Stage1SmokeTest(unittest.TestCase):
     def test_response_keys(self):
@@ -23,6 +22,7 @@ class Stage1SmokeTest(unittest.TestCase):
         ]
         for key in required:
             self.assertIn(key, result)
+
 
 if __name__ == '__main__':
     unittest.main()

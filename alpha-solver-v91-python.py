@@ -1,8 +1,6 @@
 """Alpha Solver v91 entrypoints."""
 
-from alpha.reasoning.tot import TreeOfThoughtSolver
-from alpha.policy.safe_out_sm import SOConfig, SafeOutStateMachine
-from alpha.router import ProgressiveRouter, AgentsV12Config
+from alpha.solver.observability import AlphaSolver
 
 
 def _tree_of_thought(
@@ -30,43 +28,27 @@ def _tree_of_thought(
     ),
 ) -> dict:
     """Solve ``query`` via deterministic Tree-of-Thought reasoning."""
-    solver = TreeOfThoughtSolver(
+
+    solver = AlphaSolver()
+    return solver.solve(
+        query,
         seed=seed,
         branching_factor=branching_factor,
         score_threshold=score_threshold,
         max_depth=max_depth,
         timeout_s=timeout_s,
         dynamic_prune_margin=dynamic_prune_margin,
+        low_conf_threshold=low_conf_threshold,
+        enable_cot_fallback=enable_cot_fallback,
+        max_cot_steps=max_cot_steps,
         multi_branch=multi_branch,
         max_width=max_width,
         max_nodes=max_nodes,
+        enable_progressive_router=enable_progressive_router,
+        router_min_progress=router_min_progress,
+        enable_agents_v12=enable_agents_v12,
+        agents_v12_order=agents_v12_order,
     )
-    router = (
-        ProgressiveRouter(min_progress=router_min_progress)
-        if enable_progressive_router
-        else None
-    )
-    agents_cfg = AgentsV12Config(
-        enable_agents_v12=enable_agents_v12, agents_v12_order=agents_v12_order
-    )
-    if router is None:
-        tot_result = solver.solve(query)
-    else:
-        tot_result = solver.solve(query, router=router)
-    cfg = SOConfig(
-        low_conf_threshold=low_conf_threshold,
-        enable_cot_fallback=enable_cot_fallback,
-        seed=seed,
-        max_cot_steps=max_cot_steps,
-    )
-    sm = SafeOutStateMachine(cfg)
-    envelope = sm.run(tot_result, query)
-    envelope["diagnostics"] = {
-        "tot": tot_result,
-        "router": {"stage": router.stage if router else "basic"},
-        "agents_v12": {
-            "enabled": agents_cfg.enable_agents_v12,
-            "order": agents_cfg.agents_v12_order,
-        },
-    }
-    return envelope
+
+
+__all__ = ["_tree_of_thought", "AlphaSolver"]

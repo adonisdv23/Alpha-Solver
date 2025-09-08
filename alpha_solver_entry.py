@@ -14,6 +14,7 @@ if _spec is None or _spec.loader is None:
 _module = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_module)  # type: ignore[attr-defined]
 
+AlphaSolver = _module.AlphaSolver  # type: ignore[attr-defined]
 _tree_of_thought = _module._tree_of_thought  # type: ignore[attr-defined]
 
-__all__ = ["_tree_of_thought"]
+__all__ = ["AlphaSolver", "_tree_of_thought"]

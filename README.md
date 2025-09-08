@@ -47,6 +47,10 @@ print(result["final_answer"], result["confidence"])
 Note: `_tree_of_thought` is imported from `alpha_solver_entry` (a small shim)
 because the canonical file name is hyphenated for historical reasons.
 
+`_tree_of_thought` is the stable public API. Advanced users may import
+`AlphaSolver` from `alpha_solver_entry`, which wraps the P3 observability
+implementation in `alpha.solver.observability`.
+
 ```python
 _tree_of_thought(
     query: str,
