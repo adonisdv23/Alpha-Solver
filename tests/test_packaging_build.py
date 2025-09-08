@@ -1,20 +1,15 @@
-import importlib.util
 import shutil
 import subprocess
 import sys
-import unittest
 from pathlib import Path
 
-# Skip this test if optional packaging dependencies are missing. We raise
-# `unittest.SkipTest` before importing `pytest` so environments lacking the
-# `packaging` distribution don't error during module import.
-if (
-    importlib.util.find_spec("build") is None
-    or importlib.util.find_spec("packaging") is None
-):
-    raise unittest.SkipTest("build or packaging module missing")
-
 import pytest
+
+# Skip if optional packaging dependencies are missing. Using
+# ``pytest.importorskip`` ensures the test is marked as skipped during
+# collection rather than erroring out when the modules are absent.
+pytest.importorskip("build")
+pytest.importorskip("packaging")
 
 
 def test_packaging_build(tmp_path: Path) -> None:
