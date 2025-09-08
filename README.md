@@ -96,6 +96,34 @@ result = _tree_of_thought(
 print(result["route"], result["final_answer"])
 ```
 
+### SAFE-OUT v1.1 (State Machine & Structured Recovery)
+
+```python
+from alpha_solver_entry import _tree_of_thought
+
+result = _tree_of_thought("unclear query")
+print(result["route"])
+print(result["phases"])
+print(result["notes"])
+```
+
+Example output:
+
+```json
+{
+  "final_answer": "To proceed, clarify: unclear query …",
+  "route": "cot_fallback",
+  "confidence": 0.5,
+  "reason": "low_confidence",
+  "notes": "Confidence below 0.60; used chain-of-thought fallback. | phases: init->assess->fallback->finalize",
+  "tot": {"confidence": 0.55, "reason": "ok", ...},
+  "cot": {"confidence": 0.5, "steps": []},
+  "phases": ["init", "assess", "fallback", "finalize"]
+}
+```
+
+_tree_of_thought maintains backward compatibility: existing keys are unchanged; phases and enriched notes are additive.
+
 ## Telemetry Leaderboard (offline, stdlib-only)
 
 Generate a Markdown leaderboard from telemetry JSONL files:

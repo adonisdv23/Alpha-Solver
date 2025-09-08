@@ -7,6 +7,12 @@
 ### Docs
 - Clarified `score_threshold` vs `low_conf_threshold` and documented SAFE-OUT output schema.
 
+## [2025-09-09]
+### Added
+- SAFE-OUT v1.1 state machine with structured recovery and phased JSONL logging.
+### Changed
+- `_tree_of_thought` entrypoint returns phases and enriched notes while preserving existing keys.
+
 ## [2025-09-07]
 ### Added
 - SAFE-OUT policy (low-confidence fallback) with JSON `safe_out_decision` logging.
