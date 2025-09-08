@@ -35,8 +35,32 @@ class TelemetryExporter:
                 await asyncio.sleep(self.retry_seconds)
 
     async def emit(self, event: Dict[str, Any]) -> None:
+        # Auto-populate required fields for backward compatibility.
+        event.setdefault("session_id", "unknown")
+        event.setdefault("event", "unknown")
+        event.setdefault("timestamp", "")
+        event.setdefault("version", 1)
+        event.setdefault("data", {})
+        validate_event(event)
         await self.queue.put(event)
 
     async def close(self) -> None:
         await self.queue.put(None)
         await self._task
+
+
+def validate_event(event: Dict[str, Any]) -> bool:
+    """Validate telemetry event contract.
+
+    Required fields: session_id, event, timestamp, version, data.
+    Returns True if valid otherwise raises ValueError.
+    """
+
+    required = {"session_id", "event", "timestamp", "version", "data"}
+    missing = required - event.keys()
+    if missing:
+        raise ValueError(f"missing fields: {sorted(missing)}")
+    return True
+
+
+__all__ = ["TelemetryExporter", "validate_event"]

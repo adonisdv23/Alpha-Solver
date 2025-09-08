@@ -38,6 +38,17 @@ python -m alpha.executors.math_exec "2+2"
 
 ## Using Tree-of-Thought
 
+### Observability & Replay
+
+`alpha-solver-v91-python.py` exposes optional observability flags:
+
+```bash
+python alpha-solver-v91-python.py "demo" --record mysession
+python alpha-solver-v91-python.py "demo" --replay mysession --strict-accessibility
+```
+
+Logs can be redirected with `--log-path` and telemetry sent via `--telemetry-endpoint`.
+
 ```python
 from alpha_solver_entry import _tree_of_thought
 result = _tree_of_thought("solve x")
