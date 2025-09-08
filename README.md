@@ -118,24 +118,41 @@ result = _tree_of_thought(
 print(result["route"], result["final_answer"])
 ```
 
+### `alpha_solver_cli.py`
+
+A thin wrapper around `_tree_of_thought` exposes router and SAFE-OUT flags:
+
+```bash
+python alpha_solver_cli.py "demo" --multi-branch --max-width 2 --max-nodes 4 \
+    --enable-progressive-router --router-escalation basic,structured,constrained \
+    --low-conf-threshold 0.5 --no-cot-fallback
+```
+
 ### Multi-Branch ToT & Progressive Router
 
 ```python
 from alpha_solver_entry import _tree_of_thought
 
-env = _tree_of_thought(
-    "color puzzle",
-    seed=42,
-    multi_branch=True,
-    max_width=2,
-    max_nodes=4,
-    enable_progressive_router=True,
-    router_min_progress=0.8,
-)
-print(env["final_answer"])
-print(env["diagnostics"]["router"]["stage"])
-print(env["diagnostics"]["tot"]["explored_nodes"])
-# deterministic multi-branch example
+
+def demo_router() -> None:
+    """Run a deterministic progressive-router example."""
+    env = _tree_of_thought(
+        "color puzzle",
+        seed=42,
+        multi_branch=True,
+        max_width=2,
+        max_nodes=4,
+        enable_progressive_router=True,
+        router_escalation=("basic", "structured", "constrained"),
+        router_min_progress=0.8,
+    )
+    print(env["final_answer"])
+    print(env["diagnostics"]["router"]["stage"])
+    print(env["diagnostics"]["tot"]["explored_nodes"])
+
+
+if __name__ == "__main__":
+    demo_router()
 ```
 
 Sample output:
@@ -147,6 +164,12 @@ structured
 ```
 
 Determinism: beam expansion sorts candidates by score (rounded to 3 decimals) and lexical path.
+
+| option | default | description |
+| --- | --- | --- |
+| `max_width` | `3` | Beam width for multi-branch search |
+| `max_nodes` | `100` | Node expansion limit |
+| `router_escalation` | `basic→structured→constrained` | Progressive stages |
 
 ### SAFE-OUT v1.1 (State Machine & Structured Recovery)
 

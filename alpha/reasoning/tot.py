@@ -160,6 +160,7 @@ class TreeOfThoughtSolver:
             current = heapq.heappop(self._frontier)[-1]
             log_event(
                 "expand",
+                layer="tot",
                 node_id=current.id,
                 depth=current.depth,
                 score=current.score,
@@ -199,6 +200,7 @@ class TreeOfThoughtSolver:
             route = router.stage if router else "basic"
             log_event(
                 "tot_layer",
+                layer="tot",
                 depth=depth,
                 size=len(frontier),
                 route=route,
@@ -209,6 +211,7 @@ class TreeOfThoughtSolver:
             for node in layer:
                 log_event(
                     "tot_candidate",
+                    layer="tot",
                     depth=node.depth,
                     score=node.score,
                     path=list(node.path),
@@ -260,7 +263,7 @@ class TreeOfThoughtSolver:
         root = Node(content=query, path=(query,), depth=0, id=self._next_id())
         root = replace(root, score=self.path_scorer(root))
 
-        log_event("config", config=self._config_dict(), seed=self.seed)
+        log_event("config", layer="tot", config=self._config_dict(), seed=self.seed)
 
         if self.multi_branch:
             best = self.beam_search(root, router=router)
@@ -279,6 +282,7 @@ class TreeOfThoughtSolver:
 
         log_event(
             "summary",
+            layer="tot",
             reason=reason,
             explored=self._explored_nodes,
             best_score=best.score,

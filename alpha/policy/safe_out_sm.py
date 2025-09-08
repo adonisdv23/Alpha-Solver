@@ -40,7 +40,7 @@ class SafeOutStateMachine:
 
         phases: List[str] = ["init"]
         confidence = float(tot_result.get("confidence", 0.0))
-        log_event("safe_out_config", config=asdict(self.config))
+        log_event("safe_out_config", layer="safe_out", config=asdict(self.config))
         log_safe_out_phase(
             phase="init",
             route="pending",

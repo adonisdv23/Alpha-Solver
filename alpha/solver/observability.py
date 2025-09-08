@@ -45,6 +45,7 @@ class AlphaSolver:
         max_nodes: int = 100,
         enable_progressive_router: bool = False,
         router_min_progress: float = 0.3,
+        router_escalation: Tuple[str, ...] = ("basic", "structured", "constrained"),
         enable_agents_v12: bool = False,
         agents_v12_order: Tuple[str, ...] = (
             "decomposer",
@@ -68,7 +69,9 @@ class AlphaSolver:
             max_nodes=max_nodes,
         )
         router = (
-            ProgressiveRouter(min_progress=router_min_progress)
+            ProgressiveRouter(
+                min_progress=router_min_progress, escalation=router_escalation
+            )
             if enable_progressive_router
             else None
         )
@@ -97,6 +100,10 @@ class AlphaSolver:
             "agents_v12": {
                 "enabled": agents_cfg.enable_agents_v12,
                 "order": agents_cfg.agents_v12_order,
+            },
+            "safe_out": {
+                "low_conf_threshold": low_conf_threshold,
+                "enable_cot_fallback": enable_cot_fallback,
             },
         }
 
