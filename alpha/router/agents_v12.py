@@ -1,6 +1,6 @@
-from __future__ import annotations
-
 """Groundwork for pluggable multi-agent router v12."""
+
+from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import List, Protocol
@@ -52,3 +52,4 @@ class NoOpCalculator:
 
     def run(self, expr: str) -> float:
         return 0.0
+

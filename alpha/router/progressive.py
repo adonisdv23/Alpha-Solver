@@ -3,7 +3,7 @@ from __future__ import annotations
 """Deterministic progressive complexity router."""
 
 from dataclasses import dataclass
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
 from alpha.reasoning.logging import log_event
 from .config import ProgressiveRouterConfig
@@ -23,8 +23,8 @@ class ProgressiveRouter:
     ) -> Optional["ProgressiveRouter"]:
         """Construct a router from ``ProgressiveRouterConfig``.
 
-        Returns ``None`` when ``enable_progressive_router`` is ``False`` to allow
-        callers to gate creation behind a single configuration object.
+        Returns ``None`` when ``enable_progressive_router`` is ``False`` to
+        allow callers to gate creation behind a single configuration object.
         """
         if not config.enable_progressive_router:
             return None
@@ -39,8 +39,16 @@ class ProgressiveRouter:
 
     def route(self, progress: float) -> str:
         """Return current stage and escalate if ``progress`` is low."""
-        if progress < self.min_progress and self.stage_index < len(self.escalation) - 1:
+        if (
+            progress < self.min_progress
+            and self.stage_index < len(self.escalation) - 1
+        ):
             prev = self.stage
             self.stage_index += 1
-            log_event("router_escalate", previous=prev, new=self.stage, progress=progress)
+            log_event(
+                "router_escalate",
+                previous=prev,
+                new=self.stage,
+                progress=progress,
+            )
         return self.stage

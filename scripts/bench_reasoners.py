@@ -53,7 +53,9 @@ def _bench() -> List[Dict[str, object]]:
         )
 
         # ToT multi
-        solver = TreeOfThoughtSolver(seed=42, multi_branch=True, max_width=2, max_nodes=10)
+        solver = TreeOfThoughtSolver(
+            seed=42, multi_branch=True, max_width=2, max_nodes=10
+        )
         start = time.time()
         tot_multi = solver.solve(prompt)
         elapsed = int((time.time() - start) * 1000)
@@ -69,7 +71,9 @@ def _bench() -> List[Dict[str, object]]:
         )
 
         # ToT + Router
-        solver = TreeOfThoughtSolver(seed=42, multi_branch=True, max_width=2, max_nodes=10)
+        solver = TreeOfThoughtSolver(
+            seed=42, multi_branch=True, max_width=2, max_nodes=10
+        )
         router = ProgressiveRouter()
         start = time.time()
         tot_router = solver.solve(prompt, router=router)

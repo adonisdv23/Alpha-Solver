@@ -32,7 +32,10 @@ TEMPLATE_FUNCS = (
 
 
 class TreeOfThoughtSolver:
-    """Deterministic Tree-of-Thought solver with optional multi-branch search."""
+    """Deterministic Tree-of-Thought solver.
+
+    Provides optional multi-branch search.
+    """
 
     def __init__(
         self,
@@ -60,7 +63,9 @@ class TreeOfThoughtSolver:
         self.visited: Dict[Node, float] = {}
         self._id_counter = 0
         self._query_tokens: set[str] = set()
-        self._frontier: List[Tuple[float, int, Tuple[str, ...], int, Node]] = []
+        self._frontier: List[
+            Tuple[float, int, Tuple[str, ...], int, Node]
+        ] = []
         self._explored_nodes = 0
         self._timed_out = False
 
@@ -71,7 +76,9 @@ class TreeOfThoughtSolver:
         self._id_counter += 1
         return self._id_counter
 
-    def _priority(self, node: Node) -> Tuple[float, int, Tuple[str, ...], int, Node]:
+    def _priority(
+        self, node: Node
+    ) -> Tuple[float, int, Tuple[str, ...], int, Node]:
         return (-node.score, node.depth, node.path, node.id, node)
 
     def _config_dict(self) -> Dict[str, float | int]:
@@ -110,13 +117,17 @@ class TreeOfThoughtSolver:
     def path_scorer(self, node: Node) -> float:
         """Score ``node`` using simple deterministic heuristics."""
         tokens = set(node.content.lower().split())
-        relevance = len(self._query_tokens & tokens) / max(len(self._query_tokens), 1)
+        relevance = len(self._query_tokens & tokens) / max(
+            len(self._query_tokens), 1
+        )
 
         progress = max(0.0, 1 - (node.depth / max(self.max_depth, 1)))
 
         text = " ".join(node.path).lower()
         contradictions = {"contradiction", "inconsistent", "impossible"}
-        consistency = 0.0 if any(term in text for term in contradictions) else 1.0
+        consistency = (
+            0.0 if any(term in text for term in contradictions) else 1.0
+        )
 
         score = 0.4 * relevance + 0.3 * progress + 0.3 * consistency
         return round(max(0.0, min(1.0, score)), 3)
@@ -143,7 +154,10 @@ class TreeOfThoughtSolver:
             if current.score > best.score:
                 best = current
                 self._retrace_and_prune(best.score)
-            if current.score >= self.score_threshold or current.depth >= self.max_depth:
+            if (
+                current.score >= self.score_threshold
+                or current.depth >= self.max_depth
+            ):
                 continue
             for child in self.branch_generator(current):
                 prev = self.visited.get(child)
@@ -154,7 +168,9 @@ class TreeOfThoughtSolver:
             self._explored_nodes += 1
         return best
 
-    def beam_search(self, root: Node, *, router: "ProgressiveRouter" | None = None) -> Node:
+    def beam_search(
+        self, root: Node, *, router: "ProgressiveRouter" | None = None
+    ) -> Node:
         """Deterministic breadth-limited multi-branch exploration."""
         start = time.time()
         frontier: List[Node] = [root]
@@ -166,7 +182,13 @@ class TreeOfThoughtSolver:
                 break
             depth = frontier[0].depth
             route = router.stage if router else "basic"
-            log_event("tot_layer", depth=depth, size=len(frontier), route=route, seed=self.seed)
+            log_event(
+                "tot_layer",
+                depth=depth,
+                size=len(frontier),
+                route=route,
+                seed=self.seed,
+            )
             frontier.sort(key=lambda n: (-round(n.score, 3), n.path))
             layer = frontier[: self.max_width]
             for node in layer:
@@ -182,7 +204,10 @@ class TreeOfThoughtSolver:
             for node in layer:
                 if node.score > best.score:
                     best = node
-                if node.score >= self.score_threshold or node.depth >= self.max_depth:
+                if (
+                    node.score >= self.score_threshold
+                    or node.depth >= self.max_depth
+                ):
                     continue
                 for child in self.branch_generator(node):
                     next_frontier.append(child)
@@ -209,7 +234,9 @@ class TreeOfThoughtSolver:
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
-    def solve(self, query: str, *, router: "ProgressiveRouter" | None = None) -> Dict[str, object]:
+    def solve(
+        self, query: str, *, router: "ProgressiveRouter" | None = None
+    ) -> Dict[str, object]:
         """Solve ``query`` using deterministic Tree-of-Thought search."""
         self._query_tokens = set(query.lower().split())
         self._explored_nodes = 0
@@ -228,7 +255,11 @@ class TreeOfThoughtSolver:
         reason = (
             "timeout"
             if self._timed_out
-            else ("ok" if best.score >= self.score_threshold else "below_threshold")
+            else (
+                "ok"
+                if best.score >= self.score_threshold
+                else "below_threshold"
+            )
         )
 
         log_event(

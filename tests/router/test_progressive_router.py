@@ -2,7 +2,9 @@ from alpha.router import ProgressiveRouter, ProgressiveRouterConfig
 
 
 def test_progressive_router_escalates():
-    cfg = ProgressiveRouterConfig(enable_progressive_router=True, router_min_progress=0.5)
+    cfg = ProgressiveRouterConfig(
+        enable_progressive_router=True, router_min_progress=0.5
+    )
     router = ProgressiveRouter.from_config(cfg)
     assert router is not None
     assert router.route(0.6) == "basic"

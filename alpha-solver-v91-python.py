@@ -23,7 +23,11 @@ def _tree_of_thought(
     enable_progressive_router: bool = False,
     router_min_progress: float = 0.3,
     enable_agents_v12: bool = False,
-    agents_v12_order: tuple[str, ...] = ("decomposer", "checker", "calculator"),
+    agents_v12_order: tuple[str, ...] = (
+        "decomposer",
+        "checker",
+        "calculator",
+    ),
 ) -> dict:
     """Solve ``query`` via deterministic Tree-of-Thought reasoning."""
     solver = TreeOfThoughtSolver(
