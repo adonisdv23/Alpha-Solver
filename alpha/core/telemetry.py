@@ -2,6 +2,49 @@ from __future__ import annotations
 import asyncio
 from typing import Any, Awaitable, Callable, Dict, List
 
+from prometheus_client import Counter, Histogram
+
+# Prometheus metrics
+REQUEST_COUNT = Counter(
+    "alpha_request_total",
+    "Total API requests",
+    labelnames=("path", "strategy"),
+)
+
+REQUEST_LATENCY_MS = Histogram(
+    "alpha_request_latency_ms",
+    "API request latency in milliseconds",
+    labelnames=("path", "strategy"),
+)
+
+RATE_LIMIT_COUNT = Counter(
+    "alpha_rate_limit_total",
+    "Rate limit events encountered",
+)
+
+SAFE_OUT_COUNT = Counter(
+    "alpha_safe_out_total",
+    "SAFE-OUT responses emitted",
+    labelnames=("reason",),
+)
+
+
+def observe_request(path: str, strategy: str, duration_ms: float) -> None:
+    """Record a request count and latency."""
+    label = {"path": path, "strategy": strategy or ""}
+    REQUEST_COUNT.labels(**label).inc()
+    REQUEST_LATENCY_MS.labels(**label).observe(duration_ms)
+
+
+def rate_limited() -> None:
+    """Increment the rate limit counter."""
+    RATE_LIMIT_COUNT.inc()
+
+
+def safe_out(reason: str) -> None:
+    """Increment the SAFE-OUT counter."""
+    SAFE_OUT_COUNT.labels(reason=reason).inc()
+
 
 class TelemetryExporter:
     """Asynchronous telemetry exporter with batching and retry."""
@@ -75,4 +118,10 @@ def validate_event(event: Dict[str, Any]) -> bool:
     return True
 
 
-__all__ = ["TelemetryExporter", "validate_event"]
+__all__ = [
+    "TelemetryExporter",
+    "validate_event",
+    "observe_request",
+    "rate_limited",
+    "safe_out",
+]

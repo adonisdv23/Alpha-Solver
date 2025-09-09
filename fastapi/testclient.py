@@ -12,6 +12,12 @@ class TestResponse:
         if hasattr(self._response, "json"):
             return self._response.json()
         return self._response
+    @property
+    def text(self):  # pragma: no cover - helper for tests
+        body = getattr(self._response, "body", b"")
+        if isinstance(body, (bytes, bytearray)):
+            return body.decode()
+        return str(body)
 
 class TestClient:
     def __init__(self, app: FastAPI):

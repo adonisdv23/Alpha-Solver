@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import json
 import logging
 import time
 import uuid
@@ -19,10 +20,31 @@ from prometheus_fastapi_instrumentator import Instrumentator
 
 from alpha_solver_entry import _tree_of_thought
 from alpha.core.config import APISettings
+from alpha.core.telemetry import observe_request, rate_limited, safe_out
 from .security import validate_api_key, sanitize_query
 from .otel import init_tracer
 
 logger = logging.getLogger("alpha-solver.api")
+
+
+class JsonFormatter(logging.Formatter):
+    def format(self, record: logging.LogRecord) -> str:  # pragma: no cover - formatting
+        payload = {"level": record.levelname.lower(), "msg": record.getMessage()}
+        for key in ("request_id", "path", "client", "duration_ms", "strategy"):
+            val = getattr(record, key, None)
+            if val is not None:
+                payload[key] = val
+        return json.dumps(payload)
+
+
+_handler = logging.StreamHandler()
+_handler.setFormatter(JsonFormatter())
+logger.handlers = [_handler]
+logger.setLevel(logging.INFO)
+uvicorn_logger = logging.getLogger("uvicorn.access")
+uvicorn_logger.handlers = [_handler]
+uvicorn_logger.propagate = False
+uvicorn_logger.setLevel(logging.INFO)
 
 cfg = APISettings()
 app = FastAPI(title="Alpha Solver API", version=cfg.version)
@@ -75,6 +97,7 @@ app.routes[("GET", "/openapi.json")] = lambda: {
 async def add_request_id(request: Request, call_next):
     req_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
     request.state.request_id = req_id
+    request.state.trace_id = req_id
     start = time.time()
     try:
         response = await call_next(request)
@@ -82,10 +105,16 @@ async def add_request_id(request: Request, call_next):
         raise
     except Exception:  # pragma: no cover - safety
         logger.exception("request error")
+        safe_out("internal error")
         response = JSONResponse(
             status_code=500, content={"final_answer": "SAFE-OUT: internal error"}
         )
     duration_ms = (time.time() - start) * 1000
+    observe_request(
+        request.url.path,
+        getattr(request.state, "strategy", ""),
+        duration_ms,
+    )
     logger.info(
         "request",
         extra={
@@ -93,6 +122,7 @@ async def add_request_id(request: Request, call_next):
             "path": request.url.path,
             "client": request.client.host if request.client else None,
             "duration_ms": duration_ms,
+            "strategy": getattr(request.state, "strategy", None),
         },
     )
     response.headers["X-Request-ID"] = req_id
@@ -106,6 +136,7 @@ async def add_request_id(request: Request, call_next):
 async def http_exception_handler(request: Request, exc: HTTPException):
     body = {"final_answer": f"SAFE-OUT: {exc.detail}"}
     headers = {"X-Request-ID": getattr(request.state, "request_id", "")}
+    safe_out(str(exc.detail))
     return JSONResponse(status_code=exc.status_code, content=body, headers=headers)
 
 
@@ -121,6 +152,7 @@ def rate_limiter(request: Request) -> None:
     while dq and dq[0] <= now - window:
         dq.popleft()
     if len(dq) >= cfg.ratelimit.max_requests:
+        rate_limited()
         raise HTTPException(status_code=429, detail="rate limit exceeded")
     dq.append(now)
 
@@ -130,6 +162,7 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
     query = sanitize_query(req.query)
     params = req.context or {}
     strategy = req.strategy or params.get("strategy")
+    request.state.strategy = strategy or ""
     start = time.time()
     if strategy == "react":
         from alpha.reasoning.react_lite import run_react_lite
@@ -146,8 +179,10 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
 
 
 @app.get("/healthz")
-async def health() -> Dict[str, str]:
-    return {"status": "ok"}
+async def health() -> JSONResponse:
+    if not getattr(app.state, "config", None):
+        return JSONResponse(status_code=500, content={"status": "config-missing"})
+    return JSONResponse(content={"status": "ok"})
 
 
 @app.get("/readyz")
