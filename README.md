@@ -2,42 +2,32 @@
 
 Alpha Solver is a lightweight planning and execution engine for tool selection.
 
-## Install & Run
+
+## MVP Quickstart
 
 ```bash
+# CLI
 pip install -e .
-alpha-solver run --queries "demo" --plan-only
-```
+alpha-solver run --queries "2+2?" --strategy react
 
-## CLI & Quick Start
-See [docs/RUN_GUIDE.md](docs/RUN_GUIDE.md) for more examples and details.
+# SDK
+pip install -e clients/python
+python - <<'PY'
+from alpha_solver_sdk import AlphaClient
+client = AlphaClient("http://localhost:8000")
+print(client.solve("2+2?", strategy="react"))
+PY
 
-```bash
-python -m alpha.cli run --queries "demo query" --regions US --plan-only --seed 1234
-python -m alpha.cli run --queries-file docs/queries.sample.txt --regions US EU --explain
-python -m alpha.cli --examples  # show sample commands
-python -m alpha.cli replay --session SESSION_ID
-python -m alpha.cli bench --quick
-python -m alpha.cli a11y-check --input artifacts/replays/SESSION_ID.jsonl
-python -m alpha.cli router simulate --dataset datasets/mvp_golden.jsonl --seed 42 --compare-baseline
-```
+# API
+curl -H "Content-Type: application/json" \
+     -d '{"query":"2+2?","strategy":"react"}' \
+     http://localhost:8000/v1/solve
 
-## Quality Gates
-
-Run the standard formatting, tests and evaluation before opening a pull request:
-
-```bash
+# Checks
 make gates
 ```
 
-Evaluation artifacts are written to `artifacts/eval/`.
-
-Governance limits:
-
-```bash
-alpha-solver run --queries demo --budget-max-steps 5 --budget-max-seconds 2 --breaker-max-fails 1
-```
-
+See [docs/api.md](docs/api.md) for API details, [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md) for telemetry, and the production stack in [infrastructure/docker-compose.prod.yml](infrastructure/docker-compose.prod.yml).
 
 ## Local executors
 
@@ -86,7 +76,7 @@ curl -H "X-API-Key: $API_KEY" -H "Content-Type: application/json" \
 Python client:
 
 ```python
-from clients.python.alpha_client import AlphaClient
+from alpha_solver_sdk import AlphaClient
 
 client = AlphaClient("http://localhost:8000", "changeme")
 print(client.solve("2+2?", strategy="react", context={"seed": 42}))
