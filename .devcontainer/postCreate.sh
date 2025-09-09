@@ -49,4 +49,3 @@ pre-commit install && pre-commit run --files README.md || true
 } > "$STAMP"
 
 exit 0
-
