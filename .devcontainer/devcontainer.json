@@ -7,8 +7,8 @@
     "NO_PROXY": "localhost,127.0.0.1"
   },
   "postCreateCommand": "bash .devcontainer/postCreate.sh",
-  "postAttachCommand": "bash .devcontainer/postCreate.sh",
-  "remoteEnv": { "PATH": "${containerEnv:PATH}:/home/codespace/.local/bin:/home/codespace/.venvs/precommit/bin" },
+  "postAttachCommand": "pre-commit --version >/dev/null 2>&1 || true",
+  "remoteEnv": { "PATH": "/home/codespace/.venvs/precommit/bin:/home/codespace/.local/bin:${containerEnv:PATH}" },
   "customizations": {
     "vscode": {
       "settings": {
