@@ -22,6 +22,16 @@ python -m alpha.cli a11y-check --input artifacts/replays/SESSION_ID.jsonl
 python -m alpha.cli router simulate --dataset datasets/mvp_golden.jsonl --seed 42 --compare-baseline
 ```
 
+## Quality Gates
+
+Run the standard formatting, tests and evaluation before opening a pull request:
+
+```bash
+make gates
+```
+
+Evaluation artifacts are written to `artifacts/eval/`.
+
 Governance limits:
 
 ```bash
