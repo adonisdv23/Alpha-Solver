@@ -72,11 +72,12 @@ def _cmd_solve(args: argparse.Namespace) -> None:
         from alpha.reasoning.react_lite import run_react_lite
 
         result = run_react_lite(args.prompt, seed=args.seed)
+        print(f"{result['final_answer']} {result['confidence']}")
     else:
         from alpha_solver_entry import _tree_of_thought
 
         result = _tree_of_thought(args.prompt, seed=args.seed)
-    print(result.get("final_answer"), result.get("confidence"))
+        print(result.get("final_answer"), result.get("confidence"))
 
 
 def _build_parser() -> argparse.ArgumentParser:
