@@ -7,7 +7,7 @@ import logging
 import time
 import uuid
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Literal
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
@@ -36,6 +36,7 @@ init_tracer(app)
 class SolveRequest(BaseModel):
     query: str
     context: Optional[Dict[str, Any]] = None
+    strategy: Optional[Literal["cot", "react", "tot"]] = None
 
 
 @app.middleware("http")
@@ -71,8 +72,16 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
     validate_api_key(request, cfg.api_key)
     query = sanitize_query(req.query)
     params = req.context or {}
+    strategy = req.strategy or params.get("strategy")
     start = time.time()
-    result = _tree_of_thought(query, **params)
+    if strategy == "react":
+        from alpha.reasoning.react_lite import run_react_lite
+
+        seed = params.get("seed", 0)
+        max_steps = params.get("max_steps", 2)
+        result = run_react_lite(query, seed=seed, max_steps=max_steps)
+    else:
+        result = _tree_of_thought(query, **params)
     duration_ms = (time.time() - start) * 1000
     cost = duration_ms * cfg.cost_per_ms
     _record_cost(duration_ms, cost)

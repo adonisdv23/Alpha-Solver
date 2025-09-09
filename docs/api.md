@@ -29,8 +29,19 @@ Each key is limited to **60 requests per minute**.
 ```bash
 curl -H "X-API-Key: changeme" \
      -H "Content-Type: application/json" \
-     -d '{"query": "hello"}' \
+     -d '{"query": "hello", "strategy": "react"}' \
      http://localhost:8000/v1/solve
+```
+
+`strategy` selects the reasoning mode: `cot` (default), `react`, or `tot`. Responses using `react` include a `trace` and `meta` block:
+
+```json
+{
+  "final_answer": "...",
+  "trace": [{"thought": "t1:...", "action": "self-check", "observation": "deterministic reflection"}],
+  "confidence": 0.9,
+  "meta": {"strategy": "react", "seed": 42}
+}
 ```
 
 ## Docs & Metrics

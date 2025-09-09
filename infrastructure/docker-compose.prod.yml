@@ -1,0 +1,38 @@
+version: '3'
+services:
+  api:
+    build: ..
+    command: uvicorn service.app:app --host 0.0.0.0 --port 8000
+    environment:
+      - API_KEY=${API_KEY}
+      - RATE_LIMIT_PER_MINUTE=60
+      - OTEL_ENDPOINT=http://otel-collector:4317
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../artifacts:/app/artifacts
+      - ../logs:/app/logs
+    depends_on:
+      - otel-collector
+      - prometheus
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "4317:4317"
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+  grafana:
+    image: grafana/grafana-oss:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
