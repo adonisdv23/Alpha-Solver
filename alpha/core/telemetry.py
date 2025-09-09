@@ -2,11 +2,46 @@ from __future__ import annotations
 import asyncio
 from typing import Any, Awaitable, Callable, Dict, List
 
+from prometheus_client import Counter, Histogram
+
+# basic Prometheus metrics used across the service
+_REQUEST_COUNT = Counter("alpha_requests_total", "Total API requests", ["endpoint"])
+_REQUEST_LATENCY = Histogram(
+    "alpha_request_latency_seconds", "Latency of API requests", ["endpoint"]
+)
+_RATE_LIMIT_COUNT = Counter(
+    "alpha_ratelimit_total", "Total rate limit events", ["endpoint"]
+)
+_SAFE_OUT_COUNT = Counter(
+    "alpha_safe_out_total", "Total SAFE-OUT events", ["endpoint"]
+)
+
+
+def record_request(endpoint: str, duration_seconds: float) -> None:
+    """Record a request and its latency."""
+    _REQUEST_COUNT.labels(endpoint=endpoint).inc()
+    _REQUEST_LATENCY.labels(endpoint=endpoint).observe(duration_seconds)
+
+
+def record_rate_limit(endpoint: str) -> None:
+    """Record a rate limit event."""
+    _RATE_LIMIT_COUNT.labels(endpoint=endpoint).inc()
+
+
+def record_safe_out(endpoint: str) -> None:
+    """Record a SAFE-OUT event."""
+    _SAFE_OUT_COUNT.labels(endpoint=endpoint).inc()
+
 
 class TelemetryExporter:
     """Asynchronous telemetry exporter with batching and retry."""
 
-    def __init__(self, sender: Callable[[List[Dict[str, Any]]], Awaitable[None]], batch_size: int = 10, retry_seconds: float = 0.1):
+    def __init__(
+        self,
+        sender: Callable[[List[Dict[str, Any]]], Awaitable[None]],
+        batch_size: int = 10,
+        retry_seconds: float = 0.1,
+    ):
         self.sender = sender
         self.batch_size = batch_size
         self.retry_seconds = retry_seconds
@@ -42,10 +77,16 @@ class TelemetryExporter:
         event.setdefault("version", 1)
         event.setdefault("properties", {})
         # propagate deterministic ids when provided
-        if "trace_id" in event:
-            event.setdefault("request_id", event["trace_id"])
-        if "request_id" in event:
-            event.setdefault("trace_id", event["request_id"])
+        req_id = event.get("request_id")
+        trace_id = event.get("trace_id")
+        if req_id and not trace_id:
+            trace_id = req_id
+        if trace_id and not req_id:
+            req_id = trace_id
+        if req_id:
+            event["request_id"] = req_id
+        if trace_id:
+            event["trace_id"] = trace_id
         validate_event(event)
         await self.queue.put(event)
 
@@ -75,4 +116,10 @@ def validate_event(event: Dict[str, Any]) -> bool:
     return True
 
 
-__all__ = ["TelemetryExporter", "validate_event"]
+__all__ = [
+    "TelemetryExporter",
+    "validate_event",
+    "record_request",
+    "record_rate_limit",
+    "record_safe_out",
+]

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import json
 import logging
 import time
 import uuid
@@ -15,21 +16,52 @@ from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
-from prometheus_fastapi_instrumentator import Instrumentator
+from prometheus_client import CONTENT_TYPE_LATEST, generate_latest, start_http_server
 
 from alpha_solver_entry import _tree_of_thought
 from alpha.core.config import APISettings
+from alpha.core.telemetry import record_rate_limit, record_request, record_safe_out
 from .security import validate_api_key, sanitize_query
 from .otel import init_tracer
 
+
+class JsonFormatter(logging.Formatter):
+    """Minimal JSON log formatter."""
+
+    def format(self, record: logging.LogRecord) -> str:  # pragma: no cover - trivial
+        payload = {"level": record.levelname, "msg": record.getMessage()}
+        for field in ("request_id", "strategy"):
+            if hasattr(record, field):
+                payload[field] = getattr(record, field)
+        return json.dumps(payload)
+
+
+handler = logging.StreamHandler()
+handler.setFormatter(JsonFormatter())
+logging.basicConfig(level=logging.INFO, handlers=[handler])
+logging.getLogger("uvicorn.access").handlers = [handler]
+
 logger = logging.getLogger("alpha-solver.api")
+
+
+class PlainResponse:
+    """Minimal plain text response for the TestClient."""
+
+    def __init__(self, content: bytes, media_type: str):
+        self._content = content.decode()
+        self.status_code = 200
+        self.headers = {"content-type": media_type}
+
+    def json(self) -> str:
+        return self._content
 
 cfg = APISettings()
 app = FastAPI(title="Alpha Solver API", version=cfg.version)
 app.state.config = cfg
 app.state.ready = True
 
-Instrumentator().instrument(app).expose(app)
+# expose Prometheus metrics on a dedicated port
+start_http_server(9000)
 init_tracer(app)
 
 app.add_middleware(
@@ -81,18 +113,21 @@ async def add_request_id(request: Request, call_next):
     except HTTPException:  # let FastAPI handlers deal with it
         raise
     except Exception:  # pragma: no cover - safety
-        logger.exception("request error")
+        logger.exception("request error", extra={"request_id": req_id})
+        record_safe_out(request.url.path)
         response = JSONResponse(
             status_code=500, content={"final_answer": "SAFE-OUT: internal error"}
         )
-    duration_ms = (time.time() - start) * 1000
+    duration = time.time() - start
+    record_request(request.url.path, duration)
     logger.info(
         "request",
         extra={
             "request_id": req_id,
             "path": request.url.path,
             "client": request.client.host if request.client else None,
-            "duration_ms": duration_ms,
+            "duration_ms": duration * 1000,
+            "strategy": getattr(request.state, "strategy", None),
         },
     )
     response.headers["X-Request-ID"] = req_id
@@ -106,6 +141,7 @@ async def add_request_id(request: Request, call_next):
 async def http_exception_handler(request: Request, exc: HTTPException):
     body = {"final_answer": f"SAFE-OUT: {exc.detail}"}
     headers = {"X-Request-ID": getattr(request.state, "request_id", "")}
+    record_safe_out(request.url.path)
     return JSONResponse(status_code=exc.status_code, content=body, headers=headers)
 
 
@@ -121,6 +157,7 @@ def rate_limiter(request: Request) -> None:
     while dq and dq[0] <= now - window:
         dq.popleft()
     if len(dq) >= cfg.ratelimit.max_requests:
+        record_rate_limit(request.url.path)
         raise HTTPException(status_code=429, detail="rate limit exceeded")
     dq.append(now)
 
@@ -130,6 +167,7 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
     query = sanitize_query(req.query)
     params = req.context or {}
     strategy = req.strategy or params.get("strategy")
+    request.state.strategy = strategy
     start = time.time()
     if strategy == "react":
         from alpha.reasoning.react_lite import run_react_lite
@@ -147,7 +185,8 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
 
 @app.get("/healthz")
 async def health() -> Dict[str, str]:
-    return {"status": "ok"}
+    ok = bool(app.state.config)
+    return {"status": "ok" if ok else "error"}
 
 
 @app.get("/readyz")
@@ -155,6 +194,11 @@ async def ready() -> JSONResponse:
     if not app.state.ready:
         return JSONResponse(status_code=503, content={"status": "not ready"})
     return JSONResponse(content={"status": "ok"})
+
+
+@app.get("/metrics")
+def metrics() -> PlainResponse:
+    return PlainResponse(generate_latest(), CONTENT_TYPE_LATEST)
 
 
 def _record_cost(duration_ms: float, cost: float) -> None:
