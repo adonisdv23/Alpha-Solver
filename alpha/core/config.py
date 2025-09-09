@@ -50,6 +50,23 @@ class ValidationConfig:
 
 
 @dataclass
+class ReactConfig:
+    """Configuration for ReAct-Lite executor."""
+
+    enabled: bool = True
+    max_steps: int = 2
+    min_conf: float = 0.70
+
+
+@dataclass
+class StrategyConfig:
+    """Reasoning strategy selection and nested configs."""
+
+    strategy: str = "cot"
+    react: ReactConfig = field(default_factory=ReactConfig)
+
+
+@dataclass
 class TokenBudgetConfig:
     """Router token budget controls."""
 
@@ -130,6 +147,8 @@ __all__ = [
     "APISettings",
     "QualityGateConfig",
     "ValidationConfig",
+    "ReactConfig",
+    "StrategyConfig",
     "TokenBudgetConfig",
     "VoteConfig",
     "RouterConfig",

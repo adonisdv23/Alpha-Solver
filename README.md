@@ -57,6 +57,31 @@ See [docs/api.md](docs/api.md) for usage details.
 python -m alpha.executors.math_exec "2+2"
 ```
 
+### Production Quickstart
+
+```bash
+docker compose -f infrastructure/docker-compose.prod.yml up -d
+```
+
+Set `API_KEY` before launching. Prometheus runs on `http://localhost:9090` and Grafana on `http://localhost:3000` (read-only dashboards).
+
+Example request:
+
+```bash
+curl -H "X-API-Key: $API_KEY" -H "Content-Type: application/json" \
+     -d '{"query":"hi","strategy":"react"}' \
+     http://localhost:8000/v1/solve
+```
+
+Python client:
+
+```python
+from clients.python.alpha_client import AlphaClient
+
+client = AlphaClient("http://localhost:8000", "changeme")
+print(client.solve("2+2?", strategy="react", context={"seed": 42}))
+```
+
 ## Using Tree-of-Thought
 
 ### Observability & Replay

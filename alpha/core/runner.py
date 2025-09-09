@@ -25,7 +25,7 @@ from .session_trace import write_session_trace
 from .determinism import apply_seed
 from alpha.policy.governance import GovernanceEngine
 from alpha.reasoning.cot_self_validate import validate_answer
-from alpha.core.config import ValidationConfig
+from alpha.core.config import ValidationConfig, StrategyConfig
 
 # simple in-memory telemetry log used in tests
 TELEMETRY_EVENTS: List[Dict[str, Any]] = []
@@ -37,20 +37,40 @@ def run_reasoning(
     strategy: str = "CoT",
     seed: int = 0,
     config: ValidationConfig | None = None,
+    strategy_config: StrategyConfig | None = None,
     cot_steps: List[str] | None = None,
     answer: str | None = None,
     confidence: float = 0.0,
+    rules: Dict[str, str] | None = None,
 ) -> Dict[str, Any]:
     """Run a reasoning strategy optionally applying self-validation."""
-
     from alpha.reasoning.cot import run_cot
+    from alpha.reasoning.react_lite import run_react_lite
+
+    selected = strategy.lower()
+    if selected == "cot" and strategy_config and strategy_config.strategy:
+        selected = strategy_config.strategy.lower()
+
+    if selected == "react":
+        max_steps = 2
+        if strategy_config and strategy_config.react.enabled:
+            max_steps = strategy_config.react.max_steps
+        result = run_react_lite(query, seed=seed, max_steps=max_steps, rules=rules)
+        for idx, step in enumerate(result.get("trace", []), 1):
+            TELEMETRY_EVENTS.append(
+                {"event": "react_step", "idx": idx, "thought": step.get("thought")}
+            )
+        TELEMETRY_EVENTS.append(
+            {"event": "react_done", "confidence": result.get("confidence", 0.0)}
+        )
+        return result
 
     if cot_steps is None or answer is None:
         result = run_cot(query, seed=seed, max_steps=3)
     else:
         result = {"steps": cot_steps, "answer": answer, "confidence": confidence}
     cfg = config or ValidationConfig()
-    if strategy == "CoT" and cfg.enabled:
+    if selected == "cot" and cfg.enabled:
         ok, reasons = validate_answer(result.get("steps", []), result.get("answer", ""))
         result["validation"] = {"ok": ok, "reasons": reasons}
         result["post_validate_confidence"] = result.get("confidence", 0.0)

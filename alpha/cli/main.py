@@ -67,6 +67,18 @@ def _cmd_router_simulate(args: argparse.Namespace) -> None:
     print(json.dumps(report))
 
 
+def _cmd_solve(args: argparse.Namespace) -> None:
+    if args.strategy == "react":
+        from alpha.reasoning.react_lite import run_react_lite
+
+        result = run_react_lite(args.prompt, seed=args.seed)
+    else:
+        from alpha_solver_entry import _tree_of_thought
+
+        result = _tree_of_thought(args.prompt, seed=args.seed)
+    print(result.get("final_answer"), result.get("confidence"))
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="alpha.cli.main")
     sub = parser.add_subparsers(dest="command")
@@ -102,6 +114,13 @@ def _build_parser() -> argparse.ArgumentParser:
     sim_parser.add_argument("--seed", type=int, default=42)
     sim_parser.add_argument("--compare-baseline", action="store_true")
     sim_parser.set_defaults(func=_cmd_router_simulate)
+
+    # solve
+    solve_parser = sub.add_parser("solve")
+    solve_parser.add_argument("--prompt", required=True)
+    solve_parser.add_argument("--strategy", choices=["cot", "react", "tot"], default="cot")
+    solve_parser.add_argument("--seed", type=int, default=0)
+    solve_parser.set_defaults(func=_cmd_solve)
 
     return parser
 
