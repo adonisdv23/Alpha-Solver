@@ -31,4 +31,3 @@ def test_packaging_build(tmp_path: Path) -> None:
         pytest.skip("build module missing or build failed")
 
     assert any((work / "dist").glob("*"))
-

@@ -134,4 +134,3 @@ class SafeOutStateMachine:
 
 
 __all__ = ["SOConfig", "SafeOutStateMachine"]
-

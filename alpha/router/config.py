@@ -23,4 +23,3 @@ class ProgressiveRouterConfig:
         default_factory=lambda: ("basic", "structured", "constrained")
     )
     router_min_progress: float = 0.3
-

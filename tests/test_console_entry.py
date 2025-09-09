@@ -28,4 +28,3 @@ def test_console_help_and_version():
     )
     assert result.returncode == 0
     assert f"alpha-solver {_expected_version()}" in result.stdout
-

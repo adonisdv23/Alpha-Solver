@@ -76,4 +76,3 @@ def test_strict_accessibility_failure(monkeypatch) -> None:
     monkeypatch.setattr(ObservabilityManager, "check_text", bad_check)
     with pytest.raises(ValueError):
         _tree_of_thought("demo", strict_accessibility=True)
-

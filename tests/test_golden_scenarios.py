@@ -21,4 +21,3 @@ def test_plan_only_golden(tmp_path, query, region):
     plan = _normalize(Path("artifacts/last_plan.json"))
     golden = json.loads((Path("tests/golden/tiny_plan.json")).read_text())
     assert plan == golden
-

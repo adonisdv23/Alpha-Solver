@@ -25,4 +25,3 @@ JSON object with:
 When `ALPHA_POLICY_DRYRUN=1` the solver logs policy violations at the warning
 level instead of stopping execution. This allows simulation of governance
 effects without interrupting runs.
-

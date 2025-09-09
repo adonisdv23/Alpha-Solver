@@ -1,0 +1,19 @@
+{
+  "name": "Alpha-Solver",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "containerEnv": {
+    "HTTP_PROXY": "",
+    "HTTPS_PROXY": "",
+    "NO_PROXY": "localhost,127.0.0.1"
+  },
+  "postCreateCommand": "bash .devcontainer/postCreate.sh",
+  "postAttachCommand": "bash .devcontainer/postCreate.sh",
+  "remoteEnv": { "PATH": "${containerEnv:PATH}:/home/codespace/.local/bin:/home/codespace/.venvs/precommit/bin" },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  }
+}

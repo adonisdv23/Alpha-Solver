@@ -1,4 +1,3 @@
 # Example queries list (comments allowed)
 calendar integration
 @file docs/queries.more.txt
-

@@ -129,7 +129,7 @@ budgets:
     limit_usd: 15000
     approved_tools: ["t001", "t002", "t003"]
     approval_required_above: 500
-    
+
 cost_allocation:
   - pattern: "project.*"
     tag: project_code
@@ -218,7 +218,7 @@ contracts:
     support_hours: "business"
     escalation_time_minutes: 120
     measurement_period: monthly
-    
+
   sla.premium:
     id: sla.premium
     tier: premium
@@ -258,7 +258,7 @@ performance_targets:
     target_p99_ms: 1500
     measurement_window: "5m"
     breaching_action: "alert"
-    
+
   perf.orchestration.throughput:
     id: perf.orchestration.throughput
     metric: requests_per_second
@@ -355,7 +355,7 @@ dependencies:
     required_by: ["selector", "planner", "orchestrator"]
     criticality: essential
     startup_order: 1
-    
+
   dep.core.selector:
     id: dep.core.selector
     module: selector
@@ -363,7 +363,7 @@ dependencies:
     required_by: ["planner", "orchestrator"]
     criticality: essential
     startup_order: 2
-    
+
   dep.tool.t001:
     id: dep.tool.t001
     tool: t001
@@ -371,7 +371,7 @@ dependencies:
     conflicts_with: []
     version_constraints: ">=1.0.0"
     optional: false
-    
+
   dep.vendor.openai:
     id: dep.vendor.openai
     vendor: openai
@@ -379,7 +379,7 @@ dependencies:
     health_check: "https://api.openai.com/v1/health"
     timeout_seconds: 30
     retry_policy: exponential_backoff
-    
+
   dep.vendor.anthropic:
     id: dep.vendor.anthropic
     vendor: anthropic
@@ -393,7 +393,7 @@ circular_detection:
   max_depth: 10
   fail_on_circular: true
   detection_algorithm: "tarjan"
-  
+
 resolution_strategy:
   missing_optional: warn
   missing_required: fail
@@ -477,7 +477,7 @@ classifications:
     allowed_vendors: all
     encryption_required: false
     can_cache: true
-    
+
   class.internal:
     id: class.internal
     level: internal
@@ -487,7 +487,7 @@ classifications:
     encryption_required: false
     can_cache: true
     audit_access: false
-    
+
   class.confidential:
     id: class.confidential
     level: confidential
@@ -498,7 +498,7 @@ classifications:
     retention_days: 1095
     can_cache: false
     audit_access: true
-    
+
   class.pii:
     id: class.pii
     level: pii
@@ -511,7 +511,7 @@ classifications:
     retention_days: 730
     can_cache: false
     audit_access: true
-    
+
   class.phi:
     id: class.phi
     level: phi
@@ -587,30 +587,30 @@ graph TB
         OT[orchestration_templates.yaml]
         AC[action_commands.json]
     end
-    
+
     subgraph Security["Security Layer"]
         SV[secrets_vault.json]
         DC[data_classification.yaml]
         AT[audit_trail.json]
     end
-    
+
     subgraph Governance["Governance Layer"]
         RC[risk_checks.json]
         EM[escalation_matrix.json]
         GM[governance_metrics.yaml]
     end
-    
+
     subgraph Operations["Operations Layer"]
         BC[budget_controls.yaml]
         CB[circuit_breakers.json]
         SLA[sla_contracts.yaml]
     end
-    
+
     subgraph Testing["Testing Layer"]
         SC[simulation_configs.json]
         DG[dependency_graph.yaml]
     end
-    
+
     %% Core dependencies
     TR --> SV
     TR --> DC
@@ -618,26 +618,26 @@ graph TB
     VR --> CB
     OT --> DG
     AC --> BC
-    
+
     %% Governance flow
     RC --> EM
     RC --> CB
     GM --> EM
-    
+
     %% Audit requirements
     BC --> AT
     DC --> AT
     SV --> AT
-    
+
     %% Operational dependencies
     SLA --> GM
     CB --> VR
     CB --> EM
-    
+
     %% Testing dependencies
     SC --> OT
     DG --> OT
-    
+
     style Core fill:#e1f5fe
     style Security fill:#fff3e0
     style Governance fill:#f3e5f5
@@ -650,25 +650,25 @@ graph TB
 digraph G {
     rankdir=LR;
     node [shape=box, style=rounded];
-    
+
     subgraph cluster_0 {
         label="Risk Detection";
         style=filled;
         color=lightgrey;
         node [style=filled,color=white];
-        
+
         Monitor [label="Continuous\nMonitoring"];
         RiskEval [label="Risk\nEvaluation"];
         ScoreCalc [label="Score\nCalculation"];
         Monitor -> RiskEval -> ScoreCalc;
     }
-    
+
     subgraph cluster_1 {
         label="Decision Logic";
         style=filled;
         color=lightblue;
         node [style=filled,color=white];
-        
+
         Threshold [label="Threshold\nCheck"];
         Classify [label="Risk\nClassification"];
         Policy [label="Policy\nEngine"];
@@ -676,30 +676,30 @@ digraph G {
         Threshold -> Classify;
         Classify -> Policy;
     }
-    
+
     subgraph cluster_2 {
         label="Response Actions";
         style=filled;
         color=lightgreen;
         node [style=filled,color=white];
-        
+
         Mitigate [label="Auto\nMitigation"];
         Escalate [label="Human\nEscalation"];
         Alert [label="Alert\nSystem"];
         Halt [label="Circuit\nBreaker"];
         Audit [label="Audit\nLogging"];
     }
-    
+
     Policy -> Mitigate [label="Low Risk"];
     Policy -> Escalate [label="Medium Risk"];
     Policy -> Alert [label="High Risk"];
     Policy -> Halt [label="Critical Risk"];
-    
+
     Mitigate -> Audit;
     Escalate -> Alert [style=dashed];
     Alert -> Halt [style=dashed, label="timeout"];
     Halt -> Audit;
-    
+
     {rank=same; Mitigate; Escalate; Alert; Halt}
 }
 ```
@@ -715,17 +715,17 @@ sequenceDiagram
     participant CircuitBreaker
     participant Tool
     participant Audit
-    
+
     User->>Orchestrator: Request
     Orchestrator->>Selector: Select Tool
     Selector->>Budget: Check Budget
-    
+
     alt Budget OK
         Budget-->>Selector: Approved
         Selector->>Secrets: Get Credentials
         Secrets-->>Selector: Credentials
         Selector->>CircuitBreaker: Check Status
-        
+
         alt Circuit Closed
             CircuitBreaker-->>Selector: Proceed
             Selector->>Tool: Execute
@@ -742,7 +742,7 @@ sequenceDiagram
         Selector->>Audit: Log Budget Breach
         Selector-->>Orchestrator: Error
     end
-    
+
     Orchestrator-->>User: Response
 ```
 
@@ -1019,14 +1019,14 @@ features:
   parallel_execution: true  # Test concurrent flows
   cache_ttl_seconds: 60  # Short cache for fresh results
   failure_injection: 0.05  # 5% random failures for resilience testing
-  
+
 constraints:
   max_spend_per_hour: 100
   blocked_vendors: []  # All vendors available
   data_classification: ["public", "internal"]  # No sensitive data
   escalation_enabled: false  # No production escalations
   retention_days: 30  # Short retention for experiments
-  
+
 monitoring:
   metrics_collection: detailed
   performance_profiling: enabled
@@ -1052,14 +1052,14 @@ features:
   parallel_execution: false  # Sequential for full auditability
   cache_ttl_seconds: 0  # No caching of sensitive data
   encryption_everywhere: true  # All data encrypted at rest and in transit
-  
+
 constraints:
   max_spend_per_hour: 500
   blocked_vendors: ["non_compliant_list"]
   data_classification: ["public", "internal", "confidential", "pii", "phi"]
   escalation_enabled: true
   retention_days: 2555  # 7 years for compliance
-  
+
 compliance:
   standards: ["HIPAA", "GDPR", "SOC2", "ISO27001", "PCI-DSS"]
   encryption: required
@@ -1067,14 +1067,14 @@ compliance:
   right_to_audit: true
   baa_required: true  # Business Associate Agreement for healthcare
   data_processing_agreement: true  # DPA for GDPR
-  
+
 governance:
   approval_required: ["phi_access", "bulk_operations", "cross_border"]
   four_eyes_principle: true  # Dual approval for critical operations
   change_control: enabled
   audit_retention_years: 7
   incident_response_sla: 4  # Hours
-  
+
 monitoring:
   compliance_dashboard: enabled
   privacy_metrics: enabled
@@ -1101,19 +1101,19 @@ features:
   cache_ttl_seconds: 3600  # Aggressive caching
   connection_pooling: enabled
   batch_processing: enabled
-  
+
 optimizations:
   prefetch_predictions: true
   speculative_execution: true
   result_streaming: true
   compression: enabled
-  
+
 constraints:
   max_spend_per_hour: 2000
   blocked_vendors: ["slow_vendors"]
   data_classification: ["public", "internal", "confidential"]
   escalation_enabled: true
-  
+
 monitoring:
   apm_integration: enabled  # Application Performance Monitoring
   real_time_metrics: true

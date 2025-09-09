@@ -44,4 +44,3 @@ def benchmark(
 
 
 __all__ = ["benchmark"]
-

@@ -37,4 +37,3 @@ def load_queries(path: str | None) -> List[str]:
 
     visit(start.resolve())
     return out
-

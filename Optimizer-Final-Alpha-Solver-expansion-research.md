@@ -2,93 +2,93 @@
 
 # 📜 Research Prompt (Alpha Solver Expansion)
 
-**Context:**  
-We are building an orchestration framework called **Alpha Solver** that routes tasks to the best tools, models, and processes.  
-We’ve tested it on projects like creating a **Signs365 mirror storefront with markup, auto-ordering, dropshipping, compliance, and ROI tracking**.  
-What looked simple revealed many missing parts: pricing integrity, tax alignment, proofing, UX, SEO, compliance, fraud, blind shipping, cutoffs, etc.  
+**Context:**
+We are building an orchestration framework called **Alpha Solver** that routes tasks to the best tools, models, and processes.
+We’ve tested it on projects like creating a **Signs365 mirror storefront with markup, auto-ordering, dropshipping, compliance, and ROI tracking**.
+What looked simple revealed many missing parts: pricing integrity, tax alignment, proofing, UX, SEO, compliance, fraud, blind shipping, cutoffs, etc.
 
 We now want to expand research so that Alpha Solver’s future runs are *more complete, sectioned, and qualified*, with clear user prompts for decisions.
 
 ---
 
-## 🔎 Your Task  
-Produce a **comprehensive research brief** that expands the Alpha Solver tool registry and orchestration framework.  
+## 🔎 Your Task
+Produce a **comprehensive research brief** that expands the Alpha Solver tool registry and orchestration framework.
 Make the output **structured, detailed, and long**, broken into clearly labeled sections.
 
 ---
 
 ## 📌 Required Sections
 
-### 1. Framework Expansion  
-- Build a **layered blueprint** for handling complex projects:  
-  1. Framing & scope  
-  2. Sectional breakdown  
-  3. Tool assignment  
-  4. Qualification questions (for user confirmation)  
-  5. Orchestration plan  
-  6. Monitoring & governance  
+### 1. Framework Expansion
+- Build a **layered blueprint** for handling complex projects:
+  1. Framing & scope
+  2. Sectional breakdown
+  3. Tool assignment
+  4. Qualification questions (for user confirmation)
+  5. Orchestration plan
+  6. Monitoring & governance
 - Show where Alpha Solver should **pause and ask the user** simple yes/no or short questions instead of guessing.
 
 ---
 
-### 2. Ecosystem Mapping  
-Identify **tools, vendors, platforms, and models** across these buckets. For each, explain the gap it solves, its strengths, and limitations:  
-- E-commerce & storefronts  
-- Automation/RPA  
-- Prepress & file handling  
-- Finance & tax  
-- Compliance & governance  
-- UX/design  
-- SEO & marketing  
-- Accessibility & trust  
-- Observability & monitoring  
+### 2. Ecosystem Mapping
+Identify **tools, vendors, platforms, and models** across these buckets. For each, explain the gap it solves, its strengths, and limitations:
+- E-commerce & storefronts
+- Automation/RPA
+- Prepress & file handling
+- Finance & tax
+- Compliance & governance
+- UX/design
+- SEO & marketing
+- Accessibility & trust
+- Observability & monitoring
 - Fallback vendors
 
 ---
 
-### 3. Operational Risks & Hidden Gaps  
-- Identify **gotchas most people miss** (e.g., negative margin risk, ADA lawsuits, DMCA, fraud, price mismatches, cutoff calendars, SEO cannibalization).  
-- Explain how Alpha Solver should systematically check or prevent these.  
+### 3. Operational Risks & Hidden Gaps
+- Identify **gotchas most people miss** (e.g., negative margin risk, ADA lawsuits, DMCA, fraud, price mismatches, cutoff calendars, SEO cannibalization).
+- Explain how Alpha Solver should systematically check or prevent these.
 - Show where escalation to a **human-in-the-loop** is required.
 
 ---
 
-### 4. Qualification Question Framework  
-- Create a structured list of **questions Alpha Solver should always ask the user** before proceeding.  
-- Group them into categories: Legal, UX, Operations, Finance.  
+### 4. Qualification Question Framework
+- Create a structured list of **questions Alpha Solver should always ask the user** before proceeding.
+- Group them into categories: Legal, UX, Operations, Finance.
 - Keep them short so the user can answer yes/no or briefly.
 
 ---
 
-### 5. Best-in-Class & Emerging Tools  
-- Highlight which tools/models are currently **best-in-class** (and why).  
-- Show where **general LLMs (Claude, GPT-5, DeepSeek)** are strongest vs where **domain-specific tools** are necessary.  
+### 5. Best-in-Class & Emerging Tools
+- Highlight which tools/models are currently **best-in-class** (and why).
+- Show where **general LLMs (Claude, GPT-5, DeepSeek)** are strongest vs where **domain-specific tools** are necessary.
 - Flag any **niche/emerging players** that could give Alpha Solver an edge.
 
 ---
 
-### 6. Repeatable Orchestration Template  
-- Produce a **generalized template** Alpha Solver can apply to ANY complex build:  
-  - Section breakdown  
-  - Tool assignment  
-  - Qualification questions  
-  - Orchestration plan  
-  - Monitoring & governance  
+### 6. Repeatable Orchestration Template
+- Produce a **generalized template** Alpha Solver can apply to ANY complex build:
+  - Section breakdown
+  - Tool assignment
+  - Qualification questions
+  - Orchestration plan
+  - Monitoring & governance
 
 ---
 
-## 📌 Output Requirements  
-- Detailed, structured, and as long as possible.  
-- Use headings, bullet points, and JSON snippets where useful.  
-- Explicitly include:  
-  - Tools per section  
-  - Qualification questions  
-  - Tool chaining examples  
-  - Hidden risks and escalation points  
+## 📌 Output Requirements
+- Detailed, structured, and as long as possible.
+- Use headings, bullet points, and JSON snippets where useful.
+- Explicitly include:
+  - Tools per section
+  - Qualification questions
+  - Tool chaining examples
+  - Hidden risks and escalation points
 
 ---
 
-## 🔧 Optional (if space allows)  
+## 🔧 Optional (if space allows)
 Simulate applying the improved framework back to the **Signs365 case study** to show how it works in practice.
 
 * * *
@@ -112,43 +112,43 @@ A layered blueprint for orchestrating **complex, multi-domain projects**. Alpha 
 ### **1.1 Phases**
 
 1. **Framing & Scope**
-    
+
     * Define project objective (“mirror storefront with automated dropshipping”).
-        
+
     * Identify core deliverables (storefront, payments, automation, monitoring).
-        
+
     * Clarify constraints (budget, tech stack, vendor lock-in).
-        
+
 2. **Sectional Breakdown**
-    
+
     * Split into **domains** (E-commerce, UX, Tax, Automation, Compliance, SEO, etc.).
-        
+
     * Each section gets its own **tool registry + risk checklist**.
-        
+
 3. **Tool Assignment**
-    
+
     * Map each section to **primary tools**, **secondary fallback tools**, and **governance checks**.
-        
+
 4. **Qualification Questions**
-    
+
     * Alpha Solver pauses here.
-        
+
     * Ask the user **short confirmations** before running tools (e.g., “Do you have resale certificates for target states?”).
-        
+
 5. **Orchestration Plan**
-    
+
     * Chain tools into a **workflow**.
-        
+
     * Identify which tasks can be automated vs. human-reviewed.
-        
+
     * Log dependencies (e.g., pricing integrity → tax rules → UX cart flow).
-        
+
 6. **Monitoring & Governance**
-    
+
     * Create observability hooks (logs, dashboards, alerts).
-        
+
     * Assign escalation thresholds (e.g., if >3% failed orders → human review).
-        
+
 
 * * *
 
@@ -160,96 +160,96 @@ Tools, vendors, and platforms that Alpha Solver can pull from.
 ### **2.1 E-commerce & Storefronts**
 
 * **Shopify**: Fast launch, rich app ecosystem. Limits: Liquid customization headaches, higher fees.
-    
+
 * **WooCommerce (WordPress)**: Flexible, cheap. Limits: plugin sprawl, security patching.
-    
+
 * **Magento/Adobe Commerce**: Enterprise-grade. Limits: dev-heavy, high TCO.
-    
+
 * **Custom Next.js storefront**: Maximum control. Limits: requires dev resources.
-    
+
 * **Signs365 API / Mirror vendor portals**: For print-specific inventory sync.
-    
+
 
 ### **2.2 Automation / RPA**
 
 * **Zapier / Make.com**: Fast no-code automation. Limits: scaling costs.
-    
+
 * **Playwright / Puppeteer**: Scripted automation for vendor portals. Limits: brittle to UI changes.
-    
+
 * **UiPath / PowerAutomate**: Enterprise RPA. Limits: licensing cost.
-    
+
 
 ### **2.3 Prepress & File Handling**
 
 * **Adobe Illustrator + scripts**: Standard for print proofing.
-    
+
 * **Enfocus PitStop / Switch**: Automated prepress checks.
-    
+
 * **Ghostscript / ImageMagick**: Automated file conversion at scale.
-    
+
 
 ### **2.4 Finance & Tax**
 
 * **Avalara**: Automated tax compliance, resale cert tracking.
-    
+
 * **TaxJar**: SMB-friendly, but limited advanced rules.
-    
+
 * **QuickBooks / NetSuite**: Bookkeeping & reconciliation.
-    
+
 
 ### **2.5 Compliance & Governance**
 
 * **TrustArc / OneTrust**: GDPR/CCPA cookie + consent management.
-    
+
 * **WCAG tools (axe, WAVE)**: Accessibility testing.
-    
+
 * **DMCA Safe Harbor frameworks**: Templates + process.
-    
+
 
 ### **2.6 UX & Design**
 
 * **Figma**: Wireframing, prototyping.
-    
+
 * **Hotjar / FullStory**: UX feedback.
-    
+
 * **Lighthouse / WebPageTest**: Performance optimization.
-    
+
 
 ### **2.7 SEO & Marketing**
 
 * **Ahrefs / SEMrush**: Keyword & backlink.
-    
+
 * **SurferSEO / Clearscope**: Content optimization.
-    
+
 * **Google Search Console**: Index + performance monitoring.
-    
+
 
 ### **2.8 Accessibility & Trust**
 
 * **WCAG audits**: Avoid ADA lawsuits.
-    
+
 * **McAfee / Norton seals**: Boost trust.
-    
+
 * **Stripe Radar**: Fraud detection.
-    
+
 
 ### **2.9 Observability & Monitoring**
 
 * **Datadog / New Relic**: Full-stack monitoring.
-    
+
 * **Sentry**: Error monitoring.
-    
+
 * **PagerDuty**: Escalation routing.
-    
+
 
 ### **2.10 Fallback Vendors**
 
 * **Signs365 → Fallback: 4over / Printful / VistaPrint**.
-    
+
 * **UPS → Fallback: FedEx / USPS**.
-    
+
 * **Stripe → Fallback: Adyen / PayPal**.
-    
+
 
 * * *
 
@@ -259,45 +259,45 @@ Tools, vendors, and platforms that Alpha Solver can pull from.
 ### **3.1 Financial**
 
 * **Negative margins** from vendor price changes.
-    
+
 * **Tax exposure** if resale certs missing → unexpected nexus.
-    
+
 * **Chargebacks/fraud** from blind shipping.
-    
+
 
 ### **3.2 Legal & Compliance**
 
 * **ADA lawsuits** if accessibility ignored.
-    
+
 * **DMCA takedowns** for uploaded logos/art.
-    
+
 * **FTC penalties** for hidden fees or unclear disclaimers.
-    
+
 
 ### **3.3 Operational**
 
 * **Cutoff calendars**: Missed print deadlines.
-    
+
 * **Proof mismatches**: Wrong file version shipped.
-    
+
 * **Blind shipping errors**: Vendor inserts own invoice.
-    
+
 
 ### **3.4 Marketing & SEO**
 
 * **SEO cannibalization**: Duplicate product pages.
-    
+
 * **Poor schema markup**: Low SERP CTR.
-    
+
 
 ### **3.5 Escalation Points**
 
 * Tax → CPA required.
-    
+
 * Accessibility → lawyer or ADA consultant.
-    
+
 * Vendor breach (invoice in blind ship) → human escalation.
-    
+
 
 * * *
 
@@ -309,38 +309,38 @@ Questions Alpha Solver should **always ask the user** before executing.
 ### **4.1 Legal**
 
 * Do you have resale certificates for all target states?
-    
+
 * Do you need blind shipping?
-    
+
 * Should ADA/WCAG audits be enforced pre-launch?
-    
+
 
 ### **4.2 UX**
 
 * Should the storefront allow guest checkout?
-    
+
 * Do you want default upsells/cross-sells?
-    
+
 * Should proof approvals be manual or automated?
-    
+
 
 ### **4.3 Operations**
 
 * Do you need same-day cutoff alignment with vendor?
-    
+
 * Should fallback vendors auto-trigger if primary fails?
-    
+
 * Should orders queue or fail when automation breaks?
-    
+
 
 ### **4.4 Finance**
 
 * Do you want auto tax remittance (Avalara/TaxJar)?
-    
+
 * Should credit risk checks be enabled for high-ticket orders?
-    
+
 * Should refunds auto-process or require approval?
-    
+
 
 * * *
 
@@ -350,33 +350,33 @@ Questions Alpha Solver should **always ask the user** before executing.
 ### **5.1 Best-in-Class Today**
 
 * **General LLMs**: GPT-5 (reasoning), Claude (summaries, structure), DeepSeek (fast retrieval).
-    
+
 * **E-commerce**: Shopify (fast deploy), Next.js (custom).
-    
+
 * **Tax**: Avalara.
-    
+
 * **Automation**: Playwright (scripted), Zapier (no-code).
-    
+
 * **Observability**: Datadog + Sentry.
-    
+
 
 ### **5.2 Domain-Specific Tools**
 
 * **Print prepress**: Enfocus Switch/PitStop.
-    
+
 * **Blind shipping**: Printful API + white-label settings.
-    
+
 * **Fraud detection**: Stripe Radar + Sift.
-    
+
 
 ### **5.3 Emerging/Niche**
 
 * **Stability Matrix**: AI-driven UX optimization.
-    
+
 * **Rill Data**: Realtime BI for storefront metrics.
-    
+
 * **LangGraph orchestration**: Multi-agent AI flows.
-    
+
 
 * * *
 
@@ -427,50 +427,50 @@ Sections:
 ### **Step 1. Framing**
 
 * Goal: Mirror Signs365 storefront → markup → auto-order → blind ship.
-    
+
 
 ### **Step 2. Section Breakdown**
 
 * Storefront (Shopify/WooCommerce).
-    
+
 * Automation (Playwright for vendor ordering).
-    
+
 * Finance/Tax (Avalara integration).
-    
+
 * Compliance (ADA, DMCA).
-    
+
 * SEO/UX (structured metadata).
-    
+
 * Monitoring (Sentry, Datadog).
-    
+
 
 ### **Step 3. Tool Assignment**
 
 * Shopify storefront → Zapier/Playwright → Avalara → OneTrust → Sentry.
-    
+
 
 ### **Step 4. Qualification Questions**
 
 * Blind shipping required?
-    
+
 * ADA compliance enforced?
-    
+
 * Auto tax remittance enabled?
-    
+
 
 ### **Step 5. Orchestration Plan**
 
 * Customer order → Shopify checkout → Stripe → Zapier pushes to Playwright script → Signs365 order placed → Confirmation back to Shopify.
-    
+
 
 ### **Step 6. Governance**
 
 * Daily order reconciliation.
-    
+
 * Escalate to human if >3% orders fail.
-    
+
 * Quarterly ADA + tax audit.
-    
+
 
 * * *
 
@@ -498,15 +498,15 @@ Totally aligned. Let’s stop “patching” and design the **canonical, file-dr
 ================
 
 * **File-driven, not hardcoded:** all tools, vendors, rules, and prompts live in registries.
-    
+
 * **Small, ranked shortlists:** select **top 3–5** per domain per task, not the whole catalog.
-    
+
 * **Deterministic + overridable:** same inputs ⇒ same shortlist; user flags or rules can pin/ban tools.
-    
+
 * **Composable:** framework sections (Framing → Sections → Tools → Orchestration → Gov) are data, not bespoke code.
-    
+
 * **Versioned & testable:** registries carry semver + checksums; unit tests enforce invariants.
-    
+
 
 * * *
 
@@ -603,13 +603,13 @@ alpha_solver/
 ### JSON Schema highlights (`schemas/tools.schema.json`)
 
 * `tools[].id` unique, kebab or dotted.
-    
+
 * `domains` from `taxonomy.json`.
-    
+
 * `signals` all ∈ [0,1].
-    
+
 * `adapter` optional; if present, must exist.
-    
+
 
 * * *
 
@@ -759,20 +759,20 @@ sections:
 **Algorithm (high level):**
 
 1. **Parse domains** from `sections.yaml` for the requested section(s).
-    
+
 2. Pull candidates from `tools.json` where `domains ∩ section.domains ≠ ∅`.
-    
-3. **Score** each candidate:  
+
+3. **Score** each candidate:
     `score = Σ (signal_k * weight_k)` using `decision_rules.yaml → weighting`, modified by `scoring_weights.json → contexts[mode]`.
-    
+
 4. Apply **constraints**: min_signal, must_include_tags, user pins/bans.
-    
+
 5. If fewer than shortlist_size, consider **adjacent_domains** with a small penalty.
-    
+
 6. **Sort & truncate** to **top-N** per domain; tie-break by `maturity` then alphabetical `id`.
-    
+
 7. Emit **explanation** object for traceability.
-    
+
 
 **Pseudo-API:**
 
@@ -798,13 +798,13 @@ result = shortlist_by_section(
 **Planner:** `orchestrator.py` turns a section’s shortlist into runnable steps:
 
 * **Example (SEO):**
-    
+
     1. `seo.ahrefs:keyword_research` → 2) `seo.clearscope:content_brief` → 3) `validator:duplicate_keywords` → 4) `publisher:cms_api`.
-        
+
 * **Example (Automation/Signs365):**
-    
+
     1. `ecom.webhook:order_created` → 2) `automation.playwright:place_vendor_order` → 3) `fulfillment.tracker:update_status` → 4) `finance.reconcile`.
-        
+
 
 **Plan object (YAML):**
 
@@ -828,15 +828,15 @@ plan:
 ========================================
 
 * **Thresholds** in `sections.yaml` via IDs (resolved in `governance.py` to concrete metrics).
-    
+
 * Example rules:
-    
+
     * `g.error_rate`: alert if `order_submit_errors > 2%` over 24h.
-        
+
     * `g.cannibalization`: block publish if “target keyword” already owned with similar intent.
-        
+
 * **Escalation matrix** (code + config): P0 page human; P1 create ticket; P2 log.
-    
+
 
 * * *
 
@@ -844,17 +844,17 @@ plan:
 ==============================================
 
 * Keep **one codebase** (modules above).
-    
+
 * All variability lives in registries.
-    
+
 * **Session setup** (what gets mounted each run):
-    
+
     * `registries/` (all JSON/YAML files, versioned)
-        
+
     * `runtime/session_config.json` (pins/bans, context mode, shortlist sizes, feature flags)
-        
+
     * optional `user_overrides.json` (temporary experiment knobs)
-        
+
 
 **Session file example (`runtime/session_config.json`):**
 
@@ -878,21 +878,21 @@ plan:
 ======================================
 
 * **Semver + checksum** on every registry file.
-    
+
 * `loader.py` validates against `schemas/*.json` and writes a **fingerprint** to `runtime/cache/manifest.json`.
-    
+
 * `tests/test_selector.py` includes golden tests:
-    
+
     * Stable ordering given fixed inputs.
-        
+
     * Pins/bans respected.
-        
+
     * Adjacent domain fallback only when needed.
-        
+
 * **CI rules:**
-    
+
     * Reject PRs if schema invalid or **top-N drift** exceeds tolerance (to avoid accidental reshuffles).
-        
+
 
 * * *
 
@@ -900,20 +900,20 @@ plan:
 ==============================================
 
 1. Add tool entry to `tools.json`.
-    
+
 2. (Optionally) add `adapter` file in `adapters/`.
-    
+
 3. Adjust `decision_rules.yaml` if domain weighting changes.
-    
+
 4. Run tests → new shortlist snapshots updated.
-    
+
 
 * * *
 
 🧩 Example: “SEO task” returns top-4 (not 130)
 ==============================================
 
-**Input:** Section=`seo`, Mode=`enterprise_launch`, Pins=`[seo.ahrefs]`.  
+**Input:** Section=`seo`, Mode=`enterprise_launch`, Pins=`[seo.ahrefs]`.
 **Output (illustrative):**
 
 ```json
@@ -937,7 +937,7 @@ plan:
 _Any “biomedical tool” would only surface if:_
 
 * it’s in `adjacency` **and** it satisfies constraints with sufficient score after penalty.
-    
+
 
 * * *
 
@@ -947,12 +947,12 @@ _Any “biomedical tool” would only surface if:_
 For **ecommerce** run, Alpha Solver asks from `prompts.json`:
 
 * “Allow guest checkout? (yes/no)”
-    
+
 * “Require blind shipping on all orders? (yes/no)”
-    
-* “Use strict manual approval for refunds? (yes/no)”  
+
+* “Use strict manual approval for refunds? (yes/no)”
     …and stores those boolean answers in the **session state**, which `selector` and `orchestrator` can use to filter tools (e.g., must support blind shipping).
-    
+
 
 * * *
 
@@ -960,15 +960,15 @@ For **ecommerce** run, Alpha Solver asks from `prompts.json`:
 =====================================
 
 1. Freeze current behavior snapshot (tests + a one-time “reference shortlist”).
-    
+
 2. Extract all referenced tools into `tools.json` with signals.
-    
+
 3. Write first pass of `decision_rules.yaml` to replicate current shortlists.
-    
+
 4. Turn off patch branches; route all choices through `selector.py`.
-    
+
 5. Add **adjacency** gradually as you expand domains.
-    
+
 
 * * *
 
@@ -1003,11 +1003,11 @@ _(You’ll already have loader/validators; this plugs right in.)_
 =======================================
 
 * **Required:** `registries/` (the 7 files above) + `runtime/session_config.json`.
-    
+
 * **Optional:** `user_overrides.json` (temporary project flags).
-    
+
 * **Everything else** stays in the single Python base.
-    
+
 
 * * *
 
@@ -1015,17 +1015,17 @@ _(You’ll already have loader/validators; this plugs right in.)_
 ==================================================
 
 1. **Adopt this repo layout** (empty adapters are fine).
-    
+
 2. **Seed `tools.json`** with your top 30–60 (start with SEO, automation, ecommerce, print).
-    
+
 3. **Write `decision_rules.yaml` v1** with weights for `seo`, `automation`, `ecommerce`.
-    
+
 4. **Implement `selector.py`** (≈100–150 LOC) + unit tests.
-    
+
 5. **Replace any hardcoded tool picks** with `shortlist_by_section(...)`.
-    
+
 6. **Gate execution on `prompts.json` answers** (boolean switches).
-    
+
 
 If you want, I can generate **starter registry files** (filled with your likely top picks) and the **jsonschemas** so you can drop them straight into the repo and run tests immediately.
 
@@ -1050,61 +1050,61 @@ A) Canonical Artifact Set (the “what” we ship and version)
 ----------------------------------------------------------
 
 1. **Master Compound List (MCL)**
-    
+
     * One index that references _every_ domain, tool, vendor, section, question, metric, action, and template by **stable ID**.
-        
+
     * Purpose: global lookup + cross-links (prevents drift and “lost work”).
-        
+
     * File: `registries/master_compound_list.json`.
-        
+
 2. **Registry Pack (authoritative, file-driven)**
-    
+
     * **A2.1 `tools.json`** – tool/catalog entries, capabilities, signals, tags, adapters.
-        
+
     * **A2.2 `vendors.json`** – fulfillment/print vendors, cutoffs, SLAs, fallbacks, risk.
-        
+
     * **A2.3 `sections.yaml`** – which domains each section covers + question IDs + governance hooks.
-        
+
     * **A2.4 `decision_rules.yaml`** – shortlist sizes, domain weightings, adjacencies, pins/bans logic.
-        
+
     * **A2.5 `scoring_weights.json`** – context modes (e.g., `rapid_prototype`, `enterprise_launch`).
-        
+
     * **A2.6 `prompts.json`** – short qualification questions (yes/no/brief) keyed by ID.
-        
+
     * **A2.7 `taxonomy.json`** – controlled vocab for domains, categories, tags.
-        
+
     * **A2.8 `risk_checks.json`** – operational/legal checks (ADA/DMCA/tax/fraud/cutoffs/cannibalization).
-        
+
     * **A2.9 `escalation_matrix.json`** – severity to human-in-the-loop escalation routes.
-        
+
     * **A2.10 `governance_metrics.yaml`** – metric IDs, thresholds, alert policies (ties into sections).
-        
+
     * **A2.11 `orchestration_templates.yaml`** – reusable plan skeletons (e.g., Signs365 mirror, SEO launch).
-        
+
     * **A2.12 `action_commands.json`** – **action/command library** that maps tool capabilities → runnable adapter verbs (the pathways you mentioned).
-        
+
 3. **Schema Pack (validation & CI)**
-    
+
     * `schemas/*.schema.json|yaml` for each registry file above (keeps everything tidy & testable).
-        
+
 4. **Runtime Pack (per session)**
-    
+
     * **A4.1 `session_config.json`** – mode, pins/bans, shortlist sizes, feature flags (ask questions, block on ADA, auto-failover).
-        
+
     * **A4.2 `user_overrides.json`** – temporary experiment/forcing rules.
-        
+
     * **A4.3 `.env` references** – API keys for adapters (kept out of git).
-        
+
 5. **Adapter Pack (thin, swappable)**
-    
+
     * `core/adapters/*` – Playwright, Shopify, Stripe, Avalara, Ahrefs, Clearscope, Sentry, etc.
-        
+
     * Each adapter exposes **supported actions** (IDs declared in `action_commands.json`).
-        
+
 6. **Test & CI Pack**
-    
+
     * Golden tests for selector stability; schema validation; orchestration dry-runs; “drift guards” for shortlists.
-        
+
 
 * * *
 
@@ -1112,41 +1112,41 @@ B) Core Logic (the “how” we decide & execute)
 ---------------------------------------------
 
 1. **Loader & Validator** (`core/loader.py`)
-    
+
     * Loads all registries, validates schemas, writes a manifest fingerprint.
-        
+
 2. **Selector (Shortlist Engine)** (`core/selector.py`)
-    
+
     * Turns sections + rules + weights (+ pins/bans) into **top-N** tools per domain with an explain object.
-        
+
     * Supports **adjacency** and penalty rules when domains are sparse.
-        
+
 3. **Question Gate** (`core/questions.py`)
-    
+
     * Pulls yes/no/short prompts from `prompts.json` for the current sections.
-        
+
     * Stores answers in session state for downstream filtering (e.g., require blind shipping support).
-        
+
 4. **Planner/Orchestrator** (`core/orchestrator.py`)
-    
+
     * Converts shortlists + templates into a **plan** with ordered **actions** (from `action_commands.json`).
-        
+
     * Emits `plan` objects (IDs only) → adapters execute.
-        
+
 5. **Policy & Risk Engine** (`core/policy.py`)
-    
+
     * Runs `risk_checks.json` prior to execution (ADA, DMCA, tax nexus, cutoff fit, fraud posture, SEO cannibalization).
-        
+
     * Blocks or warns based on `governance_metrics.yaml` and `escalation_matrix.json`.
-        
+
 6. **Governance & Observability** (`core/governance.py`)
-    
+
     * Tracks metric IDs, thresholds, and emits alerts or pages per escalation rules.
-        
+
 7. **Explainers & Evidence Log** (`core/explain.py`)
-    
+
     * Records why a tool/action was chosen (weights, pins, constraints) + attaches artifacts/links for audit.
-        
+
 
 * * *
 
@@ -1156,34 +1156,34 @@ C) Pathways & Commands (the “verbs” you referenced)
 **C1. Action Command Grammar** (lives in `action_commands.json`)
 
 * **Structure:**
-    
+
     * `action_id` → `{ tool_id, verb, required_inputs, outputs, prechecks, postchecks }`
-        
+
 * **Examples (IDs only; no details here):**
-    
+
     * `seo.keyword_research.ahrefs` → Ahrefs adapter verb
-        
+
     * `content.brief.clearscope` → Clearscope “create_brief”
-        
+
     * `automation.vendor_order.playwright` → Playwright script to place Signs365 order
-        
+
     * `compliance.wcag.audit` → axe/WAVE scanner stub
-        
+
     * `finance.tax.quote.avalara` → Avalara tax estimate
-        
+
     * `observability.instrument.sentry` → Sentry DSN bootstrap
-        
+
 
 **C2. Pathway Families** (high level)
 
 * **SEO Pathway:** research → brief → draft → dup-intent check → publish → index health.
-    
+
 * **Signs365 Pathway:** order webhook → validate proof/state tax → vendor cutoff alignment → blind ship → reconcile.
-    
+
 * **Prepress Pathway:** receive → PitStop checks → fix/flatten → soft proof → approval gate.
-    
+
 * **Governance Pathway:** metric sample → threshold compare → alert/escalate or proceed.
-    
+
 
 * * *
 
@@ -1191,68 +1191,68 @@ D) Section Map (where work actually lives)
 ------------------------------------------
 
 1. **E-commerce** → domains: ecommerce, payments, catalog
-    
+
     * Questions: guest checkout, blind ship, refunds policy
-        
+
     * Metrics: abandonment, error_rate, refund_ratio
-        
+
     * Templates: checkout webhooks, order pipeline
-        
+
 2. **Automation/RPA** → domains: automation, rpa
-    
+
     * Questions: portal stability, cutoff alignment
-        
+
     * Metrics: job_fail_rate, retry_success_rate
-        
+
 3. **Prepress & File Handling** → domains: print, fulfillment
-    
+
     * Questions: proof manual/auto, color profile standard
-        
+
     * Metrics: remake_rate, proof_cycle_time
-        
+
 4. **Finance & Tax** → domains: finance, tax
-    
+
     * Questions: resale certs, auto remittance
-        
+
     * Metrics: margin_guard_breaches, tax_variance
-        
+
 5. **Compliance & Governance** → domains: compliance, accessibility
-    
+
     * Questions: ADA enforce, cookie banner
-        
+
     * Metrics: wcag_violations_open, dmca_claims_open
-        
+
 6. **UX/Design** → domains: ux, content_ops
-    
+
     * Questions: upsells, cross-sells, proof UX
-        
+
     * Metrics: session_to_proof_rate
-        
+
 7. **SEO & Marketing** → domains: seo, marketing, analytics
-    
+
     * Questions: target keywords, cannibalization guard
-        
+
     * Metrics: index_health, cannibalization_hits
-        
+
 8. **Accessibility & Trust** → domains: accessibility, compliance
-    
+
     * Questions: enforce A/AA, trust badges
-        
+
     * Metrics: a11y_blockers, trust_clickthrough
-        
+
 9. **Observability & Monitoring** → domains: observability
-    
+
     * Questions: paging policy, on-call window
-        
+
     * Metrics: MTTR, alert_fatigue_index
-        
+
 10. **Fallback Vendors** → domains: fulfillment
-    
+
 
 * Questions: auto-failover allowed? price delta cap?
-    
+
 * Metrics: failover_success_rate
-    
+
 
 _(Each section only names the **top-level** artifacts above; the per-section detail lives in the registries.)_
 
@@ -1262,25 +1262,25 @@ E) Hidden Risk Classes (IDs only; detailed checks live in `risk_checks.json`)
 -----------------------------------------------------------------------------
 
 * `risk.negative_margin` (vendor price drift, unpropagated markups)
-    
+
 * `risk.tax_nexus_gap` (missing resale cert/state exposure)
-    
+
 * `risk.ada_noncompliance` (WCAG blockers)
-    
+
 * `risk.dmca_exposure` (user-uploaded logos/art)
-    
+
 * `risk.fraud_blind_ship` (Radar/Sift posture mismatch)
-    
+
 * `risk.cutoff_miss` (production calendar mismatch)
-    
+
 * `risk.price_mismatch` (storefront vs vendor matrix drift)
-    
+
 * `risk.proof_mismatch` (wrong file version shipped)
-    
+
 * `risk.seo_cannibalization` (duplicate intent pages)
-    
+
 * `risk.vendor_failover_leak` (blind-ship leak on fallback)
-    
+
 
 * * *
 
@@ -1288,10 +1288,10 @@ F) Execution Modes (selection + policy weighting)
 -------------------------------------------------
 
 * `rapid_prototype` – speed > accuracy; N small; looser prechecks.
-    
-* `enterprise_launch` – accuracy & maturity high; stricter risk gates; full governance.  
+
+* `enterprise_launch` – accuracy & maturity high; stricter risk gates; full governance.
     _(Weights are defined in `scoring_weights.json`, referenced by `decision_rules.yaml`.)_
-    
+
 
 * * *
 
@@ -1299,13 +1299,13 @@ G) Minimal Templates Library (IDs only; bodies live in `orchestration_templates.
 --------------------------------------------------------------------------------------
 
 * `tpl.signs365_mirror` – webhook → validate → place order → track → reconcile → notify.
-    
+
 * `tpl.seo_content_launch` – research → brief → draft → review → publish → index check.
-    
+
 * `tpl.prepress_autoproof` – receive → pitstop → fix → soft proof → approval → archive.
-    
+
 * `tpl.gov_minimum_viable` – sample metrics → compare → alert/escalate.
-    
+
 
 * * *
 
@@ -1313,13 +1313,13 @@ H) Naming & ID Conventions (to prevent drift)
 ---------------------------------------------
 
 * **Domains:** `snake_lower` from `taxonomy.json` (e.g., `seo`, `automation`).
-    
+
 * **Tools:** `domain.toolname` (e.g., `seo.ahrefs`, `automation.playwright`).
-    
+
 * **Actions:** `domain.verb.tool` (e.g., `automation.vendor_order.playwright`).
-    
+
 * **Risks:** `risk.<label>`; **Metrics:** `met.<label>`; **Questions:** `q.<label>`; **Templates:** `tpl.<label>`.
-    
+
 
 * * *
 
@@ -1349,17 +1349,17 @@ J) How we’ll use this (no guessing, no patches)
 -----------------------------------------------
 
 1. **Load** the Registry Pack (schemas enforce shape).
-    
+
 2. **Ask** section questions (from `prompts.json`) and store answers in session state.
-    
+
 3. **Select** top-N per section (via `decision_rules.yaml` + `scoring_weights.json` + pins/bans).
-    
+
 4. **Plan** using `orchestration_templates.yaml` + `action_commands.json`.
-    
+
 5. **Check** `risk_checks.json` and **govern** via `governance_metrics.yaml` + `escalation_matrix.json`.
-    
+
 6. **Execute** through adapters; **explain** and **log** evidence.
-    
+
 
 * * *
 
@@ -1388,47 +1388,47 @@ Master High-Level Inventory (Final Pre-Diagram Review)
 1) Canonical Artifacts (file-driven sources of truth)
 -----------------------------------------------------
 
-* **Master Compound List (MCL)**  
-    What: the index of everything (sections, tools, vendors, actions, risks, metrics, questions, templates, taxonomies).  
-    Why: avoids drift; single lookup for stable IDs.  
+* **Master Compound List (MCL)**
+    What: the index of everything (sections, tools, vendors, actions, risks, metrics, questions, templates, taxonomies).
+    Why: avoids drift; single lookup for stable IDs.
     Connects to: every registry below.
-    
+
 * **Registry Pack**
-    
+
     * `tools.json` (tool catalog: domains, capabilities, signals, adapters)
-        
+
     * `vendors.json` (print/fulfillment vendors: cutoffs, SLAs, fallbacks, risk)
-        
+
     * `sections.yaml` (which domains a section covers; question IDs; governance hooks)
-        
+
     * `decision_rules.yaml` (shortlist size, weights, adjacency, pins/bans)
-        
+
     * `scoring_weights.json` (context modes: rapid_prototype vs enterprise_launch)
-        
+
     * `prompts.json` (short yes/no/brief questions per section)
-        
+
     * `taxonomy.json` (controlled vocab: domains, tags, categories)
-        
+
     * `risk_checks.json` (named risk checks like ADA/DMCA/tax/cutoffs/fraud/SEO cannibalization)
-        
+
     * `governance_metrics.yaml` (metric IDs, thresholds, sampling)
-        
+
     * `escalation_matrix.json` (severity → routing: log, ticket, page, human review)
-        
+
     * **`action_commands.json`** (the verb library mapping tool capabilities → runnable adapter actions)
-        
+
     * `orchestration_templates.yaml` (plan skeletons: Signs365 mirror, SEO launch, prepress)
-        
-* **Schema Pack** (`schemas/*`)  
-    What: JSON/YAML schemas for each registry.  
+
+* **Schema Pack** (`schemas/*`)
+    What: JSON/YAML schemas for each registry.
     Why: validation + CI checks.
-    
+
 * **Runtime Pack**
-    
+
     * `session_config.json` (mode, pins/bans, feature flags)
-        
+
     * `user_overrides.json` (temporary constraints), `.env` refs for adapters
-        
+
 
 * * *
 
@@ -1436,19 +1436,19 @@ Master High-Level Inventory (Final Pre-Diagram Review)
 -----------------------------------------------------
 
 * **Loader/Validator**: loads registries, validates schemas, writes manifest/fingerprint.
-    
+
 * **Selector (Shortlist Engine)**: picks top-N tools per section using weights, adjacency, pins/bans; returns explainability.
-    
+
 * **Question Gate**: fetches and records **qualification questions** per section; answers feed selector + planner filters.
-    
+
 * **Planner/Orchestrator**: composes a **plan** from shortlists + templates → sequence of **action commands** (IDs only).
-    
+
 * **Policy/Risk Engine**: runs `risk_checks` pre-execution; block/warn based on governance + escalation rules.
-    
+
 * **Governance/Observability**: attaches metrics, thresholds, alerts; writes telemetry.
-    
+
 * **Explainer/Evidence Log**: traces “why chosen,” artifacts, parameters; supports audits.
-    
+
 
 * * *
 
@@ -1456,25 +1456,25 @@ Master High-Level Inventory (Final Pre-Diagram Review)
 ------------------------------------------------
 
 * **E-commerce** (ecommerce, payments, catalog)
-    
+
 * **Automation/RPA** (automation, rpa)
-    
+
 * **Prepress & File Handling** (print, fulfillment)
-    
+
 * **Finance & Tax** (finance, tax)
-    
+
 * **Compliance & Governance** (compliance, accessibility)
-    
+
 * **UX/Design** (ux, content_ops)
-    
+
 * **SEO & Marketing** (seo, marketing, analytics)
-    
+
 * **Accessibility & Trust** (accessibility, compliance, trust)
-    
+
 * **Observability & Monitoring** (observability)
-    
+
 * **Fallback Vendors** (fulfillment failovers)
-    
+
 
 _(Each section references: question IDs, risk checks, metrics, and orchestration template IDs.)_
 
@@ -1484,13 +1484,13 @@ _(Each section references: question IDs, risk checks, metrics, and orchestration
 ----------------------------------------------------
 
 * **SEO Pathway**: keyword_research → brief → draft → cannibalization_check → publish → index_health.
-    
+
 * **Signs365 Pathway**: order_webhook → tax/price/markup guard → vendor_cutoff alignment → blind_ship → reconcile.
-    
+
 * **Prepress Pathway**: intake → PitStop checks → fix/flatten → soft proof → approval gate → archive.
-    
+
 * **Governance Pathway**: sample metrics → compare thresholds → alert/escalate → human-in-loop if required.
-    
+
 
 * * *
 
@@ -1498,15 +1498,15 @@ _(Each section references: question IDs, risk checks, metrics, and orchestration
 -----------------------------------------------
 
 * **Financial**: `risk.negative_margin`, `risk.price_mismatch`, `risk.chargeback_spike`
-    
+
 * **Tax/Legal**: `risk.tax_nexus_gap`, `risk.resale_cert_missing`, `risk.dmca_exposure`
-    
+
 * **Accessibility/Compliance**: `risk.ada_noncompliance`, `risk.cookie_consent_gap`, `risk.privacy flags`
-    
+
 * **Ops/Calendar**: `risk.cutoff_miss`, `risk.proof_mismatch`, `risk.vendor_failover_leak`
-    
+
 * **Marketing/SEO**: `risk.seo_cannibalization`, `risk.schema_missing`
-    
+
 
 _(Each risk has: precheck rule, data inputs, block/allow policy, escalation route.)_
 
@@ -1516,11 +1516,11 @@ _(Each risk has: precheck rule, data inputs, block/allow policy, escalation rout
 ----------------------------------------------------
 
 * **Key Metrics (IDs):** `met.error_rate`, `met.job_fail_rate`, `met.remake_rate`, `met.abandonment`, `met.margin_guard_breaches`, `met.index_health`, `met.wcag_violations_open`, `met.mttr`
-    
+
 * **Thresholds & Actions:** warning vs block; ticket vs page; auto-failover vs halt.
-    
+
 * **Review Cadence:** daily ops checks, weekly UX/SEO, monthly compliance/tax audits.
-    
+
 
 * * *
 
@@ -1528,23 +1528,23 @@ _(Each risk has: precheck rule, data inputs, block/allow policy, escalation rout
 ----------------------------------------------------------------------
 
 * **Deterministic Shortlisting**: same inputs → same top-N; stable tie-breaks; pins/bans honored.
-    
+
 * **Human-in-the-Loop Points**: proof approvals, DMCA escalations, ADA criticals, high-value tax anomalies.
-    
+
 * **Idempotency & Retries**: action commands accept idempotency keys; exponential backoff; dead-letter queues.
-    
+
 * **Secrets & Policy**: adapters read from `.env` via vault or secrets manager; least-privilege tokens.
-    
+
 * **Cost Controls**: per-tool quotas, budget ceilings; “expensive action” prompts.
-    
+
 * **Caching & Memoization**: avoid duplicate API calls (e.g., keyword results, tax quotes).
-    
+
 * **Rate Limiting/Backpressure**: per-vendor & per-tool guards.
-    
+
 * **Environment Promotion**: dev → stage → prod; feature flags in `session_config`.
-    
+
 * **Simulation / Dry-Run Mode**: no-op execution to validate plans + risk checks before live.
-    
+
 
 * * *
 
@@ -1552,13 +1552,13 @@ _(Each risk has: precheck rule, data inputs, block/allow policy, escalation rout
 ---------------------------------------------------
 
 * **Signals**: maturity, ecosystem, cost, speed, accuracy (0–1).
-    
+
 * **Weights**: per domain (in `decision_rules.yaml`) + per context (in `scoring_weights.json`).
-    
+
 * **Adjacency Rules**: if domain thin or constraints unmet, pull from `adjacent_domains` with penalty.
-    
+
 * **Explainability**: record which weights/constraints decided the ranking.
-    
+
 
 * * *
 
@@ -1566,15 +1566,15 @@ _(Each risk has: precheck rule, data inputs, block/allow policy, escalation rout
 --------------------------------------------------
 
 * **Legal/Tax**: resale certs present? auto-remittance? blind shipping contractual?
-    
+
 * **UX/Commerce**: guest checkout? strict refund approvals? proof manual vs auto?
-    
+
 * **Ops/Vendors**: align to vendor cutoff calendars? allow auto-failover? maximum price delta?
-    
+
 * **SEO/Content**: have target keywords? enable cannibalization guard pre-publish?
-    
+
 * **Compliance**: enforce ADA AA at launch? cookie/consent banner required?
-    
+
 
 _(Answers become session flags → influence selection and plan branching.)_
 
@@ -1584,11 +1584,11 @@ _(Answers become session flags → influence selection and plan branching.)_
 -----------------------------------------------------
 
 * **Fallback Matrix**: primary → 4over/VistaPrint, Stripe → Adyen/PayPal, UPS → FedEx/USPS.
-    
+
 * **Eligibility Rules**: capabilities parity (blind ship), price delta cap, SLA minimum.
-    
+
 * **State Machine**: try primary; on failure with code X/Y, evaluate fallback policy; re-route or halt with escalation.
-    
+
 
 * * *
 
@@ -1596,11 +1596,11 @@ _(Answers become session flags → influence selection and plan branching.)_
 ---------------------------
 
 * **Plan & Decision Logs**: store chosen tools, weights, pinned decisions, rejected candidates.
-    
+
 * **Artifact Capture**: proofs, quotes, vendor responses, SEO briefs, accessibility reports.
-    
+
 * **Repro Packs**: bundle `session_config`, plan YAML, inputs, and hashes for replayability.
-    
+
 
 * * *
 
@@ -1608,14 +1608,14 @@ _(Answers become session flags → influence selection and plan branching.)_
 ------------------------------------------
 
 * `tpl.signs365_mirror`
-    
+
 * `tpl.seo_content_launch`
-    
+
 * `tpl.prepress_autoproof`
-    
-* `tpl.gov_minimum_viable`  
+
+* `tpl.gov_minimum_viable`
     _(All reference the same action command IDs so execution stays uniform.)_
-    
+
 
 * * *
 
@@ -1623,13 +1623,13 @@ _(Answers become session flags → influence selection and plan branching.)_
 ------------------------------------------
 
 * **Domains**: `snake_lower` (e.g., `seo`, `automation`)
-    
+
 * **Tools**: `domain.tool` (e.g., `seo.ahrefs`)
-    
+
 * **Actions**: `domain.verb.tool` (e.g., `automation.vendor_order.playwright`)
-    
+
 * **Risks/Metrics/Questions/Templates**: `risk.*`, `met.*`, `q.*`, `tpl.*`
-    
+
 
 * * *
 
@@ -1637,17 +1637,17 @@ _(Answers become session flags → influence selection and plan branching.)_
 ----------------------------------------------------------
 
 * **LLM vs Domain Tool Policy**: where GPT/Claude/DeepSeek are used (planning, summarization, anomaly triage) vs **must** use domain tools (tax quotes, prepress, payments).
-    
+
 * **Data Residency & PII Handling**: rules for uploads (artwork, addresses), retention windows, redaction in logs.
-    
+
 * **Calendar & Timezone Canon**: vendor cutoff evaluation with explicit tz (`America/Detroit` for S365 example).
-    
+
 * **A/B & Canary**: content/UX experiments gated by budget + governance.
-    
+
 * **Cost/Margin Guardrails**: pre-checkout and pre-vendor-order margin checks (block negative margin).
-    
+
 * **Fraud Posture**: Stripe Radar (or Sift) thresholds; extra verification flow for high-risk orders.
-    
+
 
 * * *
 
@@ -1657,34 +1657,34 @@ _(Answers become session flags → influence selection and plan branching.)_
 **Nodes (boxes):**
 
 * Registries: MCL, Tools, Vendors, Sections, Decision Rules, Scoring Weights, Prompts, Risk Checks, Governance Metrics, Escalation Matrix, Action Commands, Templates, Taxonomy
-    
+
 * Core Modules: Loader, Selector, Question Gate, Planner, Policy/Risk Engine, Governance/Observability, Explainer/Evidence
-    
+
 * Execution: Adapters (Shopify, Stripe, Playwright, Avalara, PitStop, Sentry, Ahrefs, Clearscope)
-    
+
 * Runtime: Session Config, User Overrides, .env/Secrets
-    
+
 * External Systems: Vendor Portals (Signs365/4over), Payment, Tax, Analytics, Search Console
-    
+
 
 **Edges (arrows):**
 
 * Loader → (all Registries) → Manifest
-    
+
 * Sections + Decision Rules + Scoring Weights + Session Config → Selector → **Top-N Shortlists**
-    
+
 * Sections → Prompts → Question Gate → **Session Flags** → Selector/Planner filters
-    
+
 * Shortlists + Templates + Action Commands → Planner → **Plan**
-    
+
 * Plan + Session Flags → Policy/Risk Engine → **allow/block + escalation**
-    
+
 * Allowed Plan → Adapters → External Systems
-    
+
 * Adapters → Governance/Observability (metrics) → Escalation Matrix
-    
+
 * Everything → Explainer/Evidence Log (audit trail)
-    
+
 
 * * *
 
@@ -1963,13 +1963,13 @@ Notes for your critique
 -----------------------
 
 * If you want **fewer files**, we can merge:
-    
+
     * `decision_rules.yaml` + `scoring_weights.json` → `selection_rules.yaml`
-        
+
     * `governance_metrics.yaml` + `escalation_matrix.json` → `governance.yaml`
-        
+
 * If you want **more separation**, split `action_commands.json` into per-domain files.
-    
+
 
 When you’re ready, tell me which layout you prefer (merged vs split), and I’ll output the **starter registries with empty-but-valid schemas** so your team can plug this into the Python base immediately.
 
@@ -2018,13 +2018,13 @@ Can you think of a clause dezeD b prompt to run while I sleep that will help adv
 Yes — if you want to let this **advance automatically overnight**, the best kind of “Claude-sized prompt” (or “deep research cycle” prompt) is one that:
 
 1. **Re-iterates the mission clearly** → Alpha Solver is file-driven, repeatable, and modular.
-    
+
 2. **Forces expansion** → ask the model to discover missing registries, hidden risk classes, or orchestration edges.
-    
+
 3. **Demands structured output** → JSON/YAML stubs, diagrams, and validation rules.
-    
+
 4. **Keeps it additive, not patchy** → it must build on the Master Hierarchy, not rewrite from scratch.
-    
+
 
 Here’s a draft prompt you could paste into Claude (or any long-context model) and let it run:
 
@@ -2033,81 +2033,81 @@ Here’s a draft prompt you could paste into Claude (or any long-context model) 
 🌙 Overnight Expansion Prompt (Alpha Solver)
 ============================================
 
-**Context:**  
+**Context:**
 We are designing Alpha Solver, a framework that orchestrates tasks across tools, vendors, and governance. The core principle: **file-driven registries + a stable Python base**. No ad-hoc patches. All variability should live in static JSON/YAML registries that feed the core modules (loader, selector, planner, policy engine, governance).
 
 We now have a **Master Hierarchy** with:
 
 * Canonical artifacts (tools.json, vendors.json, sections.yaml, decision_rules.yaml, scoring_weights.json, prompts.json, risk_checks.json, governance_metrics.yaml, escalation_matrix.json, action_commands.json, orchestration_templates.yaml, taxonomy.json, master_compound_list.json)
-    
+
 * Core modules (loader, selector, question_gate, planner/orchestrator, policy/risk, governance/observability, explainer/evidence)
-    
+
 * Pathways, risks, qualification questions, templates, fallback vendors, and governance metrics.
-    
+
 
 **Your task while I sleep:**
 
 1. **Check completeness:** scan the hierarchy for any _missing registries, modules, or governance constructs_ that would be critical in enterprise-grade orchestration (e.g., security, secrets management, budget guards, simulation/dry-run modes, replay packs).
-    
+
 2. **Expand registries:**
-    
+
     * Generate **empty-but-valid JSON/YAML stubs** for any missing registry files.
-        
+
     * Ensure each has stable IDs, version numbers, and schema hints.
-        
+
 3. **Linkages:** identify new cross-links between registries (e.g., which risk IDs should auto-trigger escalation routes; which governance metrics map directly to action_commands).
-    
+
 4. **Diagram drafts:** output new diagram scripts (Graphviz or Mermaid) that visualize:
-    
+
     * Registry pack interdependencies
-        
+
     * Policy/risk escalation flows
-        
+
     * Tool/action_command execution pipelines
-        
+
 5. **Validation rules:** propose schema constraints (jsonschema or YAML spec) for any new registries.
-    
+
 6. **Stretch goals:** suggest _two new execution modes_ beyond `rapid_prototype` and `enterprise_launch` (e.g., `sandbox_research`, `regulated_environment`), with their weighting tweaks.
-    
+
 
 **Output format:**
 
 * Part A: List of newly identified high-level gaps (with justification).
-    
+
 * Part B: JSON/YAML stubs for new registries.
-    
+
 * Part C: Cross-link table (registry → registry).
-    
+
 * Part D: Diagram code (Mermaid/Graphviz).
-    
+
 * Part E: Schema rules for new files.
-    
+
 * Part F: Proposed execution modes.
-    
+
 
 **Constraints:**
 
 * Build _additively_ on the current Master Hierarchy — do not rewrite or collapse.
-    
+
 * Keep IDs stable (`risk.*`, `tpl.*`, `q.*`, `met.*`).
-    
+
 * Use semver for versions.
-    
+
 
 * * *
 
 👉 This kind of prompt will ensure when you wake up you have:
 
 * Missing pieces filled.
-    
+
 * New stubs ready to drop into `/registries`.
-    
+
 * Diagram source you can render.
-    
+
 * Schema rules to validate.
-    
+
 * Fresh execution modes to discuss.
-    
+
 
 * * *
 
@@ -2259,7 +2259,7 @@ budgets:
     limit_usd: 15000
     approved_tools: ["t001", "t002", "t003"]
     approval_required_above: 500
-    
+
 cost_allocation:
   - pattern: "project.*"
     tag: project_code
@@ -2352,7 +2352,7 @@ contracts:
     support_hours: "business"
     escalation_time_minutes: 120
     measurement_period: monthly
-    
+
   sla.premium:
     id: sla.premium
     tier: premium
@@ -2392,7 +2392,7 @@ performance_targets:
     target_p99_ms: 1500
     measurement_window: "5m"
     breaching_action: "alert"
-    
+
   perf.orchestration.throughput:
     id: perf.orchestration.throughput
     metric: requests_per_second
@@ -2493,7 +2493,7 @@ dependencies:
     required_by: ["selector", "planner", "orchestrator"]
     criticality: essential
     startup_order: 1
-    
+
   dep.core.selector:
     id: dep.core.selector
     module: selector
@@ -2501,7 +2501,7 @@ dependencies:
     required_by: ["planner", "orchestrator"]
     criticality: essential
     startup_order: 2
-    
+
   dep.tool.t001:
     id: dep.tool.t001
     tool: t001
@@ -2509,7 +2509,7 @@ dependencies:
     conflicts_with: []
     version_constraints: ">=1.0.0"
     optional: false
-    
+
   dep.vendor.openai:
     id: dep.vendor.openai
     vendor: openai
@@ -2517,7 +2517,7 @@ dependencies:
     health_check: "https://api.openai.com/v1/health"
     timeout_seconds: 30
     retry_policy: exponential_backoff
-    
+
   dep.vendor.anthropic:
     id: dep.vendor.anthropic
     vendor: anthropic
@@ -2531,7 +2531,7 @@ circular_detection:
   max_depth: 10
   fail_on_circular: true
   detection_algorithm: "tarjan"
-  
+
 resolution_strategy:
   missing_optional: warn
   missing_required: fail
@@ -2619,7 +2619,7 @@ classifications:
     allowed_vendors: all
     encryption_required: false
     can_cache: true
-    
+
   class.internal:
     id: class.internal
     level: internal
@@ -2629,7 +2629,7 @@ classifications:
     encryption_required: false
     can_cache: true
     audit_access: false
-    
+
   class.confidential:
     id: class.confidential
     level: confidential
@@ -2640,7 +2640,7 @@ classifications:
     retention_days: 1095
     can_cache: false
     audit_access: true
-    
+
   class.pii:
     id: class.pii
     level: pii
@@ -2653,7 +2653,7 @@ classifications:
     retention_days: 730
     can_cache: false
     audit_access: true
-    
+
   class.phi:
     id: class.phi
     level: phi
@@ -2731,30 +2731,30 @@ graph TB
         OT[orchestration_templates.yaml]
         AC[action_commands.json]
     end
-    
+
     subgraph Security["Security Layer"]
         SV[secrets_vault.json]
         DC[data_classification.yaml]
         AT[audit_trail.json]
     end
-    
+
     subgraph Governance["Governance Layer"]
         RC[risk_checks.json]
         EM[escalation_matrix.json]
         GM[governance_metrics.yaml]
     end
-    
+
     subgraph Operations["Operations Layer"]
         BC[budget_controls.yaml]
         CB[circuit_breakers.json]
         SLA[sla_contracts.yaml]
     end
-    
+
     subgraph Testing["Testing Layer"]
         SC[simulation_configs.json]
         DG[dependency_graph.yaml]
     end
-    
+
     %% Core dependencies
     TR --> SV
     TR --> DC
@@ -2762,26 +2762,26 @@ graph TB
     VR --> CB
     OT --> DG
     AC --> BC
-    
+
     %% Governance flow
     RC --> EM
     RC --> CB
     GM --> EM
-    
+
     %% Audit requirements
     BC --> AT
     DC --> AT
     SV --> AT
-    
+
     %% Operational dependencies
     SLA --> GM
     CB --> VR
     CB --> EM
-    
+
     %% Testing dependencies
     SC --> OT
     DG --> OT
-    
+
     style Core fill:#e1f5fe
     style Security fill:#fff3e0
     style Governance fill:#f3e5f5
@@ -2796,25 +2796,25 @@ dot
 digraph G {
     rankdir=LR;
     node [shape=box, style=rounded];
-    
+
     subgraph cluster_0 {
         label="Risk Detection";
         style=filled;
         color=lightgrey;
         node [style=filled,color=white];
-        
+
         Monitor [label="Continuous\nMonitoring"];
         RiskEval [label="Risk\nEvaluation"];
         ScoreCalc [label="Score\nCalculation"];
         Monitor -> RiskEval -> ScoreCalc;
     }
-    
+
     subgraph cluster_1 {
         label="Decision Logic";
         style=filled;
         color=lightblue;
         node [style=filled,color=white];
-        
+
         Threshold [label="Threshold\nCheck"];
         Classify [label="Risk\nClassification"];
         Policy [label="Policy\nEngine"];
@@ -2822,30 +2822,30 @@ digraph G {
         Threshold -> Classify;
         Classify -> Policy;
     }
-    
+
     subgraph cluster_2 {
         label="Response Actions";
         style=filled;
         color=lightgreen;
         node [style=filled,color=white];
-        
+
         Mitigate [label="Auto\nMitigation"];
         Escalate [label="Human\nEscalation"];
         Alert [label="Alert\nSystem"];
         Halt [label="Circuit\nBreaker"];
         Audit [label="Audit\nLogging"];
     }
-    
+
     Policy -> Mitigate [label="Low Risk"];
     Policy -> Escalate [label="Medium Risk"];
     Policy -> Alert [label="High Risk"];
     Policy -> Halt [label="Critical Risk"];
-    
+
     Mitigate -> Audit;
     Escalate -> Alert [style=dashed];
     Alert -> Halt [style=dashed, label="timeout"];
     Halt -> Audit;
-    
+
     {rank=same; Mitigate; Escalate; Alert; Halt}
 }
 
@@ -2863,17 +2863,17 @@ sequenceDiagram
     participant CircuitBreaker
     participant Tool
     participant Audit
-    
+
     User->>Orchestrator: Request
     Orchestrator->>Selector: Select Tool
     Selector->>Budget: Check Budget
-    
+
     alt Budget OK
         Budget-->>Selector: Approved
         Selector->>Secrets: Get Credentials
         Secrets-->>Selector: Credentials
         Selector->>CircuitBreaker: Check Status
-        
+
         alt Circuit Closed
             CircuitBreaker-->>Selector: Proceed
             Selector->>Tool: Execute
@@ -2890,7 +2890,7 @@ sequenceDiagram
         Selector->>Audit: Log Budget Breach
         Selector-->>Orchestrator: Error
     end
-    
+
     Orchestrator-->>User: Response
 
 
@@ -3175,14 +3175,14 @@ features:
   parallel_execution: true  # Test concurrent flows
   cache_ttl_seconds: 60  # Short cache for fresh results
   failure_injection: 0.05  # 5% random failures for resilience testing
-  
+
 constraints:
   max_spend_per_hour: 100
   blocked_vendors: []  # All vendors available
   data_classification: ["public", "internal"]  # No sensitive data
   escalation_enabled: false  # No production escalations
   retention_days: 30  # Short retention for experiments
-  
+
 monitoring:
   metrics_collection: detailed
   performance_profiling: enabled
@@ -3210,14 +3210,14 @@ features:
   parallel_execution: false  # Sequential for full auditability
   cache_ttl_seconds: 0  # No caching of sensitive data
   encryption_everywhere: true  # All data encrypted at rest and in transit
-  
+
 constraints:
   max_spend_per_hour: 500
   blocked_vendors: ["non_compliant_list"]
   data_classification: ["public", "internal", "confidential", "pii", "phi"]
   escalation_enabled: true
   retention_days: 2555  # 7 years for compliance
-  
+
 compliance:
   standards: ["HIPAA", "GDPR", "SOC2", "ISO27001", "PCI-DSS"]
   encryption: required
@@ -3225,14 +3225,14 @@ compliance:
   right_to_audit: true
   baa_required: true  # Business Associate Agreement for healthcare
   data_processing_agreement: true  # DPA for GDPR
-  
+
 governance:
   approval_required: ["phi_access", "bulk_operations", "cross_border"]
   four_eyes_principle: true  # Dual approval for critical operations
   change_control: enabled
   audit_retention_years: 7
   incident_response_sla: 4  # Hours
-  
+
 monitoring:
   compliance_dashboard: enabled
   privacy_metrics: enabled
@@ -3261,19 +3261,19 @@ features:
   cache_ttl_seconds: 3600  # Aggressive caching
   connection_pooling: enabled
   batch_processing: enabled
-  
+
 optimizations:
   prefetch_predictions: true
   speculative_execution: true
   result_streaming: true
   compression: enabled
-  
+
 constraints:
   max_spend_per_hour: 2000
   blocked_vendors: ["slow_vendors"]
   data_classification: ["public", "internal", "confidential"]
   escalation_enabled: true
-  
+
 monitoring:
   apm_integration: enabled  # Application Performance Monitoring
   real_time_metrics: true
@@ -3482,24 +3482,24 @@ policy_inputs:
 ==============================================================
 
 * **Budget → Actions**: every planned step gets a pre-flight `ops.budget.check`. If `deny`, planner attempts downgrade/fallback; else halt + escalate `risk.budget_breach`.
-    
+
 * **Risk → Escalation**: `risk_checks.json` thresholds map to `escalation_matrix.json`. Add new mappings for `budget_breach`, `open_circuit`, `sla_breach`, `data_misclassification`, `secret_access_anomaly`.
-    
+
 * **Breakers → Vendors**: `circuit_breakers.json` keyed by `vendor_id` or `action_key`; when “open,” policy engine forces `vendors.json` fallback path (respecting price-delta caps).
-    
+
 * **SLAs → Metrics**: `sla_contracts.yaml` targets hydrate `governance_metrics.yaml` queries and dashboards.
-    
+
 * **Data classification → Vendor filter**: planner excludes vendors/tools unless `allowed_vendors` permits the class (e.g., `pii` requires “privacy_certified”).
-    
+
 * **Audit trail**: log **all** secret fetches, budget denials, breaker transitions, and SLA breaches.
-    
+
 
 * * *
 
 5) Tiny “starter” schemas (to keep you unblocked)
 =================================================
 
-> You already have detailed stubs in the Claude artifact. We’ll **adopt those** as-is for: `secrets_vault.json`, `budget_controls.yaml`, `audit_trail.json`, `sla_contracts.yaml`, `simulation_configs.json`, `dependency_graph.yaml`, `circuit_breakers.json`, `data_classification.yaml`.  
+> You already have detailed stubs in the Claude artifact. We’ll **adopt those** as-is for: `secrets_vault.json`, `budget_controls.yaml`, `audit_trail.json`, `sla_contracts.yaml`, `simulation_configs.json`, `dependency_graph.yaml`, `circuit_breakers.json`, `data_classification.yaml`.
 > In our repo, place matching validators in `schemas/` and add CI checks for: presence, semver pattern, and id-prefix rules (`sec.*`, `bud.*`, `cb.*`, `class.*`, etc.).
 
 * * *
@@ -3510,25 +3510,25 @@ policy_inputs:
 In `planner/orchestrator`:
 
 1. **Before** any external action:
-    
+
     * `ops.secrets.fetch` (if adapter requires)
-        
+
     * `ops.budget.check` (estimate cost from tool/verb metadata)
-        
+
     * `ops.circuit.check` (key = vendor_id or action_id)
-        
+
 2. **On failure/deny**:
-    
+
     * Try **template-defined fallback** (if breakers open and fallback allowed)
-        
+
     * Else **halt** → `ops.audit.log` with reason → escalate via `escalation_matrix.json`.
-        
+
 3. **After action**:
-    
+
     * `ops.audit.log` event (success/failure, cost, latency)
-        
+
     * Emit metrics → governance
-        
+
 
 This is ~30–60 LOC of glue around the existing plan executor.
 
@@ -3553,19 +3553,19 @@ This is ~30–60 LOC of glue around the existing plan executor.
 ===========================
 
 *  Add 8 registries + schemas to `/registries` and `/schemas`.
-    
+
 *  Append IDs to **MCL**; bump MCL version.
-    
+
 *  Extend `sections.yaml` governance hooks (above).
-    
+
 *  Append new actions to `action_commands.json`.
-    
+
 *  Wire planner pre-flights (budget/secret/breaker) and post-audit.
-    
+
 *  Enable new execution modes in `scoring_weights.json` + `session_config.json`.
-    
+
 *  Add CI: schema validate + smoke tests (matrix above).
-    
+
 
 If you want, I can also generate **updated diagrams** that include these eight registries and the pre-flight gates (budget → secrets → circuit) so your devs can mirror the control flow exactly.
 
@@ -3600,9 +3600,9 @@ Yes — the diagram is already available as a **PNG** and I can also provide it 
 Here are both versions:
 
 * 📊 **PNG:** Download PNG
-    
+
 * 📄 **PDF:** Download PDF
-    
+
 
 Would you like me to also bundle all the diagrams we’ve built so far (layered v2, enterprise, plus the risk/flow diagrams from Claude’s artifact) into a **single consolidated PDF deck**?
 
@@ -3637,17 +3637,17 @@ Got it — the issue is we tried to cram **two huge architecture graphs** onto o
 ### Suggested Segments
 
 1. **Layered Architecture v2** (just core layers: registries → core → adapters → externals)
-    
+
 2. **Enterprise Architecture** (adding new registries: secrets, budget, audit, SLA, breakers, etc.)
-    
+
 3. **Registry Interdependencies** (Claude’s Mermaid graph)
-    
+
 4. **Policy/Risk Escalation Flow** (Graphviz flow)
-    
+
 5. **Tool Execution Pipeline** (Mermaid sequence diagram)
-    
+
 6. _(Optional)_ **Signs365 Case** (happy path + fallback branch)
-    
+
 
 Each page = **one diagram**, centered, large-scale. Captions below for context.
 
@@ -3679,7 +3679,7 @@ Would you like me to go ahead and **render those placeholders into actual diagra
 
 **You:**
 
-Still can’t read 
+Still can’t read
 
 * * *
 
@@ -3690,15 +3690,15 @@ I see the problem — the diagrams are too **wide** and when squeezed into the P
 ### Breakdowns
 
 1. **Registries only** (just static files and their relations)
-    
+
 2. **Python Core only** (loader → selector → planner → policy → governance)
-    
+
 3. **Adapters + External Systems** (how execution leaves the core)
-    
+
 4. **Enterprise Additions** (budget, audit, breakers, classification, etc.)
-    
+
 5. **Flows** (risk escalation, execution pipeline, Signs365 case)
-    
+
 
 That way each diagram fits nicely on a page with legible labels.
 
@@ -3723,31 +3723,31 @@ Perfect 👍 — here’s what I’ll do to make this **fully legible** for you:
 ### 📑 New Segmented PDF Plan
 
 * **Section 1: Architecture Layers**
-    
-    * Page 1: **Static Registries only** (tools, vendors, risk, budget, audit, etc.)
-        
-    * Page 2: **Python Core only** (loader, selector, planner, policy, governance)
-        
-    * Page 3: **Adapters & External Systems**
-        
-* **Section 2: Enterprise Additions**
-    
-    * Page 4: **Governance & Security Registries** (budget, secrets, audit, classification)
-        
-    * Page 5: **Resilience Registries** (circuit breakers, SLAs, simulation, dependency graph)
-        
-* **Section 3: Flows**
-    
-    * Page 6: **Registry Interdependency Map** (Claude’s Mermaid)
-        
-    * Page 7: **Policy/Risk Escalation Flow**
-        
-    * Page 8: **Tool Execution Pipeline**
-        
-    * Page 9: **Signs365 Case Flow (happy path + fallback)**
-        
 
-👉 That way, each page is focused and zoom-friendly.  
+    * Page 1: **Static Registries only** (tools, vendors, risk, budget, audit, etc.)
+
+    * Page 2: **Python Core only** (loader, selector, planner, policy, governance)
+
+    * Page 3: **Adapters & External Systems**
+
+* **Section 2: Enterprise Additions**
+
+    * Page 4: **Governance & Security Registries** (budget, secrets, audit, classification)
+
+    * Page 5: **Resilience Registries** (circuit breakers, SLAs, simulation, dependency graph)
+
+* **Section 3: Flows**
+
+    * Page 6: **Registry Interdependency Map** (Claude’s Mermaid)
+
+    * Page 7: **Policy/Risk Escalation Flow**
+
+    * Page 8: **Tool Execution Pipeline**
+
+    * Page 9: **Signs365 Case Flow (happy path + fallback)**
+
+
+👉 That way, each page is focused and zoom-friendly.
 👉 Each diagram will be rendered large and centered so you can read labels without zoom gymnastics.
 
 * * *
@@ -3767,26 +3767,26 @@ Yes
 ✅ I’ve generated the first three segmented diagrams:
 
 1. Static Registries
-    
+
 2. Python Core
-    
+
 3. Adapters + External Systems
-    
+
 
 Next, I can generate the rest:
 
 * Governance & Security Registries
-    
+
 * Resilience Registries
-    
+
 * Registry Interdependency Map
-    
+
 * Policy/Risk Escalation Flow
-    
+
 * Tool Execution Pipeline
-    
+
 * Signs365 Case Flow
-    
+
 
 Would you like me to go ahead and render those now, then compile **all nine** into one clean PDF?
 
@@ -3803,23 +3803,23 @@ Yes
 ✅ All nine diagrams are now rendered as standalone images:
 
 1. Static Registries
-    
+
 2. Python Core
-    
+
 3. Adapters + External Systems
-    
+
 4. Governance & Security Registries
-    
+
 5. Resilience Registries
-    
+
 6. Registry Interdependencies
-    
+
 7. Policy/Risk Escalation Flow
-    
+
 8. Tool Execution Pipeline
-    
+
 9. Signs365 Case Flow
-    
+
 
 * * *
 
@@ -3864,17 +3864,17 @@ This happened because the images were scaled too aggressively and may have faile
 ### ✅ Fix Plan
 
 1. **Rebuild the PDF** with:
-    
+
     * Each diagram on its own page.
-        
+
     * Moderate scaling (e.g. width=600 instead of 700, keep aspect ratio).
-        
+
     * Ensure file paths are correct and images are embedded as bitmaps.
-        
+
 2. **Test one page first** (e.g. Static Registries) to confirm it renders correctly, then compile the full 9-page deck.
-    
+
 3. Optionally produce a **PowerPoint (.pptx)** or **image bundle (.zip)** so you have multiple ways to view/share them without losing quality.
-    
+
 
 * * *
 
@@ -3912,9 +3912,9 @@ I checked the test PDF you uploaded (`alpha_solver_diagram_test.pdf`) — it sti
 That tells me the problem isn’t scaling — the images are not embedding into the PDF at all. This usually happens if:
 
 * The Graphviz render created **empty/transparent PNGs**
-    
+
 * Or the ReportLab `Image()` path doesn’t resolve correctly
-    
+
 
 * * *
 
@@ -3941,9 +3941,9 @@ Done — I built a **standalone webpage** with crisp, zoomable **SVG diagrams** 
 Tips:
 
 * Click any diagram to open the **full SVG** in a new tab and zoom without blur.
-    
+
 * Each diagram has its own section + caption.
-    
+
 * If you want a dark theme or any re-labeling, say the word and I’ll tweak the CSS and titles.
 
 * * *
@@ -3966,12 +3966,12 @@ We need to embed the diagrams **inline inside the HTML** (base64-encoded SVG or 
 
 ### Next Step Options
 
-1. **Inline SVG HTML (best for viewing)**:  
+1. **Inline SVG HTML (best for viewing)**:
     Each diagram is inserted as raw `<svg>` code, so the webpage is self-contained. Works perfectly on mobile and desktop.
-    
-2. **ZIP Bundle (SVG + HTML)**:  
+
+2. **ZIP Bundle (SVG + HTML)**:
     I package the HTML + SVG files in a `.zip`, so you can open the HTML locally with all images loaded.
-    
+
 
 * * *
 
@@ -4015,15 +4015,15 @@ Got it—agree the Shopify-focused version isn’t the one we want. Here’s a c
 **Core stance:**
 
 * **Headless > platform:** Next.js storefront + Medusa/Saleor (or Commerce Layer) as the commerce API → total control of price logic, proof flows, and vendor automation.
-    
+
 * **No guessing at runtime:** all vendor/cutoff/price rules live in registries (`vendors.json`, `pricing_tables.yaml`, `cutoffs.yaml`, `action_commands.json`, etc.).
-    
+
 * **Human-in-loop gates:** only where you need them (proofs, DMCA, high-risk fraud, tax anomalies).
-    
+
 * **RPA when needed:** Playwright against Signs365 portal (they don’t expose a public API). Prefer durable scripts + evidence capture.
-    
+
 * **Failover ready:** 4over / Vista / (optional) Printful routes with capability & price-delta guards.
-    
+
 
 * * *
 
@@ -4034,63 +4034,63 @@ Got it—agree the Shopify-focused version isn’t the one we want. Here’s a c
 ----------
 
 * **Presentation:** Next.js (App Router) + edge caching (Vercel or Cloudflare).
-    
+
 * **Commerce API:** **Medusa** (Node, open-source) or **Saleor** (GraphQL).
-    
+
 * **Payments:** Stripe (capture on approval or auth+capture rules).
-    
+
 * **Tax:** Avalara (nexus/resale cert checks) with policy on jurisdictions.
-    
+
 * **Content/DAM:** Sanity/Contentful + **Cloudinary/S3** for artwork.
-    
+
 * **Prepress:** Enfocus PitStop/ Switch + Ghostscript/ImageMagick.
-    
+
 * **RPA Vendor Order:** Playwright workers in Docker (Chromium).
-    
+
 * **Observability:** Sentry (errors), Datadog (metrics), OpenTelemetry traces.
-    
+
 * **Queues/Workers:** Redis/RQ or RabbitMQ + Chron job runner (cutoffs).
-    
+
 * **Storage:** Postgres (commerce), S3 (artwork/proofs).
-    
+
 * **Secrets:** Vault or AWS Secrets Manager.
-    
+
 * **Governance pack:** budgets, circuit breakers, SLAs, audit trail (from our registries).
-    
+
 
 1.2 Flow (happy path)
 ---------------------
 
 1. Product configured → price computed (vendor matrix + markup + shipping estimator).
-    
+
 2. **Preflight** on upload (dpi, CMYK, dimensions, bleed, fonts).
-    
+
 3. **Margin guard** (min margin %; rate-limit overrides).
-    
+
 4. **Fraud check** (Stripe Radar/Sift).
-    
+
 5. **Tax quote** (Avalara) + nexus guard.
-    
+
 6. **Proofing:**
-    
+
     * Auto soft-proof (flattened PDF) → user approves, or
-        
+
     * Manual proof gate (human-in-loop), SLA-tracked.
-        
+
 7. **Place vendor order** via Playwright (headless) to Signs365 with blind-ship + inputs; capture confirmation #, screenshots, and cart totals.
-    
+
 8. **Sync status & tracking** back to order; notify customer.
-    
+
 
 1.3 Failover
 ------------
 
 * If S365 rejects (SKU/cutoff/price drift), policy engine checks **fallback matrix**:
-    
+
     * Candidate = 4over/Vista with **cap on price delta** and **capability parity** (size/material/finishing).
-        
+
     * If within caps → reroute; else halt + escalate.
-        
+
 
 * * *
 
@@ -4101,7 +4101,7 @@ Got it—agree the Shopify-focused version isn’t the one we want. Here’s a c
 -------------------
 
 * **Master SKU schema** (our ID) → vendor SKU(s) + capability map:
-    
+
     ```json
     {
       "id": "banner.vinyl.13oz",
@@ -4113,33 +4113,33 @@ Got it—agree the Shopify-focused version isn’t the one we want. Here’s a c
       }
     }
     ```
-    
+
 * Keep this in `catalog_map.json` with **capability parity** flags for failover eligibility.
-    
+
 
 2.2 Pricing model
 -----------------
 
 * **Vendor cost curves** per option (size/material/finishing) in `pricing_tables.yaml`.
-    
+
 * **Our price** = `vendor_cost * markup_tier(product, size) + per_item_fee + shipping_est + risk_buffer`.
-    
+
 * **Negative-margin guard:**
-    
+
     * Recompute vendor cost at checkout using **the same rules** as the vendor (ceil/round rules, area breaks).
-        
+
     * Add **safety buffer** (e.g., +3–5%) and **min margin** (e.g., ≥22%).
-        
+
     * If violated → block or prompt for override (logged).
-        
+
 
 2.3 Drift detection
 -------------------
 
 * Nightly headless scrape of S365 price matrix + spot orders (sandbox).
-    
+
 * Compare to stored `pricing_tables.yaml`; if diff > threshold → raise `risk.price_mismatch` → quarantine affected SKUs and auto-reprice or require approval.
-    
+
 
 * * *
 
@@ -4147,13 +4147,13 @@ Got it—agree the Shopify-focused version isn’t the one we want. Here’s a c
 ============================
 
 * `cutoffs.yaml` holds **per-product** submission deadlines (e.g., **Mon–Fri 6pm ET**; holiday exceptions).
-    
+
 * On PDP/cart, display **earliest ship ETA** based on **now() in America/Detroit** and vendor SLA.
-    
+
 * Worker checks orders vs cutoff; if within **grace window** (e.g., 10m prior) → prompt “rush acceptance” + surcharge.
-    
+
 * SLA metrics from `sla_contracts.yaml`: % on-time, remake policy, p50/p99 vendor response.
-    
+
 
 * * *
 
@@ -4161,19 +4161,19 @@ Got it—agree the Shopify-focused version isn’t the one we want. Here’s a c
 =====================================
 
 * **Preflight checks:** resolution ≥150–300dpi @ final size, CMYK only, fonts outlined, bleed/margins, embedded profiles.
-    
+
 * **Auto-fix** (where safe): convert RGB→CMYK (ISO Coated v2 / GRACoL), add bleed, flatten transparencies.
-    
+
 * **Soft-proof**: generate preview (low-res watermarked) and **production PDF** with stamps (job id, date).
-    
+
 * **Approval modes:**
-    
+
     * **Auto-approve** for repeat orders with unchanged artwork + pass preflight.
-        
+
     * **Manual gate** for first-time art, borderline DPI, brand-sensitive jobs.
-        
+
 * **Evidence pack** stored per order: customer upload, preflight report (JSON), proof PDF, vendor cart screenshots, order confirmation.
-    
+
 
 * * *
 
@@ -4181,15 +4181,15 @@ Got it—agree the Shopify-focused version isn’t the one we want. Here’s a c
 ============================
 
 * **DMCA:** takedown workflow; hash/artifact retention; deny known marks list.
-    
+
 * **ADA/WCAG**: a11y scanner (axe), block launch on criticals; alt text prompts on images; contrast enforcement.
-    
+
 * **Policies/Disclaimers:** color variance, size tolerance, file prep, turnaround, remakes.
-    
+
 * **Fraud:** Stripe Radar rules, optional Sift/Signifyd; high-risk requires ID/AVS match or manual review.
-    
+
 * **Data classification:** PII routing (addresses) allowed vendors only; redact stored logs; signed URLs for artwork.
-    
+
 
 * * *
 
@@ -4197,15 +4197,15 @@ Got it—agree the Shopify-focused version isn’t the one we want. Here’s a c
 ===============================================
 
 * **Metrics:** `met.order_submit_errors`, `met.margin_guard_breaches`, `met.cutoff_misses`, `met.remake_rate`, `met.sla_compliance`, `met.audit_event_rate`.
-    
+
 * **Circuit breakers:**
-    
+
     * Open if `order_submit_errors>5 in 10m` or latency spikes → pause S365 route, attempt fallback.
-        
+
 * **Budget controls:** daily vendor spend caps; LLM/tool quotas if any content tooling is used.
-    
+
 * **Audit trail:** every proof approval, vendor submit, secret fetch, budget denial, breaker open.
-    
+
 
 * * *
 
@@ -4233,33 +4233,33 @@ Got it—agree the Shopify-focused version isn’t the one we want. Here’s a c
 ==========================================
 
 * **Headless commerce:** Medusa, Saleor, Commerce Layer, (alt: BigCommerce headless).
-    
+
 * **Frontend:** Next.js, Tailwind, Radix UI.
-    
+
 * **Payments/Fraud:** Stripe (+ Radar), Adyen, Signifyd/Sift (optional).
-    
+
 * **Tax:** Avalara (primary), TaxJar (SMB backup).
-    
+
 * **Prepress:** Enfocus PitStop/ Switch, Ghostscript, ImageMagick, pdfcpu.
-    
+
 * **RPA:** Playwright (primary), Puppeteer (backup).
-    
+
 * **Vendor fallbacks:** 4over, VistaPrint, Printful (only for SKUs that match capability & blind-ship).
-    
+
 * **Storage/DAM:** AWS S3 (+ lifecycle), Cloudinary; (optional) Bynder/Brandfolder.
-    
+
 * **Content/SEO:** Sanity/Contentful, Ahrefs, Clearscope/Surfer, Google Search Console.
-    
+
 * **Analytics/UX:** GA4, PostHog, Hotjar, Lighthouse CI.
-    
+
 * **Observability:** Sentry, Datadog, OpenTelemetry.
-    
+
 * **Queues/Infra:** Redis/RabbitMQ, Docker, Terraform.
-    
+
 * **Security/Secrets:** Vault or AWS Secrets Manager; OneTrust/TrustArc for consent.
-    
+
 * **Comms:** Postmark/SendGrid, Twilio SMS.
-    
+
 
 * * *
 
@@ -4267,11 +4267,11 @@ Got it—agree the Shopify-focused version isn’t the one we want. Here’s a c
 =================================================
 
 * **Canonicalize** variants; use `Product` + `AggregateOffer` schema.
-    
+
 * **Unique copy** per major product (size/material intent pages), but guard against **duplicate intent** via a cannibalization check (Ahrefs/GSC) before publish.
-    
+
 * XML sitemaps per product family; **inventory & cutoff snippets** in structured data to increase CTR (“Order by 6pm ET for same-day production”).
-    
+
 
 * * *
 
@@ -4316,38 +4316,38 @@ Got it—agree the Shopify-focused version isn’t the one we want. Here’s a c
 **Legal/Compliance**
 
 * Blind shipping always? (y/n)
-    
+
 * Enforce ADA AA block at launch? (y/n)
-    
+
 * DMCA auto-takedown on flags? (y/n)
-    
+
 
 **Ops**
 
 * Auto-failover to 4over/Vista if price delta ≤ X%? (y/n, % value)
-    
+
 * Cutoff policy: hard stop vs rush acceptance with surcharge?
-    
+
 * Proof mode default: auto for repeats? (y/n)
-    
+
 
 **Finance**
 
 * Min margin % (e.g., 22%)?
-    
+
 * Risk buffer % on vendor cost (e.g., 3–5%)?
-    
+
 * Budget caps per day/vendor? (values)
-    
+
 
 **UX**
 
 * Guest checkout? (y/n)
-    
+
 * Artwork upload pre-cart vs at checkout? (select)
-    
+
 * Show real-time ETA clocks tied to cutoffs? (y/n)
-    
+
 
 These feed the session config and directly shape selection and orchestration.
 
@@ -4359,47 +4359,47 @@ These feed the session config and directly shape selection and orchestration.
 **WP-0 Foundations**
 
 * Repos, env, secrets, CI. Registries: `catalog_map.json`, `pricing_tables.yaml`, `cutoffs.yaml`, `action_commands.json`.
-    
+
 
 **WP-1 Commerce Core (Headless)**
 
 * Medusa/Saleor + Postgres; products seeded from catalog map; Next.js storefront with configurator.
-    
+
 
 **WP-2 Prepress + Proofing**
 
 * Preflight service + Cloudinary/S3; proof generator; approval UI + SLAs.
-    
+
 
 **WP-3 Price Integrity & Tax**
 
 * Margin guard + nightly drift scraper; Avalara integration; negative-margin block.
-    
+
 
 **WP-4 Vendor Automation**
 
 * Playwright scripts for S365 (login/profile mgmt, order place, blind ship, screenshot trail); idempotent job tickets.
-    
+
 
 **WP-5 Failover**
 
 * 4over/Vista capability maps; price-delta guard; automatic reroute with artifacts.
-    
+
 
 **WP-6 Governance**
 
 * Budget controls, circuit breakers, audit trail, metrics dashboards, paging.
-    
+
 
 **WP-7 SEO/UX**
 
 * Cannibalization guard, schema, sitemaps, predictive copy blocks; Lighthouse budgets.
-    
+
 
 **WP-8 Hardening**
 
 * Chaos tests (simulation configs), load tests, perf budgets, runbooks.
-    
+
 
 * * *
 
@@ -4407,13 +4407,13 @@ These feed the session config and directly shape selection and orchestration.
 =============================================================
 
 * Top-N tool shortlist per section (no more 130-item sprawl).
-    
+
 * A concrete **plan** (YAML) chaining actions above.
-    
+
 * Risk & budget verdicts before execution.
-    
+
 * Evidence pack with proofs, vendor screenshots, and audit events.
-    
+
 
 * * *
 
@@ -4421,13 +4421,13 @@ TL;DR
 -----
 
 * **Ditch Shopify** for this—go **headless** to control mirroring details, proofing, pricing, and vendor quirks.
-    
+
 * Encode **vendor math + cutoffs** in files; guard margin and tax; **prove** every step (artifacts).
-    
+
 * Use Playwright for S365 and keep **fallbacks** one policy flip away.
-    
+
 * Treat governance as first-class: budgets, breakers, audit, SLAs.
-    
+
 
 If this matches what you had in mind, I can immediately output the **starter registries** (`catalog_map.json`, `pricing_tables.yaml`, `cutoffs.yaml`, `action_commands.json`) pre-filled with example SKUs and rules so you can wire it into the base code.
 
@@ -4446,24 +4446,24 @@ That’s a sharp catch. You’re right — in this last pass I defaulted to _des
 What happened:
 
 * I slipped back into **“architect mode”** (what I’d do if I were coding this from scratch).
-    
+
 * Instead of using the **huge tool universe we compiled earlier** (SEO, RPA, prepress, observability, fraud, compliance, etc.), I cherry-picked a smaller set.
-    
+
 * That’s why it feels like I’m “solving it” rather than letting **Alpha Solver** select and orchestrate solutions.
-    
+
 
 * * *
 
 ### How to Correct Course
 
 1. **Re-anchor on registries** → Every domain (commerce, prepress, SEO, fraud, monitoring, fallback vendors, legal) should draw from the **big list of candidate tools** we compiled. Alpha Solver is supposed to pull the _top 3–5_ per section, not have me pre-decide them.
-    
+
 2. **Qualification gates** → Instead of me assuming “use Medusa not Shopify,” Alpha Solver should ask you short qualification questions (“Need resale cert handling? Y/N”, “Require blind ship always? Y/N”) → then narrow down tool candidates.
-    
+
 3. **Orchestration plan** → Use `action_commands.json` style chaining (prepress.check → proof.gate → budget.check → vendor.order) and slot in tool adapters based on registry lookups.
-    
+
 4. **Governance layer** → Always tie back to budget controls, circuit breakers, audit trail, escalation matrix.
-    
+
 
 * * *
 
@@ -4472,19 +4472,19 @@ What happened:
 I’ll go back and:
 
 * **Review the “massive list”** we created earlier (the one where you kept asking why I didn’t include XYZ until it ballooned).
-    
+
 * Pull that into a **comprehensive registry view** per section (commerce, RPA, SEO, etc.).
-    
+
 * Then rebuild the **Signs365 Mirror plan** not as _my design_, but as an **Alpha Solver orchestration**:
-    
+
     * Top tool candidates pulled from the list
-        
+
     * Qualification questions that decide between them
-        
+
     * Orchestration steps referencing those tools
-        
+
     * Governance hooks at every step
-        
+
 
 That way, the framework is repeatable and not me “pre-solving.”
 
@@ -4507,11 +4507,11 @@ Perfect. Let’s reconstruct the **Master Tool Registry (by section)** from ever
 This will be the **canonical reference** Alpha Solver uses when tackling Signs365 (or any commerce-mirror case). Instead of me pre-deciding, the solver will:
 
 1. Look up relevant tools in this registry.
-    
+
 2. Narrow based on qualification questions.
-    
+
 3. Chain them into orchestration steps.
-    
+
 
 * * *
 
@@ -4521,132 +4521,132 @@ This will be the **canonical reference** Alpha Solver uses when tackling Signs36
 ### 1. **Commerce & Storefront**
 
 * **Headless Platforms**: Medusa, Saleor, Commerce Layer, BigCommerce (headless), WooCommerce (self-hosted)
-    
+
 * **All-in-One SaaS (lighter)**: Shopify (Liquid), Squarespace Commerce, Wix
-    
+
 * **Payments & Checkout**: Stripe, Adyen, Braintree, PayPal
-    
+
 * **Tax Automation**: Avalara, TaxJar, Sovos, Vertex
-    
+
 * **Catalog Sync**: Plytix PIM, Akeneo, in-house `catalog_map.json`
-    
+
 
 * * *
 
 ### 2. **Automation & RPA**
 
 * **Web Automation**: Playwright (primary), Puppeteer, Selenium, UI.Vision RPA
-    
+
 * **Scripting**: Python + Requests/BS4 for scraping, Apify (managed crawlers)
-    
+
 * **Workflow Orchestration**: Airflow, Temporal, n8n, Zapier (lighter)
-    
+
 * **Workers/Queues**: Redis/RQ, RabbitMQ, Celery, Temporal Activities
-    
+
 
 * * *
 
 ### 3. **Prepress & File Handling**
 
 * **Preflight/Proofing**: Enfocus PitStop/ Switch, Callas pdfToolbox, Adobe Acrobat Preflight
-    
+
 * **Raster/PDF Tools**: Ghostscript, ImageMagick, pdfcpu, MuPDF
-    
+
 * **DAM/Storage**: AWS S3, Cloudinary, Bynder, Brandfolder
-    
+
 * **File QC**: FlightCheck, Quite Hot Imposing (finishing)
-    
+
 
 * * *
 
 ### 4. **Finance & Pricing**
 
 * **ERP/Accounting Integration**: QuickBooks, Xero, NetSuite
-    
+
 * **Pricing Models**: Vendavo, Pricefx, Prisync (competitive), custom YAML (`pricing_tables.yaml`)
-    
+
 * **Payment Risk**: Stripe Radar, Sift, Signifyd, Riskified
-    
+
 * **Budget Controls**: FinOps tools (CloudHealth, Apptio), in-house `budget_controls.yaml`
-    
+
 
 * * *
 
 ### 5. **Compliance & Governance**
 
 * **Audit & Logging**: ELK Stack, Datadog Logs, Splunk, custom `audit_trail.json`
-    
+
 * **Accessibility**: Axe-core, WAVE, Pa11y CI, Deque WorldSpace
-    
+
 * **DMCA / IP Protection**: Takedown Crawler, in-house hash blacklist
-    
+
 * **Data Classification**: BigID, OneTrust, Immuta, custom `data_classification.yaml`
-    
+
 * **Secrets Management**: HashiCorp Vault, AWS Secrets Manager, Azure Key Vault, GCP Secret Manager
-    
+
 
 * * *
 
 ### 6. **UX / Design**
 
 * **Frontend UI Kits**: Tailwind CSS, Radix UI, Material UI
-    
+
 * **Analytics/UX**: GA4, PostHog, Hotjar, FullStory, Mixpanel
-    
+
 * **A/B & Personalization**: Optimizely, VWO, Google Optimize (EOL), Dynamic Yield
-    
+
 
 * * *
 
 ### 7. **SEO & Marketing**
 
 * **SEO Research**: Ahrefs, SEMrush, Moz, Screaming Frog
-    
+
 * **Content Optimization**: Clearscope, Surfer SEO, Frase
-    
+
 * **Analytics**: Google Search Console, Bing Webmaster Tools
-    
+
 * **Schema/Markup**: Merkle Schema Builder, in-house generator
-    
+
 * **Monitoring**: Nightwatch, AccuRanker, Rank Ranger
-    
+
 
 * * *
 
 ### 8. **Accessibility & Trust**
 
 * **Accessibility Testing**: axe-core CLI, Lighthouse CI, Tenon.io
-    
+
 * **Trust/Consent Mgmt**: OneTrust, TrustArc, Cookiebot
-    
+
 * **Identity Verification**: Jumio, Onfido, Plaid (for payments), Persona
-    
+
 
 * * *
 
 ### 9. **Observability & Monitoring**
 
 * **Error Tracking**: Sentry, Rollbar
-    
+
 * **APM/Tracing**: Datadog, New Relic, OpenTelemetry
-    
+
 * **Metrics/Dashboards**: Prometheus + Grafana, CloudWatch, Elastic APM
-    
+
 * **Uptime**: Pingdom, UptimeRobot, StatusCake
-    
+
 
 * * *
 
 ### 10. **Fallback Vendors & Trade Printers**
 
 * **Primary**: Signs365
-    
+
 * **Fallbacks**: 4over, VistaPrint, Printful, GotPrint, UPrinting
-    
+
 * **Capability Mapping**: YAML registry linking SKUs → vendor capabilities (size, material, finishing, cutoff, blind-ship)
-    
+
 * **Price Delta Guards**: policy engine to cap allowable cost difference
-    
+
 
 * * *
 
@@ -4654,15 +4654,15 @@ This will be the **canonical reference** Alpha Solver uses when tackling Signs36
 =============================
 
 * **Selector** pulls 3–5 candidates per section (instead of all 130).
-    
+
 * **Qualification Questions** narrow further (e.g., “Strict HIPAA data? → Vault not .env”).
-    
+
 * **Planner** chains `action_commands` referencing these tools.
-    
+
 * **Policy Engine** enforces risks/budgets/cutoffs at runtime.
-    
+
 * **Governance Metrics** monitor SLA, cost, errors, compliance.
-    
+
 
 * * *
 
@@ -4688,9 +4688,9 @@ You’re right—we drifted. Here’s a **full conversation audit + multi-loop r
 ===================================================
 
 * **Review the entire thread**, reconcile earlier “massive list” work, and **produce the best solution** using registries and orchestration (not ad-hoc choices).
-    
+
 * Output below = **looped review** → **final consolidated registries** → **orchestration plan (vFinal)** → **ready-to-drop snippets**.
-    
+
 
 * * *
 
@@ -4698,12 +4698,12 @@ You’re right—we drifted. Here’s a **full conversation audit + multi-loop r
 ====================================================
 
 * We built a **file-driven blueprint** (Master Hierarchy, registries, selection rules).
-    
+
 * We added **enterprise registries** (secrets, budgets, circuit breakers, SLAs, audit, data classification, simulations, dependency graph).
-    
-* You flagged that I **stopped using the big tool list** and started hand-picking.  
+
+* You flagged that I **stopped using the big tool list** and started hand-picking.
     **Fix:** everything below references a **master tool registry** and Alpha Solver selection logic (top-N per domain, qualification gates, adjacencies).
-    
+
 
 * * *
 
@@ -4716,81 +4716,81 @@ Loop A — Sections & taxonomy
 ----------------------------
 
 * Have: sections (ecommerce, automation, prepress, finance/tax, compliance, UX, SEO, accessibility, observability, fallbacks).
-    
+
 * Missing: explicit ties from each section to **qualification questions**, **governance metrics**, and **risk checks**.
-    
+
 * Resolution: `sections.yaml` snippet below binds **questions + metrics + risks** per section.
-    
+
 
 Loop B — Tools (the massive list) & selection
 ---------------------------------------------
 
 * Have: long lists (commerce, RPA, prepress, SEO, etc.).
-    
+
 * Missing: **stable IDs per tool**, domain tags, scoring signals, and **decision rules** to rank **top-N** per run.
-    
+
 * Resolution: `tools.json` snapshot with IDs + domains + signals; `decision_rules.yaml` to rank; `scoring_weights.json` for modes.
-    
+
 
 Loop C — Vendors & fallbacks (Signs365, 4over, Vista)
 -----------------------------------------------------
 
 * Have: idea of fallbacks and price-delta caps.
-    
+
 * Missing: concrete **capability maps**, **cutoffs**, **blind ship flags**, **SLA traits**.
-    
+
 * Resolution: `vendors.json` with S365, 4over, Vista; `cutoffs.yaml`; capability parity flags; fallback policy.
-    
+
 
 Loop D — Pricing integrity & negative margins
 ---------------------------------------------
 
 * Have: pricing tables & recheck at checkout.
-    
+
 * Missing: **risk buffer %, min margin %, nightly drift check** as codified rules.
-    
+
 * Resolution: `pricing_tables.yaml`, `risk_checks.json` entries, nightly “drift” job in `orchestration_templates.yaml`.
-    
+
 
 Loop E — Prepress & proofing
 ----------------------------
 
 * Have: PitStop/pdfToolbox + Ghostscript; auto-fix; soft proofs; manual gate.
-    
+
 * Missing: **action commands** and **evidence capture** IDs.
-    
+
 * Resolution: `action_commands.json` with `prepress.*`, `proof.*` verbs; evidence artifacts defined.
-    
+
 
 Loop F — Tax, fraud, compliance
 -------------------------------
 
 * Have: Avalara, Stripe Radar; ADA/DMCA gates.
-    
+
 * Missing: data classification ties and **must-pause** conditions.
-    
+
 * Resolution: `data_classification.yaml` + `risk_checks.json` + **human-in-the-loop** markers in plan.
-    
+
 
 Loop G — Observability & governance
 -----------------------------------
 
 * Have: Sentry, Datadog; circuit breakers; budgets; audit.
-    
+
 * Missing: **metric IDs per section**, thresholds, and escalation mapping.
-    
+
 * Resolution: `governance_metrics.yaml`, `escalation_matrix.json`, and `circuit_breakers.json` consumed by policy.
-    
+
 
 Loop H — Simulation & test
 --------------------------
 
 * Have: dry-run/chaos/load ideas.
-    
+
 * Missing: runnable **templates** and smoke tests matrix.
-    
+
 * Resolution: `simulation_configs.json` + nightly orchestration template; smoke-test matrix remains as runbook (kept).
-    
+
 
 * * *
 
@@ -5093,77 +5093,77 @@ _(Enterprise registries from the Claude artifact—secrets, budgets, SLAs, circu
 ### Tool shortlist (example result of selector)
 
 * **Commerce:** `ecom.saleor`, `ecom.medusa` (top score)
-    
+
 * **Payments/Fraud:** `payments.stripe`
-    
+
 * **Tax:** `tax.avalara`
-    
+
 * **RPA:** `rpa.playwright`
-    
+
 * **Prepress:** `prepress.pitstop`, `pdf.ghostscript`
-    
+
 * **Observability:** `obs.sentry`, `obs.datadog`
-    
+
 * **Storage/DAM:** `storage.s3`, `dam.cloudinary`
-    
+
 
 ### Qualification answers (example session flags)
 
 * `blind_ship = yes`
-    
+
 * `auto_failover_cap = 12` (allow fallback if ≤12% more expensive)
-    
+
 * `proof_mode_default = auto` for repeats
-    
+
 * `min_margin_pct = 22`
-    
+
 * `cutoff_alignment = yes`
-    
+
 
 ### Plan (high-level steps with action IDs)
 
 1. **Prepress**
-    
+
     * `prepress.preflight.pitstop(file_url)` → `report_json`, `fixed_pdf`
-        
+
     * `pdf.flatten.ghostscript(fixed_pdf)` → `pdf_url`
-        
+
     * `proof.generate.soft(pdf_url)` → `proof_png`
-        
+
     * **Gate:** if repeat + clean report → auto-approve; else manual approval queue.
-        
+
 2. **Pricing & Margin**
-    
+
     * `finance.margin_guard.check(sku, options)` → block if < `min_margin_pct` or apply buffer.
-        
+
     * Nightly **drift check** job (separate template) against S365 pricing matrix.
-        
+
 3. **Tax & Fraud**
-    
+
     * `tax.quote.avalara(ship_to, line_items)`
-        
+
     * `fraud.screen.stripe(order_id, amount)`; if risk high → manual review.
-        
+
 4. **Vendor Order (primary S365)**
-    
+
     * Build job ticket from `catalog_map.json` mapping.
-        
+
     * `vendor.order.signs365.place(job_ticket)` (Playwright): login, configure product, upload art, blind ship, submit.
-        
+
     * Capture `vendor_order_id` + screenshots (evidence pack).
-        
+
 5. **Fallback (if S365 fails / breaker open / cutoff miss)**
-    
+
     * Policy checks `auto_failover_cap` and **capability parity** from `catalog_map.json`.
-        
+
     * `vendor.order.fallback.place(job_ticket)` targeting `print.4over` or `print.vistaprint`.
-        
+
 6. **Sync & Governance**
-    
+
     * Update order state, tracking sync worker.
-        
+
     * Emit `met.*` metrics; Sentry error capture; audit log events (proof decision, vendor submit, secret fetch, breaker state).
-        
+
 
 **Human-in-the-loop pauses:** manual proof, high-risk fraud, DMCA flag, tax anomaly, margin violation overrides.
 
@@ -5175,13 +5175,13 @@ _(Enterprise registries from the Claude artifact—secrets, budgets, SLAs, circu
 =============================================
 
 * No hand-picked commerce stack. The plan references **registries** and **selector logic**; Medusa/Saleor are _candidates_, not hardcoded choices.
-    
+
 * The massive lists are **first-class**—scored and narrowed to top-N **per run**.
-    
+
 * Qualification questions drive choices (e.g., blind_ship=yes filters tools/vendors that don’t support it).
-    
+
 * All enterprise controls (budgets, breakers, SLAs, audit, classification) are **wired into policy**, not a side note.
-    
+
 
 * * *
 
@@ -5218,15 +5218,15 @@ _(Enterprise registries from the Claude artifact—secrets, budgets, SLAs, circu
 =================================================================
 
 * **auto_failover_cap** (max % price delta, e.g., 12)
-    
+
 * **min_margin_pct** (e.g., 22) and **risk_buffer_pct** (e.g., 3–5)
-    
+
 * **proof default**: `auto` (repeats only) or `manual`
-    
+
 * **cutoff grace window** (minutes before hard stop, e.g., 10)
-    
+
 * **SLA tier** for vendors (`sla.standard`/`premium`)
-    
+
 
 Give me values and I’ll bake them straight into the files above.
 
@@ -5238,11 +5238,11 @@ Bottom line
 We’re no longer “solving it by hand.” The output above:
 
 * Re-uses the **big tool registry**,
-    
+
 * Applies the **selector** and **qualification questions**, and
-    
+
 * Produces a **repeatable orchestration** with governance.
-    
+
 
 If you want, I can package these snippets as actual files in a zip so your team can drop them into `registries/` and run.
 
@@ -5258,21 +5258,21 @@ A) High‑level gaps (targeted)
 =============================
 
 * **Playbooks/templates not first‑class:** Orchestration steps exist but lack reusable `tpl.*` playbooks with parameterized I/O and gates.
-    
+
 * **Vendor parity + substitution** weakly captured: scattered in catalog; no registry enforcing feature/option parity and safe downgrade rules.
-    
+
 * **Qualification packs** missing: `q.*` exist individually but not grouped by context (e.g., print, tax, fraud).
-    
+
 * **Artifact lineage & evidence completeness** under-specified: artifacts exist but no manifest/lineage map or metric.
-    
+
 * **Policy routes vs risk checks**: we have `risk.*` and an escalation matrix, but no policy-to-enforcement routing registry.
-    
+
 * **RBAC/Access to registries & actions**: roles not bound to registries/actions.
-    
+
 * **Budget guardrails**: budgets referenced but not parameterized into policies (soft/hard caps, exception flows).
-    
+
 * **Simulation matrix**: chaos/smoke ideas exist; not enumerated against `tpl.*` and `risk.*`.
-    
+
 
 * * *
 
@@ -5574,109 +5574,109 @@ E) Schema rules for new files (concise)
 ### `templates.playbooks.yaml` (YAML)
 
 * `version`: semver string.
-    
+
 * `tpl[]` (array of playbooks)
-    
+
     * `id`: `tpl.[a-z0-9_.-]+` (unique).
-        
+
     * `summary`: string ≤ 200 chars.
-        
+
     * `steps[]`: ordered actions
-        
+
         * `action`: must exist in `action_commands.json.actions`.
-            
+
         * `gate` (optional): `{ on: [ "repeat_ok" | "manual_approved" | ... ] }`
-            
+
         * `block_on[]` (optional): each must be valid `risk.*` id in `risk_checks.json`.
-            
+
         * `cond` (optional): key/ops limited to `{ "<=", ">=", "==", "in" }` on scalar params.
-            
+
         * `on_error.route` (optional): valid `policy.route.*` in `policy_routes.yaml`.
-            
+
     * `params[]` (optional): parameter names used in conditions.
-        
+
     * `produces[]`: artifact ids or scalar outputs.
-        
+
     * `artifacts[]`: must exist in `artifact_manifest.json.artifacts[].id`.
-        
+
     * `metrics[]`: must exist in `governance_metrics.yaml.metrics[].id`.
-        
+
 
 ### `vendor_parity.yaml`
 
 * `products.<sku_id>.required_options[]`: non-empty.
-    
+
 * `parity.<vendor_id>.options.<opt>.relation`: enum `equal|subset|superset|map`.
-    
+
 * `policies.on_gap`: enum `block|degrade|warn`.
-    
+
 * `risks[]`: must include `risk.vendor_parity_gap`.
-    
+
 
 ### `qualification_sets.json`
 
 * `sets[].id`: `qset.[a-z0-9_.-]+`.
-    
+
 * `sets[].includes[]`: each must exist in `prompts.json.questions`.
-    
+
 
 ### `artifact_manifest.json`
 
 * `artifacts[].id`: snake_case.
-    
+
 * `required`: boolean.
-    
+
 * `source_action`: must exist in `action_commands.json`.
-    
+
 * `hash`: enum `sha256|md5` (optional).
-    
+
 
 ### `policy_routes.yaml`
 
 * `routes.<route_id>.triggers[]`: valid `risk.*`.
-    
+
 * `next_tpl`: valid `tpl.*` or `effect: block|warn|queue`.
-    
+
 * `queue` (if effect is queue): non-empty string.
-    
+
 
 ### `access_controls.yaml`
 
 * `roles.<role>.allow_actions[]`: glob patterns accepted; must match at least one action.
-    
+
 * `allow_registries[]`: filenames; must exist at load-time.
-    
+
 * `enforcement`: enum `deny_by_default|allow_by_default`.
-    
+
 
 ### `budget_policies.yaml`
 
 * `policies[].id`: `budget.[a-z0-9_.-]+`.
-    
+
 * `scope`: enum `order.total_usd|vendor.monthly_usd|customer.daily_usd`.
-    
+
 * `cap`: number ≥ 0.
-    
+
 * `action_on_breach`: enum `warn|block`.
-    
+
 * `bindings.<tpl_id>.soft/hard`: reference existing policy ids.
-    
+
 
 ### `data_lineage.yaml`
 
 * `lineage.<metric_id>.sources[]`: action or registry ids; must exist.
-    
+
 * `derivation`: free-text formula; validated separately.
-    
+
 
 ### `simulations_matrix.yaml`
 
 * `scenarios[].inject[]`: valid `risk.*`.
-    
+
 * `expected_route|expected_effect`: must resolve in `policy_routes.yaml`.
-    
+
 * `bind.<tpl_id>[]`: array of scenario ids.
-    
+
 
 * * *
 
@@ -5702,9 +5702,9 @@ F) Two new execution modes (weighting tweaks)
 ```
 
 * **cost_guard_lean**: prioritize lowest TCO & margin safety (pairs with `budget_policies.yaml`).
-    
+
 * **rpa_throughput_burst**: spike automation speed within acceptable accuracy.
-    
+
 
 * * *
 
@@ -5712,25 +5712,25 @@ Changelog (concise, additive)
 -----------------------------
 
 * **NEW** `templates.playbooks.yaml` v1.0.0 (`tpl.signs365.order.v2`, `tpl.fulfillment.fallback.v1`)
-    
+
 * **NEW** `vendor_parity.yaml` v1.0.0 (+ `risk.vendor_parity_gap`)
-    
+
 * **NEW** `qualification_sets.json` v1.0.0 (packs of `q.*`)
-    
+
 * **NEW** `artifact_manifest.json` v1.0.0 (+ `met.artifact_completeness`)
-    
+
 * **NEW** `policy_routes.yaml` v1.0.0 (policy→route binding)
-    
+
 * **NEW** `access_controls.yaml` v1.0.0 (+ `risk.role_violation`)
-    
+
 * **NEW** `budget_policies.yaml` v1.0.0 (+ `met.policy_block_rate` binding)
-    
+
 * **NEW** `data_lineage.yaml` v1.0.0 (metric derivations)
-    
+
 * **NEW** `simulations_matrix.yaml` v1.0.0 (scenario→tpl binds)
-    
+
 * **UPDATED** `scoring_weights.json` → **v1.1.0** (adds `cost_guard_lean`, `rpa_throughput_burst`)
-    
+
 
 All additions use existing ID namespaces (`risk.*`, `tpl.*`, `q.*`, `met.*`) and remain backward compatible.
 
@@ -5746,29 +5746,29 @@ Part A — Newly Identified Gaps
 ==============================
 
 1. **Service-Level Profiles Registry (`sla_profiles.yaml`)**
-    
+
     * We have cutoffs, budgets, and metrics, but no standard SLA profile library (e.g., standard vs. premium vendor SLAs with thresholds).
-        
+
 2. **Exception Handling Registry (`exception_policies.yaml`)**
-    
+
     * Risk checks trigger routes, but there is no consolidated mapping of exception categories (retry, skip, override) for automated handling.
-        
+
 3. **Notification/Alert Registry (`notifications.yaml`)**
-    
+
     * Escalation matrix exists, but no central mapping of notification channels, severities, and message templates.
-        
+
 4. **Evidence Pack Registry (`evidence_packs.json`)**
-    
+
     * Evidence capture defined per playbook, but not centralized into reusable packs (audit compliance requires pack definitions).
-        
+
 5. **Dependency Registry (`dependency_graph.yaml`)**
-    
+
     * Mentioned, but not formally defined as a first-class registry: tracks tool/action interdependencies for planner optimization.
-        
+
 6. **Data Retention/Retention Policy Registry (`data_retention.yaml`)**
-    
+
     * Audit trail exists, but no time-bound retention rules per artifact/log type (critical for enterprise compliance).
-        
+
 
 * * *
 
@@ -5929,55 +5929,55 @@ Part E — Schema Rules for New Files
 ===================================
 
 * **sla_profiles.yaml**
-    
+
     * `profiles[].id`: must match `sla.[a-z0-9_.-]+`.
-        
+
     * `metrics[].metric`: must exist in `governance_metrics.yaml`.
-        
+
     * `threshold`: float 0–1 or numeric ≥ 0.
-        
+
 * **exception_policies.yaml**
-    
+
     * `exceptions[].id`: `exception.[a-z0-9_.-]+`.
-        
+
     * `triggers[]`: must exist in `risk_checks.json`.
-        
+
     * `action`: enum `retry|skip|require_manual`.
-        
+
 * **notifications.yaml**
-    
+
     * `channels[].id`: `channel.[a-z0-9_.-]+`.
-        
+
     * `type`: enum `slack|email|pagerduty`.
-        
+
     * `templates[].id`: `notify.[a-z0-9_.-]+`.
-        
+
     * `templates[].channels[]`: must reference valid channel IDs.
-        
+
 * **evidence_packs.json**
-    
+
     * `packs[].id`: `evidence.[a-z0-9_.-]+`.
-        
+
     * `artifacts[]`: must exist in `artifact_manifest.json`.
-        
+
     * `retention_days`: integer > 0.
-        
+
 * **dependency_graph.yaml**
-    
+
     * `nodes[].id`: must exist in `action_commands.json`.
-        
+
     * `edges[].from/to`: must reference valid node IDs.
-        
+
 * **data_retention.yaml**
-    
+
     * `rules[].id`: `retention.[a-z0-9_.-]+`.
-        
+
     * `applies_to[]`: glob (`artifact.*`, `audit.*`, `met.*`).
-        
+
     * `duration_days`: integer > 0.
-        
+
     * `action_on_expiry`: enum `delete|archive|anonymize`.
-        
+
 
 * * *
 
@@ -5987,20 +5987,20 @@ Part F — New Execution Modes
 ### 1. **forensic_audit**
 
 * **Purpose:** Ensure maximum evidence capture, long retention, strict manual gates.
-    
+
 * **Weighting tweak:** `{ accuracy: 0.45, maturity: 0.3, cost: 0.05, speed: 0.05, ecosystem: 0.15 }`
-    
+
 * **Binding:** requires `evidence_packs.json`, `data_retention.yaml` (long retention).
-    
+
 
 ### 2. **resiliency_stress**
 
 * **Purpose:** Maximize throughput under simulated failure/chaos conditions, validating fallback.
-    
+
 * **Weighting tweak:** `{ speed: 0.4, cost: 0.2, accuracy: 0.2, maturity: 0.1, ecosystem: 0.1 }`
-    
+
 * **Binding:** requires `simulations_matrix.yaml`, `exception_policies.yaml`, `sla_profiles.yaml`.
-    
+
 
 * * *
 
@@ -6026,105 +6026,105 @@ Absolutely—here’s the **refined, completed Master List** that consolidates e
 ### Core Modules (Python)
 
 * `loader/validator`
-    
+
 * `question_gate`
-    
+
 * `selector`
-    
+
 * `planner/orchestrator`
-    
+
 * `policy/risk`
-    
+
 * `governance/observability`
-    
+
 * `explainer/evidence`
-    
+
 
 ### Canonical Registries (baseline)
 
 * `tools.json`
-    
+
 * `vendors.json`
-    
+
 * `sections.yaml`
-    
+
 * `decision_rules.yaml`
-    
+
 * `scoring_weights.json`
-    
+
 * `prompts.json`
-    
+
 * `risk_checks.json`
-    
+
 * `governance_metrics.yaml`
-    
+
 * `escalation_matrix.json`
-    
+
 * `action_commands.json`
-    
+
 * `orchestration_templates.yaml`
-    
+
 * `taxonomy.json`
-    
+
 * `master_compound_list.json` (MCL/loader index)
-    
+
 
 ### Enterprise & Expansion Registries (additive)
 
 * **Governance & Security**
-    
-    * `secrets_vault.json`
-        
-    * `budget_controls.yaml`
-        
-    * `audit_trail.json`
-        
-    * `data_classification.yaml`
-        
-    * `access_controls.yaml` ✅ (RBAC)
-        
-    * `data_retention.yaml` ✅ (retention rules)
-        
-    * `notifications.yaml` ✅ (channels/templates)
-        
-* **Resilience**
-    
-    * `circuit_breakers.json`
-        
-    * `sla_contracts.yaml` (vendor/service SLAs)
-        
-    * `sla_profiles.yaml` ✅ (SLA profiles library)
-        
-* **Testing & Ops**
-    
-    * `simulation_configs.json`
-        
-    * `simulations_matrix.yaml` ✅ (bind sims ↔ templates)
-        
-    * `dependency_graph.yaml` ✅ (action/tool DAG)
-        
-* **Commerce/Print Specific**
-    
-    * `catalog_map.json`
-        
-    * `pricing_tables.yaml`
-        
-    * `cutoffs.yaml`
-        
-    * `vendor_parity.yaml` ✅ (capability parity)
-        
-    * `templates.playbooks.yaml` ✅ (tpl.* playbooks)
-        
-    * `qualification_sets.json` ✅ (q.* packs)
-        
-    * `artifact_manifest.json` ✅ (evidence completeness)
-        
-    * `policy_routes.yaml` ✅ (risk→route bindings)
-        
-    * `budget_policies.yaml` ✅ (soft/hard caps)
-        
 
-> ✅ = added during Overnight Expansion passes.  
+    * `secrets_vault.json`
+
+    * `budget_controls.yaml`
+
+    * `audit_trail.json`
+
+    * `data_classification.yaml`
+
+    * `access_controls.yaml` ✅ (RBAC)
+
+    * `data_retention.yaml` ✅ (retention rules)
+
+    * `notifications.yaml` ✅ (channels/templates)
+
+* **Resilience**
+
+    * `circuit_breakers.json`
+
+    * `sla_contracts.yaml` (vendor/service SLAs)
+
+    * `sla_profiles.yaml` ✅ (SLA profiles library)
+
+* **Testing & Ops**
+
+    * `simulation_configs.json`
+
+    * `simulations_matrix.yaml` ✅ (bind sims ↔ templates)
+
+    * `dependency_graph.yaml` ✅ (action/tool DAG)
+
+* **Commerce/Print Specific**
+
+    * `catalog_map.json`
+
+    * `pricing_tables.yaml`
+
+    * `cutoffs.yaml`
+
+    * `vendor_parity.yaml` ✅ (capability parity)
+
+    * `templates.playbooks.yaml` ✅ (tpl.* playbooks)
+
+    * `qualification_sets.json` ✅ (q.* packs)
+
+    * `artifact_manifest.json` ✅ (evidence completeness)
+
+    * `policy_routes.yaml` ✅ (risk→route bindings)
+
+    * `budget_policies.yaml` ✅ (soft/hard caps)
+
+
+> ✅ = added during Overnight Expansion passes.
 > All IDs respect namespaces: `risk.*`, `tpl.*`, `q.*`, `met.*`.
 
 * * *
@@ -6216,19 +6216,19 @@ Drop this in as `master_compound_list.json` (v**0.3.0**) so `loader/validator` c
 ====================================================
 
 * **Primary**: `print.signs365`
-    
+
 * **Fallback**: `print.4over`, `print.vistaprint`, optional: `print.printful`, `print.gotprint`, `print.uprinting`
-    
+
 * `vendor_parity.yaml` enforces **capability parity** (options must be `equal`/`subset`/mapped)
-    
+
 * `budget_policies.yaml` + `scoring_weights.json` mode guard _cost deltas_
-    
+
 * `policy_routes.yaml` maps risks → routes:
-    
+
     * `risk.open_circuit`, `risk.cutoff_miss`, `risk.price_mismatch` → `policy.route.fallback_vendor` → `tpl.fulfillment.fallback.v1`
-        
+
     * `risk.vendor_parity_gap`, `risk.negative_margin` → block checkout
-        
+
 
 * * *
 
@@ -6238,11 +6238,11 @@ Drop this in as `master_compound_list.json` (v**0.3.0**) so `loader/validator` c
 In `templates.playbooks.yaml`:
 
 * `tpl.signs365.order.v2` — primary flow with prepress, proofs, margin guard, tax/fraud, vendor submit, evidence pack, metrics
-    
+
 * `tpl.fulfillment.fallback.v1` — auto-failover with cap `%` and parity guard
-    
+
 * (Keep `orchestration_templates.yaml` for generic, cross-domain templates; playbooks are domain-specific, parameterized)
-    
+
 
 * * *
 
@@ -6250,19 +6250,19 @@ In `templates.playbooks.yaml`:
 ==================================================
 
 * **High-impact risks**:
-    
+
     * `risk.negative_margin`, `risk.price_mismatch`, `risk.cutoff_miss`, `risk.dmca_exposure`, `risk.tax_nexus_gap`, `risk.fraud_high`, `risk.open_circuit`, `risk.vendor_parity_gap`, `risk.data_misclassification`
-        
+
 * **Routes (`policy_routes.yaml`)**:
-    
+
     * `policy.route.fallback_vendor` (→ run `tpl.fulfillment.fallback.v1`)
-        
+
     * `policy.route.manual_review` (→ queues)
-        
+
     * `policy.route.block_checkout` (→ effect `block`)
-        
+
 * **Exceptions (`exception_policies.yaml`)**: retry once, skip non-critical, require manual for DMCA/PII/PHI
-    
+
 
 * * *
 
@@ -6270,21 +6270,21 @@ In `templates.playbooks.yaml`:
 ===========================================
 
 * **Metrics (`governance_metrics.yaml`)**: `met.error_rate`, `met.job_fail_rate`, `met.retry_success_rate`, `met.remake_rate`, `met.abandonment`, `met.margin_guard_breaches`, `met.sla_compliance`, `met.circuit_state`, `met.audit_event_rate`, `met.artifact_completeness`, `met.policy_block_rate`
-    
+
 * **SLAs**: `sla_contracts.yaml` (vendor/data) + `sla_profiles.yaml` (standard/premium) → bound to metrics
-    
+
 * **Budgets**: `budget_controls.yaml` (limits + alerts) + `budget_policies.yaml` (soft/hard caps bound to playbooks)
-    
+
 * **Breakers**: `circuit_breakers.json` keyed by vendor/action; open → force fallback route
-    
+
 * **Notifications**: `notifications.yaml` (channels/templates) + `escalation_matrix.json` (warn/page)
-    
+
 * **Audit/Retention**: `audit_trail.json` (immutable events) + `data_retention.yaml` (artifact/metric retention) + `evidence_packs.json` (pack completeness target)
-    
+
 * **Access**: `access_controls.yaml` (RBAC for actions/registries)
-    
+
 * **Classification**: `data_classification.yaml` (PII/PHI rules → vendor allowlists; auto-masking)
-    
+
 
 * * *
 
@@ -6294,13 +6294,13 @@ In `templates.playbooks.yaml`:
 From `prompts.json` + `qualification_sets.json`:
 
 * **Commerce**: `q.checkout_guest`, `q.blind_ship`, `q.returns_policy`
-    
+
 * **Print**: `q.proof_mode_default`, `q.color_profile_standard`, `q.cutoff_alignment`
-    
+
 * **Finance/Tax**: `q.auto_failover_cap`, `q.resale_certs_on_file`, `q.auto_remittance`
-    
+
 * **SEO**: `q.target_keywords`, `q.seo_cannibalization_guard`
-    
+
 
 * * *
 
@@ -6308,17 +6308,17 @@ From `prompts.json` + `qualification_sets.json`:
 ==============================================
 
 * **Existing**: `rapid_prototype`, `enterprise_launch`, `sandbox_research`, `regulated_environment`, `high_performance`
-    
+
 * **New**:
-    
+
     * `cost_guard_lean` — TCO & margin safety first
-        
+
     * `rpa_throughput_burst` — automation velocity under acceptable accuracy
-        
+
     * `forensic_audit` — evidence/retention/manual gates first
-        
+
     * `resiliency_stress` — chaos/fallback validation performance
-        
+
 
 _(If you’d like, we can keep just two of the new four; they’re independent.)_
 
@@ -6328,23 +6328,23 @@ _(If you’d like, we can keep just two of the new four; they’re independent.)
 ===============================================
 
 * **Playbooks** → `action_commands`, `policy_routes`, `artifact_manifest`, `governance_metrics`, `vendor_parity`
-    
+
 * **Vendor Parity** → `catalog_map`, `vendors`, `risk_checks`
-    
+
 * **Qualification Sets** → `prompts`
-    
+
 * **Artifacts** → `action_commands` → feeds `met.artifact_completeness`
-    
+
 * **Policy Routes** → `risk_checks`, `templates.playbooks`
-    
+
 * **Access Controls (RBAC)** → governs reads of registries + action execution
-    
+
 * **Budget Policies** → binds to playbooks; emits `met.policy_block_rate`
-    
+
 * **Data Lineage** → defines how `met.*` derive from actions/registries
-    
+
 * **Sim Matrix** → binds failure scenarios to playbooks; asserts route/effect
-    
+
 
 * * *
 
@@ -6402,11 +6402,11 @@ _(If you’d like, we can keep just two of the new four; they’re independent.)
 =====================================================
 
 * **ADDED**: `templates.playbooks.yaml`, `vendor_parity.yaml`, `qualification_sets.json`, `artifact_manifest.json`, `policy_routes.yaml`, `access_controls.yaml`, `budget_policies.yaml`, `data_retention.yaml`, `notifications.yaml`, `sla_profiles.yaml`, `simulations_matrix.yaml`, `dependency_graph.yaml`.
-    
+
 * **UPDATED**: `scoring_weights.json` (new modes), `governance_metrics.yaml` (added `met.artifact_completeness`, `met.policy_block_rate`).
-    
+
 * **NO BREAKING CHANGES**: All additions are additive and referenced through MCL v0.3.0 load order.
-    
+
 
 * * *
 
@@ -6414,31 +6414,31 @@ _(If you’d like, we can keep just two of the new four; they’re independent.)
 =============================================================
 
 * **ID patterns**:
-    
+
     * Playbooks `tpl.[a-z0-9_.-]+`
-        
+
     * Risks `risk.[a-z0-9_.-]+`
-        
+
     * Metrics `met.[a-z0-9_.-]+`
-        
+
     * Questions `q.[a-z0-9_.-]+`
-        
+
 * **Cross-file checks**:
-    
+
     * Every `action` in playbooks must exist in `action_commands.json`.
-        
+
     * Every `block_on[]` risk must exist in `risk_checks.json`.
-        
+
     * Every artifact in playbooks must exist in `artifact_manifest.json`.
-        
+
     * Every route in playbooks must exist in `policy_routes.yaml`.
-        
+
     * Every metric referenced in playbooks/SLAs exists in `governance_metrics.yaml`.
-        
+
     * `vendor_parity.yaml` `on_gap: block|degrade|warn` only.
-        
+
     * RBAC must not grant `*` over `governance/` to non-admin roles.
-        
+
 
 * * *
 
@@ -6446,13 +6446,13 @@ TL;DR
 -----
 
 * This is the **single source of truth** for Alpha Solver’s registries.
-    
+
 * The updated **MCL v0.3.0** enumerates everything the loader needs, in order.
-    
+
 * Playbooks (`tpl.*`) + policy routes + parity + budgets + breakers + SLAs + notifications + retention = a **complete, governed orchestration**.
-    
+
 * You can now wire this straight into the Python base with one `load_all()` pass and start running templates with qualification-gated tool selection.
-    
+
 
 If you want, I can output any of these as **ready-to-save files** (one zip), or generate **schema files** for CI validation next.
 
@@ -6548,87 +6548,87 @@ Core (stable)
 -------------
 
 * **tools.json** — tool registry (IDs, domains, signals).
-    
+
 * **vendors.json** — vendor registry (IDs, capabilities, SLAs, fallbacks).
-    
+
 * **sections.yaml** — problem domains + bound questions/risks/metrics.
-    
+
 * **decision_rules.yaml** — selector ranking logic & shortlist sizes.
-    
+
 * **scoring_weights.json** — execution modes (rapid_prototype, enterprise_launch, sandbox_research, regulated_environment, high_performance, cost_guard_lean, rpa_throughput_burst, forensic_audit, resiliency_stress).
-    
+
 * **prompts.json** — `q.*` qualification questions.
-    
+
 * **qualification_sets.json** — grouped `q.*` packs (print, commerce, finance, SEO).
-    
+
 * **risk_checks.json** — `risk.*` policies (block/warn/escalate).
-    
+
 * **governance_metrics.yaml** — `met.*` metric IDs & thresholds.
-    
+
 * **escalation_matrix.json** — warn/page routes & contacts.
-    
+
 * **action_commands.json** — action verbs → tool adapters (inputs/outputs).
-    
+
 * **orchestration_templates.yaml** — generic orchestration templates.
-    
+
 * **templates.playbooks.yaml** — domain playbooks (e.g., `tpl.signs365.order.v2`).
-    
+
 * **taxonomy.json** — domain/label taxonomy.
-    
+
 * **master_compound_list.json** — loader index (above).
-    
+
 
 Commerce/Print specifics
 ------------------------
 
 * **catalog_map.json** — our SKU → vendor SKU + option mapping.
-    
+
 * **pricing_tables.yaml** — vendor cost curves, markups, min margin, risk buffer.
-    
+
 * **cutoffs.yaml** — submission deadlines & exceptions.
-    
+
 * **vendor_parity.yaml** — capability parity and downgrade rules.
-    
+
 * **artifact_manifest.json** — evidence completeness (required artifacts).
-    
+
 * **policy_routes.yaml** — risk → route binding (fallback, manual, block).
-    
+
 
 Governance & Security
 ---------------------
 
 * **secrets_vault.json** — secret handles and vault locations.
-    
+
 * **budget_controls.yaml** — spend limits, rate limits, alerts.
-    
+
 * **budget_policies.yaml** — soft/hard caps bound to `tpl.*`.
-    
+
 * **audit_trail.json** — immutable audit events & retention.
-    
+
 * **data_classification.yaml** — PII/PHI levels, vendor allowlists.
-    
+
 * **access_controls.yaml** — RBAC (roles → actions/registries).
-    
+
 * **data_retention.yaml** — retention policies per artifact/log/metric.
-    
+
 * **notifications.yaml** — channels (Slack/Email/PagerDuty) + templates.
-    
+
 * **circuit_breakers.json** — failure/timeout thresholds, fallback actions.
-    
+
 * **sla_contracts.yaml** — vendor/service SLAs (contract layer).
-    
+
 * **sla_profiles.yaml** — reusable SLA profiles (standard, premium).
-    
+
 
 Ops & Testing
 -------------
 
 * **dependency_graph.yaml** — action/tool DAG for planning & validation.
-    
+
 * **simulation_configs.json** — sim/dry-run/chaos/load modes.
-    
+
 * **simulations_matrix.yaml** — bind scenarios ↔ `tpl.*` with expected effects.
-    
+
 
 * * *
 
@@ -6636,27 +6636,27 @@ Ops & Testing
 =====================================
 
 * **templates.playbooks.yaml** → `action_commands.json`, `policy_routes.yaml`, `artifact_manifest.json`, `governance_metrics.yaml`, `vendor_parity.yaml`.
-    
+
 * **vendor_parity.yaml** → `catalog_map.json`, `vendors.json`, `risk_checks.json` (emits `risk.vendor_parity_gap`).
-    
+
 * **qualification_sets.json** → `prompts.json`.
-    
+
 * **artifact_manifest.json** → `action_commands.json` (feeds `met.artifact_completeness`).
-    
+
 * **policy_routes.yaml** → `risk_checks.json` + `templates.playbooks.yaml`.
-    
+
 * **budget_policies.yaml** → `templates.playbooks.yaml` (emits `met.policy_block_rate`).
-    
+
 * **notifications.yaml** → `escalation_matrix.json`.
-    
+
 * **sla_profiles.yaml** → `governance_metrics.yaml`.
-    
+
 * **data_retention.yaml** → `artifact_manifest.json`, `audit_trail.json`.
-    
+
 * **dependency_graph.yaml** → `action_commands.json`, `templates.playbooks.yaml`.
-    
+
 * **simulations_matrix.yaml** → `risk_checks.json`, `policy_routes.yaml`, `templates.playbooks.yaml`.
-    
+
 
 * * *
 
@@ -6664,23 +6664,23 @@ Ops & Testing
 ===================================================
 
 * **ID patterns**: `risk.*`, `tpl.*`, `met.*`, `q.*` (regex in MCL).
-    
+
 * **Cross-file assertions**:
-    
+
     * Every playbook `action` must exist in **action_commands.json**.
-        
+
     * Every `block_on[]` risk must exist in **risk_checks.json**.
-        
+
     * Every artifact in a playbook must exist in **artifact_manifest.json**.
-        
+
     * Every route referenced (e.g., `on_error.route`) must exist in **policy_routes.yaml**.
-        
+
     * Metrics in SLAs/playbooks must be defined in **governance_metrics.yaml**.
-        
+
     * Parity `on_gap` ∈ `{block|degrade|warn}`.
-        
+
     * RBAC must not grant wildcard over `/governance/*` to non-admin roles.
-        
+
 
 * * *
 
@@ -6688,13 +6688,13 @@ Ops & Testing
 =======================
 
 * **MCL** bumped to **0.3.1**.
-    
+
 * Confirmed & included new registries: **templates.playbooks.yaml**, **vendor_parity.yaml**, **qualification_sets.json**, **artifact_manifest.json**, **policy_routes.yaml**, **access_controls.yaml**, **budget_policies.yaml**, **data_retention.yaml**, **notifications.yaml**, **sla_profiles.yaml**, **simulations_matrix.yaml**, **dependency_graph.yaml**.
-    
+
 * **scoring_weights.json** retains prior modes and includes **cost_guard_lean**, **rpa_throughput_burst**, **forensic_audit**, **resiliency_stress** (non-breaking).
-    
+
 * No removals; all additions are **additive** and referenced via the MCL load order.
-    
+
 
 * * *
 
@@ -6715,15 +6715,15 @@ A) High‑level gaps (additive, no breaking changes)
 ==================================================
 
 1. **Exception handling registry** missing: unify retriable/skip/manual rules per `risk.*`, `action.*`, and vendor.
-    
+
 2. **Evidence packs vs. artifacts**: we track artifacts, but not **named packs** required per playbook/route for proof & audits.
-    
+
 3. **Data lineage** absent: explicit mapping from **Action → Artifact → Metric (met.*)** with calc provenance and retention class.
-    
+
 4. **Sim assertions** thin: scenarios exist, but no **expected outcomes**/assertions for route/effect/metrics.
-    
+
 5. **Execution mode coverage**: need modes to bias **sustainability** and **vendor diversification** strategies.
-    
+
 
 * * *
 
@@ -7147,7 +7147,7 @@ E) Schema rules (new files)
 F) Two new execution modes (weighting tweaks)
 =============================================
 
-Append to **`scoring_weights.json`** (semver bump → _minor_).  
+Append to **`scoring_weights.json`** (semver bump → _minor_).
 _New version suggestion: **1.5.0**_
 
 ```json
@@ -7222,13 +7222,13 @@ Concise changelog
 -----------------
 
 * **MCL 0.3.2**: added `exception_policies.yaml`, `evidence_packs.json`, `data_lineage.yaml`, `sim_assertions.yaml`.
-    
+
 * **New schemas**: JSON Schemas for the four registries.
-    
+
 * **New modes**: `sustainability_focus`, `vendor_diversification` added to `scoring_weights.json` (**1.5.0**).
-    
+
 * **Diagrams**: registry dependencies, risk/policy flow, and tool→action pipeline.
-    
+
 * **No breaking changes**: all additions are optional and referenced via patches/load order append.
 
 * * *
@@ -7244,29 +7244,29 @@ Part A: Newly Identified High‑Level Gaps
 ----------------------------------------
 
 1. **Service Level Playbooks Registry**
-    
+
     * We have `sla_contracts.yaml` and `sla_profiles.yaml`, but no registry binding **service levels → orchestration templates** (e.g., premium SLA must enforce `tpl.*` with extra monitoring).
-        
+
     * Needed for enterprise compliance where SLAs dictate execution pathways.
-        
+
 2. **Knowledge Packs Registry**
-    
+
     * Currently we have `qualification_sets.json` and `prompts.json`. Missing is a registry of **domain‑specific knowledge packs** (like curated external data sources, policy references, compliance standards) to preload into planner context.
-        
+
     * Helps enterprise scenarios where evidence must be enriched with standards.
-        
+
 3. **Error Taxonomy Registry**
-    
+
     * Risks (`risk_checks.json`) are defined, but no **structured error taxonomy** exists to categorize runtime failures consistently.
-        
+
     * Needed to unify monitoring, observability, and exception handling.
-        
+
 4. **Vendor Capability Extensions**
-    
+
     * `vendor_parity.yaml` exists, but no registry mapping **optional vendor extensions** (add‑ons, plugins, non‑core capabilities) → tool compatibility.
-        
+
     * Ensures optional features (e.g., eco‑options, advanced proofs) don’t break orchestration.
-        
+
 
 * * *
 
@@ -7553,17 +7553,17 @@ Part F: Proposed Execution Modes
 --------------------------------
 
 1. **`sustainability_first`**
-    
+
     * Weight sustainability signals highest; require `vendor_extensions` with eco tags.
-        
+
     * Prioritizes environmental standards even at cost of margin.
-        
+
 2. **`latency_critical`**
-    
+
     * Weight latency + SLA compliance above all else.
-        
+
     * Designed for event‑driven campaigns or rush projects; disables vendors with history of `err.network.timeout`.
-        
+
 
 * * *
 
@@ -7584,23 +7584,23 @@ Part A. High‑Level Gaps (newly identified this run)
 ---------------------------------------------------
 
 1. **Runbooks Registry**
-    
+
     * Missing a registry that ties **operational runbooks** (step‑by‑step recovery docs) to risks (`risk.*`) and escalation routes.
-        
+
     * Needed for enterprise audits and ISO compliance.
-        
+
 2. **Cost Guardrails Registry**
-    
+
     * We have `budget_controls.yaml` and `budget_policies.yaml`, but no registry encoding **absolute cost guardrails** (per order, per vendor, per time window).
-        
+
     * Critical to prevent overspend in burst modes.
-        
+
 3. **Vendor Trust Scores**
-    
+
     * No registry capturing external **trust/reputation metrics** (audit results, certifications, security scores).
-        
+
     * Needed for regulated procurement where vendor selection depends on external trust.
-        
+
 
 * * *
 
@@ -7828,42 +7828,42 @@ Part F. Two New Execution Modes
 ### 1. **`audit_ready`**
 
 * Description: Maximize evidence completeness + runbook alignment for regulated clients.
-    
+
 * Weights:
-    
+
     * `evidence`: 1.0
-        
+
     * `risk`: 1.0
-        
+
     * `sla`: 0.9
-        
+
     * `latency`: 0.5
-        
+
     * `cost`: 0.6
-        
+
 * Constraints: Require `runbooks` present for all active risks.
-    
+
 
 * * *
 
 ### 2. **`cost_guard_max`**
 
 * Description: Operate under strict cost containment with hard guardrail enforcement.
-    
+
 * Weights:
-    
+
     * `cost`: 1.0
-        
+
     * `margin`: 0.9
-        
+
     * `risk`: 0.8
-        
+
     * `sla`: 0.6
-        
+
     * `latency`: 0.6
-        
+
 * Constraints: Enforce `cost_guardrails.json` checks before any vendor execution.
-    
+
 
 * * *
 
@@ -7871,15 +7871,15 @@ Concise Changelog (Δ since Turn 1)
 ----------------------------------
 
 * Added **runbooks.yaml**, **cost_guardrails.json**, **vendor_trust.yaml**.
-    
+
 * Added schemas for each new registry.
-    
+
 * Defined cross‑links into risks, budgets, vendors.
-    
+
 * Two new modes: `audit_ready`, `cost_guard_max`.
-    
+
 * Semver for new registries: **1.0.0** each.
-    
+
 * No breaking changes. All additions are optional, additive.
 
 * * *
@@ -7895,23 +7895,23 @@ Part A. Newly Identified High‑Level Gaps
 ----------------------------------------
 
 1. **Compliance Tags Registry**
-    
+
     * Current taxonomy covers domains, but no registry explicitly tags **compliance regimes** (HIPAA, GDPR, PCI) to tools, vendors, or playbooks.
-        
+
     * Needed for enterprise‑grade regulated orchestration.
-        
+
 2. **Observability Events Registry**
-    
+
     * Metrics exist, but no normalized **event catalog** describing what logs/alerts must be emitted.
-        
+
     * Ensures governance/observability module can enforce auditability.
-        
+
 3. **Capability Tiers Registry**
-    
+
     * Vendors have parity and extensions, but no **tier mapping** (basic / standard / premium) that informs playbook selection.
-        
+
     * Useful for selector and planner cost vs. feature trade‑offs.
-        
+
 
 * * *
 
@@ -8114,39 +8114,39 @@ Part F. Proposed Execution Modes
 --------------------------------
 
 1. **`compliance_strict`**
-    
+
     * Prioritize vendors/playbooks tagged with `comp.*`.
-        
+
     * Weights:
-        
+
         * `risk`: 1.0
-            
+
         * `compliance`: 1.0
-            
+
         * `sla`: 0.9
-            
+
         * `cost`: 0.6
-            
+
         * `latency`: 0.6
-            
+
 2. **`observability_max`**
-    
+
     * Maximize logging, evidence, and event coverage.
-        
+
     * Weights:
-        
+
         * `evidence`: 1.0
-            
+
         * `observability`: 1.0
-            
+
         * `sla`: 0.8
-            
+
         * `latency`: 0.5
-            
+
         * `cost`: 0.5
-            
+
     * Constraint: require all active actions to emit `evt.*` as defined in `events.json`.
-        
+
 
 * * *
 
@@ -8154,13 +8154,13 @@ Changelog (Δ since Turn 2)
 --------------------------
 
 * Added **compliance_tags.yaml**, **events.json**, **capability_tiers.yaml**.
-    
+
 * Introduced schemas for all three.
-    
+
 * Linked compliance → vendors/playbooks/routes, events → metrics/audit/notifications, tiers → vendor parity/weights/decision rules.
-    
+
 * Added execution modes: `compliance_strict`, `observability_max`.
-    
+
 * Semver for new registries: **1.0.0**.
-    
+
 * Additive only; no rewrites of existing files.

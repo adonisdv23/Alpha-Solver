@@ -58,4 +58,3 @@ lint.ignore = ["E501", "E402", "E401"]
 # Keep source strict, relax tests to avoid noise blocking CI.
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*" = ["F401", "E401"]
-

@@ -29,4 +29,3 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     "enable_cache": True,
     "cache_path": "artifacts/cache/tot_cache.json",
 }
-

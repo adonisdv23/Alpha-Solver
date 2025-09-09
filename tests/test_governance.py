@@ -46,4 +46,3 @@ def test_policy_dryrun_supresses(caplog):
         except GovernanceError as err:
             dry.handle(err)
     assert "policy dry-run" in caplog.text
-

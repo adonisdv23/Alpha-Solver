@@ -18,4 +18,3 @@ SAFE_OUT_REASONS = {
 
 
 __all__ = ["UserInputError", "hint", "SAFE_OUT_REASONS"]
-

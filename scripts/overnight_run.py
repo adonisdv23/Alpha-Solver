@@ -274,7 +274,7 @@ def _normalize_telemetry_at_exit():
             with open(tp, "r", encoding="utf-8") as f:
                 for line in f:
                     line=line.strip()
-                    if not line: 
+                    if not line:
                         continue
                     import json as _json
                     first = _json.loads(line)
@@ -292,7 +292,7 @@ def _normalize_telemetry_at_exit():
                 with open(tp, "r", encoding="utf-8") as f:
                     for line in f:
                         line=line.strip()
-                        if not line: 
+                        if not line:
                             continue
                         hdr = _json.loads(line)
                         rid = hdr.get("run_id","")

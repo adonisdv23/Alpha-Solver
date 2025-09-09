@@ -12,4 +12,3 @@ def check_accessibility() -> ObservabilityManager:
     cfg = ObservabilityManager().config
     cfg.enable_accessibility = True
     return ObservabilityManager(cfg)
-

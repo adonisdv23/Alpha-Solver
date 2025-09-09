@@ -13,4 +13,3 @@ def test_load_queries_with_comments_and_cycles(tmp_path):
     c2.write_text("@file c1.txt\nfour\n", encoding="utf-8")
 
     assert load_queries(str(main)) == ["one", "three", "four", "two"]
-
