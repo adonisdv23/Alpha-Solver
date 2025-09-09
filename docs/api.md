@@ -54,4 +54,3 @@ Responses using `react` include a `trace` and `meta` block:
 * Interactive docs: `http://localhost:8000/docs`
 * OpenAPI JSON: `http://localhost:8000/openapi.json`
 * Prometheus metrics: `http://localhost:8000/metrics`
-

@@ -53,4 +53,3 @@ def test_rate_limit_window(monkeypatch):
     now[0] += 61
     resp = client.post("/v1/solve", json={"query": "hi"}, headers=headers)
     assert resp.status_code == 200
-
