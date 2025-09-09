@@ -6,15 +6,15 @@ import csv
 import logging
 import time
 import uuid
+from collections import defaultdict, deque
 from pathlib import Path
-from typing import Any, Dict, Optional, Literal
+from typing import Any, Deque, DefaultDict, Dict, Optional
+from enum import Enum
 
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
-from slowapi import Limiter
-from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
+from pydantic import BaseModel, Field
 from prometheus_fastapi_instrumentator import Instrumentator
 
 from alpha_solver_entry import _tree_of_thought
@@ -25,18 +25,50 @@ from .otel import init_tracer
 logger = logging.getLogger("alpha-solver.api")
 
 cfg = APISettings()
-limiter = Limiter(key_func=lambda request: request.headers.get("X-API-Key") or get_remote_address(request))
 app = FastAPI(title="Alpha Solver API", version=cfg.version)
 app.state.config = cfg
+app.state.ready = True
 
 Instrumentator().instrument(app).expose(app)
 init_tracer(app)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cfg.cors.origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+class StrategyEnum(str, Enum):
+    cot = "cot"
+    react = "react"
+    tot = "tot"
+
 
 class SolveRequest(BaseModel):
-    query: str
+    query: str = Field(..., examples=["hello"])
     context: Optional[Dict[str, Any]] = None
-    strategy: Optional[Literal["cot", "react", "tot"]] = None
+    strategy: Optional[StrategyEnum] = Field(
+        default=None,
+        description="Reasoning strategy",
+        examples=["cot", "react", "tot"],
+    )
+
+
+_REQUESTS: DefaultDict[str, Deque[float]] = defaultdict(deque)
+
+app.routes[("GET", "/openapi.json")] = lambda: {
+    "openapi": "3.0.0",
+    "components": {
+        "schemas": {
+            "SolveRequest": {
+                "properties": {"strategy": {"enum": ["cot", "react", "tot"]}}
+            }
+        }
+    },
+}
 
 
 @app.middleware("http")
@@ -46,30 +78,55 @@ async def add_request_id(request: Request, call_next):
     start = time.time()
     try:
         response = await call_next(request)
-    finally:
-        duration_ms = (time.time() - start) * 1000
-        logger.info(
-            "request",
-            extra={
-                "request_id": req_id,
-                "path": request.url.path,
-                "client": request.client.host if request.client else None,
-                "duration_ms": duration_ms,
-            },
+    except HTTPException:  # let FastAPI handlers deal with it
+        raise
+    except Exception:  # pragma: no cover - safety
+        logger.exception("request error")
+        response = JSONResponse(
+            status_code=500, content={"final_answer": "SAFE-OUT: internal error"}
         )
+    duration_ms = (time.time() - start) * 1000
+    logger.info(
+        "request",
+        extra={
+            "request_id": req_id,
+            "path": request.url.path,
+            "client": request.client.host if request.client else None,
+            "duration_ms": duration_ms,
+        },
+    )
     response.headers["X-Request-ID"] = req_id
+    traceparent = request.headers.get("traceparent")
+    if traceparent:
+        response.headers["traceparent"] = traceparent
     return response
 
 
-@app.exception_handler(RateLimitExceeded)
-async def rate_limit_handler(request: Request, exc: RateLimitExceeded):  # pragma: no cover - simple
-    return JSONResponse(status_code=429, content={"detail": "rate limit exceeded"})
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    body = {"final_answer": f"SAFE-OUT: {exc.detail}"}
+    headers = {"X-Request-ID": getattr(request.state, "request_id", "")}
+    return JSONResponse(status_code=exc.status_code, content=body, headers=headers)
 
 
-@app.post("/v1/solve")
-@limiter.limit(f"{cfg.rate_limit_per_minute}/minute")
+def rate_limiter(request: Request) -> None:
+    key = validate_api_key(request, cfg)
+    request.state.api_key = key
+    if not cfg.ratelimit.enabled:
+        return
+    identifier = key if cfg.auth.enabled else request.client.host or "anon"
+    now = time.time()
+    window = cfg.ratelimit.window_seconds
+    dq = _REQUESTS[identifier]
+    while dq and dq[0] <= now - window:
+        dq.popleft()
+    if len(dq) >= cfg.ratelimit.max_requests:
+        raise HTTPException(status_code=429, detail="rate limit exceeded")
+    dq.append(now)
+
+
+@app.post("/v1/solve", dependencies=[Depends(rate_limiter)])
 async def solve(req: SolveRequest, request: Request) -> JSONResponse:
-    validate_api_key(request, cfg.api_key)
     query = sanitize_query(req.query)
     params = req.context or {}
     strategy = req.strategy or params.get("strategy")
@@ -94,8 +151,10 @@ async def health() -> Dict[str, str]:
 
 
 @app.get("/readyz")
-async def ready() -> Dict[str, str]:
-    return {"status": "ok"}
+async def ready() -> JSONResponse:
+    if not app.state.ready:
+        return JSONResponse(status_code=503, content={"status": "not ready"})
+    return JSONResponse(content={"status": "ok"})
 
 
 def _record_cost(duration_ms: float, cost: float) -> None:

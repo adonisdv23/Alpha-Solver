@@ -4,13 +4,49 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, List
 import os
 
 try:  # pragma: no cover - exercised in tests
     import yaml  # type: ignore
 except ModuleNotFoundError:  # pragma: no cover
     yaml = None
+
+
+@dataclass
+class ServiceAuthConfig:
+    """API-Key authentication configuration."""
+
+    enabled: bool = os.getenv("SERVICE_AUTH_ENABLED", "true").lower() == "true"
+    header: str = os.getenv("SERVICE_AUTH_HEADER", "X-API-Key")
+    keys: List[str] = field(
+        default_factory=lambda: os.getenv(
+            "SERVICE_AUTH_KEYS", os.getenv("API_KEY", "dev-secret")
+        ).split(",")
+    )
+
+
+@dataclass
+class ServiceRateLimitConfig:
+    """Per-key sliding window rate limit configuration."""
+
+    enabled: bool = os.getenv("SERVICE_RATELIMIT_ENABLED", "true").lower() == "true"
+    window_seconds: int = int(os.getenv("SERVICE_RATELIMIT_WINDOW_SECONDS", "60"))
+    max_requests: int = int(
+        os.getenv(
+            "SERVICE_RATELIMIT_MAX_REQUESTS",
+            os.getenv("RATE_LIMIT_PER_MINUTE", "120"),
+        )
+    )
+
+
+@dataclass
+class ServiceCorsConfig:
+    """CORS configuration (lock down in production)."""
+
+    origins: List[str] = field(
+        default_factory=lambda: os.getenv("SERVICE_CORS_ORIGINS", "*").split(",")
+    )
 
 
 @dataclass
@@ -21,13 +57,34 @@ class APISettings:
     configured at deployment time without code changes.
     """
 
-    api_key: str = os.getenv("API_KEY", "")
-    rate_limit_per_minute: int = int(os.getenv("RATE_LIMIT_PER_MINUTE", "60"))
+    auth: ServiceAuthConfig = field(default_factory=ServiceAuthConfig)
+    ratelimit: ServiceRateLimitConfig = field(default_factory=ServiceRateLimitConfig)
+    cors: ServiceCorsConfig = field(default_factory=ServiceCorsConfig)
     cost_per_token: float = float(os.getenv("COST_PER_TOKEN", "0"))
     cost_per_ms: float = float(os.getenv("COST_PER_MS", "0.0001"))
     otel_endpoint: str = os.getenv("OTEL_ENDPOINT", "http://otel-collector:4317")
     prom_port: int = int(os.getenv("PROM_PORT", "8000"))
     version: str = os.getenv("ALPHA_SOLVER_VERSION", "0.0.0")
+
+    # Back-compat shims -------------------------------------------------
+    @property
+    def api_key(self) -> str:
+        return self.auth.keys[0] if self.auth.keys else ""
+
+    @api_key.setter
+    def api_key(self, value: str) -> None:
+        self.auth.keys = [value]
+
+    @property
+    def rate_limit_per_minute(self) -> int:
+        if self.ratelimit.window_seconds == 0:
+            return 0
+        return int(self.ratelimit.max_requests * 60 / self.ratelimit.window_seconds)
+
+    @rate_limit_per_minute.setter
+    def rate_limit_per_minute(self, value: int) -> None:
+        self.ratelimit.max_requests = value
+        self.ratelimit.window_seconds = 60
 
 
 @dataclass
@@ -145,6 +202,9 @@ def get_quality_gate(path: Path | str = Path("config/quality_gate.yaml")) -> Qua
 
 __all__ = [
     "APISettings",
+    "ServiceAuthConfig",
+    "ServiceRateLimitConfig",
+    "ServiceCorsConfig",
     "QualityGateConfig",
     "ValidationConfig",
     "ReactConfig",
