@@ -4,7 +4,6 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-from typing import Any
 
 from alpha.eval import harness
 from alpha.core.config import get_quality_gate
