@@ -40,4 +40,3 @@ def test_ci_quality_gate(tmp_path: Path) -> None:
     assert second.returncode == 0, second.stderr
     h2 = hashlib.sha256(router_file.read_bytes()).hexdigest()
     assert h1 == h2
-
