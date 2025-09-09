@@ -9,6 +9,7 @@ services:
       - OTEL_ENDPOINT=http://otel-collector:4317
     ports:
       - "8000:8000"
+      - "9000:9000"
     volumes:
       - ../artifacts:/app/artifacts
       - ../logs:/app/logs
@@ -25,7 +26,7 @@ services:
   prometheus:
     image: prom/prometheus:latest
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     ports:
       - "9090:9090"
   grafana:
@@ -33,6 +34,6 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
     depends_on:
       - prometheus

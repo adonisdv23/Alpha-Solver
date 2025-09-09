@@ -1,5 +1,6 @@
 scrape_configs:
   - job_name: 'alpha-solver'
     scrape_interval: 15s
+    metrics_path: /metrics
     static_configs:
-      - targets: ['api:8000']
+      - targets: ['api:9000']
