@@ -1,0 +1,48 @@
+{
+  "info": {
+    "name": "Alpha Solver",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Solve",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "X-API-Key", "value": "{{api_key}}"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"2+2?\",\n  \"strategy\": \"react\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/v1/solve",
+          "host": ["{{base_url}}"],
+          "path": ["v1", "solve"]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {"key": "base_url", "value": "http://localhost:8000"},
+    {"key": "api_key", "value": ""}
+  ],
+  "environments": [
+    {
+      "name": "local",
+      "values": [
+        {"key": "base_url", "value": "http://localhost:8000"},
+        {"key": "api_key", "value": ""}
+      ]
+    },
+    {
+      "name": "prod",
+      "values": [
+        {"key": "base_url", "value": "https://api.alpha-solver.com"},
+        {"key": "api_key", "value": "changeme"}
+      ]
+    }
+  ]
+}
