@@ -2,20 +2,23 @@
 
 from __future__ import annotations
 
-import os
 import re
 from fastapi import HTTPException, Request
+from alpha.core.config import APISettings
 
 # Regex to match control characters (except newlines and tabs which are generally safe)
 _CONTROL_CHARS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f]")
 
 
-def validate_api_key(request: Request, api_key: str) -> None:
-    """Validate the ``X-API-Key`` header against the configured key."""
+def validate_api_key(request: Request, config: APISettings) -> str:
+    """Validate the configured API key header when authentication is enabled."""
 
-    supplied = request.headers.get("X-API-Key")
-    if not api_key or supplied != api_key:
+    if not config.auth.enabled:
+        return request.headers.get(config.auth.header, "")
+    supplied = request.headers.get(config.auth.header)
+    if supplied not in config.auth.keys:
         raise HTTPException(status_code=401, detail="invalid API key")
+    return supplied
 
 
 def sanitize_query(text: str, max_length: int = 1000) -> str:

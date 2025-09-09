@@ -12,28 +12,33 @@ Once started the service is available at `http://localhost:8000`.
 
 ## Authentication
 
-Requests must include an API key header:
+Requests may include an API key header (default `X-API-Key`). When
+authentication is enabled, only configured keys are accepted. Set
+`SERVICE_AUTH_KEYS=key1,key2` to change the allowed keys or
+`SERVICE_AUTH_ENABLED=false` to disable the check entirely.
 
 ```
-X-API-Key: changeme
+X-API-Key: dev-secret
 ```
-
-Set `API_KEY` environment variable to change the expected key.
 
 ## Rate limiting
 
-Each key is limited to **60 requests per minute**.
+Each API key is limited to **120 requests per 60 seconds** by default. Set
+`SERVICE_RATELIMIT_ENABLED=false` to disable or tune
+`SERVICE_RATELIMIT_WINDOW_SECONDS` and `SERVICE_RATELIMIT_MAX_REQUESTS`. When
+auth is disabled the limit applies per client IP.
 
 ## Example
 
 ```bash
-curl -H "X-API-Key: changeme" \
+curl -H "X-API-Key: dev-secret" \
      -H "Content-Type: application/json" \
      -d '{"query": "hello", "strategy": "react"}' \
      http://localhost:8000/v1/solve
 ```
 
-`strategy` selects the reasoning mode: `cot` (default), `react`, or `tot`. Responses using `react` include a `trace` and `meta` block:
+`strategy` selects the reasoning mode: `cot` (default), `react`, or `tot`.
+Responses using `react` include a `trace` and `meta` block:
 
 ```json
 {
@@ -49,3 +54,4 @@ curl -H "X-API-Key: changeme" \
 * Interactive docs: `http://localhost:8000/docs`
 * OpenAPI JSON: `http://localhost:8000/openapi.json`
 * Prometheus metrics: `http://localhost:8000/metrics`
+

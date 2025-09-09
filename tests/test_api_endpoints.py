@@ -21,7 +21,12 @@ def test_health_ready_and_openapi():
     client, key = _client()
     assert client.get("/healthz").status_code == 200
     assert client.get("/readyz").status_code == 200
-    assert client.get("/openapi.json").status_code == 200
+    app.state.ready = False
+    assert client.get("/readyz").status_code == 503
+    app.state.ready = True
+    schema = client.get("/openapi.json").json()
+    enum_vals = schema["components"]["schemas"]["SolveRequest"]["properties"]["strategy"]["enum"]
+    assert set(enum_vals) == {"cot", "react", "tot"}
     assert client.get("/metrics").status_code == 200
 
 

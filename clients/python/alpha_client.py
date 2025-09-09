@@ -10,7 +10,7 @@ from typing import Any, Dict, Optional
 class AlphaClient:
     """Minimal HTTP client for the Alpha Solver API."""
 
-    def __init__(self, api_url: str, api_key: str) -> None:
+    def __init__(self, api_url: str, api_key: Optional[str] = None) -> None:
         self.api_url = api_url.rstrip("/")
         self.api_key = api_key
 
@@ -28,7 +28,9 @@ class AlphaClient:
             payload["strategy"] = strategy
         data = json.dumps(payload).encode("utf-8")
         url = f"{self.api_url}/v1/solve"
-        headers = {"Content-Type": "application/json", "X-API-Key": self.api_key}
+        headers = {"Content-Type": "application/json"}
+        if self.api_key:
+            headers["X-API-Key"] = self.api_key
         backoff = 0.5
         for attempt in range(3):
             req = urllib.request.Request(url, data=data, headers=headers)
