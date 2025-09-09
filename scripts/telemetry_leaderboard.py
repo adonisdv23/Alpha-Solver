@@ -1,12 +1,33 @@
-"""Offline telemetry leaderboard generator (stdlib-only)."""
-
 from __future__ import annotations
+from pathlib import Path
+import sys
+import atexit
+
+def _normalize_single_trailing_nl_on_out_from_argv(argv):
+    try:
+        i = argv.index("--out")
+        out_arg = argv[i+1]
+    except Exception:
+        return
+    try:
+        out_path = Path(out_arg)
+        if out_path.exists():
+            txt = out_path.read_text(encoding="utf-8")
+            out_path.write_text(txt.rstrip("\n") + "\n", encoding="utf-8")
+    except Exception:
+        pass
+
+atexit.register(_normalize_single_trailing_nl_on_out_from_argv, sys.argv)
+
+"""Offline telemetry leaderboard generator (stdlib-only)."""
+def _ensure_single_trailing_nl(text: str) -> str:
+    # normalize to exactly one trailing newline
+    return text.rstrip('\n') + '\n'
 
 import argparse
 import csv
 import io
 import json
-from pathlib import Path
 from typing import Dict, Iterable, Iterator, List
 
 
@@ -118,3 +139,21 @@ def render_markdown(rows: List[dict], topk: int) -> str:
 
 if __name__ == "__main__":  # pragma: no cover
     main()
+
+def _normalize_single_trailing_nl_on_out_from_argv(argv: list[str]) -> None:
+    try:
+        i = argv.index("--out")
+    except ValueError:
+        return
+    try:
+        out_arg = argv[i+1]
+    except IndexError:
+        return
+    try:
+        out_path = Path(out_arg)
+        if out_path.exists():
+            text = out_path.read_text(encoding="utf-8")
+            out_path.write_text(text.rstrip("\n") + "\n", encoding="utf-8")
+    except Exception:
+        # Don't crash the script on normalization issues
+        pass
