@@ -1,2 +1,0 @@
-pre-commit 4.3.0
-setup-complete
