@@ -25,13 +25,21 @@ nightly-local:
 	$(MAKE) telemetry
 
 golden:
-	pytest -q tests/test_golden_scenarios.py
+        pytest -q tests/test_golden_scenarios.py
 
 test:
-	pytest -q
+        pytest -q
+
+format:
+        pre-commit run --all-files
+
+eval:
+        python -m alpha.eval.harness --dataset datasets/mvp_golden.jsonl --seed 42 --compare-baseline
+
+gates: format test eval
 
 preflight:
-	python scripts/preflight.py
+        python scripts/preflight.py
 
 dev-venv:
 	python -m venv .venv && .venv/bin/pip install -r requirements.txt -r requirements-dev.txt
@@ -56,7 +64,7 @@ version-bump:
 release:
 	@echo "See RELEASE.md for steps. Push tag to trigger CI release."
 
-.PHONY: test-determinism verify-determinism
+.PHONY: format eval gates test-determinism verify-determinism
 
 test-determinism:
 	pytest -q tests/test_tot_determinism.py
