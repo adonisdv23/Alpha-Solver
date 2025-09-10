@@ -1,48 +1,40 @@
 {
   "info": {
-    "name": "Alpha Solver",
+    "name": "Alpha Solver (MVP)",
+    "_postman_id": "7e0e5b1a-1c2d-4a6e-bc99-aaaaaaaaaaaa",
+    "description": "Postman collection for Alpha Solver MVP endpoints.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "Solve",
+      "name": "Solve (no API key)",
       "request": {
         "method": "POST",
         "header": [
-          {"key": "Content-Type", "value": "application/json"},
-          {"key": "X-API-Key", "value": "{{api_key}}"}
+          { "key": "Content-Type", "value": "application/json" }
         ],
+        "url": { "raw": "{{baseUrl}}/v1/solve", "host": ["{{baseUrl}}"], "path": ["v1","solve"] },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"query\": \"2+2?\",\n  \"strategy\": \"react\"\n}"
-        },
-        "url": {
-          "raw": "{{base_url}}/v1/solve",
-          "host": ["{{base_url}}"],
-          "path": ["v1", "solve"]
+          "raw": "{\n  \"prompt\": \"Explain 21*3 with brief rationale and answer.\",\n  \"strategy\": \"react\"\n}\n"
         }
-      },
-      "response": []
-    }
-  ],
-  "variable": [
-    {"key": "base_url", "value": "http://localhost:8000"},
-    {"key": "api_key", "value": ""}
-  ],
-  "environments": [
-    {
-      "name": "local",
-      "values": [
-        {"key": "base_url", "value": "http://localhost:8000"},
-        {"key": "api_key", "value": ""}
-      ]
+      }
     },
     {
-      "name": "prod",
-      "values": [
-        {"key": "base_url", "value": "https://api.alpha-solver.com"},
-        {"key": "api_key", "value": "changeme"}
-      ]
+      "name": "Solve (with API key)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-API-Key", "value": "{{apiKey}}", "type": "text" }
+        ],
+        "url": { "raw": "{{baseUrl}}/v1/solve", "host": ["{{baseUrl}}"], "path": ["v1","solve"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prompt\": \"Explain 21*3 with brief rationale and answer.\",\n  \"strategy\": \"react\"\n}\n"
+        }
+      }
     }
-  ]
+  ],
+  "event": []
 }

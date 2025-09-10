@@ -8,3 +8,5 @@ telemetry/*.jsonl
 .DS_Store
 bench_out/
 .codespaces/
+clients/python/dist/
+clients/python/*.egg-info/
