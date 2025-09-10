@@ -1,15 +1,14 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=67"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "alpha-solver-sdk"
-version = "0.1.0"
-description = "Python client SDK for Alpha Solver"
+version = "0.0.0"
+description = "Alpha Solver Python SDK"
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = ["requests"]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["alpha_solver_sdk"]

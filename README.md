@@ -3,27 +3,32 @@
 Alpha Solver is a lightweight planning and execution engine for tool selection.
 
 
-## MVP Quickstart
+## MVP Quickstart (5 minutes)
 
+### 1) CLI (local)
 ```bash
-# CLI
-pip install -e .
-alpha-solver run --queries "2+2?" --strategy react
+python -m alpha.cli.main solve --strategy react --seed 1337 --prompt "Explain 21*3 with brief rationale and answer."
+```
 
-# SDK
+### 2) Python SDK (local)
+```bash
 pip install -e clients/python
 python - <<'PY'
-from alpha_solver_sdk import AlphaClient
+from alpha_client import AlphaClient
 client = AlphaClient("http://localhost:8000")
-print(client.solve("2+2?", strategy="react"))
+print(client.solve(prompt="Explain 21*3 with brief rationale and answer.", strategy="react"))
 PY
+```
 
-# API
-curl -H "Content-Type: application/json" \
-     -d '{"query":"2+2?","strategy":"react"}' \
-     http://localhost:8000/v1/solve
+### 3) API (HTTP)
+```bash
+curl -X POST http://localhost:8000/v1/solve \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "Explain 21*3 with brief rationale and answer.", "strategy": "react"}'
+```
 
-# Checks
+### 4) Quality gates
+```bash
 make gates
 ```
 
