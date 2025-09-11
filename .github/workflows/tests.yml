@@ -71,3 +71,7 @@ jobs:
           path: |
             artifacts/**
             tests/**/diff*.txt
+      - name: Lint (ruff only)
+        run: |
+          pip install ruff==0.5.7
+          ruff check alpha
