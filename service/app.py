@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any, Deque, DefaultDict, Dict, Optional
 from enum import Enum
 
-from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
@@ -43,17 +43,6 @@ logging.getLogger("uvicorn.access").handlers = [handler]
 
 logger = logging.getLogger("alpha-solver.api")
 
-
-class PlainResponse:
-    """Minimal plain text response for the TestClient."""
-
-    def __init__(self, content: bytes, media_type: str):
-        self._content = content.decode()
-        self.status_code = 200
-        self.headers = {"content-type": media_type}
-
-    def json(self) -> str:
-        return self._content
 
 cfg = APISettings()
 app = FastAPI(title="Alpha Solver API", version=cfg.version)
@@ -193,9 +182,9 @@ async def ready() -> JSONResponse:
     return JSONResponse(content={"status": "ok"})
 
 
-@app.get("/metrics")
-def metrics() -> PlainResponse:
-    return PlainResponse(generate_latest(), CONTENT_TYPE_LATEST)
+@app.get("/metrics", response_model=None)
+def metrics():
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 
 def _record_cost(duration_ms: float, cost: float) -> None:
