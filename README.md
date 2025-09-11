@@ -1,6 +1,10 @@
 # Alpha Solver
 
-Alpha Solver is a lightweight planning and execution engine for tool selection.
+Alpha Solver is a lightweight planning and execution engine for tool‑augmented
+reasoning. It currently provides a Tree‑of‑Thought solver, a SAFE‑OUT policy
+engine for governed execution, and an experimental FastAPI service with
+observability. Users can interact through the CLI, Python SDK, or HTTP API, and
+built‑in executors handle math, CSV, and sandboxed subprocesses.
 
 
 ## MVP Quickstart (5 minutes)
