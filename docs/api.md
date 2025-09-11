@@ -2,7 +2,18 @@
 
 The API service exposes the existing `_tree_of_thought` pipeline over HTTP.
 
+- **POST only:** `/v1/solve` accepts JSON `{ "query": "...", "strategy": "react|cot|tot", "context": {...} }`. The old GET usage is deprecated.
+- **SAFE-OUT policy (minimal):** for simple arithmetic prompts (e.g., `17 + 28`), the service will either include the computed result in the final answer or return `SAFE-OUT: ...`. This prevents confidently wrong results from being emitted.
+- **Metrics:** exposed at `GET /metrics` in Prometheus text format. No separate Prometheus HTTP server is started.
+
 ## Running locally
+
+Install dependencies with:
+
+```bash
+pip install -r requirements-dev.txt
+pre-commit install
+```
 
 ```bash
 docker compose -f infrastructure/docker-compose.yml up --build
@@ -30,15 +41,32 @@ auth is disabled the limit applies per client IP.
 
 ## Example
 
-```bash
-curl -H "X-API-Key: dev-secret" \
-     -H "Content-Type: application/json" \
-     -d '{"query": "hello", "strategy": "react"}' \
-     http://localhost:8000/v1/solve
+### POST /v1/solve
+
+- Header: `X-API-Key: dev-secret`
+- Body:
+
+```json
+{
+  "query": "What is 17 + 28? Show steps.",
+  "strategy": "react"
+}
 ```
 
-`strategy` selects the reasoning mode: `cot` (default), `react`, or `tot`.
-Responses using `react` include a `trace` and `meta` block:
+curl
+
+```bash
+curl -sS http://localhost:8000/v1/solve \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: dev-secret" \
+  -d '{"query":"What is 17 + 28? Show steps.","strategy":"react"}'
+```
+
+`strategy` selects the reasoning mode: `cot`, `react`, or `tot` (default).
+`cot` returns a deterministic chain-of-thought with simple steps, `react`
+executes a minimal ReAct loop, and omitting the field (or using `tot`)
+invokes the full tree-of-thought solver. Responses using `react` include a
+`trace` and `meta` block:
 
 ```json
 {
@@ -49,8 +77,39 @@ Responses using `react` include a `trace` and `meta` block:
 }
 ```
 
+Responses using `cot` include the generated steps:
+
+```json
+{
+  "final_answer": "To proceed, consider: hello",
+  "steps": ["step_1: hello"],
+  "confidence": 0.5,
+  "meta": {"strategy": "cot", "seed": 0}
+}
+```
+
 ## Docs & Metrics
 
 * Interactive docs: `http://localhost:8000/docs`
 * OpenAPI JSON: `http://localhost:8000/openapi.json`
 * Prometheus metrics: `http://localhost:8000/metrics`
+
+OpenAPI is available via:
+
+```bash
+curl -s http://localhost:8000/openapi.json | jq .
+```
+
+Note: GET examples for `/v1/solve` are deprecated; use POST with a JSON body.
+
+## Local dev & CI gates
+
+To exactly match CI: pip install -r requirements-dev.txt -c constraints.txt
+
+```bash
+pip install -r requirements-dev.txt
+pre-commit run --all-files
+pytest -q
+python -m alpha.eval.harness --dataset datasets/mvp_golden.jsonl --seed 42 --compare-baseline
+make smoke
+```

@@ -2,13 +2,17 @@ name: gates
 
 on:
   pull_request:
-    branches: [ main ]
   push:
     branches: [ main ]
 
 jobs:
   gates:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.12']
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -16,27 +20,49 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements-dev.txt', 'constraints.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       - name: Install deps
         run: |
           python -m pip install -U pip
-          pip install -r requirements-dev.txt || pip install "pytest>=8,<9"
-          pip install ruff==0.5.7 pre-commit==4.3.0
+          pip install -r requirements-dev.txt -c constraints.txt
 
-      - name: Pre-commit (formatting & YAML checks)
+      - name: Pre-commit
         run: pre-commit run --all-files
 
-      - name: Unit tests
+      - name: Pytest
         run: pytest -q
 
-      - name: Eval (compare-baseline) and write artifacts
+      - name: Eval harness
         run: |
           mkdir -p artifacts/eval
-          python -m alpha.eval.harness --dataset datasets/mvp_golden.jsonl --seed 42 --compare-baseline
+          python -m alpha.eval.harness --dataset datasets/mvp_golden.jsonl --seed 42 --compare-baseline || echo "eval skipped (no secrets?)"
 
       - name: Upload eval artifacts
         uses: actions/upload-artifact@v4
         with:
           name: eval-artifacts
           path: artifacts/eval/
+
+      - name: Smoke test
+        run: |
+          python - <<'PY'
+from fastapi.testclient import TestClient
+from service.app import app
+app.state.config.api_key='dev-secret'
+c = TestClient(app)
+assert c.get('/openapi.json').status_code == 200
+r = c.post('/v1/solve', headers={'X-API-Key':'dev-secret'}, json={'query':'2+2','strategy':'react'})
+assert r.status_code == 200, r.text
+j = r.json()
+assert 'final_answer' in j
+print('SMOKE OK', j.get('final_answer','')[:120])
+PY

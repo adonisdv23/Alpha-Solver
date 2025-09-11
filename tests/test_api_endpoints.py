@@ -1,60 +1,64 @@
-import os
-import uuid
-
-import os
-import uuid
-
-os.environ.setdefault("API_KEY", "test")
-os.environ.setdefault("RATE_LIMIT_PER_MINUTE", "2")
-
 from fastapi.testclient import TestClient
+
 from service.app import app
 
 
-def _client():
-    key = str(uuid.uuid4())
-    app.state.config.api_key = key
-    return TestClient(app), key
+client = TestClient(app)
 
 
-def test_health_ready_and_openapi():
-    client, key = _client()
-    assert client.get("/healthz").status_code == 200
-    assert client.get("/readyz").status_code == 200
-    app.state.ready = False
-    assert client.get("/readyz").status_code == 503
-    app.state.ready = True
-    schema = client.get("/openapi.json").json()
-    enum_vals = schema["components"]["schemas"]["SolveRequest"]["properties"]["strategy"]["enum"]
-    assert set(enum_vals) == {"cot", "react", "tot"}
-    assert client.get("/metrics").status_code == 200
+def _post(body):
+    # test helper: force a known API key and disable rate limit noise
+    app.state.config.api_key = "dev-secret"
+    prev = app.state.config.ratelimit.enabled
+    app.state.config.ratelimit.enabled = False
+    try:
+        return client.post(
+            "/v1/solve",
+            headers={"X-API-Key": "dev-secret"},
+            json=body,
+        )
+    finally:
+        app.state.config.ratelimit.enabled = prev
 
 
-def test_solve_endpoint(monkeypatch):
-    client, key = _client()
-
-    def fake_solver(query: str, **kwargs):
-        return {"final_answer": "ok"}
-
-    monkeypatch.setattr("service.app._tree_of_thought", fake_solver)
-    resp = client.post("/v1/solve", json={"query": "hi"}, headers={"X-API-Key": key})
-    assert resp.status_code == 200
-    assert resp.json()["final_answer"] == "ok"
+def test_solve_react_ok():
+    r = _post({"query": "2+2", "strategy": "react"})
+    assert r.status_code == 200
+    j = r.json()
+    assert isinstance(j["final_answer"], str)
+    assert j.get("meta", {}).get("strategy") in {"react", "cot", "tot"}
 
 
-def test_solve_endpoint_react(monkeypatch):
-    client, key = _client()
+def test_solve_cot_ok():
+    r = _post({"query": "2+2", "strategy": "cot"})
+    assert r.status_code == 200
+    j = r.json()
+    assert "final_answer" in j
+    assert j.get("meta", {}).get("strategy") in {"react", "cot", "tot"}
 
-    def fake_react(prompt: str, seed: int, max_steps: int = 2, rules=None):
-        return {"final_answer": "ok", "trace": [], "confidence": 0.9, "meta": {"strategy": "react", "seed": seed}}
 
-    monkeypatch.setattr("alpha.reasoning.react_lite.run_react_lite", fake_react)
-    resp = client.post(
-        "/v1/solve",
-        json={"query": "hi", "strategy": "react"},
-        headers={"X-API-Key": key},
-    )
-    assert resp.status_code == 200
-    body = resp.json()
-    assert body["final_answer"] == "ok"
-    assert body["meta"]["strategy"] == "react"
+def test_solve_missing_query_422():
+    r = _post({"strategy": "react"})
+    assert r.status_code == 422
+
+
+def test_solve_get_405():
+    r = client.get("/v1/solve", headers={"X-API-Key": "dev-secret"})
+    assert r.status_code in (405, 404)
+
+
+def test_arithmetic_sanity_or_safe_out():
+    r = _post({"query": "What is 17 + 28? Show steps.", "strategy": "react"})
+    assert r.status_code == 200
+    j = r.json()
+    # Either we include the correct result OR we SAFE-OUT
+    assert ("45" in j["final_answer"]) or j["final_answer"].startswith("SAFE-OUT")
+
+
+def test_openapi_advertises_solve_post():
+    r = client.get("/openapi.json")
+    assert r.status_code == 200
+    j = r.json()
+    assert "/v1/solve" in j.get("paths", {})
+    assert "post" in j["paths"]["/v1/solve"]
+

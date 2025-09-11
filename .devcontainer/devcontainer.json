@@ -1,19 +1,12 @@
 {
   "name": "Alpha-Solver",
-  "image": "mcr.microsoft.com/devcontainers/python:3.12",
-  "containerEnv": {
-    "HTTP_PROXY": "",
-    "HTTPS_PROXY": "",
-    "NO_PROXY": "localhost,127.0.0.1"
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": { "version": "3.12" }
   },
-  "postCreateCommand": "bash .devcontainer/postCreate.sh",
-  "postAttachCommand": "pre-commit --version >/dev/null 2>&1 || true",
-  "remoteEnv": { "PATH": "/home/codespace/.venvs/precommit/bin:/home/codespace/.local/bin:${containerEnv:PATH}" },
+  "postCreateCommand": "pip install -r requirements-dev.txt",
   "customizations": {
     "vscode": {
-      "settings": {
-        "terminal.integrated.defaultProfile.linux": "bash"
-      }
+      "extensions": ["ms-python.python", "charliermarsh.ruff"]
     }
   }
 }
