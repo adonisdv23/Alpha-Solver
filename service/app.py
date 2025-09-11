@@ -12,9 +12,9 @@ from pathlib import Path
 from typing import Any, Deque, DefaultDict, Dict, Optional
 from enum import Enum
 
-from fastapi import Depends, FastAPI, HTTPException, Request, Response
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest, start_http_server
 
@@ -84,9 +84,9 @@ _REQUESTS: DefaultDict[str, Deque[float]] = defaultdict(deque)
 @app.get("/openapi.json")
 async def openapi_json() -> JSONResponse:
     root = Path(__file__).resolve().parents[1]
-    with (root / "openapi.json").open("r") as f:
-        spec = json.load(f)
-    return JSONResponse(spec)
+    with open(root / "openapi.json", "r") as f:
+        data = json.load(f)
+    return JSONResponse(data)
 
 
 @app.middleware("http")
@@ -182,9 +182,10 @@ async def ready() -> JSONResponse:
     return JSONResponse(content={"status": "ok"})
 
 
-@app.get("/metrics", response_model=None)
+@app.get("/metrics")
 def metrics():
-    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
+    payload = generate_latest()
+    return Response(payload, media_type=CONTENT_TYPE_LATEST)
 
 
 def _record_cost(duration_ms: float, cost: float) -> None:
