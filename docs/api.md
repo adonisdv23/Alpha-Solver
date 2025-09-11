@@ -2,10 +2,14 @@
 
 The API service exposes the existing `_tree_of_thought` pipeline over HTTP.
 
-## Running locally
+## Local dev & CI gates
+
+Run `docker compose -f infrastructure/docker-compose.yml up --build`.
+
+To exactly match CI:
 
 ```bash
-docker compose -f infrastructure/docker-compose.yml up --build
+pip install -r requirements-dev.txt -c constraints.txt
 ```
 
 Once started the service is available at `http://localhost:8000`.

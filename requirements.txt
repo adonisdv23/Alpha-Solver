@@ -1,3 +1,4 @@
 pytest
 jsonschema
 pyyaml
+prometheus-client>=0.20,<1
