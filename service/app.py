@@ -91,16 +91,13 @@ class SolveRequest(BaseModel):
 
 _REQUESTS: DefaultDict[str, Deque[float]] = defaultdict(deque)
 
-app.routes[("GET", "/openapi.json")] = lambda: {
-    "openapi": "3.0.0",
-    "components": {
-        "schemas": {
-            "SolveRequest": {
-                "properties": {"strategy": {"enum": ["cot", "react", "tot"]}}
-            }
-        }
-    },
-}
+
+@app.get("/openapi.json")
+async def openapi_json() -> JSONResponse:
+    root = Path(__file__).resolve().parents[1]
+    with (root / "openapi.json").open("r") as f:
+        spec = json.load(f)
+    return JSONResponse(spec)
 
 
 @app.middleware("http")
