@@ -82,11 +82,11 @@ _REQUESTS: DefaultDict[str, Deque[float]] = defaultdict(deque)
 
 
 @app.get("/openapi.json")
-async def openapi_json() -> JSONResponse:
-    root = Path(__file__).resolve().parents[1]
-    with open(root / "openapi.json", "r") as f:
-        data = json.load(f)
-    return JSONResponse(data)
+def openapi_json() -> JSONResponse:
+    spec_path = Path(__file__).resolve().parents[1] / "openapi.json"
+    with spec_path.open("r", encoding="utf-8") as f:
+        spec = json.load(f)
+    return JSONResponse(spec)
 
 
 @app.middleware("http")
