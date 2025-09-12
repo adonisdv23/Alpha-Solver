@@ -7,37 +7,43 @@ logger = logging.getLogger("alpha-solver.otel")
 def init_tracer(app, exporter=None):
     """Initialize tracing and instrument the FastAPI app.
     Idempotent and safe if OpenTelemetry is not installed.
-    Returns the tracer provider (or None if no-op).
+    Returns the span processor (or None if no-op).
     """
-    existing = getattr(app.state, "tracer_provider", None)
-    if existing:
-        return existing
 
-    try:
+    if getattr(app.state, "otel_ready", False):
+        return getattr(app.state, "span_processor", None)
+
+    try:  # pragma: no cover - optional dep
         from opentelemetry import trace
         from opentelemetry.sdk.resources import Resource
         from opentelemetry.sdk.trace import TracerProvider
-        from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+        from opentelemetry.sdk.trace.export import (
+            InMemorySpanExporter,
+            SimpleSpanProcessor,
+        )
         from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-    except Exception as exc:  # pragma: no cover - optional dep
+    except Exception as exc:
         logger.info("OTEL not available; tracing disabled: %s", exc)
         app.state.tracer_provider = None
+        app.state.span_processor = None
+        app.state.otel_ready = False
         return None
 
-    resource = Resource.create({"service.name": "alpha-solver"})
-    provider = TracerProvider(resource=resource)
-    if exporter is not None:
-        try:
-            provider.add_span_processor(SimpleSpanProcessor(exporter))
-        except Exception as exc:  # defensive: exporter errors shouldn't crash
-            logger.warning("Failed to attach OTEL exporter: %s", exc)
-    trace.set_tracer_provider(provider)
+    provider = trace.get_tracer_provider()
+    if not isinstance(provider, TracerProvider):
+        resource = Resource.create({"service.name": "alpha-solver"})
+        provider = TracerProvider(resource=resource)
+        trace.set_tracer_provider(provider)
 
-    try:
-        FastAPIInstrumentor.instrument_app(app, tracer_provider=provider)
-    except Exception as exc:  # defensive: do not crash app startup
+    proc = SimpleSpanProcessor(exporter or InMemorySpanExporter())
+    provider.add_span_processor(proc)
+
+    try:  # defensive: do not crash app startup
+        FastAPIInstrumentor().instrument_app(app)
+    except Exception as exc:
         logger.warning("Failed to instrument FastAPI app for OTEL: %s", exc)
 
     app.state.tracer_provider = provider
-    logger.info("OTEL FastAPI instrumentation enabled.")
-    return provider
+    app.state.span_processor = proc
+    app.state.otel_ready = True
+    return proc
