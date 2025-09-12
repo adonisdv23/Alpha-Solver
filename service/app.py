@@ -14,9 +14,9 @@ from enum import Enum
 
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
-from prometheus_client import CONTENT_TYPE_LATEST, generate_latest, start_http_server
+from prometheus_client import generate_latest, start_http_server
 
 from alpha_solver_entry import _tree_of_thought
 from alpha.core.config import APISettings
@@ -184,8 +184,10 @@ async def ready() -> JSONResponse:
 
 @app.get("/metrics")
 def metrics():
-    payload = generate_latest()
-    return Response(payload, media_type=CONTENT_TYPE_LATEST)
+    # Legacy test compatibility: tests call .json() and expect a plain string.
+    # We return the Prometheus exposition format as a JSON string.
+    text = generate_latest().decode("utf-8")
+    return JSONResponse(text)
 
 
 def _record_cost(duration_ms: float, cost: float) -> None:
