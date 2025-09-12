@@ -15,6 +15,7 @@ from enum import Enum
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.openapi.utils import get_openapi
 from pydantic import BaseModel, Field
 from prometheus_client import generate_latest, start_http_server
 
@@ -76,6 +77,24 @@ class SolveRequest(BaseModel):
         description="Reasoning strategy",
         examples=["cot", "react", "tot"],
     )
+
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    schema = get_openapi(title=app.title, version=app.version, routes=app.routes)
+    solve = schema.get("components", {}).get("schemas", {}).get("SolveRequest", {})
+    props = solve.get("properties", {})
+    strategy = props.get("strategy", {})
+    if "enum" not in strategy:
+        strategy["enum"] = ["react", "cot", "tot"]
+    props["strategy"] = strategy
+    solve["properties"] = props
+    schema.setdefault("components", {}).setdefault("schemas", {})["SolveRequest"] = solve
+    app.openapi_schema = schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi
 
 
 _REQUESTS: DefaultDict[str, Deque[float]] = defaultdict(deque)
