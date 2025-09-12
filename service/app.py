@@ -15,7 +15,6 @@ from enum import Enum
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi.openapi.utils import get_openapi
 from pydantic import BaseModel, Field
 from prometheus_client import generate_latest, start_http_server
 
@@ -77,25 +76,6 @@ class SolveRequest(BaseModel):
         description="Reasoning strategy",
         examples=["cot", "react", "tot"],
     )
-
-
-def custom_openapi():
-    if app.openapi_schema:
-        return app.openapi_schema
-    schema = get_openapi(title=app.title, version=app.version, routes=app.routes)
-    solve = schema.get("components", {}).get("schemas", {}).get("SolveRequest", {})
-    props = solve.get("properties", {})
-    strategy = props.get("strategy", {})
-    if "enum" not in strategy:
-        strategy["enum"] = ["react", "cot", "tot"]
-    props["strategy"] = strategy
-    solve["properties"] = props
-    schema.setdefault("components", {}).setdefault("schemas", {})["SolveRequest"] = solve
-    app.openapi_schema = schema
-    return app.openapi_schema
-
-app.openapi = custom_openapi
-
 
 _REQUESTS: DefaultDict[str, Deque[float]] = defaultdict(deque)
 
@@ -219,3 +199,25 @@ def _record_cost(duration_ms: float, cost: float) -> None:
 
 
 __all__ = ["app"]
+
+from fastapi.openapi.utils import get_openapi
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = get_openapi(
+        title="Alpha Solver",
+        version="1.0.0",
+        routes=app.routes,
+    )
+    # Ensure the strategy enum is present
+    if "components" in openapi_schema:
+        if "schemas" in openapi_schema["components"]:
+            if "SolveRequest" in openapi_schema["components"]["schemas"]:
+                if "properties" in openapi_schema["components"]["schemas"]["SolveRequest"]:
+                    if "strategy" in openapi_schema["components"]["schemas"]["SolveRequest"]["properties"]:
+                        openapi_schema["components"]["schemas"]["SolveRequest"]["properties"]["strategy"]["enum"] = ["react", "cot", "tot"]
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi
