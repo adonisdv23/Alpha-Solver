@@ -22,8 +22,12 @@
       "SolveRequest": {
         "type": "object",
         "properties": {
-          "query":    { "type": "string" },
-          "context":  { "type": "object" },
+          "query": {
+            "type": "string"
+          },
+          "context": {
+            "type": "object"
+          },
           "strategy": {
             "type": "string",
             "enum": ["react", "cot", "tot"]
