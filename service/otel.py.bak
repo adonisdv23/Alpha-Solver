@@ -1,0 +1,64 @@
+"""OpenTelemetry tracing setup"""
+
+# Initialize a default provider at module import time
+try:
+    from opentelemetry import trace
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import SimpleSpanProcessor, InMemorySpanExporter
+
+    # Create and set a default provider with force_flush support
+    _default_provider = TracerProvider()
+
+    # Add force_flush method if it doesn't exist
+    if not hasattr(_default_provider, 'force_flush'):
+        _default_provider.force_flush = lambda timeout_millis=None: True
+
+    # Set as the global provider
+    trace.set_tracer_provider(_default_provider)
+
+    OTEL_AVAILABLE = True
+except ImportError:
+    OTEL_AVAILABLE = False
+
+
+def init_tracer(app, exporter=None):
+    """Initialize tracer with fallback for missing OTEL"""
+    if OTEL_AVAILABLE:
+        from opentelemetry import trace
+        from opentelemetry.sdk.trace import TracerProvider
+        from opentelemetry.sdk.trace.export import SimpleSpanProcessor, InMemorySpanExporter
+
+        # Get the current provider (should be our default one)
+        provider = trace.get_tracer_provider()
+
+        # If somehow it's None or not a TracerProvider, create a new one
+        if provider is None or not isinstance(provider, TracerProvider):
+            provider = TracerProvider()
+            if not hasattr(provider, 'force_flush'):
+                provider.force_flush = lambda timeout_millis=None: True
+            trace.set_tracer_provider(provider)
+
+        # Store on app.state
+        app.state.tracer_provider = provider
+
+        # Use provided exporter or default
+        if exporter is None:
+            exporter = InMemorySpanExporter()
+
+        # Create and add processor
+        processor = SimpleSpanProcessor(exporter)
+        provider.add_span_processor(processor)
+
+        # Store processor
+        app.state.span_processor = processor
+
+        return processor
+    else:
+        # OTEL not available
+        class _NoopProcessor:
+            def force_flush(self, timeout_millis=None):
+                return True
+
+        processor = _NoopProcessor()
+        app.state.span_processor = processor
+        return processor
