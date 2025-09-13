@@ -16,9 +16,29 @@ from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from contextlib import nullcontext
-from opentelemetry import trace
+try:
+    from opentelemetry import trace
+except Exception:
+    class _NoTrace:
+        def get_tracer(self, *a, **k):
+            from contextlib import nullcontext
+            class _Nop:
+                def start_as_current_span(self, *aa, **kk):
+                    return nullcontext()
+            return _Nop()
+    trace = _NoTrace()  # type: ignore
 from starlette.middleware.base import BaseHTTPMiddleware
-from opentelemetry import trace
+try:
+    from opentelemetry import trace
+except Exception:
+    class _NoTrace:
+        def get_tracer(self, *a, **k):
+            from contextlib import nullcontext
+            class _Nop:
+                def start_as_current_span(self, *aa, **kk):
+                    return nullcontext()
+            return _Nop()
+    trace = _NoTrace()  # type: ignore
 from pydantic import BaseModel, Field
 from prometheus_client import generate_latest, start_http_server
 
