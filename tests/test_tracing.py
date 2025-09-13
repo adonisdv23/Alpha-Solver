@@ -7,7 +7,10 @@ os.environ.setdefault("RATE_LIMIT_PER_MINUTE", "2")
 from fastapi.testclient import TestClient
 from service.app import app
 from service.otel import init_tracer
-from opentelemetry.sdk.trace.export import InMemorySpanExporter
+try:
+    from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
+except ImportError:
+    from opentelemetry.sdk.trace.export import InMemorySpanExporter
 from opentelemetry import trace
 
 

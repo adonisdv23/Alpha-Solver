@@ -1,3 +1,9 @@
 pytest
 jsonschema
 pyyaml
+prometheus-client>=0.20,<1
+fastapi>=0.111,<0.113
+starlette<0.38
+pydantic>=2.7,<3
+httpx>=0.27,<0.28
+uvicorn[standard]>=0.30,<0.32

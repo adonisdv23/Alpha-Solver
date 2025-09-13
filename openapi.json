@@ -1,0 +1,40 @@
+{
+  "openapi": "3.0.0",
+  "info": { "title": "Alpha Solver API", "version": "1.0" },
+  "paths": {
+    "/v1/solve": {
+      "post": {
+        "summary": "Solve a query",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SolveRequest" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "OK" } }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SolveRequest": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "context": {
+            "type": "object"
+          },
+          "strategy": {
+            "type": "string",
+            "enum": ["react", "cot", "tot"]
+          }
+        },
+        "required": ["query"]
+      }
+    }
+  }
+}

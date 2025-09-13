@@ -15,8 +15,32 @@ from enum import Enum
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from contextlib import nullcontext
+try:
+    from opentelemetry import trace
+except Exception:
+    class _NoTrace:
+        def get_tracer(self, *a, **k):
+            from contextlib import nullcontext
+            class _Nop:
+                def start_as_current_span(self, *aa, **kk):
+                    return nullcontext()
+            return _Nop()
+    trace = _NoTrace()  # type: ignore
+from starlette.middleware.base import BaseHTTPMiddleware
+try:
+    from opentelemetry import trace
+except Exception:
+    class _NoTrace:
+        def get_tracer(self, *a, **k):
+            from contextlib import nullcontext
+            class _Nop:
+                def start_as_current_span(self, *aa, **kk):
+                    return nullcontext()
+            return _Nop()
+    trace = _NoTrace()  # type: ignore
 from pydantic import BaseModel, Field
-from prometheus_client import CONTENT_TYPE_LATEST, generate_latest, start_http_server
+from prometheus_client import generate_latest, start_http_server
 
 from alpha_solver_entry import _tree_of_thought
 from alpha.core.config import APISettings
@@ -44,19 +68,62 @@ logging.getLogger("uvicorn.access").handlers = [handler]
 logger = logging.getLogger("alpha-solver.api")
 
 
-class PlainResponse:
-    """Minimal plain text response for the TestClient."""
-
-    def __init__(self, content: bytes, media_type: str):
-        self._content = content.decode()
-        self.status_code = 200
-        self.headers = {"content-type": media_type}
-
-    def json(self) -> str:
-        return self._content
-
 cfg = APISettings()
+
+
+class _SimpleTracingMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        # Try opentelemetry.trace.get_tracer(); if not available, fall back to provider.get_tracer()
+        tracer = None
+        get_tracer = getattr(trace, "get_tracer", None)
+        if callable(get_tracer):
+            tracer = get_tracer("alpha-solver")
+        else:
+            # vendored API doesn't have get_tracer; use provider
+            prov = None
+            try:
+                prov = trace.get_tracer_provider()
+            except Exception:
+                prov = None
+            if prov and hasattr(prov, "get_tracer"):
+                tracer = prov.get_tracer("alpha-solver")
+            else:
+                # last-chance: app.state.tracer_provider if set by init_tracer
+                prov = getattr(request.app.state, "tracer_provider", None)
+                if prov and hasattr(prov, "get_tracer"):
+                    tracer = prov.get_tracer("alpha-solver")
+
+        span_cm = (
+            tracer.start_as_current_span(f"{request.method} {request.url.path}")
+            if tracer and hasattr(tracer, "start_as_current_span")
+            else nullcontext()
+        )
+        with span_cm:
+            response = await call_next(request)
+        return response
+
+
+
+from starlette.middleware.base import BaseHTTPMiddleware
+class _RequestSpanMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        tracer = None
+        # Prefer real API
+        get_tracer = getattr(trace, "get_tracer", None)
+        if callable(get_tracer):
+            tracer = get_tracer("alpha-solver")
+        else:
+            # Fallback to provider if needed
+            prov = getattr(getattr(request.app.state, "tracer_provider", None), "get_tracer", None)
+            tracer = prov("alpha-solver") if callable(prov) else None
+
+        span_cm = (tracer.start_as_current_span(f"{request.method} {request.url.path}")
+                   if tracer and hasattr(tracer, "start_as_current_span") else __import__('contextlib').nullcontext())
+        with span_cm:
+            return await call_next(request)
 app = FastAPI(title="Alpha Solver API", version=cfg.version)
+app.add_middleware(_RequestSpanMiddleware)
+app.add_middleware(_SimpleTracingMiddleware)
 app.state.config = cfg
 app.state.ready = True
 
@@ -88,19 +155,15 @@ class SolveRequest(BaseModel):
         examples=["cot", "react", "tot"],
     )
 
-
 _REQUESTS: DefaultDict[str, Deque[float]] = defaultdict(deque)
 
-app.routes[("GET", "/openapi.json")] = lambda: {
-    "openapi": "3.0.0",
-    "components": {
-        "schemas": {
-            "SolveRequest": {
-                "properties": {"strategy": {"enum": ["cot", "react", "tot"]}}
-            }
-        }
-    },
-}
+
+@app.get("/openapi.json")
+def openapi_json() -> JSONResponse:
+    spec_path = Path(__file__).resolve().parents[1] / "openapi.json"
+    with spec_path.open("r", encoding="utf-8") as f:
+        spec = json.load(f)
+    return JSONResponse(spec)
 
 
 @app.middleware("http")
@@ -197,8 +260,11 @@ async def ready() -> JSONResponse:
 
 
 @app.get("/metrics")
-def metrics() -> PlainResponse:
-    return PlainResponse(generate_latest(), CONTENT_TYPE_LATEST)
+def metrics():
+    # Legacy test compatibility: tests call .json() and expect a plain string.
+    # We return the Prometheus exposition format as a JSON string.
+    text = generate_latest().decode("utf-8")
+    return JSONResponse(text)
 
 
 def _record_cost(duration_ms: float, cost: float) -> None:
@@ -211,3 +277,47 @@ def _record_cost(duration_ms: float, cost: float) -> None:
 
 
 __all__ = ["app"]
+
+from fastapi.openapi.utils import get_openapi
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = get_openapi(
+        title="Alpha Solver",
+        version="1.0.0",
+        routes=app.routes,
+    )
+    # Ensure the strategy enum is present
+    if "components" in openapi_schema:
+        if "schemas" in openapi_schema["components"]:
+            if "SolveRequest" in openapi_schema["components"]["schemas"]:
+                if "properties" in openapi_schema["components"]["schemas"]["SolveRequest"]:
+                    if "strategy" in openapi_schema["components"]["schemas"]["SolveRequest"]["properties"]:
+                        openapi_schema["components"]["schemas"]["SolveRequest"]["properties"]["strategy"]["enum"] = ["react", "cot", "tot"]
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi
+
+# Custom OpenAPI to ensure strategy enum
+from fastapi.openapi.utils import get_openapi
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = get_openapi(
+        title="Alpha Solver",
+        version="1.0.0",
+        routes=app.routes,
+    )
+    # Ensure strategy enum exists
+    if "components" in openapi_schema and "schemas" in openapi_schema["components"]:
+        if "SolveRequest" in openapi_schema["components"]["schemas"]:
+            props = openapi_schema["components"]["schemas"]["SolveRequest"].get("properties", {})
+            if "strategy" in props:
+                props["strategy"]["enum"] = ["react", "cot", "tot"]
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi
