@@ -1,0 +1,11 @@
+runs: 100
+factor_noise_pct: 3
+float_tol: 1.0e-6
+compare_keys:
+  - decision
+  - confidence
+  - budget_verdict
+  - score
+  - tool
+  - sandbox_decision
+fail_on_flap: true
