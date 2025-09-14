@@ -1,0 +1,15 @@
+providers:
+  openai:
+    gpt-4o:
+      input_price_per_1k: 5.0
+      output_price_per_1k: 15.0
+      min_charge_usd: 0.0
+    gpt-4o-mini:
+      input_price_per_1k: 0.5
+      output_price_per_1k: 1.5
+      min_charge_usd: 0.0
+  anthropic:
+    claude-3-5-sonnet:
+      input_price_per_1k: 3.0
+      output_price_per_1k: 15.0
+      min_charge_usd: 0.0
