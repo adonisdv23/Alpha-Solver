@@ -3,6 +3,9 @@ from __future__ import annotations
 import argparse
 import json
 from typing import Iterable, Tuple
+import uuid
+
+from alpha.core.observability import ObservabilityManager
 
 from alpha_solver_entry import _tree_of_thought
 
@@ -29,7 +32,17 @@ def main(argv: Iterable[str] | None = None) -> None:  # pragma: no cover - thin 
     ap.add_argument("--clarify-conf-threshold", type=float, default=0.55)
     ap.add_argument("--min-budget-tokens", type=int, default=256)
     ap.add_argument("--no-cot-fallback", action="store_true", help="Disable CoT fallback")
+    ap.add_argument("--record", action="store_true", help="Record replay session")
+    ap.add_argument("--replay", help="Replay session id")
+    ap.add_argument("--obs-stats", action="store_true", help="Print observability stats")
     args = ap.parse_args(list(argv) if argv is not None else None)
+
+    obs: ObservabilityManager | None = None
+    session_id: str | None = None
+    if args.record or args.replay or args.obs_stats:
+        obs = ObservabilityManager(replay_session=args.replay)
+        if args.record:
+            session_id = uuid.uuid4().hex
 
     result = _tree_of_thought(
         args.query,
@@ -42,8 +55,18 @@ def main(argv: Iterable[str] | None = None) -> None:  # pragma: no cover - thin 
         clarify_conf_threshold=args.clarify_conf_threshold,
         min_budget_tokens=args.min_budget_tokens,
         enable_cot_fallback=not args.no_cot_fallback,
+        observability=obs,
     )
     print(json.dumps(result, sort_keys=True))
+
+    if obs:
+        sid = obs.close(args.replay or session_id)
+        if args.obs_stats:
+            stats = {
+                "events_logged": len(obs.replay.events) if obs.replay else 0,
+                "sessions": [sid] if sid else [],
+            }
+            print(json.dumps(stats, sort_keys=True))
 
 
 if __name__ == "__main__":  # pragma: no cover
