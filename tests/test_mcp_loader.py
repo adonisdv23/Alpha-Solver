@@ -24,6 +24,7 @@ def test_valid_registry_loads_and_lists():
     assert list_tools(registry) == ["alpha-tool", "beta-tool"]
     tool = get_tool(registry, "alpha-tool")
     assert tool["timeout_ms"] == 15000
+    assert tool["estimated_latency_ms"] == 200
     assert tool["enabled"] is True
 
 
