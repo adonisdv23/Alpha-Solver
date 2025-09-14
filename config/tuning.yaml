@@ -1,0 +1,17 @@
+search:
+  strategy: "grid"
+  steps_per_weight: 5
+  jitter_pct: 0
+bounds:
+  confidence: [0.5, 1.5]
+  tool_first: [0.0, 0.5]
+  cost_tokens: [0.0001, 0.002]
+  steps: [0.01, 0.10]
+  risk: [0.2, 1.0]
+  latency_ms: [0.0005, 0.005]
+metrics:
+  primary: "top1_accuracy"
+  secondary: "mean_margin"
+runtime:
+  max_evals: 2000
+  seed: 42
