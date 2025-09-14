@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-"""Simulated Google Sheets adapter."""
+"""Simulated Google Sheets adapter with basic hardening."""
 
 from time import perf_counter, sleep
 from typing import Any, Dict, List, Tuple
@@ -9,14 +9,22 @@ from .base import AdapterError, IToolAdapter
 
 
 class GSheetsAdapter:
-    """In-memory sheet store with idempotent appends."""
+    """In-memory sheet store with idempotent appends and retries."""
 
     _LATENCY_S = 0.002
+    _MAX_ATTEMPTS = 2
 
     def __init__(self) -> None:
         self._sheets: Dict[str, List[List[Any]]] = {}
-        self._idem: Dict[str, Tuple[Dict[str, Any], Dict[str, Any]]] = {}
+        # key -> stored value for idempotent replies
+        self._idem: Dict[
+            Tuple[str, str, str | None, Tuple[Tuple[Any, ...], ...]],
+            Dict[str, Any],
+        ] = {}
+        # track keys for which we've already simulated a transient failure
+        self._transient_once: set[Tuple[str, str, Tuple[Tuple[Any, ...], ...]]] = set()
 
+    # Protocol methods -------------------------------------------------------
     def name(self) -> str:  # pragma: no cover - trivial
         return "gsheets"
 
@@ -27,17 +35,20 @@ class GSheetsAdapter:
         idempotency_key: str | None = None,
         timeout_s: float = 5.0,
     ) -> Dict[str, Any]:
-        if idempotency_key and idempotency_key in self._idem:
-            prev_payload, prev_res = self._idem[idempotency_key]
-            if prev_payload == payload:
-                return prev_res
-            raise AdapterError(code="SCHEMA", retryable=False)
-
         if not isinstance(payload, dict):
             raise AdapterError(code="SCHEMA", retryable=False)
+
+        # Merge idempotency sources (parameter takes precedence)
+        idempotency_key = idempotency_key or payload.get("idempotency_key")
+
+        # Drop any *_pii keys
+        payload = {k: v for k, v in payload.items() if not k.endswith("_pii")}
+
         sheet = payload.get("sheet")
+        cell_range = payload.get("range", "A1")
         op = payload.get("op")
         values = payload.get("values")
+
         if not isinstance(sheet, str) or op not in {"append", "read"}:
             raise AdapterError(code="SCHEMA", retryable=False)
 
@@ -45,28 +56,93 @@ class GSheetsAdapter:
         if timeout_s < latency:
             raise AdapterError(code="TIMEOUT", retryable=True)
 
-        start = perf_counter()
-        sleep(latency)
         if op == "append":
             if not isinstance(values, list) or not all(isinstance(r, list) for r in values):
                 raise AdapterError(code="SCHEMA", retryable=False)
-            rows = self._sheets.setdefault(sheet, [])
-            rows.extend([list(r) for r in values])
-            value: Any = len(values)
+            sanitized_values, sanitized_cells = self._sanitize_values(values)
+            idem_key = (
+                sheet,
+                cell_range,
+                idempotency_key,
+                tuple(tuple(r) for r in sanitized_values),
+            )
+
+            if idempotency_key and idem_key in self._idem:
+                return self._idem[idem_key]
+
+            attempts = 0
+            start = perf_counter()
+            value: Any = None
+            while True:
+                attempts += 1
+                try:
+                    if (
+                        (sheet, cell_range, tuple(tuple(r) for r in sanitized_values))
+                        not in self._transient_once
+                    ):
+                        self._transient_once.add(
+                            (sheet, cell_range, tuple(tuple(r) for r in sanitized_values))
+                        )
+                        raise AdapterError(code="TRANSIENT", retryable=True)
+
+                    rows = self._sheets.setdefault(sheet, [])
+                    rows.extend([list(r) for r in sanitized_values])
+                    value = len(sanitized_values)
+                    break
+                except AdapterError as err:
+                    if err.code == "TRANSIENT" and err.retryable and attempts < self._MAX_ATTEMPTS:
+                        continue
+                    raise
+            end = perf_counter()
+            meta = {
+                "latency_ms": (end - start) * 1000,
+                "attempts": attempts,
+                "idempotent": False,
+                "sanitized_cells": sanitized_cells,
+                "retryable": False,
+            }
+            res = {"ok": True, "value": value, "meta": meta}
+            if idempotency_key:
+                self._idem[idem_key] = res
+            return res
+
         else:  # read
+            start = perf_counter()
+            sleep(latency)
             rows = self._sheets.get(sheet, [])
             value = [list(r) for r in rows]
-        end = perf_counter()
-        meta = {"latency_ms": (end - start) * 1000, "retryable": False}
-        res = {"ok": True, "value": value, "meta": meta}
-        if op == "append" and idempotency_key:
-            self._idem[idempotency_key] = (payload, res)
-        return res
+            end = perf_counter()
+            meta = {
+                "latency_ms": (end - start) * 1000,
+                "attempts": 1,
+                "idempotent": True,
+                "sanitized_cells": 0,
+                "retryable": False,
+            }
+            return {"ok": True, "value": value, "meta": meta}
+
+    def _sanitize_values(self, values: List[List[Any]]) -> Tuple[List[List[Any]], int]:
+        sanitized: List[List[Any]] = []
+        changed = 0
+        for row in values:
+            new_row: List[Any] = []
+            for cell in row:
+                orig = cell
+                if isinstance(cell, str):
+                    cell = cell.strip().replace("\n", "")
+                new_row.append(cell)
+                if cell != orig:
+                    changed += 1
+            sanitized.append(new_row)
+        return sanitized, changed
 
     def to_route_explain(self, meta: Dict[str, Any]) -> Dict[str, Any]:
         return {
             "adapter": self.name(),
             "latency_ms": float(meta.get("latency_ms", 0.0)),
-            "attempts": 1,
+            "attempts": int(meta.get("attempts", 1)),
+            "idempotent": bool(meta.get("idempotent", False)),
+            "sanitized_cells": int(meta.get("sanitized_cells", 0)),
             "retriable": bool(meta.get("retryable", meta.get("retriable", False))),
         }
+
