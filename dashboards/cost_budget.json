@@ -1,0 +1,33 @@
+{
+  "annotations": {"list": []},
+  "editable": false,
+  "schemaVersion": 39,
+  "templating": {"list": []},
+  "title": "Cost and Budget",
+  "panels": [
+    {
+      "type": "graph",
+      "title": "Tokens Per Second",
+      "datasource": "${DS_PROMETHEUS}",
+      "targets": [
+        {"expr": "sum(rate(alpha_solver_tokens_total[5m]))"}
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Cost USD Per Second",
+      "datasource": "${DS_PROMETHEUS}",
+      "targets": [
+        {"expr": "sum(rate(alpha_solver_cost_usd_total[5m]))"}
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Confidence Avg",
+      "datasource": "${DS_PROMETHEUS}",
+      "targets": [
+        {"expr": "avg(alpha_solver_confidence)"}
+      ]
+    }
+  ]
+}
