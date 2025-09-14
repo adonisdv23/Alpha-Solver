@@ -1,0 +1,9 @@
+{
+  "templates": {
+    "ask_missing_fields": "You're missing: {{ missing_fields|join(', ') }}. Please provide them briefly.",
+    "disambiguate_intent": "I can do A or B. Which one do you want? Reply with just A or B.",
+    "reduce_scope_low_budget": "We have limited budget. Can you narrow to {{ suggested_scope }}?",
+    "pick_tool_first": "I can use a tool to fetch {{ target }}. Should I proceed? (yes/no)",
+    "generic_clarify": "Please clarify your request in one sentence."
+  }
+}
