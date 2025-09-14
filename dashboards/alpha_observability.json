@@ -1,0 +1,36 @@
+{
+  "annotations": {"list": []},
+  "editable": false,
+  "fiscalYearStartMonth": 0,
+  "schemaVersion": 39,
+  "templating": {"list": []},
+  "title": "Alpha Observability",
+  "panels": [
+    {
+      "type": "graph",
+      "title": "Route Decision Allow Rate",
+      "datasource": "${DS_PROMETHEUS}",
+      "targets": [
+        {"expr": "rate(alpha_solver_route_decision_total{decision=\"allow\"}[5m])"}
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Budget Verdict Totals",
+      "datasource": "${DS_PROMETHEUS}",
+      "targets": [
+        {"expr": "sum by (budget_verdict)(alpha_solver_budget_verdict_total)"}
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Latency p95 ms",
+      "datasource": "${DS_PROMETHEUS}",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(alpha_solver_latency_ms_bucket[5m])) by (le))"
+        }
+      ]
+    }
+  ]
+}
