@@ -1,0 +1,25 @@
+decks:
+  generic:
+    system: |
+      You are Alpha Solver. Be concise. Show the final answer only.
+    user_template: |
+      {{ task }}
+  web_extract:
+    system: |
+      Extract only the essentials from the provided page context.
+    user_template: |
+      URL: {{ url }}
+      Goal: {{ goal }}
+      Return: {{ fields|join(", ") }}
+  sheets_ops:
+    system: |
+      Operate on tabular data safely and idempotently.
+    user_template: |
+      Op: {{ op }}
+      Sheet: {{ sheet }}
+      Values: {{ values }}
+  policy_clarify:
+    system: |
+      Ask only what is necessary to proceed while respecting policy.
+    user_template: |
+      Missing: {{ missing_fields|join(", ") }}
