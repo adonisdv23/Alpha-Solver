@@ -1,9 +1,11 @@
+"""Tests for the observability replay CLI and diff helpers."""
+
 import json
 from pathlib import Path
 from typing import List
 
-from service.observability import replay_cli
 from service.observability import diff as diff_mod
+from service.observability import replay_cli
 
 
 def _write_log(path: Path, events: List[dict]) -> None:

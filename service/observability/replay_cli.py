@@ -1,13 +1,15 @@
 from __future__ import annotations
 
-"""Simple command line interface for replaying observability logs."""
+"""Command line interface for replaying and diffing observability logs."""
 
 import argparse
 import json
 from typing import List, Optional
 
-from .replay import ReplayHarness
 from . import diff as diff_mod
+from .replay import ReplayHarness
+
+__all__ = ["main"]
 
 
 # ---------------------------------------------------------------------------

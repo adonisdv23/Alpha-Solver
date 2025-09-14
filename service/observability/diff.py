@@ -1,12 +1,14 @@
 from __future__ import annotations
 
-"""Lightweight helpers to diff observability log files."""
+"""Helpers to produce unified diffs between observability logs."""
 
-import json
 import difflib
-from typing import Iterable, List, Dict, Any, Optional
+import json
+from typing import Any, Dict, Iterable, List, Optional
 
 from .replay import ReplayHarness
+
+__all__ = ["diff_events", "diff_logs"]
 
 
 # ---------------------------------------------------------------------------
