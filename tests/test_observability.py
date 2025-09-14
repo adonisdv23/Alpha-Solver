@@ -47,6 +47,7 @@ def test_policy_fields_passthrough_when_present(tmp_path):
         **BASE_ROUTE,
         "policy_verdict": "allow",
         "redaction_stats": {"foo": 1},
+        "extra": "drop-me",
     }
     log_path = tmp_path / "p.log"
     logger = JsonlLogger(str(log_path))
@@ -60,6 +61,8 @@ def test_policy_fields_passthrough_when_present(tmp_path):
     event = read_events(log_path)[0]
     assert "policy_verdict" in event["route_explain"]
     assert "redaction_stats" in event["route_explain"]
+    # ensure unexpected fields are removed from route_explain
+    assert "extra" not in event["route_explain"]
     assert "pii_raw" not in event["payload"]
     assert event["payload"]["keep"] == 1
 

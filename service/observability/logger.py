@@ -55,11 +55,21 @@ class JsonlLogger:
         if payload:
             clean_payload = {k: v for k, v in payload.items() if k != "pii_raw"}
 
+        # ensure the route_explain contract – only the required keys and
+        # optional pass‑through fields are persisted.  This prevents log
+        # bloat and guarantees a stable schema for replay consumers.
+        allowed = {"decision", "confidence", "budget_verdict"}
+        if "policy_verdict" in route_explain:
+            allowed.add("policy_verdict")
+        if "redaction_stats" in route_explain:
+            allowed.add("redaction_stats")
+        clean_route = {k: route_explain[k] for k in allowed}
+
         event = {
-            "ts": _dt.datetime.utcnow().isoformat() + "Z",
+            "ts": _dt.datetime.utcnow().replace(tzinfo=None).isoformat() + "Z",
             "pid": self._pid,
             "name": name,
-            "route_explain": route_explain,
+            "route_explain": clean_route,
             "payload": clean_payload,
             "meta": meta or {},
         }
