@@ -1,0 +1,652 @@
+scenarios:
+- id: web-to-sheet-01
+  steps:
+  - tool: playwright
+    action: get_text
+    input:
+      url: https://example.com
+      selector: '#title'
+    expect:
+      contains: Example
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row1
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-02
+  steps:
+  - tool: playwright
+    action: get_text
+    input:
+      url: https://site02.local
+      selector: '#title'
+    expect:
+      equals: ''
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row2
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-03
+  steps:
+  - tool: playwright
+    action: get_text
+    input:
+      url: https://site03.local
+      selector: '#title'
+    expect:
+      equals: ''
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row3
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-04
+  steps:
+  - tool: playwright
+    action: get_text
+    input:
+      url: https://site04.local
+      selector: '#title'
+    expect:
+      equals: ''
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row4
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-05
+  steps:
+  - tool: playwright
+    action: get_text
+    input:
+      url: https://site05.local
+      selector: '#title'
+    expect:
+      equals: ''
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row5
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-06
+  steps:
+  - tool: playwright
+    action: get_text
+    input:
+      url: https://site06.local
+      selector: '#title'
+    expect:
+      equals: ''
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row6
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-07
+  steps:
+  - tool: playwright
+    action: get_text
+    input:
+      url: https://site07.local
+      selector: '#title'
+    expect:
+      equals: ''
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row7
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-08
+  steps:
+  - tool: playwright
+    action: get_text
+    input:
+      url: https://site08.local
+      selector: '#title'
+    expect:
+      equals: ''
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row8
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-09
+  steps:
+  - tool: playwright
+    action: get_text
+    input:
+      url: https://site09.local
+      selector: '#title'
+    expect:
+      equals: ''
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row9
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-10
+  steps:
+  - tool: playwright
+    action: get_text
+    input:
+      url: https://site10.local
+      selector: '#title'
+    expect:
+      equals: ''
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row10
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-11
+  steps:
+  - tool: playwright
+    action: click
+    input:
+      url: https://click11.local
+      selector: '#btn'
+    expect:
+      equals: 1
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row11
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-12
+  steps:
+  - tool: playwright
+    action: click
+    input:
+      url: https://click12.local
+      selector: '#btn'
+    expect:
+      equals: 1
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row12
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-13
+  steps:
+  - tool: playwright
+    action: click
+    input:
+      url: https://click13.local
+      selector: '#btn'
+    expect:
+      equals: 1
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row13
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-14
+  steps:
+  - tool: playwright
+    action: click
+    input:
+      url: https://click14.local
+      selector: '#btn'
+    expect:
+      equals: 1
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row14
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-15
+  steps:
+  - tool: playwright
+    action: click
+    input:
+      url: https://click15.local
+      selector: '#btn'
+    expect:
+      equals: 1
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row15
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-16
+  steps:
+  - tool: playwright
+    action: click
+    input:
+      url: https://click16.local
+      selector: '#btn'
+    expect:
+      equals: 1
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row16
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-17
+  steps:
+  - tool: playwright
+    action: click
+    input:
+      url: https://click17.local
+      selector: '#btn'
+    expect:
+      equals: 1
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row17
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-18
+  steps:
+  - tool: playwright
+    action: click
+    input:
+      url: https://click18.local
+      selector: '#btn'
+    expect:
+      equals: 1
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row18
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-19
+  steps:
+  - tool: playwright
+    action: click
+    input:
+      url: https://click19.local
+      selector: '#btn'
+    expect:
+      equals: 1
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row19
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-20
+  steps:
+  - tool: playwright
+    action: click
+    input:
+      url: https://click20.local
+      selector: '#btn'
+    expect:
+      equals: 1
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row20
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-21
+  steps:
+  - tool: playwright
+    action: screenshot
+    input:
+      url: https://shot21.local
+      selector: body
+    expect:
+      regex: '^screenshot:'
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row21
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-22
+  steps:
+  - tool: playwright
+    action: screenshot
+    input:
+      url: https://shot22.local
+      selector: body
+    expect:
+      regex: '^screenshot:'
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row22
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-23
+  steps:
+  - tool: playwright
+    action: screenshot
+    input:
+      url: https://shot23.local
+      selector: body
+    expect:
+      regex: '^screenshot:'
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row23
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-24
+  steps:
+  - tool: playwright
+    action: screenshot
+    input:
+      url: https://shot24.local
+      selector: body
+    expect:
+      regex: '^screenshot:'
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row24
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-25
+  steps:
+  - tool: playwright
+    action: screenshot
+    input:
+      url: https://shot25.local
+      selector: body
+    expect:
+      regex: '^screenshot:'
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row25
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-26
+  steps:
+  - tool: playwright
+    action: screenshot
+    input:
+      url: https://shot26.local
+      selector: body
+    expect:
+      regex: '^screenshot:'
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row26
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-27
+  steps:
+  - tool: playwright
+    action: screenshot
+    input:
+      url: https://shot27.local
+      selector: body
+    expect:
+      regex: '^screenshot:'
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row27
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-28
+  steps:
+  - tool: playwright
+    action: screenshot
+    input:
+      url: https://shot28.local
+      selector: body
+    expect:
+      regex: '^screenshot:'
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row28
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-29
+  steps:
+  - tool: playwright
+    action: screenshot
+    input:
+      url: https://shot29.local
+      selector: body
+    expect:
+      regex: '^screenshot:'
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row29
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-30
+  steps:
+  - tool: playwright
+    action: screenshot
+    input:
+      url: https://shot30.local
+      selector: body
+    expect:
+      regex: '^screenshot:'
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row30
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
+- id: web-to-sheet-31
+  steps:
+  - tool: playwright
+    action: screenshot
+    input:
+      url: https://shot31.local
+      selector: body
+    expect:
+      regex: '^screenshot:'
+  - tool: gsheets
+    action: append
+    input:
+      sheet: demo
+      values:
+      - - row31
+        - ok
+    expect:
+      equals: 1
+  tags:
+  - showcase
+  - deterministic
