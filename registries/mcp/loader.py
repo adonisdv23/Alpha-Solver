@@ -49,6 +49,7 @@ TOOL_SCHEMA: Dict[str, Any] = {
         "type": {"type": "string", "enum": ["http", "script", "remote"]},
         "entry": {"type": "string"},
         "timeout_ms": {"type": "integer", "minimum": 0, "default": 15000},
+        "estimated_latency_ms": {"type": "integer", "minimum": 0, "default": 200},
         "enabled": {"type": "boolean", "default": True},
         "retry": {
             "type": "object",
@@ -94,6 +95,7 @@ Registry = Dict[str, Any]
 def _apply_defaults(registry: Registry) -> None:
     for tool in registry.get("tool", []):
         tool.setdefault("timeout_ms", 15000)
+        tool.setdefault("estimated_latency_ms", 200)
         tool.setdefault("enabled", True)
 
 
