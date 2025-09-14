@@ -1,0 +1,37 @@
+{
+  "annotations": {"list": []},
+  "editable": false,
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Tokens Rate",
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "targets": [
+        {"expr": "sum(rate(alpha_solver_tokens_total[5m]))"}
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Cost USD Rate",
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "targets": [
+        {"expr": "sum(rate(alpha_solver_cost_usd_total[5m]))"}
+      ]
+    },
+    {
+      "id": 3,
+      "type": "table",
+      "title": "Confidence Avg",
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "targets": [
+        {"expr": "avg(alpha_solver_confidence)"}
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "templating": {"list": []},
+  "title": "Cost & Budget",
+  "version": 1
+}

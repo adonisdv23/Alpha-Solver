@@ -1,0 +1,37 @@
+{
+  "annotations": {"list": []},
+  "editable": false,
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Allow Decision Rate",
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "targets": [
+        {"expr": "rate(alpha_solver_route_decision_total{decision=\"allow\"}[5m])"}
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Budget Verdict Totals",
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "targets": [
+        {"expr": "sum by (budget_verdict)(alpha_solver_budget_verdict_total)"}
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "P95 Latency",
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "targets": [
+        {"expr": "histogram_quantile(0.95, sum(rate(alpha_solver_latency_ms_bucket[5m])) by (le))"}
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "templating": {"list": []},
+  "title": "Alpha Observability",
+  "version": 1
+}
