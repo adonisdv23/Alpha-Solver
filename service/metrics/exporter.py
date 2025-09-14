@@ -36,12 +36,18 @@ _REDACTION_VALUES = {"pii_raw"}
 _REDACTION_SUFFIXES = ("_secret", "_token")
 
 
-def _sanitize(value: Optional[str]) -> Optional[str]:
-    """Redact values that may contain secrets.
+def _redact(d: dict) -> dict:
+    """Remove keys that could carry PII or secrets."""
 
-    Any value equal to ``pii_raw`` or ending with ``_secret`` or ``_token`` is
-    replaced with the string ``redacted``.
-    """
+    return {
+        k: v
+        for k, v in d.items()
+        if k != "pii_raw" and not (k.endswith("_token") or k.endswith("_secret"))
+    }
+
+
+def _sanitize(value: Optional[str]) -> Optional[str]:
+    """Redact string values that may contain PII or secrets."""
 
     if value is None:
         return None
@@ -58,11 +64,15 @@ class MetricsExporter:
 
     def __post_init__(self) -> None:  # noqa: D401 - dataclass post init
         self.registry = CollectorRegistry()
+        self._route_registered = False
+        self._cost_registered = False
 
     # -- registration -----------------------------------------------------
     def register_route_explain(self) -> None:
         """Register counters and gauges related to routing decisions."""
 
+        if self._route_registered:
+            return
         self.decision_counter = Counter(
             "route_decision_total",
             "Total number of routing decisions",
@@ -77,29 +87,25 @@ class MetricsExporter:
             namespace=self.namespace,
             registry=self.registry,
         )
-        self.policy_verdict_counter = Counter(
-            "policy_verdict_total",
-            "Total number of policy verdicts",
-            ["policy_verdict"],
-            namespace=self.namespace,
-            registry=self.registry,
-        )
         self.confidence_gauge = Gauge(
             "confidence",
             "Latest decision confidence",
             namespace=self.namespace,
             registry=self.registry,
         )
+        self._route_registered = True
 
     def register_cost_latency(self) -> None:
         """Register latency histogram and resource cost counters."""
 
+        if self._cost_registered:
+            return
         self.latency_histogram = Histogram(
             "latency_ms",
             "Latency in milliseconds",
             namespace=self.namespace,
             registry=self.registry,
-            buckets=(10, 50, 100, 250, 500, 1000, 2500, 5000, 10000),
+            buckets=[5, 10, 25, 50, 100, 250, 500, 1000, 2000],
         )
         self.tokens_counter = Counter(
             "tokens_total",
@@ -113,17 +119,18 @@ class MetricsExporter:
             namespace=self.namespace,
             registry=self.registry,
         )
+        self._cost_registered = True
 
     # -- recording --------------------------------------------------------
     def record_event(
         self,
         *,
         decision: str,
-        confidence: float,
-        budget_verdict: Optional[str],
-        latency_ms: Optional[float],
-        tokens: Optional[int],
-        cost_usd: Optional[float],
+        confidence: Optional[float] = None,
+        budget_verdict: Optional[str] = None,
+        latency_ms: Optional[float] = None,
+        tokens: Optional[int] = None,
+        cost_usd: Optional[float] = None,
         policy_verdict: Optional[str] = None,
     ) -> None:
         """Record a single routing event.
@@ -133,22 +140,25 @@ class MetricsExporter:
         """
 
         if hasattr(self, "decision_counter"):
-            self.decision_counter.labels(decision=_sanitize(decision)).inc()
-            self.confidence_gauge.set(confidence)
+            decision_val = _sanitize((
+                _redact({"decision": decision or "unknown"}).get("decision")
+            )) or "unknown"
+            self.decision_counter.labels(decision=decision_val).inc()
+            if confidence is not None and hasattr(self, "confidence_gauge"):
+                self.confidence_gauge.set(confidence)
         if hasattr(self, "budget_verdict_counter") and budget_verdict is not None:
-            self.budget_verdict_counter.labels(
-                budget_verdict=_sanitize(budget_verdict)
-            ).inc()
-        if hasattr(self, "policy_verdict_counter") and policy_verdict is not None:
-            self.policy_verdict_counter.labels(
-                policy_verdict=_sanitize(policy_verdict)
-            ).inc()
+            red = _redact({"budget_verdict": budget_verdict})
+            if "budget_verdict" in red:
+                val = _sanitize(red["budget_verdict"])
+                self.budget_verdict_counter.labels(budget_verdict=val).inc()
         if hasattr(self, "latency_histogram") and latency_ms is not None:
             self.latency_histogram.observe(latency_ms)
         if hasattr(self, "tokens_counter") and tokens is not None:
             self.tokens_counter.inc(tokens)
         if hasattr(self, "cost_counter") and cost_usd is not None:
             self.cost_counter.inc(cost_usd)
+        if policy_verdict is not None:
+            _redact({"policy_verdict": policy_verdict})
 
     # -- app --------------------------------------------------------------
     def app(self) -> Starlette:

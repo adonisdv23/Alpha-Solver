@@ -18,17 +18,15 @@ def test_metrics_exporter_registers_and_scrapes():
     exporter.record_event(
         decision="allow",
         confidence=0.9,
-        budget_verdict="within",
+        budget_verdict="ok",
         latency_ms=5.0,
         tokens=3,
         cost_usd=0.02,
-        policy_verdict="ok",
     )
     client = TestClient(exporter.app())
     body = _scrape(client)
     assert "alpha_solver_route_decision_total" in body
     assert "alpha_solver_budget_verdict_total" in body
-    assert "alpha_solver_policy_verdict_total" in body
     assert "alpha_solver_latency_ms_bucket" in body
     assert "alpha_solver_tokens_total" in body
     assert "alpha_solver_cost_usd_total" in body
@@ -42,11 +40,10 @@ def test_record_event_updates_counters_histograms():
     exporter.record_event(
         decision="allow",
         confidence=0.5,
-        budget_verdict="within",
+        budget_verdict="ok",
         latency_ms=123.0,
         tokens=7,
         cost_usd=0.03,
-        policy_verdict="pass",
     )
     client = TestClient(exporter.app())
     metrics_text = _scrape(client)
@@ -70,8 +67,7 @@ def test_record_event_updates_counters_histograms():
             labels = tuple()
         metrics[(name, labels)] = float(value)
     assert metrics[("alpha_solver_route_decision_total", (("decision", "allow"),))] == 1.0
-    assert metrics[("alpha_solver_budget_verdict_total", (("budget_verdict", "within"),))] == 1.0
-    assert metrics[("alpha_solver_policy_verdict_total", (("policy_verdict", "pass"),))] == 1.0
+    assert metrics[("alpha_solver_budget_verdict_total", (("budget_verdict", "ok"),))] == 1.0
     assert metrics[("alpha_solver_tokens_total", tuple())] == 7.0
     assert metrics[("alpha_solver_cost_usd_total", tuple())] == 0.03
     assert metrics[("alpha_solver_latency_ms_count", tuple())] == 1.0
@@ -95,7 +91,6 @@ def test_performance_scrape_p95_under_200ms():
                 latency_ms=1.0,
                 tokens=1,
                 cost_usd=0.001,
-                policy_verdict="ok",
             )
         _scrape(client)
         durations.append(time.monotonic() - start)
