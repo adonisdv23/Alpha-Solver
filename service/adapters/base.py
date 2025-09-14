@@ -13,14 +13,15 @@ class AdapterError(Exception):
     Attributes:
         code: Stable error code string.
         retryable: Whether the operation can be retried safely.
+        detail: Optional human readable message.
     """
 
     code: str
     retryable: bool
-    message: str | None = None
+    detail: str | None = None
 
     def __post_init__(self) -> None:  # pragma: no cover - simple delegator
-        super().__init__(self.message or self.code)
+        super().__init__(self.detail or self.code)
 
 
 class IToolAdapter(Protocol):
