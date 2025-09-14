@@ -1,0 +1,16 @@
+weights:
+  confidence: 1.0
+  tool_first: 0.2
+  cost_tokens: 0.0005   # penalty per token
+  steps: 0.05           # penalty per step
+  risk: 0.7             # penalty for risk
+  latency_ms: 0.002     # penalty per ms
+norms:
+  cost_tokens_div: 1000
+  steps_div: 10
+  latency_ms_div: 1000
+tiebreak:
+  - "confidence:desc"
+  - "latency_ms:asc"
+  - "cost_tokens:asc"
+  - "id:asc"
