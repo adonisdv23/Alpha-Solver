@@ -3,6 +3,8 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
+from service.gating.gates import GateConfig, evaluate_gates
+
 ENTRY = Path(__file__).with_name("alpha-solver-v91-python.py")
 if not ENTRY.exists():
     raise ImportError(f"Expected entrypoint file not found: {ENTRY}")
@@ -15,7 +17,43 @@ _module = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_module)  # type: ignore[attr-defined]
 
 AlphaSolver = _module.AlphaSolver  # type: ignore[attr-defined]
-_tree_of_thought = _module._tree_of_thought  # type: ignore[attr-defined]
+
+
+def _tree_of_thought(
+    query: str,
+    *,
+    low_conf_threshold: float = 0.35,
+    clarify_conf_threshold: float = 0.55,
+    min_budget_tokens: int = 256,
+    enable_cot_fallback: bool = True,
+    **kwargs,
+) -> dict:
+    """Execute reasoning pipeline and run deterministic gating.
+
+    Parameters mirror the public solver API while introducing gating knobs that
+    are forwarded to :func:`evaluate_gates`.
+    """
+
+    result = _module._tree_of_thought(
+        query,
+        low_conf_threshold=low_conf_threshold,
+        enable_cot_fallback=enable_cot_fallback,
+        **kwargs,
+    )
+    confidence = float(result.get("confidence", 0.0))
+    usage = result.get("usage") or {}
+    budget_tokens = int(usage.get("total_tokens", 0))
+    policy_flags = result.get("policy_flags", {})
+    cfg = GateConfig(
+        low_conf_threshold=low_conf_threshold,
+        clarify_conf_threshold=clarify_conf_threshold,
+        min_budget_tokens=min_budget_tokens,
+        enable_cot_fallback=enable_cot_fallback,
+    )
+    decision, explain = evaluate_gates(confidence, budget_tokens, policy_flags, cfg)
+    result["route_explain"] = explain
+    result["decision"] = decision
+    return result
 
 
 def get_solver() -> AlphaSolver:

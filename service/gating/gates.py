@@ -40,7 +40,10 @@ def evaluate_gates(
     rules_hit: List[str] = []
     budget_verdict = "ok"
 
-    if budget_tokens < cfg.min_budget_tokens:
+    if policy_flags.get("block", False):
+        rules_hit.append("policy_block")
+        decision = "block"
+    elif budget_tokens < cfg.min_budget_tokens:
         rules_hit.append("budget_low")
         budget_verdict = "low"
         decision = "clarify"
@@ -50,9 +53,6 @@ def evaluate_gates(
         decision = "clarify"
         if cfg.enable_cot_fallback:
             rules_hit.append("cot_fallback")
-    elif policy_flags.get("block", False):
-        rules_hit.append("policy_block")
-        decision = "block"
     elif confidence < cfg.clarify_conf_threshold:
         rules_hit.append("clarify_band")
         decision = "clarify"

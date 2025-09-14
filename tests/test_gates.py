@@ -23,8 +23,10 @@ def test_clarify_on_low_budget():
 
 
 def test_block_when_policy_flag_block():
-    decision, _ = evaluate_gates(0.9, 1000, {"block": True})
+    decision, explain = evaluate_gates(0.1, 10, {"block": True})
     assert decision == "block"
+    assert explain["gate_rules"] == ["policy_block"]
+    assert explain["budget_verdict"] == "ok"
 
 
 def test_clarify_band_between_low_and_clarify_threshold():
