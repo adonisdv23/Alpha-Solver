@@ -4,19 +4,52 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse
 from fastapi.testclient import TestClient
-from prometheus_client import Counter, Histogram, generate_latest, _REGISTRY
+
+import prometheus_client
+from prometheus_client import Counter, Histogram, generate_latest
+
+# The project ships a small `prometheus_client` shim for tests but some
+# environments may import the real library first.  The shim exposes a simple
+# list called `_REGISTRY`, while the real library provides a `REGISTRY`
+# `CollectorRegistry`.  Support both so tests remain stable regardless of which
+# implementation was imported earlier.
+if hasattr(prometheus_client, "_REGISTRY"):
+    _REGISTRY = prometheus_client._REGISTRY  # type: ignore[attr-defined]
+
+    def _snapshot():
+        return list(_REGISTRY)
+
+    def _clear():
+        _REGISTRY.clear()
+
+    def _restore(original):
+        _REGISTRY[:] = original
+else:  # pragma: no cover - exercised in CI with the real library
+    from prometheus_client import REGISTRY as _PROM_REGISTRY
+
+    def _snapshot():
+        return list(_PROM_REGISTRY._collector_to_names)  # type: ignore[attr-defined]
+
+    def _clear():
+        _PROM_REGISTRY._collector_to_names.clear()  # type: ignore[attr-defined]
+        _PROM_REGISTRY._names_to_collectors.clear()  # type: ignore[attr-defined]
+
+    def _restore(original):
+        _clear()
+        for collector in original:
+            _PROM_REGISTRY.register(collector)
 
 from service.tuning.report_export import export_tuning_report
 
 
 def test_metrics_names_exposed_via_client():
-    original = list(_REGISTRY)
+    original = _snapshot()
     try:
-        _REGISTRY.clear()
-        Counter("alpha_solver_replay_runs_total").inc()
-        Counter("alpha_solver_replay_flap_total").inc()
-        Histogram("alpha_solver_latency_ms_bucket").observe(1.0)
-        Counter("alpha_solver_route_decision_total").inc()
+        _clear()
+        Counter("alpha_solver_replay_runs_total", "runs").inc()
+        Counter("alpha_solver_replay_flap_total", "flaps").inc()
+        Histogram("alpha_solver_latency_ms_bucket", "latency").observe(1.0)
+        Counter("alpha_solver_route_decision_total", "decisions").inc()
 
         app = FastAPI()
 
@@ -34,7 +67,7 @@ def test_metrics_names_exposed_via_client():
         ]:
             assert name in text
     finally:
-        _REGISTRY[:] = original
+        _restore(original)
 
 
 def test_export_tuning_report_schema(tmp_path: Path):

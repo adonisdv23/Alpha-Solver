@@ -1,0 +1,8 @@
+# Default redaction configuration
+allowlist: []
+detectors:
+  authorization: true
+  api_key: true
+  generic_token: true
+  email: true
+  phone: true
