@@ -52,6 +52,26 @@ jobs:
           name: determinism-junit
           path: junit.xml
 
+  determinism-gate:
+    needs: fast-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - run: pip install -r requirements.txt
+      - run: python -m service.replay.gate --runs 10 --replay-file data/datasets/replay/replay_small.jsonl 2>&1 | tee gate.log
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: determinism-gate-log
+          path: gate.log
+
   policy_pii:
     needs: fast-tests
     runs-on: ubuntu-latest
@@ -116,7 +136,7 @@ jobs:
           path: junit.xml
 
   coverage:
-    needs: [determinism, policy_pii, budget_guard, metrics]
+    needs: [determinism, determinism-gate, policy_pii, budget_guard, metrics]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
