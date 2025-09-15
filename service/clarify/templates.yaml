@@ -1,9 +1,84 @@
-{
-  "templates": {
-    "ask_missing_fields": "You're missing: {{ missing_fields|join(', ') }}. Please provide them briefly.",
-    "disambiguate_intent": "I can do A or B. Which one do you want? Reply with just A or B.",
-    "reduce_scope_low_budget": "We have limited budget. Can you narrow to {{ suggested_scope }}?",
-    "pick_tool_first": "I can use a tool to fetch {{ target }}. Should I proceed? (yes/no)",
-    "generic_clarify": "Please clarify your request in one sentence."
-  }
-}
+deck: clarifier_v1
+templates:
+  - id: ask_missing_fields
+    intent: clarify
+    system: "You help gather missing information."
+    user: "You're missing: {{ missing_fields|join(', ') }}. Please provide them briefly."
+    variables:
+      missing_fields:
+        default: []
+  - id: disambiguate_intent
+    intent: clarify
+    system: "You resolve ambiguous intents."
+    user: "I can do {{ options|join(' or ') }}. Which do you want?"
+    variables:
+      options:
+        default: []
+  - id: generic_clarify
+    intent: clarify
+    system: "You clarify requests."
+    user: "Please clarify your request in one sentence."
+  - id: summarize
+    intent: summarize
+    system: "You are a helpful summarizer."
+    user: "Summarize the following text: {{ text }}"
+    variables:
+      text:
+        default: ""
+  - id: extract
+    intent: extract
+    system: "You extract structured data."
+    user: "Extract {{ fields|join(', ') }} from: {{ text }}"
+    variables:
+      text:
+        default: ""
+      fields:
+        default: []
+  - id: rewrite
+    intent: rewrite
+    system: "You rewrite text in different styles."
+    user: "Rewrite the text to be {{ style }}: {{ text }}"
+    variables:
+      text:
+        default: ""
+      style:
+        default: concise
+  - id: plan
+    intent: plan
+    system: "You break down tasks into plans."
+    user: "Plan the following task: {{ task }}"
+    variables:
+      task:
+        default: ""
+  - id: codegen
+    intent: codegen
+    system: "You generate code snippets."
+    user: "Write {{ language }} code to {{ task }}"
+    variables:
+      language:
+        default: python
+      task:
+        default: ""
+  - id: classify
+    intent: classify
+    system: "You classify text."
+    user: "Classify the sentiment of: {{ text }}"
+    variables:
+      text:
+        default: ""
+  - id: cite
+    intent: cite
+    system: "You provide citations for claims."
+    user: "Provide a citation for: {{ claim }}"
+    variables:
+      claim:
+        default: ""
+  - id: web_extract
+    intent: web_extract
+    system: "You use web tools to extract data."
+    user: "Use the web to extract: {{ info }}"
+    variables:
+      info:
+        default: ""
+      tool_hints:
+        default: web
