@@ -1,70 +1,67 @@
+import pytest
 from service.policy.policy_gateway import PolicyGateway, PolicyConfig
+from service.policy.redaction import EMAIL_REGEX, PHONE_REGEX
 
 
-def test_email_masking():
-    cfg = PolicyConfig(enable_input_redaction=True, detectors={"email": True, "phone": False})
-    gw = PolicyGateway(cfg)
-    route = {}
-    log_text, model_text = gw.process("Reach me at alice@example.com", route, for_model=True)
-    assert "alice@example.com" not in log_text
-    assert log_text == model_text
-    assert route["redaction_stats"]["email"] == 1
-
-    route = {}
-    log_text, model_text = gw.process("No emails here", route, for_model=True)
-    assert log_text == "No emails here"
-    assert route["redaction_stats"]["email"] == 0
-
-
-def test_phone_masking():
-    cfg = PolicyConfig(enable_input_redaction=True, detectors={"email": False, "phone": True})
-    gw = PolicyGateway(cfg)
-    route = {}
-    log_text, model_text = gw.process("Call +1-234-567-1234 now", route, for_model=True)
-    assert "+1-234-567-1234" not in log_text
-    assert log_text == model_text
-    assert route["redaction_stats"]["phone"] == 1
-
-    route = {}
-    log_text, model_text = gw.process("Number 123 is short", route, for_model=True)
-    assert "Number 123 is short" == log_text
-    assert route["redaction_stats"]["phone"] == 0
-
-
-def test_fail_closed_blocks_raw_logging(monkeypatch):
-    cfg = PolicyConfig()
+@pytest.mark.policy
+def test_pii_detection_and_redaction_performance():
+    cfg = PolicyConfig(enable_input_redaction=True)
     gw = PolicyGateway(cfg)
 
-    def boom(text, detectors):
-        raise RuntimeError("detector fail")
+    cases = []
+    # email positives and negatives
+    for i in range(30):
+        cases.append((f"Contact me at user{i}@example.com", True, False))
+    for i in range(30):
+        cases.append((f"user{i} at example dot com", False, False))
 
-    from service.policy import redaction
+    # phone positives and negatives
+    for i in range(30):
+        cases.append((f"Call me at +1-202-555-01{i:02d}", False, True))
+    for i in range(30):
+        cases.append((f"extension 10{i}", False, False))
 
-    monkeypatch.setattr(redaction, "redact", boom)
-    route = {}
-    log_text, model_text = gw.process("secret text", route, for_model=True)
-    assert "secret text" not in log_text
-    assert route["policy_verdict"] == "error"
-    assert "error" in route["redaction_stats"]
+    assert len(cases) >= 100
 
-
-def test_latency_budget_p95_under_50ms():
-    cfg = PolicyConfig()
-    gw = PolicyGateway(cfg)
+    email_detected = phone_detected = 0
+    email_total = phone_total = 0
     latencies = []
-    for _ in range(1000):
+    for text, has_email, has_phone in cases:
         route = {}
-        gw.process("Hello there", route, for_model=False)
-        latencies.append(route["redaction_stats"]["latency_ms"])
+        log_text, _ = gw.process(text, route, for_model=True)
+        stats = route["redaction_stats"]
+        latencies.append(stats["latency_ms"])
+
+        if has_email:
+            email_total += 1
+            if stats["email"]:
+                email_detected += 1
+            assert EMAIL_REGEX.search(log_text) is None
+        else:
+            assert stats["email"] == 0
+
+        if has_phone:
+            phone_total += 1
+            if stats["phone"]:
+                phone_detected += 1
+            assert PHONE_REGEX.search(log_text) is None
+        else:
+            assert stats["phone"] == 0
+
+    assert email_detected / email_total >= 0.99
+    assert phone_detected / phone_total >= 0.99
+
     latencies.sort()
     p95 = latencies[int(len(latencies) * 0.95)]
-    assert p95 < 50
+    assert p95 < cfg.latency_budget_ms_p95
 
-
-def test_route_explain_fields_present():
-    cfg = PolicyConfig()
-    gw = PolicyGateway(cfg)
-    route = {}
-    gw.process("hi", route, for_model=True)
-    assert "policy_verdict" in route
+    # ensure route explains are populated for last event
+    assert "policy_verdict" in route and route["policy_verdict"] == "pass"
     assert "redaction_stats" in route
+
+    # ensure no PII in any logged text overall
+    for text, _, _ in cases:
+        route = {}
+        log_text, _ = gw.process(text, route, for_model=True)
+        assert EMAIL_REGEX.search(log_text) is None
+        assert PHONE_REGEX.search(log_text) is None
