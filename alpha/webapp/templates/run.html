@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Alpha Solver · Demo Run</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.5;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(circle at top, #f4f6ff, #dde2f3);
+        color: #1d2038;
+      }
+      .container {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 3rem 1.5rem 4rem;
+      }
+      h1 {
+        margin-bottom: 0.75rem;
+        font-size: 2rem;
+      }
+      .lede {
+        margin-top: 0;
+        margin-bottom: 2rem;
+        font-size: 1.05rem;
+        color: #4a4f83;
+      }
+      button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.5rem;
+        border-radius: 999px;
+        border: none;
+        font-size: 1rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, #5661f6, #7b5ff4);
+        color: #fff;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        box-shadow: 0 16px 40px rgba(76, 88, 214, 0.3);
+      }
+      button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 18px 45px rgba(76, 88, 214, 0.35);
+      }
+      button:disabled {
+        cursor: progress;
+        opacity: 0.8;
+        box-shadow: none;
+        transform: none;
+      }
+      section {
+        margin-top: 2.5rem;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 16px;
+        padding: 1.75rem;
+        box-shadow: 0 24px 70px rgba(26, 32, 74, 0.12);
+        backdrop-filter: blur(10px);
+      }
+      section[hidden] {
+        display: none;
+      }
+      pre {
+        margin: 0 0 1.5rem 0;
+        padding: 1rem 1.25rem;
+        border-radius: 14px;
+        background: rgba(237, 240, 255, 0.7);
+        border: 1px solid rgba(86, 97, 246, 0.2);
+        font-size: 0.95rem;
+        white-space: pre-wrap;
+      }
+      dl {
+        margin: 0;
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      }
+      dt {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #565b8f;
+        font-weight: 600;
+      }
+      dd {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 500;
+      }
+      .error {
+        margin-top: 1.5rem;
+        padding: 0.85rem 1rem;
+        border-radius: 14px;
+        background: rgba(244, 67, 54, 0.12);
+        border: 1px solid rgba(244, 67, 54, 0.2);
+        color: #b71c1c;
+        font-weight: 500;
+      }
+      @media (max-width: 640px) {
+        .container {
+          padding: 2.5rem 1.25rem 3rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <h1>One-click demo run</h1>
+      <p class="lede">
+        Launch the canned Alpha Solver workflow end-to-end and review the result, recorded latency, and cache activity without
+        leaving the dashboard.
+      </p>
+      <button id="run-demo" type="button">Run Demo</button>
+      <section id="demo-output" hidden>
+        <h2>Latest demo result</h2>
+        <pre id="demo-result"></pre>
+        <dl class="metrics">
+          <div>
+            <dt>Latency</dt>
+            <dd><span id="demo-latency">—</span> ms</dd>
+          </div>
+          <div>
+            <dt>Cache hit</dt>
+            <dd id="demo-cache">—</dd>
+          </div>
+        </dl>
+      </section>
+      <div id="demo-error" class="error" role="alert" hidden></div>
+    </main>
+    <script>
+      const runButton = document.getElementById("run-demo");
+      const outputSection = document.getElementById("demo-output");
+      const resultBox = document.getElementById("demo-result");
+      const latencyField = document.getElementById("demo-latency");
+      const cacheField = document.getElementById("demo-cache");
+      const errorBox = document.getElementById("demo-error");
+      const defaultLabel = runButton.textContent;
+
+      function resetButton() {
+        runButton.disabled = false;
+        runButton.textContent = defaultLabel;
+      }
+
+      runButton.addEventListener("click", async () => {
+        runButton.disabled = true;
+        runButton.textContent = "Running…";
+        errorBox.hidden = true;
+        errorBox.textContent = "";
+
+        try {
+          const response = await fetch("/run", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ trigger: "demo" }),
+          });
+
+          if (!response.ok) {
+            throw new Error(`Server responded with ${response.status}`);
+          }
+
+          const payload = await response.json();
+          resultBox.textContent = payload.result || "";
+
+          const latencyValue = typeof payload.latency_ms === "number" ? payload.latency_ms : Number(payload.latency_ms);
+          latencyField.textContent = Number.isFinite(latencyValue) ? latencyValue.toFixed(1) : "—";
+          cacheField.textContent = payload.cache_hit ? "yes" : "no";
+
+          outputSection.hidden = false;
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          errorBox.textContent = `Demo run failed: ${message}`;
+          errorBox.hidden = false;
+        } finally {
+          resetButton();
+        }
+      });
+    </script>
+  </body>
+</html>
