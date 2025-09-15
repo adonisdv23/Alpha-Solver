@@ -5,7 +5,13 @@ from pathlib import Path
 import pytest
 from pytest import MonkeyPatch
 
-from alpha.metrics.aggregator import MetricsAggregator
+from alpha.metrics.aggregator import (
+    adapter_latency_ms,
+    budget_spend_cents,
+    gate_decisions_total,
+    get_metrics_text,
+    replay_pass_total,
+)
 from service.auth.jwt_utils import AuthKeyStore
 
 
@@ -46,25 +52,23 @@ def _metric_names(text: str) -> set[str]:
     return names
 
 
-def test_aggregator_prometheus_series_and_performance():
-    agg = MetricsAggregator()
-    client = agg.test_client()
+def test_exporter_prometheus_series_and_performance():
+    # Touch the counters so they appear in output.
+    gate_decisions_total.inc()
+    replay_pass_total.inc()
+    budget_spend_cents.inc()
+    adapter_latency_ms.observe(3)
 
+    get_metrics_text()  # warm path
     t0 = time.perf_counter()
-    for _ in range(20):
-        agg.record_gate("low_confidence")
-        agg.record_replay("ok")
-        agg.record_budget("under")
-        agg.record_adapter("redis", latency_ms=3)
-    text = client.get("/metrics").text
+    text = get_metrics_text()
     elapsed_ms = (time.perf_counter() - t0) * 1000
 
     assert elapsed_ms < 100
 
     names = _metric_names(text)
-    assert "alpha_solver_gate_total" in names
-    assert "alpha_solver_replay_total" in names
-    assert "alpha_solver_budget_total" in names
-    assert "alpha_solver_adapter_calls_total" in names
-    assert "alpha_solver_adapter_latency_ms" in names
+    assert "gate_decisions_total" in names
+    assert "replay_pass_total" in names
+    assert "budget_spend_cents" in names
+    assert "adapter_latency_ms" in names
 

@@ -1,124 +1,128 @@
-"""Prometheus metrics aggregation and export service."""
+"""Lightweight Prometheus metrics helpers."""
 
 from __future__ import annotations
 
-from threading import Lock
-import inspect
+try:  # pragma: no cover - the real library is preferred
+    from prometheus_client import CollectorRegistry, Counter, Histogram
+    from prometheus_client.exposition import generate_latest
+except Exception:  # pragma: no cover - lightweight fallback
+    class CollectorRegistry(dict):
+        """Very small stand-in used when prometheus_client is unavailable."""
 
-from starlette.applications import Starlette
-from starlette.responses import Response
-from starlette.routing import Route
-from starlette.testclient import TestClient
+        def register(self, metric: object) -> None:  # pragma: no cover - trivial
+            self[metric.name] = metric
 
-try:
-    from prometheus_client import (
-        CONTENT_TYPE_LATEST,
-        CollectorRegistry,
-        Counter,
-        Histogram,
-        generate_latest,
-    )
-except Exception:  # pragma: no cover - fallback for stub
-    from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest  # type: ignore
+    class _BaseMetric:
+        def __init__(self, name: str, documentation: str, registry: CollectorRegistry):
+            self.name = name
+            self.documentation = documentation
+            registry.register(self)
 
-    class CollectorRegistry(list):
-        pass
+    class Counter(_BaseMetric):
+        def __init__(self, name: str, documentation: str, registry: CollectorRegistry):
+            super().__init__(name, documentation, registry)
+            self.value = 0.0
 
-_lock = Lock()
-_REGISTRY = CollectorRegistry()
-_METRICS_CREATED = False
+        def inc(self, amount: float = 1.0) -> None:
+            self.value += amount
 
-GATES = None
-REPLAY = None
-BUDGET = None
-ADAPTER_CALLS = None
-ADAPTER_LATENCY_MS = None
+    class Histogram(_BaseMetric):
+        def __init__(
+            self,
+            name: str,
+            documentation: str,
+            *,
+            buckets: tuple[int, ...] | tuple[float, ...],
+            registry: CollectorRegistry,
+        ) -> None:
+            super().__init__(name, documentation, registry)
+            self.value = 0.0
+
+        def observe(self, amount: float) -> None:
+            self.value += amount
+
+    def generate_latest(registry: CollectorRegistry) -> bytes:  # pragma: no cover - trivial
+        lines: list[str] = []
+        for metric in registry.values():
+            mtype = "counter" if isinstance(metric, Counter) else "histogram"
+            lines.append(f"# HELP {metric.name} {metric.documentation}")
+            lines.append(f"# TYPE {metric.name} {mtype}")
+            lines.append(f"{metric.name} {metric.value}")
+        return "\n".join(lines).encode("utf-8")
+
+# A single, module-level registry keeps exports cheap.
+REGISTRY: CollectorRegistry = CollectorRegistry()
+# Backwards compatibility for existing imports.
+_REGISTRY = REGISTRY
+
+# Pre-register core series.  No dynamic labels to keep cardinality low.
+gate_decisions_total = Counter(
+    "gate_decisions_total", "Total gate decisions", registry=REGISTRY
+)
+replay_pass_total = Counter(
+    "replay_pass_total", "Total successful replays", registry=REGISTRY
+)
+budget_spend_cents = Counter(
+    "budget_spend_cents", "Budget spend in cents", registry=REGISTRY
+)
+adapter_latency_ms = Histogram(
+    "adapter_latency_ms",
+    "Adapter latency in milliseconds",
+    buckets=(10, 25, 50, 75, 100, 250, 500, 1000),
+    registry=REGISTRY,
+)
 
 
-def _ensure_metrics() -> None:
-    """Lazily create metrics in a thread-safe way."""
-    global _METRICS_CREATED, GATES, REPLAY, BUDGET, ADAPTER_CALLS, ADAPTER_LATENCY_MS
-    if _METRICS_CREATED:
-        return
-    with _lock:
-        if _METRICS_CREATED:
-            return
-        GATES = Counter(
-            "alpha_solver_gate_total",
-            "gate decisions",
-            ["gate"],
-            registry=_REGISTRY,
-        )
-        REPLAY = Counter(
-            "alpha_solver_replay_total",
-            "replay outcomes",
-            ["result"],
-            registry=_REGISTRY,
-        )
-        BUDGET = Counter(
-            "alpha_solver_budget_total",
-            "budget verdicts",
-            ["verdict"],
-            registry=_REGISTRY,
-        )
-        ADAPTER_CALLS = Counter(
-            "alpha_solver_adapter_calls_total",
-            "adapter calls",
-            ["adapter"],
-            registry=_REGISTRY,
-        )
-        ADAPTER_LATENCY_MS = Histogram(
-            "alpha_solver_adapter_latency_ms",
-            "adapter latency ms",
-            ["adapter"],
-            buckets=[5, 10, 25, 50, 100, 250, 500, 1000],
-            registry=_REGISTRY,
-        )
-        _METRICS_CREATED = True
+def get_metrics_text(
+    extra: dict | None = None, *, registry: CollectorRegistry = REGISTRY
+) -> str:
+    """Return Prometheus metrics in text format.
+
+    The optional ``extra`` mapping allows callers to bump counters in a
+    low-overhead fashion immediately before export.
+    """
+
+    if extra:
+        if (val := extra.get("gates")):
+            gate_decisions_total.inc(val)
+        if (val := extra.get("replays")):
+            replay_pass_total.inc(val)
+        if (val := extra.get("budget_cents")):
+            budget_spend_cents.inc(val)
+        if (val := extra.get("adapter_latency_ms")):
+            adapter_latency_ms.observe(val)
+
+    # ``generate_latest`` returns ``bytes``; decode once and return.
+    return generate_latest(registry).decode("utf-8")
 
 
 class MetricsAggregator:
-    """Aggregate metrics and expose a `/metrics` endpoint."""
+    """Compatibility wrapper exposing methods used in older code paths."""
 
-    def __init__(self) -> None:
-        _ensure_metrics()
+    def record_gate(self, count: int = 1) -> None:
+        gate_decisions_total.inc(count)
 
-    def record_gate(self, gate: str) -> None:
-        _ensure_metrics()
-        GATES.labels(gate=gate or "unknown").inc()
+    def record_replay(self, count: int = 1) -> None:
+        replay_pass_total.inc(count)
 
-    def record_replay(self, result: str) -> None:
-        _ensure_metrics()
-        REPLAY.labels(result=result or "unknown").inc()
+    def record_budget(self, cents: int) -> None:
+        budget_spend_cents.inc(cents)
 
-    def record_budget(self, verdict: str) -> None:
-        _ensure_metrics()
-        BUDGET.labels(verdict=verdict or "unknown").inc()
+    def record_adapter(self, latency_ms: float) -> None:
+        adapter_latency_ms.observe(latency_ms)
 
-    def record_adapter(self, adapter: str, latency_ms: float | None = None) -> None:
-        _ensure_metrics()
-        adapter = adapter or "unknown"
-        ADAPTER_CALLS.labels(adapter=adapter).inc()
-        if latency_ms is not None:
-            ADAPTER_LATENCY_MS.labels(adapter=adapter).observe(latency_ms)
-
-    def asgi_app(self):
-        _ensure_metrics()
-
-        async def metrics(_request):
-            # ``generate_latest`` signature differs between the real library and the
-            # lightweight stub used in tests. Introspect to call it correctly.
-            sig = inspect.signature(generate_latest)
-            if sig.parameters:
-                payload = generate_latest(_REGISTRY)  # type: ignore[arg-type]
-            else:  # pragma: no cover - stub path
-                payload = generate_latest()
-            return Response(payload, media_type=CONTENT_TYPE_LATEST)
-
-        return Starlette(routes=[Route("/metrics", metrics)])
-
-    def test_client(self) -> TestClient:
-        return TestClient(self.asgi_app())
+    def get_metrics_text(self, extra: dict | None = None) -> str:
+        return get_metrics_text(extra)
 
 
-__all__ = ["MetricsAggregator", "_REGISTRY"]
+__all__ = [
+    "REGISTRY",
+    "_REGISTRY",
+    "gate_decisions_total",
+    "replay_pass_total",
+    "budget_spend_cents",
+    "adapter_latency_ms",
+    "get_metrics_text",
+    "MetricsAggregator",
+]
+
