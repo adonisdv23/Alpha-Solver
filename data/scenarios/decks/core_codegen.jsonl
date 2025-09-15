@@ -1,0 +1,7 @@
+{"id":"deck-code-0001","intent":"codegen","prompt":"Write a Python function that returns the factorial of a number using recursion.","route_expected":"mcp","notes":"basic coding"}
+{"id":"deck-code-0002","intent":"codegen","prompt":"Generate a SQL query to select all users who registered in the last 30 days.","route_expected":"llm_only","notes":"database"}
+{"id":"deck-code-0003","intent":"codegen","prompt":"Produce a JavaScript snippet that debounces a function with a 300ms delay.","route_expected":"llm_only","notes":"js utility"}
+{"id":"deck-code-0004","intent":"codegen","prompt":"Write a bash script to count the number of lines in each .txt file in a directory.","route_expected":"llm_only","notes":"shell"}
+{"id":"deck-code-0005","intent":"codegen","prompt":"Create a CSS rule that centers a div both vertically and horizontally.","route_expected":"llm_only","notes":"web"}
+{"id":"deck-code-0006","intent":"codegen","prompt":"Generate a Rust function that reverses a string.","route_expected":"llm_only","notes":"rust"}
+{"id":"deck-code-0007","intent":"codegen","prompt":"Produce Python code that sorts a list of dictionaries by the 'age' key.","route_expected":"llm_only","notes":"python"}

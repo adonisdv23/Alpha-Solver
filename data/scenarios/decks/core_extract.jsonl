@@ -1,0 +1,7 @@
+{"id":"deck-ext-0001","intent":"extract","prompt":"From the paragraph about the Mars rover, extract the mission launch date.","route_expected":"mcp","notes":"date extraction"}
+{"id":"deck-ext-0002","intent":"extract","prompt":"List the three primary ingredients mentioned in the recipe for apple pie.","route_expected":"llm_only","notes":"cooking"}
+{"id":"deck-ext-0003","intent":"extract","prompt":"Identify the names of all countries referenced in the provided travel blog excerpt.","route_expected":"llm_only","notes":"geography"}
+{"id":"deck-ext-0004","intent":"extract","prompt":"Extract the total cost figure from this budget summary.","route_expected":"llm_only","notes":"financial"}
+{"id":"deck-ext-0005","intent":"extract","prompt":"From the conference agenda, extract the title of the keynote speech.","route_expected":"llm_only","notes":"events"}
+{"id":"deck-ext-0006","intent":"extract","prompt":"Find and list all the botanical terms mentioned in the passage.","route_expected":"llm_only","notes":"science terms"}
+{"id":"deck-ext-0007","intent":"extract","prompt":"Extract the call-to-action phrase from this marketing email draft.","route_expected":"llm_only","notes":"marketing"}

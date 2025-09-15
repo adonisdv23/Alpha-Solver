@@ -1,0 +1,7 @@
+{"id":"deck-rew-0001","intent":"rewrite","prompt":"Rewrite the sentence 'The meeting was not attended by many people' to sound positive.","route_expected":"llm_only","notes":"tone shift"}
+{"id":"deck-rew-0002","intent":"rewrite","prompt":"Rewrite the paragraph to remove passive voice while preserving meaning.","route_expected":"llm_only","notes":"active voice"}
+{"id":"deck-rew-0003","intent":"rewrite","prompt":"Rewrite the email to be more formal and courteous.","route_expected":"llm_only","notes":"professional"}
+{"id":"deck-rew-0004","intent":"rewrite","prompt":"Rewrite the product description so it appeals to college students.","route_expected":"llm_only","notes":"target audience"}
+{"id":"deck-rew-0005","intent":"rewrite","prompt":"Rewrite the following code comment to be clearer for beginners.","route_expected":"llm_only","notes":"clarity"}
+{"id":"deck-rew-0006","intent":"rewrite","prompt":"Rewrite the instructions in bullet points for easier reading.","route_expected":"llm_only","notes":"format"}
+{"id":"deck-rew-0007","intent":"rewrite","prompt":"Rewrite the social media post to fit within 140 characters.","route_expected":"llm_only","notes":"length limit"}
