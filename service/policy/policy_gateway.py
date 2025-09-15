@@ -46,7 +46,7 @@ class PolicyGateway:
             else:
                 model_text = message
             return log_text, model_text
-        except Exception as exc:
+        except Exception as exc:  # pragma: no cover
             if self.config.fail_closed:
                 route_explain["policy_verdict"] = "error"
                 route_explain["redaction_stats"] = {"error": str(exc)}

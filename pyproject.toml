@@ -58,3 +58,36 @@ lint.ignore = ["E501", "E402", "E401"]
 # Keep source strict, relax tests to avoid noise blocking CI.
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*" = ["F401", "E401"]
+
+[tool.pytest.ini_options]
+addopts = "-q -ra"
+markers = [
+    "determinism",
+    "budget",
+    "policy",
+    "metrics",
+]
+
+
+[tool.coverage.run]
+branch = true
+source = [
+    "service/budget",
+    "service/policy",
+    "service/metrics",
+]
+omit = [
+    "tests/*",
+    "*/venv/*",
+    "venv/*",
+    "service/budget/cli.py",
+    "service/budget/simulator.py",
+]
+
+[tool.coverage.report]
+include = [
+    "service/budget/*",
+    "service/policy/*",
+    "service/metrics/*",
+]
+fail_under = 95

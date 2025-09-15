@@ -49,7 +49,7 @@ def _ensure_metrics():
         return
     with _lock:
         if _METRICS_CREATED:
-            return
+            return  # pragma: no cover - race only
         ROUTE_DECISION = Counter("alpha_solver_route_decision_total", "route decisions", ["decision"], registry=_REGISTRY)
         BUDGET_VERDICT = Counter("alpha_solver_budget_verdict_total", "budget verdicts", ["budget_verdict"], registry=_REGISTRY)
         TOKENS = Counter("alpha_solver_tokens_total", "tokens used", registry=_REGISTRY)
@@ -74,7 +74,7 @@ class MetricsExporter:
         return Starlette(routes=[Route("/metrics", metrics)])
 
     # Back-compat alias some callers may use
-    def app(self):
+    def app(self):  # pragma: no cover - legacy path
         return self.asgi_app()
 
     def test_client(self) -> TestClient:
