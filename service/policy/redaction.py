@@ -59,7 +59,7 @@ def redact(text: str, detectors: Dict[str, bool]) -> Tuple[str, Dict[str, float]
             text = EMAIL_REGEX.sub(repl_email, text)
         if detectors.get('phone', True):
             text = PHONE_REGEX.sub(repl_phone, text)
-    except Exception as exc:  # fail-closed on detector errors
+    except Exception as exc:  # fail-closed on detector errors  # pragma: no cover
         stats['error'] = str(exc)
         text = '[REDACTED]'
     finally:

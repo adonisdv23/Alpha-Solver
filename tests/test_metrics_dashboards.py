@@ -31,6 +31,14 @@ def test_metrics_exporter_series_and_performance():
     assert not re.search(r"_token([^s]|$)", text)
     assert "_secret" not in text
 
+    # cover redaction helper
+    assert MetricsExporter._redact({
+        "keep": 1,
+        "pii_raw": "secret",
+        "api_token": "t",
+        "db_secret": "s",
+    }) == {"keep": 1}
+
 
 @pytest.mark.metrics
 def test_dashboards_have_required_panels():

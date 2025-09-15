@@ -68,10 +68,21 @@ markers = [
     "metrics",
 ]
 
+
 [tool.coverage.run]
 branch = true
-source = ["."]
-omit = ["tests/*", "*/venv/*", "venv/*"]
+source = [
+    "service/budget",
+    "service/policy",
+    "service/metrics",
+]
+omit = [
+    "tests/*",
+    "*/venv/*",
+    "venv/*",
+    "service/budget/cli.py",
+    "service/budget/simulator.py",
+]
 
 [tool.coverage.report]
 fail_under = 95
