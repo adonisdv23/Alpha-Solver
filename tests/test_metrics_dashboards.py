@@ -4,11 +4,17 @@ from pathlib import Path
 import pytest
 import re
 
-from service.metrics.exporter import MetricsExporter
+from service.metrics.exporter import MetricsExporter, _REGISTRY, Counter
 
 
 @pytest.mark.metrics
 def test_metrics_exporter_series_and_performance():
+    errors = Counter(
+        "alpha_solver_errors_total",
+        "errors",
+        ["type"],
+        registry=_REGISTRY,
+    )
     exp = MetricsExporter()
     client = exp.test_client()
 
@@ -17,6 +23,7 @@ def test_metrics_exporter_series_and_performance():
         exp.record_event(decision="allow", latency_ms=5, tokens=10, cost_usd=0.01, budget_verdict="ok")
     for i in range(50):
         exp.record_event(decision="deny", latency_ms=7, tokens=5, cost_usd=0.005, budget_verdict="over")
+    errors.labels(type="internal").inc()
     text = client.get("/metrics").text
     elapsed_ms = (time.perf_counter() - t0) * 1000
 
@@ -24,6 +31,7 @@ def test_metrics_exporter_series_and_performance():
     assert 'alpha_solver_route_decision_total{decision="allow"}' in text
     assert "alpha_solver_budget_verdict_total" in text
     assert "alpha_solver_latency_ms_bucket" in text
+    assert "alpha_solver_errors_total" in text
     assert "alpha_solver_tokens_total" in text
     assert "alpha_solver_cost_usd_total" in text
 
@@ -59,3 +67,46 @@ def test_dashboards_have_required_panels():
     assert 'sum(rate(alpha_solver_tokens_total[5m]))' in cost_exprs
     assert 'sum(rate(alpha_solver_cost_usd_total[5m]))' in cost_exprs
     assert 'avg(alpha_solver_confidence)' in cost_exprs
+
+
+@pytest.mark.metrics
+def test_new_grafana_dashboards():
+    base = Path("observability/grafana/dashboards")
+    overview = json.loads((base / "alpha_solver_overview.json").read_text())
+    gates = json.loads((base / "alpha_gates.json").read_text())
+    adapters = json.loads((base / "alpha_adapters.json").read_text())
+
+    over_titles = [p["title"] for p in overview["panels"]]
+    assert "Latency p95 ms" in over_titles
+    assert "Error Rate %" in over_titles
+    assert "Throughput req/s" in over_titles
+    over_exprs = "\n".join(t["expr"] for p in overview["panels"] for t in p.get("targets", []))
+    for name in [
+        "alpha_solver_latency_ms_bucket",
+        "alpha_solver_errors_total",
+        "alpha_solver_route_decision_total",
+        "alpha_solver_budget_verdict_total",
+        "alpha_solver_tokens_total",
+        "alpha_solver_cost_usd_total",
+    ]:
+        assert name in over_exprs
+    lat_panel = next(p for p in overview["panels"] if p["title"] == "Latency p95 ms")
+    assert any("trace" in l.get("url", "") for l in lat_panel.get("links", []))
+
+    gate_exprs = "\n".join(t["expr"] for p in gates["panels"] for t in p.get("targets", []))
+    for name in [
+        "alpha_solver_gate_low_confidence_total",
+        "alpha_solver_gate_clarify_total",
+        "alpha_solver_gate_budget_block_total",
+        "alpha_solver_gate_policy_redaction_total",
+        "alpha_solver_gate_latency_ms_bucket",
+    ]:
+        assert name in gate_exprs
+
+    ad_exprs = "\n".join(t["expr"] for p in adapters["panels"] for t in p.get("targets", []))
+    for name in [
+        "alpha_solver_adapter_calls_total",
+        "alpha_solver_adapter_latency_ms_bucket",
+        "alpha_solver_adapter_circuit_open",
+    ]:
+        assert name in ad_exprs
