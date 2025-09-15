@@ -1,0 +1,30 @@
+{"id": 1, "label": "llm_only", "query": "What is 1 plus 1?"}
+{"id": 2, "label": "llm_only", "query": "What is 2 plus 2?"}
+{"id": 3, "label": "llm_only", "query": "What is 3 plus 3?"}
+{"id": 4, "label": "llm_only", "query": "What is 4 plus 4?"}
+{"id": 5, "label": "llm_only", "query": "What is 5 plus 5?"}
+{"id": 6, "label": "llm_only", "query": "What is 6 plus 6?"}
+{"id": 7, "label": "llm_only", "query": "What is 7 plus 7?"}
+{"id": 8, "label": "llm_only", "query": "What is 8 plus 8?"}
+{"id": 9, "label": "llm_only", "query": "What is 9 plus 9?"}
+{"id": 10, "label": "llm_only", "query": "What is 10 plus 10?"}
+{"id": 11, "label": "llm_only", "query": "What is 11 plus 11?"}
+{"id": 12, "label": "llm_only", "query": "What is 12 plus 12?"}
+{"id": 13, "label": "llm_only", "query": "What is 13 plus 13?"}
+{"id": 14, "label": "llm_only", "query": "What is 14 plus 14?"}
+{"id": 15, "label": "llm_only", "query": "What is 15 plus 15?"}
+{"id": 16, "label": "mcp", "query": "Use the database tool to fetch record 16"}
+{"id": 17, "label": "mcp", "query": "Use the database tool to fetch record 17"}
+{"id": 18, "label": "mcp", "query": "Use the database tool to fetch record 18"}
+{"id": 19, "label": "mcp", "query": "Use the database tool to fetch record 19"}
+{"id": 20, "label": "mcp", "query": "Use the database tool to fetch record 20"}
+{"id": 21, "label": "mcp", "query": "Use the database tool to fetch record 21"}
+{"id": 22, "label": "mcp", "query": "Use the database tool to fetch record 22"}
+{"id": 23, "label": "mcp", "query": "Use the database tool to fetch record 23"}
+{"id": 24, "label": "mcp", "query": "Use the database tool to fetch record 24"}
+{"id": 25, "label": "mcp", "query": "Use the database tool to fetch record 25"}
+{"id": 26, "label": "mcp", "query": "Use the database tool to fetch record 26"}
+{"id": 27, "label": "mcp", "query": "Use the database tool to fetch record 27"}
+{"id": 28, "label": "mcp", "query": "Use the database tool to fetch record 28"}
+{"id": 29, "label": "mcp", "query": "Use the database tool to fetch record 29"}
+{"id": 30, "label": "mcp", "query": "Use the database tool to fetch record 30"}
