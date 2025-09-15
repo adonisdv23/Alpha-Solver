@@ -21,3 +21,11 @@ env-check:
 
 clean:
 	rm -rf **/__pycache__ .pytest_cache .ruff_cache
+
+.PHONY: cli cli-test
+
+cli:
+	python cli/alpha_solver_cli.py --help
+
+cli-test:
+	pytest tests/test_cli_*.py --cov=cli --cov-report=term-missing
