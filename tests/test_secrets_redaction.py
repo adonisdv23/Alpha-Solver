@@ -23,6 +23,12 @@ def _contains_secret(s: str) -> bool:
     return any(v in s for v in FIXTURES.values())
 
 
+@pytest.fixture(autouse=True)
+def _reset_counters():
+    redactor.reset_counters()
+    yield
+
+
 @pytest.fixture()
 def logger():
     log = logging.getLogger("redact")
@@ -40,6 +46,7 @@ def test_detections():
         redacted = redactor.redact(raw)
         assert raw not in redacted
         assert "REDACTED" in redacted or kind in {"email", "phone"}
+    assert redactor.redact(FIXTURES["auth"]) == "Authorization: Bearer ***REDACTED***"
     assert redactor.ERROR_TOTAL == 0
 
 
@@ -52,7 +59,10 @@ def test_allowlist():
 
 def test_structured_logs(logger):
     log, stream = logger
-    log.info("testing", extra={"payload": {"email": FIXTURES["email"], "deep": {"phone": FIXTURES["phone"]}}})
+    log.info(
+        "testing",
+        extra={"payload": {"email": FIXTURES["email"], "deep": {"phone": FIXTURES["phone"]}}},
+    )
     text = stream.getvalue()
     assert FIXTURES["email"] not in text
     assert FIXTURES["phone"] not in text
@@ -83,5 +93,7 @@ def test_performance_and_no_leak(logger):
     for sp in otel.get_exported_spans():
         assert not _contains_secret(str(sp.attributes))
     assert redactor.ERROR_TOTAL == 0
-    expected = (len(messages)-1) * (1000 // len(messages)) + min(1000 % len(messages), len(messages)-1)
-    assert redactor.APPLIED_TOTAL >= expected
+    expected = (len(messages) - 1) * (1000 // len(messages)) + min(
+        1000 % len(messages), len(messages) - 1
+    )
+    assert redactor.APPLIED_TOTAL == expected

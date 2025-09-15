@@ -1,3 +1,5 @@
+"""Secret redaction helpers for logs and spans."""
+
 import re
 from copy import deepcopy
 from typing import Any, Dict, Iterable, Set
