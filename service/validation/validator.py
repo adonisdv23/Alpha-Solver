@@ -70,7 +70,7 @@ def _validate(schema: Dict[str, Any], data: Any, path: str = "") -> List[FieldEr
             if minimum is not None and data < minimum:
                 errors.append(FieldError("too_small", field, f"minimum {minimum}"))
             maximum = schema.get("maximum")
-                
+
             if maximum is not None and data > maximum:
                 errors.append(FieldError("too_large", field, f"maximum {maximum}"))
     elif t == "array":

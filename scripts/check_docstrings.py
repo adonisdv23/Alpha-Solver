@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Check docstring coverage and basic style for public APIs."""
 
 from __future__ import annotations
