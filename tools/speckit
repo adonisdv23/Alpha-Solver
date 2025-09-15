@@ -1,0 +1,95 @@
+#!/usr/bin/env python3
+"""
+Minimal SpecKit/ToolKit CLI for Alpha Solver.
+
+Usage:
+  speckit emit \
+    --id NEW-RETRY-SLO-001 \
+    --track DR_Reliability \
+    --title "CI Gate: Retry & Breaker SLOs" \
+    --accept "Retries p95 < 2 ...; circuit opens <100ms ..." \
+    --targets "tests/reliability/test_retry_and_breaker.py (proposed); alpha/reliability/slo.py (proposed); .github/workflows/reliability-slo.yml" \
+    --template ci_reliability_gate_v1 \
+    --workspace-recipe "- Run failure-injection ...\n- Export JSON ..." \
+    --out .specs/NEW-RETRY-SLO-001.md
+"""
+import argparse, sys, os, datetime, textwrap, pathlib
+
+def load_template(name: str) -> str:
+    if not name:
+        return ""
+    p = pathlib.Path(".spec-templates") / f"{name}.md"
+    return p.read_text() if p.exists() else ""
+
+def write_spec(out_path: str, frontmatter: dict, sections: list[str]):
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    fm = [
+        "---",
+        f"id: {frontmatter['id']}",
+        f"title: {frontmatter['title']}",
+        "owner: alpha-solver",
+        f"phase: {frontmatter.get('phase','Next')}",
+        f"priority: {frontmatter.get('priority','P2A')}",
+        f"track: {frontmatter['track']}",
+        "spec_version: 1.0",
+        f"generated_at: {datetime.datetime.now(datetime.UTC).strftime('%Y-%m-%dT%H:%M:%SZ')}Z",
+        "---",
+        ""
+    ]
+    body = "\n\n".join(sections).rstrip() + "\n"
+    pathlib.Path(out_path).write_text("\n".join(fm) + body)
+    return out_path
+
+def parse_targets(targets: str) -> list[str]:
+    # split by ';' and strip
+    parts = [p.strip() for p in targets.split(";") if p.strip()]
+    return parts
+
+def main():
+    parser = argparse.ArgumentParser(prog="speckit", description="Alpha Solver SpecKit CLI")
+    sub = parser.add_subparsers(dest="cmd", required=True)
+
+    emit = sub.add_parser("emit", help="Emit a spec markdown file")
+    emit.add_argument("--id", required=True)
+    emit.add_argument("--track", required=True)
+    emit.add_argument("--title", required=True)
+    emit.add_argument("--accept", required=True, help="Acceptance Criteria (single string)")
+    emit.add_argument("--targets", required=True, help="Semicolon-separated paths (can include ' (proposed)')")
+    emit.add_argument("--template", default="", help="Template name (reads .spec-templates/<name>.md if exists)")
+    emit.add_argument("--workspace-recipe", default="", help="Optional newline-separated steps")
+    emit.add_argument("--phase", default="Next")
+    emit.add_argument("--priority", default="P2A")
+    emit.add_argument("--out", required=True)
+
+    args = parser.parse_args()
+    if args.cmd == "emit":
+        tmpl = load_template(args.template)
+        targets_md = "\n".join(parse_targets(args.targets))
+        sections = []
+
+        sections.append("## Goal\n" + (tmpl.strip().split("\n",1)[0] if tmpl else f"Implement {args.title}."))
+
+        sections.append("## Acceptance Criteria\n" + args.accept.strip())
+
+        wr = args.workspace_recipe.strip() if args.workspace_recipe else ""
+        wr = wr.replace("\\n", "\n")
+        sections.append("## Workspace Recipe\n" + (wr if wr else "- Define steps to run locally and in CI"))
+
+        sections.append("## Code Targets\n" + targets_md)
+
+        if tmpl:
+            # append rest of template (excluding first line used as Goal if you want)
+            rest = tmpl.split("\n",1)[1] if "\n" in tmpl else ""
+            if rest.strip():
+                sections.append(rest.strip())
+
+        sections.append("## CI\nAdd or update workflows and tests to enforce acceptance automatically.")
+
+        out = write_spec(args.out,
+            {"id": args.id, "title": args.title, "track": args.track, "phase": args.phase, "priority": args.priority},
+            sections
+        )
+        print(out)
+
+if __name__ == "__main__":
+    main()
