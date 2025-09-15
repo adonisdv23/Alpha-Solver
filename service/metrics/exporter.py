@@ -231,3 +231,8 @@ class MetricsExporter:
             )
 
         return Starlette(routes=[Route("/metrics", metrics_endpoint)])
+
+    def test_client(self):
+        from starlette.testclient import TestClient
+
+        return TestClient(self.app())

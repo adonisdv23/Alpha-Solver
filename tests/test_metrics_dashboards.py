@@ -2,8 +2,6 @@ import json
 import time
 from pathlib import Path
 
-from starlette.testclient import TestClient
-
 from service.metrics.exporter import MetricsExporter
 
 
@@ -11,7 +9,7 @@ from service.metrics.exporter import MetricsExporter
 # Metrics exporter tests
 
 def _scrape(exporter: MetricsExporter) -> str:
-    client = TestClient(exporter.app())
+    client = exporter.test_client()
     resp = client.get("/metrics")
     assert resp.status_code == 200
     return resp.text
