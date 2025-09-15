@@ -12,7 +12,6 @@ class GSheetsAdapter:
     """In-memory sheet store with idempotent appends and retries."""
 
     _LATENCY_S = 0.002
-    _MAX_ATTEMPTS = 2
 
     def __init__(self) -> None:
         self._sheets: Dict[str, List[List[Any]]] = {}
@@ -21,14 +20,16 @@ class GSheetsAdapter:
             Tuple[str, str, str | None, Tuple[Tuple[Any, ...], ...]],
             Dict[str, Any],
         ] = {}
-        # track keys for which we've already simulated a transient failure
-        self._transient_once: set[Tuple[str, str, Tuple[Tuple[Any, ...], ...]]] = set()
+        # track keys already forced to fail once for transient simulation
+        self._transient_once: set[
+            Tuple[str, str, Tuple[Tuple[Any, ...], ...]]
+        ] = set()
 
     # Protocol methods -------------------------------------------------------
     def name(self) -> str:  # pragma: no cover - trivial
         return "gsheets"
 
-    def run(
+    def _run_once(
         self,
         payload: Dict[str, Any],
         *,
@@ -60,6 +61,15 @@ class GSheetsAdapter:
             if not isinstance(values, list) or not all(isinstance(r, list) for r in values):
                 raise AdapterError(code="SCHEMA", retryable=False)
             sanitized_values, sanitized_cells = self._sanitize_values(values)
+            # simulate a flaky transient error on first unique payload
+            transient_key = (
+                sheet,
+                cell_range,
+                tuple(tuple(r) for r in sanitized_values),
+            )
+            if transient_key not in self._transient_once:
+                self._transient_once.add(transient_key)
+                raise AdapterError(code="TRANSIENT", retryable=True)
             idem_key = (
                 sheet,
                 cell_range,
@@ -70,33 +80,14 @@ class GSheetsAdapter:
             if idempotency_key and idem_key in self._idem:
                 return self._idem[idem_key]
 
-            attempts = 0
+            rows = self._sheets.setdefault(sheet, [])
+            rows.extend([list(r) for r in sanitized_values])
+            value = len(sanitized_values)
             start = perf_counter()
-            value: Any = None
-            while True:
-                attempts += 1
-                try:
-                    if (
-                        (sheet, cell_range, tuple(tuple(r) for r in sanitized_values))
-                        not in self._transient_once
-                    ):
-                        self._transient_once.add(
-                            (sheet, cell_range, tuple(tuple(r) for r in sanitized_values))
-                        )
-                        raise AdapterError(code="TRANSIENT", retryable=True)
-
-                    rows = self._sheets.setdefault(sheet, [])
-                    rows.extend([list(r) for r in sanitized_values])
-                    value = len(sanitized_values)
-                    break
-                except AdapterError as err:
-                    if err.code == "TRANSIENT" and err.retryable and attempts < self._MAX_ATTEMPTS:
-                        continue
-                    raise
             end = perf_counter()
             meta = {
                 "latency_ms": (end - start) * 1000,
-                "attempts": attempts,
+                "attempts": 1,
                 "idempotent": False,
                 "sanitized_cells": sanitized_cells,
                 "retryable": False,
@@ -120,6 +111,23 @@ class GSheetsAdapter:
                 "retryable": False,
             }
             return {"ok": True, "value": value, "meta": meta}
+
+    def run(
+        self,
+        payload: Dict[str, Any],
+        *,
+        idempotency_key: str | None = None,
+        timeout_s: float = 5.0,
+    ) -> Dict[str, Any]:
+        from .base_adapter import with_retry
+
+        # treat operations as safe to retry since _run_once raises before mutation
+        idem = True
+        return with_retry(
+            lambda: self._run_once(payload, idempotency_key=idempotency_key, timeout_s=timeout_s),
+            adapter=self.name(),
+            idempotent=idem,
+        )
 
     def _sanitize_values(self, values: List[List[Any]]) -> Tuple[List[List[Any]], int]:
         sanitized: List[List[Any]] = []
