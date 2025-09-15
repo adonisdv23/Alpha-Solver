@@ -1,98 +1,66 @@
-import copy
-from pathlib import Path
+from __future__ import annotations
 
-import yaml
-
-from service.scoring.decision_rules import load_weights
-from service.scoring import tuning
+from service.tuning.weight_harness import tune
+from service.tuning.weights_normalize import normalize, freeze
 
 
-# Sample dataset with deterministic behaviour
-LARGE_SAMPLE = [
-    {
-        "id": f"case{i}",
-        "plans": [
-            {"id": "a", "confidence": 1.0, "risk": 0.5, "label_is_winner": False},
-            {"id": "b", "confidence": 0.6, "risk": 0.0, "label_is_winner": True},
-        ],
-    }
-    for i in range(10)
-]
+def _make_dataset(n: int = 50):
+    scenarios = []
+    for i in range(n):
+        plans = [
+            {
+                "id": "a",
+                "factors": {"good": 0.7 + (i % 3) * 0.01, "bad": 0.0},
+                "label": True,
+            },
+            {
+                "id": "b",
+                "factors": {"good": 0.6 + (i % 3) * 0.01, "bad": 0.4},
+                "label": False,
+            },
+        ]
+        scenarios.append({"id": str(i), "plans": plans})
+    return scenarios
 
 
-def test_grid_points_count_and_bounds():
-    bounds = {"a": [0.0, 1.0], "b": [0.0, 0.5]}
-    pts = tuning.grid_points(bounds, 3)
-    assert len(pts) == 9
-    vals_a = sorted({p["a"] for p in pts})
-    vals_b = sorted({p["b"] for p in pts})
-    assert vals_a == [0.0, 0.5, 1.0]
-    assert vals_b == [0.0, 0.25, 0.5]
+def test_harness_improves_accuracy_and_normalises():
+    scenarios = _make_dataset()
+    default = {"good": 0.5, "bad": 0.5}
+    result = tune(scenarios, default, seed=123, samples=200)
+    assert result["after"]["accuracy"] - result["before"]["accuracy"] >= 0.05
+    weights = result["weights"]
+    assert abs(sum(weights.values()) - 1.0) < 1e-6
+    assert all(v >= 0 for v in weights.values())
+    assert list(weights.keys()) == sorted(weights.keys())
 
 
-def test_evaluate_computes_accuracy_and_margin():
-    sample = [
-        {
-            "id": "c1",
-            "plans": [
-                {"id": "p1", "confidence": 1.0, "label_is_winner": True},
-                {"id": "p2", "confidence": 0.0, "label_is_winner": False},
-            ],
-        },
-        {
-            "id": "c2",
-            "plans": [
-                {"id": "p1", "confidence": 0.8, "label_is_winner": False},
-                {"id": "p2", "confidence": 0.9, "label_is_winner": True},
-            ],
-        },
-    ]
-    weights = load_weights("config/decision_rules.yaml")
-    metrics = tuning.evaluate(weights, sample)
-    assert metrics["top1_accuracy"] == 1.0
-    assert metrics["mean_margin"] == 0.55
-
-
-def test_tune_finds_better_than_default_on_sample_ge_10pct():
-    config = yaml.safe_load(Path("config/tuning.yaml").read_text())
-    config["runtime"]["max_evals"] = 100
-    default = load_weights("config/decision_rules.yaml")
-    baseline = tuning.evaluate(default, LARGE_SAMPLE)
-    result = tuning.tune(LARGE_SAMPLE, config=config, default_weights=default)
-    assert result["metrics"]["top1_accuracy"] - baseline["top1_accuracy"] >= 0.1
-
-
-def test_save_best_yaml_and_is_reproducible(tmp_path):
-    path = tmp_path / "best.yaml"
-    weights = {"confidence": 1.1, "risk": 0.9}
-    tuning.save_best_yaml(path, weights)
-    first = path.read_text()
-    tuning.save_best_yaml(path, weights)
-    second = path.read_text()
-    assert first == second
-    data = yaml.safe_load(first)
-    assert data["weights"] == weights
-
-
-def test_to_route_explain_includes_deltas_and_evals():
-    default = load_weights("config/decision_rules.yaml")
-    result: tuning.TuningResult = {
-        "best_weights": {"confidence": 1.1},
-        "metrics": {"top1_accuracy": 0.0, "mean_margin": 0.0},
-        "evals": 12,
-        "route_explain": {},
-    }
-    explain = tuning.to_route_explain(result, default)
-    assert explain["tuning"] == "grid"
-    assert explain["evals"] == 12
-    assert "confidence" in explain["delta"]
-
-
-def test_runtime_limit_respected_and_deterministic():
-    config = yaml.safe_load(Path("config/tuning.yaml").read_text())
-    config["runtime"]["max_evals"] = 10
-    default = load_weights("config/decision_rules.yaml")
-    r1 = tuning.tune(LARGE_SAMPLE, config=config, default_weights=default)
-    r2 = tuning.tune(LARGE_SAMPLE, config=config, default_weights=default)
-    assert r1["evals"] <= 10
+def test_determinism_same_seed_same_result():
+    scenarios = _make_dataset()
+    default = {"good": 0.5, "bad": 0.5}
+    r1 = tune(scenarios, default, seed=42, samples=100)
+    r2 = tune(scenarios, default, seed=42, samples=100)
     assert r1 == r2
+
+
+def test_normalize_invariants_and_freeze():
+    raw = {"b": float("nan"), "a": -1.0, "c": float("inf")}
+    norm = normalize(raw)
+    assert abs(sum(norm.values()) - 1.0) < 1e-6
+    assert all(v >= 0 for v in norm.values())
+    assert list(norm.keys()) == sorted(norm.keys())
+    frozen = freeze(raw)
+    assert frozen == tuple(sorted(norm.items()))
+
+
+def test_no_gain_path_returns_flag():
+    # Dataset where default weights already optimal
+    scenarios = []
+    for i in range(10):
+        plans = [
+            {"id": "a", "factors": {"good": 1.0}, "label": True},
+            {"id": "b", "factors": {"good": 0.5}, "label": False},
+        ]
+        scenarios.append({"id": str(i), "plans": plans})
+    default = {"good": 1.0}
+    result = tune(scenarios, default, seed=0, samples=50)
+    assert result["no_gain"] is True
