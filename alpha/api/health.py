@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
-__all__ = ["get_health"]
+__all__ = ["get_health", "router"]
 
 
 def get_health(
@@ -12,12 +12,7 @@ def get_health(
     vectordb_ok: bool | None = None,
     provider_ok: bool | None = None,
 ) -> Dict[str, str]:
-    """Return application and dependency health information.
-
-    The function avoids network calls unless a ``redis_client`` is provided.
-    ``vectordb_ok`` and ``provider_ok`` flags allow callers to supply cached
-    health information. When ``None`` they default to ``down``.
-    """
+    """Return application and dependency health information."""
 
     def _status(flag: bool | None) -> str:
         return "ok" if flag else "down"
@@ -30,14 +25,26 @@ def get_health(
         except Exception:
             redis_status = "down"
 
-    payload: Dict[str, str] = {
+    return {
         "app": "ok",
         "redis": redis_status,
         "vectordb": _status(vectordb_ok),
         "provider": _status(provider_ok),
         "ts": datetime.now(timezone.utc).isoformat(),
     }
-    return payload
+
+
+# Optional FastAPI router for service integration
+try:  # pragma: no cover - only exercised in integration tests
+    from fastapi import APIRouter
+
+    router = APIRouter()
+
+    @router.get("/health")
+    def health_endpoint() -> Dict[str, str]:
+        return get_health()
+except Exception:  # pragma: no cover - fastapi not installed
+    router = None
 
 
 if __name__ == "__main__":  # pragma: no cover - manual debugging helper

@@ -1,8 +1,8 @@
 # Health Endpoint
 
-`alpha.api.health.get_health` returns a dictionary describing the health of the
-application and its dependencies. The data is suitable for wiring into a `/health`
-HTTP endpoint but no web server is required for tests.
+`alpha.api.health.get_health` returns a dictionary describing application and
+dependency status. The function performs no network access unless a redis client
+is supplied, making it easy to test.
 
 ```python
 from alpha.api.health import get_health
@@ -10,6 +10,9 @@ from fakeredis import FakeRedis
 
 # succeed with all dependencies healthy
 get_health(FakeRedis(), vectordb_ok=True, provider_ok=True)
+
+# without a Redis client, dependencies default to "down"
+get_health()
 ```
 
 The payload has the following shape:
@@ -24,5 +27,4 @@ The payload has the following shape:
 }
 ```
 
-Each probe is lightweight so a call should complete in well under 50 ms on a
-warm cache.
+Each probe is lightweight so a call should complete in well under 50 ms on a warm cache.

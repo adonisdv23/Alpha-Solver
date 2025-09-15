@@ -1,15 +1,17 @@
 # Rate Limiting
 
-`alpha.middleware.ratelimit.RateLimiter` implements a simple token bucket using
-Redis when available and an in-memory fallback otherwise.
+`alpha.middleware.ratelimit.RateLimiter` provides a small token‑bucket limiter.
+It can operate against Redis using `INCRBY`/`PEXPIRE` or fall back to an
+in‑memory store protected by a lock. No external service is required for tests.
 
 ```python
 from fakeredis import FakeRedis
 from alpha.middleware.ratelimit import RateLimiter
 
-rl = RateLimiter("chat", rate_per_sec=5, capacity=10, redis_client=FakeRedis())
+rl = RateLimiter(bucket="chat", rate_per_sec=5, capacity=10, redis_client=FakeRedis())
 rl.allow()
 ```
 
-Helper functions `get_bucket_level()` and `get_throttles_total()` expose the
-current state for metrics collection.
+Metrics helpers are exposed via instance methods:
+`get_bucket_level()` returns remaining tokens and `get_throttles_total()` counts
+rejected requests.
