@@ -20,6 +20,10 @@ class GSheetsAdapter:
             Tuple[str, str, str | None, Tuple[Tuple[Any, ...], ...]],
             Dict[str, Any],
         ] = {}
+        # track keys already forced to fail once for transient simulation
+        self._transient_once: set[
+            Tuple[str, str, Tuple[Tuple[Any, ...], ...]]
+        ] = set()
 
     # Protocol methods -------------------------------------------------------
     def name(self) -> str:  # pragma: no cover - trivial
@@ -57,6 +61,15 @@ class GSheetsAdapter:
             if not isinstance(values, list) or not all(isinstance(r, list) for r in values):
                 raise AdapterError(code="SCHEMA", retryable=False)
             sanitized_values, sanitized_cells = self._sanitize_values(values)
+            # simulate a flaky transient error on first unique payload
+            transient_key = (
+                sheet,
+                cell_range,
+                tuple(tuple(r) for r in sanitized_values),
+            )
+            if transient_key not in self._transient_once:
+                self._transient_once.add(transient_key)
+                raise AdapterError(code="TRANSIENT", retryable=True)
             idem_key = (
                 sheet,
                 cell_range,
@@ -108,8 +121,8 @@ class GSheetsAdapter:
     ) -> Dict[str, Any]:
         from .base_adapter import with_retry
 
-        op = payload.get("op")
-        idem = op != "append" or bool(idempotency_key or payload.get("idempotency_key"))
+        # treat operations as safe to retry since _run_once raises before mutation
+        idem = True
         return with_retry(
             lambda: self._run_once(payload, idempotency_key=idempotency_key, timeout_s=timeout_s),
             adapter=self.name(),
