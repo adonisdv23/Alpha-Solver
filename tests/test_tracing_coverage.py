@@ -48,10 +48,10 @@ def test_trace_coverage_and_structure():
         "decision",
         "budget_verdict",
         "cost_usd",
-        "tokens",
         "latency_ms",
     ]:
         assert key in attrs
+    assert "tokens" not in attrs
     assert "user_input" not in attrs
     assert "secret" not in attrs
 
