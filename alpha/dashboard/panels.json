@@ -1,0 +1,88 @@
+{
+  "$schema": "https://grafana.com/schemas/v11/dashboard.schema.json",
+  "title": "Alpha Production Observability",
+  "refresh": "30s",
+  "timezone": "browser",
+  "panels": [
+    {
+      "id": "gate-decisions-rate",
+      "title": "Gate Decisions (5m rate)",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "unit": "ops",
+      "description": "Track the rolling decision rate coming from automated gating.",
+      "targets": [
+        {
+          "expr": "sum by (decision) (rate(gate_decisions_total{environment=\"prod\"}[5m]))",
+          "legend": "{{decision}}",
+          "format": "time_series"
+        }
+      ],
+      "interval": "30s"
+    },
+    {
+      "id": "replay-pass-ratio",
+      "title": "Replay Pass Throughput",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "unit": "ops",
+      "description": "How many replay runs succeed per minute across prod environments.",
+      "targets": [
+        {
+          "expr": "sum(rate(replay_pass_total{environment=\"prod\"}[5m]))",
+          "legend": "passes",
+          "format": "time_series"
+        }
+      ],
+      "interval": "30s"
+    },
+    {
+      "id": "budget-spend-cents",
+      "title": "Budget Spend (¢ per hour)",
+      "type": "stat",
+      "datasource": "Prometheus",
+      "unit": "cents",
+      "description": "Hourly budget spend derived from the cents counter.",
+      "targets": [
+        {
+          "expr": "sum(increase(budget_spend_cents{environment=\"prod\"}[1h]))",
+          "legend": "hourly spend",
+          "format": "time_series"
+        }
+      ],
+      "interval": "1m"
+    },
+    {
+      "id": "adapter-latency",
+      "title": "Adapter Latency P95",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "unit": "milliseconds",
+      "description": "P95 latency for adapter calls aggregated across adapters.",
+      "targets": [
+        {
+          "expr": "quantile_over_time(0.95, adapter_latency_ms{environment=\"prod\"}[5m])",
+          "legend": "p95",
+          "format": "time_series"
+        }
+      ],
+      "interval": "30s"
+    },
+    {
+      "id": "reliability-slo",
+      "title": "Reliability SLO",
+      "type": "stat",
+      "datasource": "Prometheus",
+      "unit": "percent",
+      "description": "Rolling 30m SLO derived from retries and breaker open events.",
+      "targets": [
+        {
+          "expr": "(1 - ((sum(rate(retries_total{environment=\"prod\"}[30m])) + sum(rate(breaker_open_total{environment=\"prod\"}[30m]))) / sum(rate(requests_total{environment=\"prod\"}[30m])))) * 100",
+          "legend": "SLO",
+          "format": "time_series"
+        }
+      ],
+      "interval": "30s"
+    }
+  ]
+}
