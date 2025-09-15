@@ -5,7 +5,7 @@ from service.metrics import client as mclient
 
 
 def reset_registry() -> None:
-    """Reset the client registry and re-register app-level metrics."""
+    """Reset the client registry and re-register metrics used in tests."""
     mclient.registry = mclient.CollectorRegistry()
     try:
         from service import app as app_module
@@ -37,4 +37,18 @@ def reset_registry() -> None:
             labelnames=("kind",),
         )
     except Exception:  # pragma: no cover - app not imported
+        pass
+    try:
+        from service.adapters import base_adapter as base_adapter_module
+
+        base_adapter_module._init_metrics()
+    except Exception:  # pragma: no cover - adapters not imported
+        pass
+    try:
+        from service.metrics import exporter as exporter_module
+
+        exporter_module._REGISTRY = mclient.registry
+        exporter_module._METRICS_CREATED = False
+        exporter_module._ensure_metrics()
+    except Exception:  # pragma: no cover - exporter not imported
         pass

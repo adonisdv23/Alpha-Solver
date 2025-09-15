@@ -1,31 +1,59 @@
 """Tiny Prometheus client wrapper used by the service.
 
 It attempts to import the real ``prometheus_client`` package and falls back to
-lightweight shims when that import fails.  A dedicated ``CollectorRegistry`` is
-used so that tests can safely reset metrics without clashing with the library's
+minimal no-op shims when that import fails. A dedicated ``CollectorRegistry``
+is used so tests can safely reset metrics without clashing with the library's
 process-wide default registry.
 """
+
 from __future__ import annotations
 
 from typing import Iterable
 
 try:  # pragma: no cover - exercised in tests
     from prometheus_client import (
-        Counter,
-        Histogram,
         CollectorRegistry,
+        Counter,
+        Gauge,
+        Histogram,
         CONTENT_TYPE_LATEST,
         generate_latest,
     )
-except Exception:  # pragma: no cover
-    # Provide very small shims that match the subset of the API we use
-    from prometheus_client import (
-        Counter,  # type: ignore
-        Histogram,  # type: ignore
-        CollectorRegistry,  # type: ignore
-        CONTENT_TYPE_LATEST,  # type: ignore
-        generate_latest,  # type: ignore
-    )
+except Exception:  # pragma: no cover - tiny shims
+    class _Metric:
+        def __init__(self, *args, **kwargs) -> None:
+            pass
+
+        def labels(self, **kwargs):  # type: ignore[override]
+            return self
+
+        def inc(self, amount: float = 1.0) -> None:
+            pass
+
+        def observe(self, value: float) -> None:
+            pass
+
+        def set(self, value: float) -> None:
+            pass
+
+    class Counter(_Metric):
+        ...
+
+    class Gauge(_Metric):
+        ...
+
+    class Histogram(_Metric):
+        ...
+
+    class CollectorRegistry:  # type: ignore
+        def __init__(self) -> None:
+            pass
+
+    CONTENT_TYPE_LATEST = "text/plain; version=0.0.4; charset=utf-8"
+
+    def generate_latest(_registry: CollectorRegistry) -> bytes:  # pragma: no cover
+        return b""
+
 
 # Use a dedicated registry so tests don't hit the global default one
 registry: CollectorRegistry = CollectorRegistry()
@@ -34,6 +62,10 @@ registry: CollectorRegistry = CollectorRegistry()
 def counter(name: str, doc: str, labelnames: Iterable[str] = ()) -> Counter:
     """Create a counter registered in the module's registry."""
     return Counter(name, doc, labelnames=tuple(labelnames), registry=registry)
+
+
+def gauge(name: str, doc: str, labelnames: Iterable[str] = ()) -> Gauge:
+    return Gauge(name, doc, labelnames=tuple(labelnames), registry=registry)
 
 
 def histogram(
@@ -59,7 +91,14 @@ def scrape() -> tuple[str, bytes]:
 __all__ = [
     "registry",
     "counter",
+    "gauge",
     "histogram",
     "scrape",
     "CollectorRegistry",
+    "Counter",
+    "Gauge",
+    "Histogram",
+    "CONTENT_TYPE_LATEST",
+    "generate_latest",
 ]
+

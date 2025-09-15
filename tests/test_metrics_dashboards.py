@@ -4,16 +4,18 @@ from pathlib import Path
 import pytest
 import re
 
-from service.metrics.exporter import MetricsExporter, _REGISTRY, Counter
+from service.metrics.exporter import MetricsExporter
+from service.metrics.testing import reset_registry
+from service.metrics import client as mclient
 
 
 @pytest.mark.metrics
 def test_metrics_exporter_series_and_performance():
-    errors = Counter(
+    reset_registry()
+    errors = mclient.counter(
         "alpha_solver_errors_total",
         "errors",
-        ["type"],
-        registry=_REGISTRY,
+        labelnames=("type",),
     )
     exp = MetricsExporter()
     client = exp.test_client()

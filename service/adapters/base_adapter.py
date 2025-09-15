@@ -1,53 +1,49 @@
 from __future__ import annotations
 
-"""Adapter wrapper that adds circuit breaker and metrics."""
+"""Adapter wrapper that adds circuit breaker behaviour and metrics."""
 
 from typing import Any, Dict
-from threading import Lock
 import logging
-from service.metrics.exporter import _REGISTRY, Counter
-try:  # pragma: no cover - use real Gauge if available
-    from prometheus_client import Gauge
-except Exception:  # pragma: no cover - stub without Gauge
-    class Gauge(Counter):  # type: ignore
-        def set(self, value: float) -> None:
-            self.value = value
 
 from .circuit_breaker import CircuitBreaker
 from .base import IToolAdapter
+from service.metrics import client as mclient
 
 
-_METRIC_LOCK = Lock()
-_METRICS_INIT = False
-CALLS_TOTAL: Counter
-BREAKER_STATE: Gauge
-OPEN_TOTAL: Counter
+# ---------------------------------------------------------------------------
+# Metrics
+CALLS_TOTAL: mclient.Counter
+BREAKER_STATE: mclient.Gauge
+OPEN_TOTAL: mclient.Counter
 
 
-def _ensure_metrics() -> None:
-    global _METRICS_INIT, CALLS_TOTAL, BREAKER_STATE, OPEN_TOTAL
-    if _METRICS_INIT:
-        return
-    with _METRIC_LOCK:
-        if _METRICS_INIT:
-            return
-        CALLS_TOTAL = Counter(
-            "alpha_adapter_calls_total", "adapter calls", ["adapter", "result"], registry=_REGISTRY
-        )
-        BREAKER_STATE = Gauge(
-            "alpha_adapter_breaker_state", "breaker state", ["adapter", "state"], registry=_REGISTRY
-        )
-        OPEN_TOTAL = Counter(
-            "alpha_adapter_open_total", "breaker opened", ["adapter"], registry=_REGISTRY
-        )
-        _METRICS_INIT = True
+def _init_metrics() -> None:
+    """(Re)initialize metrics on the current registry."""
+    global CALLS_TOTAL, BREAKER_STATE, OPEN_TOTAL
+    CALLS_TOTAL = mclient.counter(
+        "alpha_adapter_calls_total",
+        "adapter calls",
+        labelnames=("adapter", "result"),
+    )
+    BREAKER_STATE = mclient.gauge(
+        "alpha_adapter_breaker_state",
+        "breaker state",
+        labelnames=("adapter", "state"),
+    )
+    OPEN_TOTAL = mclient.counter(
+        "alpha_adapter_open_total",
+        "breaker opened",
+        labelnames=("adapter",),
+    )
+
+
+_init_metrics()
 
 
 class BaseAdapter(IToolAdapter):
     """Shared adapter wrapper implementing circuit breaker logic."""
 
     def __init__(self, *, name: str, breaker: CircuitBreaker | None = None) -> None:
-        _ensure_metrics()
         self._name = name
         self._breaker = breaker or CircuitBreaker()
         self._update_state_metrics()
@@ -62,7 +58,13 @@ class BaseAdapter(IToolAdapter):
             BREAKER_STATE.labels(adapter=self._name, state=state).set(value)
 
     # ------------------------------------------------------------------
-    def _run(self, payload: Dict[str, Any], *, idempotency_key: str | None, timeout_s: float) -> Dict[str, Any]:
+    def _run(
+        self,
+        payload: Dict[str, Any],
+        *,
+        idempotency_key: str | None,
+        timeout_s: float,
+    ) -> Dict[str, Any]:
         raise NotImplementedError
 
     def run(
@@ -88,7 +90,9 @@ class BaseAdapter(IToolAdapter):
             CALLS_TOTAL.labels(adapter=self._name, result="failure").inc()
             if self._breaker.state == "open" and prev_state != "open":
                 OPEN_TOTAL.labels(adapter=self._name).inc()
-                logging.getLogger(__name__).warning("adapter %s circuit opened", self._name)
+                logging.getLogger(__name__).warning(
+                    "adapter %s circuit opened", self._name
+                )
             if prev_state != self._breaker.state:
                 self._update_state_metrics()
             raise
@@ -102,3 +106,4 @@ class BaseAdapter(IToolAdapter):
     # simple delegator; subclasses may override
     def to_route_explain(self, meta: Dict[str, Any]) -> Dict[str, Any]:  # pragma: no cover - simple
         return {"adapter": self._name, **meta}
+

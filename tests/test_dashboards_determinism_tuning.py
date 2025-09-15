@@ -4,25 +4,26 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse
 from fastapi.testclient import TestClient
-from prometheus_client import Counter, Histogram, generate_latest, _REGISTRY
+from service.metrics import client as mclient
 
 from service.tuning.report_export import export_tuning_report
 
 
 def test_metrics_names_exposed_via_client():
-    original = list(_REGISTRY)
+    original = mclient.registry
     try:
-        _REGISTRY.clear()
-        Counter("alpha_solver_replay_runs_total").inc()
-        Counter("alpha_solver_replay_flap_total").inc()
-        Histogram("alpha_solver_latency_ms_bucket").observe(1.0)
-        Counter("alpha_solver_route_decision_total").inc()
+        mclient.registry = mclient.CollectorRegistry()
+        mclient.counter("alpha_solver_replay_runs_total", "runs")
+        mclient.counter("alpha_solver_replay_flap_total", "flaps")
+        mclient.histogram("alpha_solver_latency_ms", "latency", buckets=(1, 2, 3))
+        mclient.counter("alpha_solver_route_decision_total", "decisions")
 
         app = FastAPI()
 
         @app.get("/metrics")
         def metrics() -> PlainTextResponse:  # pragma: no cover - simple bridge
-            return PlainTextResponse(generate_latest().decode("utf-8"))
+            ct, payload = mclient.scrape()
+            return PlainTextResponse(payload.decode("utf-8"))
 
         client = TestClient(app)
         text = client.get("/metrics").text
@@ -34,7 +35,7 @@ def test_metrics_names_exposed_via_client():
         ]:
             assert name in text
     finally:
-        _REGISTRY[:] = original
+        mclient.registry = original
 
 
 def test_export_tuning_report_schema(tmp_path: Path):

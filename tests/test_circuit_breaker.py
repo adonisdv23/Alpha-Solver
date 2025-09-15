@@ -9,6 +9,7 @@ from service.adapters.base import AdapterError
 from service.adapters.base_adapter import BaseAdapter
 from service.adapters.circuit_breaker import CircuitBreaker
 from service.metrics.exporter import MetricsExporter
+from service.metrics.testing import reset_registry
 
 
 class ManualTime:
@@ -49,6 +50,11 @@ def breaker(manual_time: ManualTime) -> CircuitBreaker:
 @pytest.fixture
 def adapter(breaker: CircuitBreaker) -> FlakyAdapter:
     return FlakyAdapter(breaker)
+
+
+@pytest.fixture(autouse=True)
+def _reset_registry() -> None:
+    reset_registry()
 
 
 def test_open_on_failures(adapter: FlakyAdapter, breaker: CircuitBreaker):
