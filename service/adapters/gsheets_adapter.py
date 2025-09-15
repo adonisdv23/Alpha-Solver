@@ -119,11 +119,11 @@ class GSheetsAdapter:
         idempotency_key: str | None = None,
         timeout_s: float = 5.0,
     ) -> Dict[str, Any]:
-        from .base_adapter import with_retry
+        from .base_adapter import call_adapter
 
         # treat operations as safe to retry since _run_once raises before mutation
         idem = True
-        return with_retry(
+        return call_adapter(
             lambda: self._run_once(payload, idempotency_key=idempotency_key, timeout_s=timeout_s),
             adapter=self.name(),
             idempotent=idem,
