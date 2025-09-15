@@ -91,3 +91,16 @@ include = [
     "service/metrics/*",
 ]
 fail_under = 95
+
+[tool.docs]
+modules = [
+    "service.security",
+    "service.alerts",
+    "service.otel",
+    "service.logging.redactor",
+    "service.gating.gates",
+    "service.tenancy.context",
+    "service.mcp.policy_auth",
+    "service.auth.api_keys",
+    "alpha.executors.math_exec",
+]
