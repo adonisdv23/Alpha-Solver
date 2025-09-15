@@ -10,16 +10,16 @@ This guide covers how to **run**, **inspect**, and **evaluate** Alpha Solver’s
 docker compose -f infrastructure/docker-compose.prod.yml up
 ```
 
-- API: http://localhost:8000  
-- Prometheus metrics: http://localhost:9090/metrics  
+- API: http://localhost:8000
+- Prometheus metrics: http://localhost:9090/metrics
 - Grafana dashboards: http://localhost:3000 (provisioned from `infrastructure/grafana/provisioning`)
 
 ---
 
 ## Endpoints
 
-- `GET /health` — basic process health; returns `{"status":"ok"}` when configuration is loaded.  
-- `GET /ready` — readiness probe toggled by `app_state.ready`.  
+- `GET /health` — basic process health; returns `{"status":"ok"}` when configuration is loaded.
+- `GET /ready` — readiness probe toggled by `app_state.ready`.
 - `GET /metrics` — Prometheus metrics (request counts, latency, rate-limit, SAFE-OUT events).
 
 ---
@@ -94,5 +94,5 @@ The overview lists run metadata and per-query leaderboards; links appear at the 
 
 ## Notes
 
-- The production compose stack wires Prometheus & Grafana for quick monitoring.  
+- The production compose stack wires Prometheus & Grafana for quick monitoring.
 - Evidence (replay/benchmark/a11y) plus metrics makes regressions easy to spot and reproduce.
