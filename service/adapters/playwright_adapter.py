@@ -7,10 +7,11 @@ from typing import Any, Dict, Tuple
 from urllib.parse import urlparse
 import re
 
-from .base import AdapterError, IToolAdapter
+from .base import AdapterError
+from .base_adapter import BaseAdapter
 
 
-class PlaywrightAdapter:
+class PlaywrightAdapter(BaseAdapter):
     """Tiny in-memory browser emulator.
 
     It supports a new ``extract`` action used by the hardened tests while still
@@ -21,6 +22,7 @@ class PlaywrightAdapter:
     _LATENCY_S = 0.002
 
     def __init__(self) -> None:
+        BaseAdapter.__init__(self, name="playwright")
         # Legacy page storage -------------------------------------------------
         self._pages: Dict[str, Dict[str, Any]] = {
             "https://example.com": {"text": "Example Domain", "clicks": 0}
@@ -42,10 +44,7 @@ class PlaywrightAdapter:
         }
 
     # Protocol methods -------------------------------------------------------
-    def name(self) -> str:  # pragma: no cover - trivial
-        return "playwright"
-
-    def run(
+    def _run(
         self,
         payload: Dict[str, Any],
         *,

@@ -5,16 +5,18 @@ from __future__ import annotations
 from time import perf_counter, sleep
 from typing import Any, Dict, List, Tuple
 
-from .base import AdapterError, IToolAdapter
+from .base import AdapterError
+from .base_adapter import BaseAdapter
 
 
-class GSheetsAdapter:
+class GSheetsAdapter(BaseAdapter):
     """In-memory sheet store with idempotent appends and retries."""
 
     _LATENCY_S = 0.002
     _MAX_ATTEMPTS = 2
 
     def __init__(self) -> None:
+        BaseAdapter.__init__(self, name="gsheets")
         self._sheets: Dict[str, List[List[Any]]] = {}
         # key -> stored value for idempotent replies
         self._idem: Dict[
@@ -25,10 +27,7 @@ class GSheetsAdapter:
         self._transient_once: set[Tuple[str, str, Tuple[Tuple[Any, ...], ...]]] = set()
 
     # Protocol methods -------------------------------------------------------
-    def name(self) -> str:  # pragma: no cover - trivial
-        return "gsheets"
-
-    def run(
+    def _run(
         self,
         payload: Dict[str, Any],
         *,
