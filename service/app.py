@@ -47,6 +47,7 @@ from alpha.core.config import APISettings
 from alpha.core.telemetry import record_rate_limit, record_request, record_safe_out
 from .security import validate_api_key, sanitize_query
 from .otel import init_tracer
+from .health import healthcheck
 
 
 class JsonFormatter(logging.Formatter):
@@ -126,6 +127,7 @@ app.add_middleware(_RequestSpanMiddleware)
 app.add_middleware(_SimpleTracingMiddleware)
 app.state.config = cfg
 app.state.ready = True
+app.state.start_time = time.time()
 
 # expose Prometheus metrics on a dedicated port
 start_http_server(9000)
@@ -245,6 +247,21 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
     cost = duration_ms * cfg.cost_per_ms
     _record_cost(duration_ms, cost)
     return JSONResponse(result)
+
+
+@app.get("/health")
+async def health_v1() -> JSONResponse:
+    payload = await healthcheck(app)
+    status = 200 if payload["status"] == "ok" else 503
+    return JSONResponse(status_code=status, content=payload)
+
+
+@app.get("/ready")
+async def ready_v1() -> JSONResponse:
+    payload = await healthcheck(app)
+    if not app.state.ready or payload["status"] != "ok":
+        return JSONResponse(status_code=503, content=payload)
+    return JSONResponse(content=payload)
 
 
 @app.get("/healthz")
