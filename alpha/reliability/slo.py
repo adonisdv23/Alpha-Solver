@@ -1,8 +1,8 @@
 import json, sys, pathlib
 
 THRESHOLDS = {
-    "retry_p95_max": 2,              # must be < 2
-    "breaker_open_p95_ms_max": 100,  # must be < 100 ms
+    "retry_p95_max": 2,
+    "breaker_open_p95_ms_max": 100,
 }
 
 def p95(values):
