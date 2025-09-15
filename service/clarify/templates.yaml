@@ -14,6 +14,20 @@ templates:
     variables:
       options:
         default: []
+  - id: reduce_scope_low_budget
+    intent: clarify
+    system: "You help narrow scope when tokens are limited."
+    user: "Token budget is low; please narrow to {{ suggested_scope }}."
+    variables:
+      suggested_scope:
+        default: ""
+  - id: pick_tool_first
+    intent: clarify
+    system: "You help pick tools when useful."
+    user: "Which tool fits best: {{ tools|join(', ') }}?"
+    variables:
+      tools:
+        default: []
   - id: generic_clarify
     intent: clarify
     system: "You clarify requests."
@@ -77,8 +91,8 @@ templates:
     intent: web_extract
     system: "You use web tools to extract data."
     user: "Use the web to extract: {{ info }}"
+    tool_hints:
+      - web
     variables:
       info:
         default: ""
-      tool_hints:
-        default: web

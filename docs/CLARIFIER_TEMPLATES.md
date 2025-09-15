@@ -27,6 +27,11 @@ The deck currently covers:
 - classify
 - cite
 - web_extract
+- ask_missing_fields
+- disambiguate_intent
+- reduce_scope_low_budget
+- pick_tool_first
+- generic_clarify
 
 ## Examples
 ```
