@@ -1,0 +1,13 @@
+model_sets:
+  default:
+    provider: openai
+    model: gpt-5
+    max_tokens: 2048
+    timeout_ms: 60000
+    price_hint: { input_per_1k: 0.005, output_per_1k: 0.015 }
+  cost_saver:
+    provider: openai
+    model: gpt-5-mini
+    max_tokens: 1024
+    timeout_ms: 45000
+    price_hint: { input_per_1k: 0.0015, output_per_1k: 0.004 }
