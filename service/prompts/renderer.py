@@ -77,6 +77,17 @@ def _render_template(template: str, ctx: Dict[str, Any]) -> str:
 
 
 def render(deck_name: str, ctx: Dict[str, Any], decks: Dict[str, Any]) -> Dict[str, str]:
+    """Render system/user prompts from ``decks``.
+
+    Args:
+        deck_name: Name of the deck to render.
+        ctx: Substitution values for template variables.
+        decks: Loaded deck mapping from :func:`load_decks`.
+
+    Returns:
+        Dict[str, str]: Rendered prompts and deck SHA.
+    """
+
     deck = decks[deck_name]
     system = _render_template(deck.get("system", ""), ctx)
     user = _render_template(deck.get("user_template", ""), ctx)
@@ -84,14 +95,43 @@ def render(deck_name: str, ctx: Dict[str, Any], decks: Dict[str, Any]) -> Dict[s
 
 
 def to_route_explain(deck_name: str, deck_sha_str: str) -> Dict[str, str]:
+    """Create a compact structure for ``route_explain``.
+
+    Args:
+        deck_name: Name of the prompt deck.
+        deck_sha_str: SHA of the deck content.
+
+    Returns:
+        Dict[str, str]: Minimal route_explain payload.
+    """
+
     return {"prompt_deck": deck_name, "deck_sha": deck_sha_str}
 
 
 def estimate_tokens(text: str) -> int:
+    """Crude token estimation based on whitespace split.
+
+    Args:
+        text: Prompt text to estimate tokens for.
+
+    Returns:
+        int: Approximate token count.
+    """
+
     return len(text.split())
 
 
 def compare_token_savings(baseline_prompts: List[str], new_prompts: List[str]) -> float:
+    """Compute percentage token savings between two prompt sets.
+
+    Args:
+        baseline_prompts: Original prompts.
+        new_prompts: Optimised prompts.
+
+    Returns:
+        float: Percentage reduction in token count.
+    """
+
     base = sum(estimate_tokens(p) for p in baseline_prompts)
     new = sum(estimate_tokens(p) for p in new_prompts)
     if base == 0:

@@ -50,6 +50,17 @@ def put_pack(
     *,
     tags: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
+    """Persist a new evidence pack to disk.
+
+    Args:
+        manifest: Manifest metadata.
+        simulation_lines: Simulation results as JSONL lines.
+        metrics: Aggregated metrics.
+        tags: Optional list of tags.
+
+    Returns:
+        Dict[str, Any]: Index entry describing the stored pack.
+    """
     now = _utcnow()
     ts = now.isoformat().replace("+00:00", "Z")
     date_str = now.strftime("%Y%m%d")
@@ -131,6 +142,17 @@ def list_packs(
     tag: Optional[str] = None,
     limit: int = 100,
 ) -> List[Dict[str, Any]]:
+    """List stored evidence packs with optional filtering.
+
+    Args:
+        start: ISO timestamp lower bound.
+        end: ISO timestamp upper bound.
+        tag: Filter by tag.
+        limit: Maximum number of results.
+
+    Returns:
+        List[Dict[str, Any]]: Matching evidence entries.
+    """
     if not INDEX_PATH.exists():
         return []
     results: List[Dict[str, Any]] = []
@@ -152,6 +174,14 @@ def list_packs(
 
 
 def get_pack(pack_id: str) -> Dict[str, Any]:
+    """Load a previously stored evidence pack by ``pack_id``.
+
+    Args:
+        pack_id: Identifier returned from :func:`put_pack`.
+
+    Returns:
+        Dict[str, Any]: Expanded evidence pack information.
+    """
     if not INDEX_PATH.exists():
         raise KeyError(pack_id)
     entry: Optional[Dict[str, Any]] = None
@@ -196,6 +226,15 @@ def get_pack(pack_id: str) -> Dict[str, Any]:
 
 
 def to_route_explain(entry: Dict[str, Any]) -> Dict[str, Any]:
+    """Convert an index entry to a compact ``route_explain`` structure.
+
+    Args:
+        entry: Evidence index entry.
+
+    Returns:
+        Dict[str, Any]: Route explain payload.
+    """
+
     return {
         "evidence_id": entry["id"],
         "sha256": entry["sha256_zip"],

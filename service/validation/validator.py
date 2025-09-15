@@ -8,12 +8,16 @@ SCHEMA_PATH = Path(__file__).parent / "schemas" / "request_schema.json"
 
 @dataclass
 class FieldError:
+    """Structured validation error."""
+
     code: str
     field: str
     reason: str
 
 
 class ValidationError(Exception):
+    """Raised when request payload fails validation."""
+
     def __init__(self, errors: List[FieldError]):
         super().__init__("invalid request")
         self.errors = [e.__dict__ for e in errors]
@@ -80,6 +84,15 @@ def _validate(schema: Dict[str, Any], data: Any, path: str = "") -> List[FieldEr
 
 
 def validate_request(payload: Dict[str, Any]) -> None:
+    """Validate *payload* against the request schema.
+
+    Args:
+        payload: Incoming request body.
+
+    Raises:
+        ValidationError: If the payload does not conform to the schema.
+    """
+
     errors = _validate(SCHEMA, payload)
     if errors:
         raise ValidationError(errors)

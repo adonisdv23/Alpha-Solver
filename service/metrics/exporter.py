@@ -61,6 +61,8 @@ def _ensure_metrics():
 
 
 class MetricsExporter:
+    """Utility for recording and exposing Prometheus metrics."""
+
     def __init__(self, namespace: str = "alpha_solver"):
         self.namespace = namespace
         _ensure_metrics()

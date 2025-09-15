@@ -42,6 +42,17 @@ def _evaluate(expr: str, context: Dict[str, Any]) -> str:
 
 
 def render(template_key: str, context: Dict[str, Any], templates: Dict[str, Any]) -> str:
+    """Render a single template using *context* values.
+
+    Args:
+        template_key: Key of the template to render.
+        context: Variables available for substitution.
+        templates: Mapping of template keys to template strings.
+
+    Returns:
+        str: Rendered template string.
+    """
+
     template = templates.get(template_key, "")
     def repl(match: re.Match) -> str:
         expr = match.group(1)

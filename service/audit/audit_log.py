@@ -12,6 +12,8 @@ _TOKEN_RE = re.compile(r"\b(?:token|secret|password)[A-Za-z0-9_-]*\b", re.I)
 
 
 class AuditLog:
+    """In-memory append-only audit log with PII redaction."""
+
     def __init__(
         self,
         retention_days: int = 30,
@@ -82,8 +84,28 @@ _audit_log = AuditLog()
 
 
 def record(event_type: str, payload: Dict[str, Any], ctx: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Record an event in the global audit log.
+
+    Args:
+        event_type: Type of event to record.
+        payload: Event payload.
+        ctx: Context containing principal information.
+
+    Returns:
+        Optional[Dict[str, Any]]: Recorded entry or ``None`` if filtered.
+    """
+
     return _audit_log.record(event_type, payload, ctx)
 
 
 def verify(stream: Iterable[Dict[str, Any]]) -> Optional[int]:
+    """Verify integrity of an exported audit log stream.
+
+    Args:
+        stream: Iterable of log entries.
+
+    Returns:
+        Optional[int]: Index of first invalid entry or ``None`` if valid.
+    """
+
     return verify_chain(stream)

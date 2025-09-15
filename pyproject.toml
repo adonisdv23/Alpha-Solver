@@ -91,3 +91,7 @@ include = [
     "service/metrics/*",
 ]
 fail_under = 95
+
+[tool.pdoc]
+modules = ["service"]
+docformat = "google"

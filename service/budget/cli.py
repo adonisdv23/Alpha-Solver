@@ -44,6 +44,15 @@ def _scrub(obj: Any) -> Any:
 
 
 def main(argv: List[str] | None = None) -> int:
+    """Run budget simulation and guarding from the command line.
+
+    Args:
+        argv: Optional list of command-line arguments.
+
+    Returns:
+        int: Exit code representing success (0) or failure.
+    """
+
     parser = argparse.ArgumentParser(description="Budget simulation and guard")
     parser.add_argument("--provider", required=True)
     parser.add_argument("--model", required=True)

@@ -25,6 +25,15 @@ def _clean_str(s: str) -> str:
 
 
 def sanitize(data: Any) -> Any:
+    """Sanitize strings or nested structures by removing risky content.
+
+    Args:
+        data: Arbitrary input data.
+
+    Returns:
+        The sanitized data with PII and dangerous patterns removed.
+    """
+
     if isinstance(data, str):
         return _clean_str(data)
     if isinstance(data, list):

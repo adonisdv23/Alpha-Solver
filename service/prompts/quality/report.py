@@ -2,6 +2,17 @@ from typing import List, Dict
 
 
 def batch_compare(pairs: List[Dict], evaluator, *, deck_sha: str, rubrics_sha_str: str) -> Dict:
+    """Batch compare prompt pairs using a provided evaluator.
+
+    Args:
+        pairs: List of baseline/variant dictionaries.
+        evaluator: Object with a ``compare`` method.
+        deck_sha: SHA of the prompt deck.
+        rubrics_sha_str: SHA of the evaluation rubrics.
+
+    Returns:
+        Dict: Summary containing win rate and per-item results.
+    """
     items = []
     wins = 0
     total = len(pairs)

@@ -28,6 +28,8 @@ def _diff(expected: Dict[str, Any], actual: Dict[str, Any]) -> Dict[str, Any]:
 
 
 class Player:
+    """Replays recorded scenarios to ensure deterministic behaviour."""
+
     def __init__(self, snapshot_fn: Callable[[], Dict[str, Any]] | None = None) -> None:
         self.snapshot_fn = snapshot_fn or compute_snapshot
 

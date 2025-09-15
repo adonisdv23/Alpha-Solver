@@ -144,12 +144,16 @@ app.add_middleware(
 
 
 class StrategyEnum(str, Enum):
+    """Available reasoning strategies for the solver."""
+
     cot = "cot"
     react = "react"
     tot = "tot"
 
 
 class SolveRequest(BaseModel):
+    """Request body for the ``/v1/solve`` endpoint."""
+
     query: str = Field(..., examples=["hello"])
     context: Optional[Dict[str, Any]] = None
     strategy: Optional[StrategyEnum] = Field(
@@ -163,6 +167,12 @@ _REQUESTS: DefaultDict[str, Deque[float]] = defaultdict(deque)
 
 @app.get("/openapi.json")
 def openapi_json() -> JSONResponse:
+    """Serve the bundled OpenAPI specification.
+
+    Returns:
+        JSONResponse: The pre-generated OpenAPI document.
+    """
+
     spec_path = Path(__file__).resolve().parents[1] / "openapi.json"
     with spec_path.open("r", encoding="utf-8") as f:
         spec = json.load(f)
@@ -171,6 +181,16 @@ def openapi_json() -> JSONResponse:
 
 @app.middleware("http")
 async def add_request_id(request: Request, call_next):
+    """Attach a request ID and log basic request metadata.
+
+    Args:
+        request: Incoming HTTP request.
+        call_next: ASGI callable for the next middleware/handler.
+
+    Returns:
+        The downstream response with ``X-Request-ID`` header.
+    """
+
     req_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
     request.state.request_id = req_id
     start = time.time()
@@ -205,6 +225,16 @@ async def add_request_id(request: Request, call_next):
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
+    """Return SAFE-OUT response for handled HTTP errors.
+
+    Args:
+        request: The HTTP request.
+        exc: Raised ``HTTPException``.
+
+    Returns:
+        JSONResponse: Safe-out payload with original status code.
+    """
+
     body = {"final_answer": f"SAFE-OUT: {exc.detail}"}
     headers = {"X-Request-ID": getattr(request.state, "request_id", "")}
     record_safe_out(request.url.path)
@@ -212,6 +242,15 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 
 def rate_limiter(request: Request) -> None:
+    """Enforce per-API-key rate limits.
+
+    Args:
+        request: Incoming HTTP request.
+
+    Raises:
+        HTTPException: If the request exceeds the allowed rate.
+    """
+
     key = validate_api_key(request, cfg)
     request.state.api_key = key
     if not cfg.ratelimit.enabled:
@@ -230,6 +269,16 @@ def rate_limiter(request: Request) -> None:
 
 @app.post("/v1/solve", dependencies=[Depends(rate_limiter)])
 async def solve(req: SolveRequest, request: Request) -> JSONResponse:
+    """Run a solve request using the selected reasoning strategy.
+
+    Args:
+        req: Incoming solve request body.
+        request: The HTTP request (for context/telemetry).
+
+    Returns:
+        JSONResponse: Solver output.
+    """
+
     query = sanitize_query(req.query)
     params = req.context or {}
     strategy = req.strategy or params.get("strategy")
@@ -251,6 +300,12 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
 
 @app.get("/health")
 async def health_v1() -> JSONResponse:
+    """Legacy health endpoint used in tests.
+
+    Returns:
+        JSONResponse: Health status payload.
+    """
+
     payload = await healthcheck(app)
     status = 200 if payload["status"] == "ok" else 503
     return JSONResponse(status_code=status, content=payload)
@@ -258,6 +313,8 @@ async def health_v1() -> JSONResponse:
 
 @app.get("/ready")
 async def ready_v1() -> JSONResponse:
+    """Legacy readiness endpoint used in tests."""
+
     payload = await healthcheck(app)
     if not app.state.ready or payload["status"] != "ok":
         return JSONResponse(status_code=503, content=payload)
@@ -266,12 +323,16 @@ async def ready_v1() -> JSONResponse:
 
 @app.get("/healthz")
 async def health() -> Dict[str, str]:
+    """Kubernetes-style health probe."""
+
     ok = bool(app.state.config)
     return {"status": "ok" if ok else "error"}
 
 
 @app.get("/readyz")
 async def ready() -> JSONResponse:
+    """Kubernetes-style readiness probe."""
+
     if not app.state.ready:
         return JSONResponse(status_code=503, content={"status": "not ready"})
     return JSONResponse(content={"status": "ok"})
@@ -279,6 +340,8 @@ async def ready() -> JSONResponse:
 
 @app.get("/metrics")
 def metrics():
+    """Expose Prometheus metrics collected in-process."""
+
     # Legacy test compatibility: tests call .json() and expect a plain string.
     # We return the Prometheus exposition format as a JSON string.
     text = generate_latest().decode("utf-8")
@@ -299,6 +362,8 @@ __all__ = ["app"]
 from fastapi.openapi.utils import get_openapi
 
 def custom_openapi():
+    """Generate OpenAPI schema with explicit strategy enum."""
+
     if app.openapi_schema:
         return app.openapi_schema
     openapi_schema = get_openapi(
@@ -322,6 +387,8 @@ app.openapi = custom_openapi
 from fastapi.openapi.utils import get_openapi
 
 def custom_openapi():
+    """Generate OpenAPI schema with explicit strategy enum."""
+
     if app.openapi_schema:
         return app.openapi_schema
     openapi_schema = get_openapi(

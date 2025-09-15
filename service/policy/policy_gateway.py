@@ -6,6 +6,8 @@ from . import redaction
 
 @dataclass
 class PolicyConfig:
+    """Configuration controlling policy redaction behaviour."""
+
     enable_input_redaction: bool = True
     detectors: Dict[str, bool] = field(default_factory=lambda: {"email": True, "phone": True})
     latency_budget_ms_p95: int = 50

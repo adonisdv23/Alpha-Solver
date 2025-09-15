@@ -28,6 +28,15 @@ def canonical_json(data: Any) -> str:
 
 
 def stable_hash(data: Any) -> str:
+    """Return a SHA256 hash over canonical JSON representation of *data*.
+
+    Args:
+        data: Arbitrary JSON-serialisable object.
+
+    Returns:
+        str: Hex digest of the stable hash.
+    """
+
     canonical = canonical_json(data)
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 

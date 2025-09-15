@@ -72,6 +72,21 @@ def verify_jwt(
     issuer: str | None = None,
     leeway: int = LEWAY_SECONDS,
 ) -> Dict:
+    """Validate a JWT and return the decoded payload.
+
+    Args:
+        token: Encoded JWT string.
+        key_store: Source of public keys.
+        audience: Expected audience claim.
+        issuer: Expected issuer claim.
+        leeway: Allowed clock skew in seconds.
+
+    Returns:
+        Dict: Decoded JWT payload.
+
+    Raises:
+        JWTError: If validation fails.
+    """
     parts = token.split(".")
     if len(parts) != 3:
         raise JWTError("invalid_header", "malformed token")

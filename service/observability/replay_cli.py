@@ -49,6 +49,15 @@ def _percentile(values: List[float], pct: float) -> float:
 
 # ---------------------------------------------------------------------------
 def main(argv: Optional[Iterable[str]] = None) -> int:
+    """Entry point for replay CLI.
+
+    Args:
+        argv: Optional iterable of arguments. Uses ``sys.argv`` if ``None``.
+
+    Returns:
+        int: Process exit code. ``0`` indicates success.
+    """
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--events", required=True, help="JSONL event log")
     parser.add_argument("--compare", help="Second JSONL log to diff against")
