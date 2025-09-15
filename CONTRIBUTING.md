@@ -1,13 +1,32 @@
 # Contributing
 
-- Use feature branches and squash merge PRs.
-- Keep `make test` green.
-- Run `ruff check alpha`.
-- Add or adjust tests for new code.
-- Follow the PR template (summary, tests, docs).
+## Workflow
 
-## Observability workflows
+1. Spec Kit → 2. Codex → 3. PR → 4. CI → 5. Squash & Merge
 
-- Use `alpha-solver-v91-python.py --record <session>` to capture replay sessions.
-- Validate deterministic output with `--replay <session>`.
-- Benchmarks write JSON/Markdown to `artifacts/benchmarks/`.
+## Branch naming
+
+- `mvp/*` for baseline work
+- `next/*` for future iterations
+
+## Local development
+
+```bash
+pip install -r requirements.txt
+pytest -q
+```
+
+## Style
+
+- Type hints and docstrings
+- Deterministic tests
+
+## Pull requests
+
+- Keep branches up to date
+- Squash merge after CI passes
+
+## Issue templates
+
+Templates live under `.github/ISSUE_TEMPLATE/`.
+
