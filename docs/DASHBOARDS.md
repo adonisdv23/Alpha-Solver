@@ -24,11 +24,19 @@ The Alpha Production Observability dashboard ships a curated slice of the core r
 
 ## Alert Coverage
 
-The companion alert rules mirror the dashboard metrics:
+The companion alert rules mirror the dashboard metrics and add high-signal reliability guardrails. Each rule is delivered in `alpha/dashboard/alerts.json` under the `dashboards_alerts_v1` template so it can be imported directly into Grafana alerting.
+
+### Core Dashboard Alerts
 
 - **Gate Decision Denial Spike** – Watches the ratio of `gate_decisions_total` with `decision="denied"` exceeding 20% for five minutes.
 - **Adapter Latency Regression** – Triggers when `quantile_over_time(0.95, adapter_latency_ms[5m])` rises above 750 ms for ten minutes.
 - **Reliability SLO Burn** – Guards the SLO using retry and breaker counters to ensure the 99.5% target is met across a 30-minute window.
+
+### Reliability Guardrail Alerts
+
+- **Retry Saturation P95 High** – Uses `sum(max_over_time(retry_p95[10m]))` to detect when the 95th percentile retry count stays at or above two attempts for 15 minutes. Sustained high retries suggest downstream pressure or configuration drift.
+- **Breaker Open Duration P95 High** – Tracks `sum(max_over_time(breaker_open_p95_ms[10m]))` and pages when the circuit breaker open duration P95 stays at or above 100 ms for 15 minutes, highlighting availability risk.
+- **HTTP 5xx Ratio High** – Averages `http_5xx_ratio` via `sum(avg_over_time(http_5xx_ratio[5m]))` and fires when responses stay above the 1% error budget threshold for 10 minutes, signalling service regressions.
 
 ## Obs-card Snippet
 
