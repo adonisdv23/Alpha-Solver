@@ -1,0 +1,49 @@
+# Default configuration for Alpha Solver
+# Safe defaults for local development
+server:
+  host: 0.0.0.0       # listen address
+  port: 8000          # http port
+  log_level: info     # logging verbosity
+
+models:
+  provider: openai    # llm provider
+  model: gpt-5        # default model name
+  timeout_ms: 60000   # request timeout in ms
+  max_tokens: 2048    # max tokens per request
+
+gates:
+  low_conf_threshold: 0.35       # below -> reject
+  clarify_conf_threshold: 0.55   # ask for clarification
+  min_budget_tokens: 256         # tokens kept in reserve
+  enable_cot_fallback: true      # use chain-of-thought when stuck
+
+finops:
+  max_cost_usd: 0.02             # absolute hard limit
+  soft_cap_usd: 0.015            # warn when reached
+  alert_on_soft_cap: true        # emit warning when soft cap hit
+
+observability:
+  tracing: true                  # distributed tracing
+  metrics: true                  # prometheus metrics
+  replay: true                   # enable replay capture
+
+policy:
+  enable_input_redaction: true   # scrub sensitive inputs
+  detectors:
+    email: true                  # detect emails
+    phone: true                  # detect phone numbers
+  latency_budget_ms_p95: 50      # policy evaluation budget
+  fail_closed: true              # deny on policy errors
+
+adapters:
+  playwright:
+    enabled: true
+  gsheets:
+    enabled: true
+
+tenancy:
+  rate_limits:
+    rps: 5                       # requests per second
+    burst: 10                    # burst allowance
+  quotas:
+    tokens_day: 200000           # daily token allotment
