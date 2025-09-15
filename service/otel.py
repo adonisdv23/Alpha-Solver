@@ -12,9 +12,11 @@ latency attribute is automatically added if one is not supplied.
 
 from __future__ import annotations
 
+import logging
 import time
 from contextlib import contextmanager
 from typing import Any, Dict
+from service.logging.redactor import redact, ERROR_COUNTER
 
 try:  # Prefer the real OpenTelemetry SDK if available
     from opentelemetry import trace
@@ -35,20 +37,28 @@ _STUB_SPANS = []  # used when OpenTelemetry SDK is unavailable
 
 # --- redaction -----------------------------------------------------------
 
-_SENSITIVE_KEYS = {"user_input", "secret", "password", "pii", "raw"}
+_DENY_KEYS = {"user_input", "secret", "password", "pii", "raw", "prompt", "token"}
+
+
+def _clean_value(val: Any) -> Any:
+    if isinstance(val, (str, dict)):
+        return redact(val)
+    return val
 
 
 def _redact(attrs: Dict[str, Any]) -> Dict[str, Any]:
-    """Remove obviously sensitive information from span attributes."""
+    """Redact and filter attributes before recording."""
 
     clean: Dict[str, Any] = {}
     for key, val in attrs.items():
         lowered = str(key).lower()
-        if any(s in lowered for s in _SENSITIVE_KEYS):
+        if any(s in lowered for s in _DENY_KEYS):
+            logging.getLogger(__name__).warning("dropping span attribute %s", key)
             continue
-        if isinstance(val, str) and any(s in val.lower() for s in _SENSITIVE_KEYS):
-            continue
-        clean[key] = val
+        try:
+            clean[key] = _clean_value(val)
+        except Exception:  # pragma: no cover - defensive
+            ERROR_COUNTER.inc()
     return clean
 
 
