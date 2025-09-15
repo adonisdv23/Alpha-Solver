@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Provider API Keys</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 2rem; }
+    th, td { border: 1px solid #ddd; padding: 0.5rem; text-align: left; }
+    th { background-color: #f2f2f2; }
+    .inline-form { display: inline-block; margin-right: 0.5rem; }
+    #empty-state { font-style: italic; color: #666; }
+  </style>
+</head>
+<body>
+  <h1>Provider API Keys</h1>
+
+  <section id="keys">
+    [[KEYS_TABLE]]
+  </section>
+
+  <section id="add-key">
+    <h2>Add provider key</h2>
+    <form method="post" action="/settings/keys">
+      <label>
+        Provider
+        <input type="text" name="provider" required />
+      </label>
+      <label>
+        API key
+        <input type="text" name="key" required />
+      </label>
+      <button type="submit">Add key</button>
+    </form>
+  </section>
+</body>
+</html>
