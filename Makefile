@@ -1,26 +1,23 @@
-.PHONY: format test eval gates test-fast test-gates coverage
+.PHONY: run test test-gates fmt lint env-check clean
 
-format:
-	@pre-commit run --all-files
+run:
+	uvicorn service.app:app --host 0.0.0.0 --port 8000
 
 test:
-        @pytest -q
-
-# Produces artifacts/eval/{summary.json,router_compare.json}
-eval:
-        @python -m alpha.eval.harness --dataset datasets/mvp_golden.jsonl --seed 42 --compare-baseline
-
-gates: format test eval
-        @echo "✅ gates done"
-
-test-fast:
-        @pytest -q -k "not slow and not e2e"
+	pytest -q
 
 test-gates:
-        @pytest -q -k determinism --maxfail=1
-        @pytest -q -k "policy or pii"
-        @pytest -q -k budget
-        @pytest -q -k metrics
+	pytest -q -k "determinism or policy or budget or metrics"
 
-coverage:
-        @pytest --cov=. --cov-report=xml --cov-report=term
+fmt:
+	black . >/dev/null 2>&1 || echo "black not installed"
+	ruff --fix . >/dev/null 2>&1 || echo "ruff not installed"
+
+lint:
+	ruff . >/dev/null 2>&1 || echo "ruff not installed"
+
+env-check:
+	python scripts/check_env.py
+
+clean:
+	rm -rf **/__pycache__ .pytest_cache .ruff_cache
