@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "prompt": {"type": "string", "minLength": 1, "maxLength": 1000},
+    "task": {"type": "string", "enum": ["solve", "plan"]},
+    "opts": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "strategy": {"type": "string", "enum": ["react", "cot", "tot"]},
+        "timeout": {"type": "number", "minimum": 0, "maximum": 60}
+      }
+    }
+  },
+  "required": ["prompt", "task"]
+}
