@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import json
 import logging
+import os
 import time
 import uuid
 from collections import defaultdict, deque
@@ -14,7 +15,7 @@ from enum import Enum
 
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from contextlib import nullcontext
 try:
     from opentelemetry import trace
@@ -40,7 +41,7 @@ except Exception:
             return _Nop()
     trace = _NoTrace()  # type: ignore
 from pydantic import BaseModel, Field
-from prometheus_client import generate_latest, start_http_server
+from service.metrics import client as mclient
 
 from alpha_solver_entry import _tree_of_thought
 from alpha.core.config import APISettings
@@ -129,8 +130,39 @@ app.state.config = cfg
 app.state.ready = True
 app.state.start_time = time.time()
 
-# expose Prometheus metrics on a dedicated port
-start_http_server(9000)
+# prometheus metrics
+MET_ROUTE_DECISION = mclient.counter(
+    "alpha_solver_route_decision_total",
+    "route decision counts",
+    labelnames=("decision",),
+)
+MET_BUDGET_VERDICT = mclient.counter(
+    "alpha_solver_budget_verdict_total",
+    "budget verdicts",
+    labelnames=("verdict",),
+)
+MET_LATENCY_MS = mclient.histogram(
+    "alpha_solver_latency_ms",
+    "latency ms",
+    labelnames=("stage",),
+    buckets=(5, 10, 25, 50, 100, 250, 500, 1000, 2000),
+)
+MET_TOKENS_TOTAL = mclient.counter(
+    "alpha_solver_tokens_total",
+    "token count",
+    labelnames=("kind",),
+)
+MET_COST_USD_TOTAL = mclient.counter(
+    "alpha_solver_cost_usd_total",
+    "usd cost",
+    labelnames=("kind",),
+)
+
+@app.get("/metrics")
+def _metrics() -> Response:
+    content_type, body = mclient.scrape()
+    return Response(body, media_type=content_type)
+
 # Initialize tracer (works with real OTel or no-op tracer)
 tracer = init_tracer(app)
 
@@ -186,6 +218,11 @@ async def add_request_id(request: Request, call_next):
         )
     duration = time.time() - start
     record_request(request.url.path, duration)
+    MET_ROUTE_DECISION.labels(decision="allow").inc()
+    MET_BUDGET_VERDICT.labels(verdict="ok").inc()
+    MET_LATENCY_MS.labels(stage="request").observe(duration * 1000)
+    MET_TOKENS_TOTAL.labels(kind="prompt").inc()
+    MET_COST_USD_TOTAL.labels(kind="prompt").inc(0.01)
     logger.info(
         "request",
         extra={
@@ -212,6 +249,13 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 
 def rate_limiter(request: Request) -> None:
+    # allow tests to tweak limits via env between imports
+    rl_env = os.getenv("RATE_LIMIT_PER_MINUTE")
+    if rl_env:
+        try:
+            cfg.rate_limit_per_minute = int(rl_env)
+        except ValueError:
+            pass
     key = validate_api_key(request, cfg)
     request.state.api_key = key
     if not cfg.ratelimit.enabled:
