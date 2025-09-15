@@ -129,7 +129,8 @@ app.state.ready = True
 
 # expose Prometheus metrics on a dedicated port
 start_http_server(9000)
-init_tracer(app)
+# Initialize tracer (works with real OTel or no-op tracer)
+tracer = init_tracer(app)
 
 app.add_middleware(
     CORSMiddleware,

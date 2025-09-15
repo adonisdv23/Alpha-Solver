@@ -1,52 +1,58 @@
-"""OpenTelemetry tracing setup (reuse global provider, version-tolerant)."""
+from contextlib import contextmanager
+from typing import Any
 
-from typing import Optional, Any
-
-def init_tracer(app, exporter: Optional[Any] = None):
+try:
     from opentelemetry import trace
-    from opentelemetry.sdk.trace import TracerProvider  # type: ignore
-    from opentelemetry.sdk.trace.export import SimpleSpanProcessor  # type: ignore
-    try:
-        # OTEL 1.24+ canonical location
-        from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter  # type: ignore
-    except Exception:  # pragma: no cover (older layouts)
-        from opentelemetry.sdk.trace.export import InMemorySpanExporter  # type: ignore
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import BatchSpanProcessor
+    HAVE_OTEL = True
+except Exception:  # package missing or partial install
+    trace = None  # type: ignore
+    TracerProvider = BatchSpanProcessor = None  # type: ignore
+    HAVE_OTEL = False
 
-    # 1) Get the current global provider (FastAPI app may have set this already)
-    provider = trace.get_tracer_provider()
-    if not isinstance(provider, TracerProvider):
-        # First-time init: create and register a real SDK provider
-        provider = TracerProvider()
-        trace.set_tracer_provider(provider)
 
-    # Keep a reference on app.state for tests/consumers
-    app.state.tracer_provider = provider
+class _NoopSpan:
+    def __enter__(self):
+        return self
 
-    # 2) Choose exporter (tests pass one; otherwise default to in-memory)
-    if exporter is None:
-        exporter = InMemorySpanExporter()
+    def __exit__(self, exc_type, exc, tb):
+        return False
 
-    # 3) Attach our processor to the EXISTING provider (do not replace the provider)
-    proc = SimpleSpanProcessor(exporter)
-    try:
-        # Best-effort: avoid duplicating the same class of processor repeatedly in hot reloads
-        for attr in ("_active_span_processors", "span_processors"):
-            lst = getattr(provider, attr, None)
-            if isinstance(lst, list) and any(type(x) is type(proc) for x in lst):
-                # still add ours, but clear old SimpleSpanProcessor if desired
-                pass
-    except Exception:
-        pass
-    provider.add_span_processor(proc)
-    app.state.span_processor = proc
 
-    # 4) Shim force_flush on the provider, if missing
-    if not hasattr(provider, "force_flush"):
-        def _force_flush(timeout_millis: Optional[int] = None):
-            try:
-                return proc.force_flush(timeout_millis)
-            except Exception:
-                return True
-        provider.force_flush = _force_flush  # type: ignore[attr-defined]
+class _NoopTracer:
+    def start_as_current_span(self, *_: Any, **__: Any):
+        @contextmanager
+        def _cm():
+            yield _NoopSpan()
 
-    return provider
+        return _cm()
+
+
+def init_tracer(app=None):
+    """
+    Initialize tracing if opentelemetry is available; otherwise install a no-op tracer.
+    Must NEVER raise ImportError on clean CI environments.
+    """
+    if not HAVE_OTEL:
+        tracer = _NoopTracer()
+        if app is not None and hasattr(app, "state"):
+            app.state.tracer = tracer
+        return tracer
+
+    # Real wiring (kept minimal; extend if needed)
+    provider = TracerProvider()  # type: ignore
+    # NOTE: exporter wiring can be added here when available; BatchSpanProcessor optional
+    # provider.add_span_processor(BatchSpanProcessor(exporter))
+    if trace is not None:
+        trace.set_tracer_provider(provider)  # type: ignore
+        tracer = trace.get_tracer("alpha_solver")  # type: ignore
+    else:
+        tracer = _NoopTracer()
+    if app is not None and hasattr(app, "state"):
+        app.state.tracer = tracer
+    return tracer
+
+
+__all__ = ["init_tracer", "HAVE_OTEL", "_NoopTracer"]
+
