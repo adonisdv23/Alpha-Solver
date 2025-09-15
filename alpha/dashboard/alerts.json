@@ -1,4 +1,5 @@
 {
+  "template": "dashboards_alerts_v1",
   "alerts": [
     {
       "name": "Gate Decision Denial Spike",
@@ -6,7 +7,8 @@
       "for": "5m",
       "labels": {
         "severity": "warning",
-        "team": "release"
+        "team": "release",
+        "service": "res_dash"
       },
       "annotations": {
         "summary": "Gate denials exceeded 20% over the last 5 minutes.",
@@ -19,7 +21,8 @@
       "for": "10m",
       "labels": {
         "severity": "critical",
-        "team": "adapters"
+        "team": "adapters",
+        "service": "res_dash"
       },
       "annotations": {
         "summary": "Adapter latency P95 breached 750ms threshold.",
@@ -32,11 +35,57 @@
       "for": "30m",
       "labels": {
         "severity": "critical",
-        "team": "reliability"
+        "team": "reliability",
+        "service": "res_dash"
       },
       "annotations": {
         "summary": "Composite reliability SLO dipped below 99.5% over the last 30 minutes.",
         "runbook": "https://runbooks.alpha/observability/reliability"
+      }
+    },
+    {
+      "name": "Retry Saturation P95 High",
+      "expr": "sum(max_over_time(retry_p95{environment=\"prod\"}[10m])) >= 2",
+      "for": "15m",
+      "labels": {
+        "severity": "warning",
+        "service": "res_dash",
+        "team": "reliability"
+      },
+      "annotations": {
+        "summary": "Retry P95 has stayed above 2 attempts across the last 10 minutes.",
+        "description": "Sustained high retry percentiles indicate downstream stress or misconfiguration.",
+        "runbook": "https://runbooks.alpha/observability/retries"
+      }
+    },
+    {
+      "name": "Breaker Open Duration P95 High",
+      "expr": "sum(max_over_time(breaker_open_p95_ms{environment=\"prod\"}[10m])) >= 100",
+      "for": "15m",
+      "labels": {
+        "severity": "critical",
+        "service": "res_dash",
+        "team": "reliability"
+      },
+      "annotations": {
+        "summary": "Circuit breaker open duration P95 exceeded 100ms.",
+        "description": "Persistent breaker openings degrade request throughput and should be mitigated quickly.",
+        "runbook": "https://runbooks.alpha/observability/breakers"
+      }
+    },
+    {
+      "name": "HTTP 5xx Ratio High",
+      "expr": "sum(avg_over_time(http_5xx_ratio{environment=\"prod\"}[5m])) > 0.01",
+      "for": "10m",
+      "labels": {
+        "severity": "critical",
+        "service": "res_dash",
+        "team": "reliability"
+      },
+      "annotations": {
+        "summary": "HTTP 5xx responses are above 1% across the last five minutes.",
+        "description": "Elevated 5xx error ratio signals regressions in upstream dependencies or new deployments.",
+        "runbook": "https://runbooks.alpha/observability/http-errors"
       }
     }
   ]
