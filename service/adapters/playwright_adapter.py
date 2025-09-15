@@ -45,14 +45,14 @@ class PlaywrightAdapter:
     def name(self) -> str:  # pragma: no cover - trivial
         return "playwright"
 
-    def run(
+    def _run_once(
         self,
         payload: Dict[str, Any],
         *,
         idempotency_key: str | None = None,
         timeout_s: float = 5.0,
     ) -> Dict[str, Any]:
-        """Execute the adapter against the given payload."""
+        """Internal single-attempt execution."""
 
         if idempotency_key and idempotency_key in self._idem:
             prev_payload, prev_res = self._idem[idempotency_key]
@@ -74,6 +74,22 @@ class PlaywrightAdapter:
             return res
         else:
             raise AdapterError(code="SCHEMA", retryable=False)
+
+    def run(
+        self,
+        payload: Dict[str, Any],
+        *,
+        idempotency_key: str | None = None,
+        timeout_s: float = 5.0,
+    ) -> Dict[str, Any]:
+        from .base_adapter import with_retry
+
+        idempotent = payload.get("action") != "click"
+        return with_retry(
+            lambda: self._run_once(payload, idempotency_key=idempotency_key, timeout_s=timeout_s),
+            adapter=self.name(),
+            idempotent=idempotent,
+        )
 
     # Legacy operations ------------------------------------------------------
     def _run_legacy(self, payload: Dict[str, Any], *, timeout_s: float) -> Dict[str, Any]:
