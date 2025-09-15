@@ -1,0 +1,7 @@
+keys:
+  - id: demo
+    hash: abc123$f874a6c9a43c5bb47cb45592a7e9eaec507e3e725206b1d1352a8e9e0720d40e
+    tenant_id: tenant1
+    scopes: [read, write]
+    status: active
+    created_at: 1700000000
