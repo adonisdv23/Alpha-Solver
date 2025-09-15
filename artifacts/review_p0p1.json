@@ -1,0 +1,21 @@
+{
+  "inventory": {
+    "p0": "mapped",
+    "p1": "mapped"
+  },
+  "tests": {
+    "focused": {
+      "command": "pytest tests/test_stage1_smoke.py",
+      "result": "passed"
+    },
+    "full": [
+      {"command": "pytest tests/test_metrics_smoke.py", "result": "passed"},
+      {"command": "pytest tests/test_determinism.py", "result": "passed"},
+      {"command": "pytest tests/test_gates.py", "result": "passed"}
+    ]
+  },
+  "metrics_verified": true,
+  "determinism_verified": true,
+  "gaps": [],
+  "verdict": "mvp_ready"
+}
