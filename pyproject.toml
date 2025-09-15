@@ -85,4 +85,9 @@ omit = [
 ]
 
 [tool.coverage.report]
+include = [
+    "service/budget/*",
+    "service/policy/*",
+    "service/metrics/*",
+]
 fail_under = 95

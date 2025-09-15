@@ -59,6 +59,18 @@ def test_pii_detection_and_redaction_performance():
     assert "policy_verdict" in route and route["policy_verdict"] == "pass"
     assert "redaction_stats" in route
 
+    # cover non-model branch
+    sample_route = {}
+    _, model_text = gw.process("hello", sample_route, for_model=False)
+    assert model_text == "hello"
+
+    # cover phone length check branch (digits > 15)
+    long_route = {}
+    long_text = "call +1-1234567890123456"
+    redacted, _ = gw.process(long_text, long_route, for_model=True)
+    assert long_route["redaction_stats"]["phone"] == 0
+    assert PHONE_REGEX.search(redacted)
+
     # ensure no PII in any logged text overall
     for text, _, _ in cases:
         route = {}
