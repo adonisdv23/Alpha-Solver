@@ -1,0 +1,21 @@
+default:
+  rate_per_sec: 5
+  burst: 10
+  quota_per_day: 100
+
+# Example per-tenant overrides used by tests
+# Each tenant can specify rate_per_sec (tokens added per second),
+# burst (bucket capacity) and quota_per_day (optional daily maximum).
+tenants:
+  tenant_a:
+    rate_per_sec: 2
+    burst: 3
+    quota_per_day: 5
+  tenant_b:
+    rate_per_sec: 1
+    burst: 2
+    quota_per_day: 3
+  tenant_c:
+    rate_per_sec: 1
+    burst: 1
+    quota_per_day: 2
