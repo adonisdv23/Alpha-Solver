@@ -1,6 +1,7 @@
-import json
 import math
 from pathlib import Path
+
+import yaml
 
 from service.clarify.trigger import (
     should_clarify,
@@ -10,7 +11,8 @@ from service.clarify.trigger import (
 from service.clarify.render import render, deck_sha
 
 
-TEMPLATES = json.loads(Path("service/clarify/templates.yaml").read_text())["templates"]
+_TEMPLATES = yaml.safe_load(Path("service/clarify/templates.yaml").read_text())["templates"]
+TEMPLATES = {t["id"]: t["user"] for t in _TEMPLATES}
 
 
 def test_should_clarify_by_decision_flag():
