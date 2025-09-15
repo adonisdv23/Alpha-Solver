@@ -29,17 +29,19 @@ class AuthKeyStore:
     def __init__(self, path: Path | str) -> None:
         self.path = Path(path)
         self._keys: Dict[str, str] = {}
-        self._mtime: float = 0.0
+        # track file modification time with nanosecond precision so that
+        # rapid rotations inside tests are detected reliably
+        self._mtime_ns: int = 0
         self.reload(force=True)
 
     def reload(self, force: bool = False) -> None:
         try:
-            mtime = self.path.stat().st_mtime
+            mtime = self.path.stat().st_mtime_ns
         except FileNotFoundError:
             self._keys = {}
-            self._mtime = 0.0
+            self._mtime_ns = 0
             return
-        if force or mtime != self._mtime:
+        if force or mtime != self._mtime_ns:
             with self.path.open() as f:
                 data = yaml.safe_load(f) or {}
             keys: Dict[str, str] = {}
@@ -50,7 +52,7 @@ class AuthKeyStore:
                     pem = value or ""
                 keys[kid] = pem
             self._keys = keys
-            self._mtime = mtime
+            self._mtime_ns = mtime
 
     def get_key(self, kid: str) -> Optional[str]:
         self.reload()
