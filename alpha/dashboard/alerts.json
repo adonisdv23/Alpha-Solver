@@ -1,0 +1,43 @@
+{
+  "alerts": [
+    {
+      "name": "Gate Decision Denial Spike",
+      "expr": "(sum(rate(gate_decisions_total{environment=\"prod\",decision=\"denied\"}[5m])) / sum(rate(gate_decisions_total{environment=\"prod\"}[5m]))) > 0.20",
+      "for": "5m",
+      "labels": {
+        "severity": "warning",
+        "team": "release"
+      },
+      "annotations": {
+        "summary": "Gate denials exceeded 20% over the last 5 minutes.",
+        "runbook": "https://runbooks.alpha/observability/gates"
+      }
+    },
+    {
+      "name": "Adapter Latency Regression",
+      "expr": "quantile_over_time(0.95, adapter_latency_ms{environment=\"prod\"}[5m]) > 750",
+      "for": "10m",
+      "labels": {
+        "severity": "critical",
+        "team": "adapters"
+      },
+      "annotations": {
+        "summary": "Adapter latency P95 breached 750ms threshold.",
+        "runbook": "https://runbooks.alpha/observability/adapters"
+      }
+    },
+    {
+      "name": "Reliability SLO Burn",
+      "expr": "(1 - ((sum(rate(retries_total{environment=\"prod\"}[30m])) + sum(rate(breaker_open_total{environment=\"prod\"}[30m]))) / sum(rate(requests_total{environment=\"prod\"}[30m])))) < 0.995",
+      "for": "30m",
+      "labels": {
+        "severity": "critical",
+        "team": "reliability"
+      },
+      "annotations": {
+        "summary": "Composite reliability SLO dipped below 99.5% over the last 30 minutes.",
+        "runbook": "https://runbooks.alpha/observability/reliability"
+      }
+    }
+  ]
+}
