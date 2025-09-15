@@ -1,0 +1,49 @@
+{
+  "uid": "determinism",
+  "title": "Determinism",
+  "panels": [
+    {
+      "title": "Replay Pass %",
+      "type": "stat",
+      "targets": [
+        {"expr": "sum(alpha_solver_replay_runs_total{status=\"pass\"}) / sum(alpha_solver_replay_runs_total)"}
+      ]
+    },
+    {
+      "title": "Flap Rate",
+      "type": "stat",
+      "targets": [
+        {"expr": "sum(alpha_solver_replay_flap_total) / sum(alpha_solver_replay_runs_total)"}
+      ]
+    },
+    {
+      "title": "Runs by Status",
+      "type": "bargauge",
+      "targets": [
+        {"expr": "alpha_solver_replay_runs_total"}
+      ]
+    },
+    {
+      "title": "Latency p50/p95",
+      "type": "graph",
+      "targets": [
+        {"expr": "histogram_quantile(0.5, sum(rate(alpha_solver_latency_ms_bucket[5m])) by (le))"},
+        {"expr": "histogram_quantile(0.95, sum(rate(alpha_solver_latency_ms_bucket[5m])) by (le))"}
+      ]
+    },
+    {
+      "title": "Errors Over Time",
+      "type": "graph",
+      "targets": [
+        {"expr": "rate(alpha_solver_route_decision_total{status=\"error\"}[5m])"}
+      ]
+    },
+    {
+      "title": "Recent Replay Failures",
+      "type": "table",
+      "targets": [
+        {"expr": "alpha_solver_replay_runs_total{status=\"fail\"}"}
+      ]
+    }
+  ]
+}

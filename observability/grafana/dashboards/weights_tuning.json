@@ -1,0 +1,43 @@
+{
+  "uid": "weights_tuning",
+  "title": "Weight Tuning",
+  "panels": [
+    {
+      "title": "Accuracy BEFORE→AFTER",
+      "type": "stat",
+      "targets": [
+        {"expr": "before.accuracy"},
+        {"expr": "after.accuracy"}
+      ]
+    },
+    {
+      "title": "Win Rate BEFORE→AFTER",
+      "type": "stat",
+      "targets": [
+        {"expr": "before.win_rate"},
+        {"expr": "after.win_rate"}
+      ]
+    },
+    {
+      "title": "Factor Weights",
+      "type": "barchart",
+      "targets": [
+        {"expr": "before.weights"},
+        {"expr": "after.weights"}
+      ]
+    },
+    {
+      "title": "Top Deltas",
+      "type": "table",
+      "targets": [
+        {"expr": "per_factor"},
+        {"expr": "delta"}
+      ]
+    },
+    {
+      "title": "Report JSON",
+      "type": "text",
+      "options": {"content": "See artifacts/tuning_report.json"}
+    }
+  ]
+}
