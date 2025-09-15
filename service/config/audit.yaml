@@ -1,0 +1,19 @@
+retention_days: 30
+redact_rules:
+  emails: true
+  phones: true
+  tokens: true
+enabled_event_types:
+  - auth.login
+  - auth.deny
+  - auth.jwt_expired
+  - policy.allow
+  - policy.deny
+  - policy.redacted
+  - budget.block
+  - budget.warn
+  - route.chosen
+  - route.fallback
+  - system.start
+  - system.ready
+  - system.shutdown
