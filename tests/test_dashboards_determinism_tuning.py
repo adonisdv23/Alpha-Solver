@@ -10,27 +10,31 @@ from service.tuning.report_export import export_tuning_report
 
 
 def test_metrics_names_exposed_via_client():
-    _REGISTRY.clear()
-    Counter("alpha_solver_replay_runs_total").inc()
-    Counter("alpha_solver_replay_flap_total").inc()
-    Histogram("alpha_solver_latency_ms_bucket").observe(1.0)
-    Counter("alpha_solver_route_decision_total").inc()
+    original = list(_REGISTRY)
+    try:
+        _REGISTRY.clear()
+        Counter("alpha_solver_replay_runs_total").inc()
+        Counter("alpha_solver_replay_flap_total").inc()
+        Histogram("alpha_solver_latency_ms_bucket").observe(1.0)
+        Counter("alpha_solver_route_decision_total").inc()
 
-    app = FastAPI()
+        app = FastAPI()
 
-    @app.get("/metrics")
-    def metrics() -> PlainTextResponse:  # pragma: no cover - simple bridge
-        return PlainTextResponse(generate_latest().decode("utf-8"))
+        @app.get("/metrics")
+        def metrics() -> PlainTextResponse:  # pragma: no cover - simple bridge
+            return PlainTextResponse(generate_latest().decode("utf-8"))
 
-    client = TestClient(app)
-    text = client.get("/metrics").text
-    for name in [
-        "alpha_solver_replay_runs_total",
-        "alpha_solver_replay_flap_total",
-        "alpha_solver_latency_ms_bucket",
-        "alpha_solver_route_decision_total",
-    ]:
-        assert name in text
+        client = TestClient(app)
+        text = client.get("/metrics").text
+        for name in [
+            "alpha_solver_replay_runs_total",
+            "alpha_solver_replay_flap_total",
+            "alpha_solver_latency_ms_bucket",
+            "alpha_solver_route_decision_total",
+        ]:
+            assert name in text
+    finally:
+        _REGISTRY[:] = original
 
 
 def test_export_tuning_report_schema(tmp_path: Path):
