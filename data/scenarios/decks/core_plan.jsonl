@@ -1,0 +1,7 @@
+{"id":"deck-plan-0001","intent":"plan","prompt":"Outline a step-by-step plan for organizing a community clean-up event.","route_expected":"mcp","notes":"multi-step"}
+{"id":"deck-plan-0002","intent":"plan","prompt":"Create a daily study schedule for a student preparing for exams in two subjects.","route_expected":"llm_only","notes":"schedule"}
+{"id":"deck-plan-0003","intent":"plan","prompt":"Plan a week-long vegetarian meal plan for a family of four.","route_expected":"llm_only","notes":"meal planning"}
+{"id":"deck-plan-0004","intent":"plan","prompt":"Develop a rollout plan for launching a new mobile app.","route_expected":"llm_only","notes":"product launch"}
+{"id":"deck-plan-0005","intent":"plan","prompt":"Plan a budget-friendly vacation itinerary for three days in Rome.","route_expected":"llm_only","notes":"travel"}
+{"id":"deck-plan-0006","intent":"plan","prompt":"Create a project timeline for building a backyard shed.","route_expected":"llm_only","notes":"DIY project"}
+{"id":"deck-plan-0007","intent":"plan","prompt":"Outline the steps needed to switch to a paperless office.","route_expected":"llm_only","notes":"workflow"}

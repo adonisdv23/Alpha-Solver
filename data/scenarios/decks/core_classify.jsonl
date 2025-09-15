@@ -1,0 +1,7 @@
+{"id":"deck-class-0001","intent":"classify","prompt":"Classify the sentiment of the review: 'The service was slow but the food was delicious.'","route_expected":"llm_only","notes":"mixed sentiment"}
+{"id":"deck-class-0002","intent":"classify","prompt":"Determine whether the tweet is about sports, politics, or entertainment.","route_expected":"llm_only","notes":"topic classification"}
+{"id":"deck-class-0003","intent":"classify","prompt":"Classify the email as spam or not spam.","route_expected":"llm_only","notes":"spam detection"}
+{"id":"deck-class-0004","intent":"classify","prompt":"Identify the genre of the book description provided.","route_expected":"llm_only","notes":"genre"}
+{"id":"deck-class-0005","intent":"classify","prompt":"Classify the following statement as fact or opinion.","route_expected":"llm_only","notes":"fact vs opinion"}
+{"id":"deck-class-0006","intent":"classify","prompt":"Determine if the message is formal or informal in tone.","route_expected":"llm_only","notes":"tone"}
+{"id":"deck-class-0007","intent":"classify","prompt":"Classify the news headline as economy, health, or technology.","route_expected":"llm_only","notes":"news category"}
