@@ -1,0 +1,95 @@
+{
+  "annotations": {"list": []},
+  "editable": false,
+  "schemaVersion": 39,
+  "title": "Alpha Solver Overview",
+  "templating": {
+    "list": [
+      {
+        "name": "tenant",
+        "type": "textbox",
+        "label": "Tenant",
+        "hide": 0,
+        "query": ""
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "graph",
+      "title": "Latency p50 ms",
+      "datasource": "${DS_PROMETHEUS}",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.5, sum(rate(alpha_solver_latency_ms_bucket{tenant=\"$tenant\"}[$__rate_interval])) by (le))"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Latency p95 ms",
+      "datasource": "${DS_PROMETHEUS}",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(alpha_solver_latency_ms_bucket{tenant=\"$tenant\"}[$__rate_interval])) by (le))"
+        }
+      ],
+      "links": [
+        {
+          "title": "View Trace",
+          "url": "http://tracing.example/trace/${__value.labels.trace_id}"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Error Rate %",
+      "datasource": "${DS_PROMETHEUS}",
+      "targets": [
+        {
+          "expr": "(sum(rate(alpha_solver_errors_total{tenant=\"$tenant\"}[$__rate_interval])) / sum(rate(alpha_solver_route_decision_total{tenant=\"$tenant\"}[$__rate_interval]))) * 100"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Throughput req/s",
+      "datasource": "${DS_PROMETHEUS}",
+      "targets": [
+        {
+          "expr": "sum(rate(alpha_solver_route_decision_total{tenant=\"$tenant\"}[$__rate_interval]))"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Budget Over",
+      "datasource": "${DS_PROMETHEUS}",
+      "targets": [
+        {
+          "expr": "sum(rate(alpha_solver_budget_verdict_total{tenant=\"$tenant\",verdict=\"over\"}[$__rate_interval]))"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Tokens Per Second",
+      "datasource": "${DS_PROMETHEUS}",
+      "targets": [
+        {
+          "expr": "sum(rate(alpha_solver_tokens_total{tenant=\"$tenant\"}[$__rate_interval]))"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Cost USD Per Second",
+      "datasource": "${DS_PROMETHEUS}",
+      "targets": [
+        {
+          "expr": "sum(rate(alpha_solver_cost_usd_total{tenant=\"$tenant\"}[$__rate_interval]))"
+        }
+      ]
+    }
+  ]
+}

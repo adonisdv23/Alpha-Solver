@@ -1,0 +1,49 @@
+{
+  "annotations": {"list": []},
+  "editable": false,
+  "schemaVersion": 39,
+  "title": "Alpha Adapters",
+  "templating": {
+    "list": [
+      {
+        "name": "tenant",
+        "type": "textbox",
+        "label": "Tenant",
+        "hide": 0,
+        "query": ""
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "graph",
+      "title": "Adapter Success Rate %",
+      "datasource": "${DS_PROMETHEUS}",
+      "targets": [
+        {
+          "expr": "(sum(rate(alpha_solver_adapter_calls_total{tenant=\"$tenant\",status=\"ok\"}[$__rate_interval])) / sum(rate(alpha_solver_adapter_calls_total{tenant=\"$tenant\"}[$__rate_interval]))) * 100"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Adapter Latency p95 ms",
+      "datasource": "${DS_PROMETHEUS}",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(alpha_solver_adapter_latency_ms_bucket{tenant=\"$tenant\"}[$__rate_interval])) by (le))"
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Circuit Open",
+      "datasource": "${DS_PROMETHEUS}",
+      "targets": [
+        {
+          "expr": "alpha_solver_adapter_circuit_open{tenant=\"$tenant\"}"
+        }
+      ]
+    }
+  ]
+}
