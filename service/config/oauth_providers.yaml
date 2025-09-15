@@ -1,0 +1,10 @@
+providers:
+  default:
+    token_url: "https://example.com/token"
+    flows: ["client_credentials", "refresh_token"]
+    cache_ttl_s: 300
+    prefetch_jitter_s: 30
+    scopes:
+      - "sheets.read"
+      - "sheets.write"
+      - "web.read"
