@@ -1,3 +1,5 @@
+"""Logging helpers for secret redaction."""
+
 import logging
 from typing import Iterable, Set, Any
 

@@ -8,6 +8,7 @@ environments.
 The :func:`span` context manager performs attribute redaction to avoid
 accidentally recording user supplied text or secrets in telemetry data.  A
 latency attribute is automatically added if one is not supplied.
+Sensitive attribute keys (e.g. 'prompt', 'token') are dropped.
 """
 
 from __future__ import annotations
