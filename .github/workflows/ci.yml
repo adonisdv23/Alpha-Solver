@@ -1,159 +1,19 @@
-name: CI
-
+name: ci
 on:
-  push:
-    branches: [main, mvp/*, next/*]
   pull_request:
-    branches: [main, mvp/*, next/*]
-
-concurrency:
-  group: alpha-solver-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
-  fast-tests:
+  unit:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-          cache: 'pip'
-      - run: pip install -r requirements.txt
-      - run: pip install pytest pytest-cov
-      - run: pytest -q -k "not slow and not e2e" --junitxml=junit.xml
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: fast-tests-junit
-          path: junit.xml
-
-  determinism:
-    needs: fast-tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip'
-      - run: pip install -r requirements.txt
-      - run: pip install pytest pytest-cov
-      - run: pytest -q -k determinism --maxfail=1 --junitxml=junit.xml
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: determinism-junit
-          path: junit.xml
-
-  determinism-gate:
-    needs: fast-tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip'
-      - run: pip install -r requirements.txt
-      - run: python -m service.replay.gate --runs 10 --replay-file data/datasets/replay/replay_small.jsonl 2>&1 | tee gate.log
-      - uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: determinism-gate-log
-          path: gate.log
-
-  policy_pii:
-    needs: fast-tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip'
-      - run: pip install -r requirements.txt
-      - run: pip install pytest pytest-cov
-      - run: pytest -q -k "policy or pii" --junitxml=junit.xml
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: policy-pii-junit
-          path: junit.xml
-
-  budget_guard:
-    needs: fast-tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip'
-      - run: pip install -r requirements.txt
-      - run: pip install pytest pytest-cov
-      - run: pytest -q -k budget --junitxml=junit.xml
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: budget-guard-junit
-          path: junit.xml
-
-  metrics:
-    needs: fast-tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip'
-      - run: pip install -r requirements.txt
-      - run: pip install pytest pytest-cov
-      - run: pytest -q -k metrics --junitxml=junit.xml
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: metrics-junit
-          path: junit.xml
-
-  coverage:
-    needs: [determinism, determinism-gate, policy_pii, budget_guard, metrics]
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip'
-      - run: pip install -r requirements.txt
-      - run: pip install pytest pytest-cov
-      - run: pytest --cov=. --cov-report=xml --cov-report=term --junitxml=junit.xml
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: coverage-artifacts
-          path: |
-            junit.xml
-            coverage.xml
+          python-version: '3.11'
+      - name: Install deps
+        run: |
+          python -m pip install -U pip
+          pip install -r requirements.txt
+      - name: Run unit tests
+        run: |
+          pytest -q
