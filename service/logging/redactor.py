@@ -1,6 +1,6 @@
 import re
 from copy import deepcopy
-from typing import Any, Dict, Iterable
+from typing import Any, Dict, Iterable, Set
 from pathlib import Path
 import yaml
 from service.metrics.exporter import Counter, _REGISTRY
@@ -29,7 +29,7 @@ try:
 except Exception:  # pragma: no cover - file missing
     _CONFIG = {}
 
-_ALLOWLIST: set[str] = set(_CONFIG.get("allowlist", []))
+_DEFAULT_ALLOWLIST: Set[str] = set(_CONFIG.get("allowlist", []))
 _DETECTORS: Dict[str, bool] = {
     "authorization": True,
     "api_key": True,
@@ -136,35 +136,43 @@ def _redact_str(text: str) -> str:
     return text
 
 
-def _redact(obj: Any) -> Any:
+def _redact(obj: Any, allow: Set[str]) -> Any:
     if isinstance(obj, str):
         return _redact_str(obj)
     if isinstance(obj, dict):
         out: Dict[Any, Any] = {}
         for k, v in obj.items():
-            if isinstance(k, str) and k in _ALLOWLIST:
+            if isinstance(k, str) and k in allow:
                 out[k] = v
             else:
-                out[k] = _redact(v)
+                out[k] = _redact(v, allow)
         return out
     if isinstance(obj, list):
-        return [_redact(v) for v in obj]
+        return [_redact(v, allow) for v in obj]
     if isinstance(obj, tuple):
-        return tuple(_redact(v) for v in obj)
+        return tuple(_redact(v, allow) for v in obj)
+    if isinstance(obj, set):
+        return {_redact(v, allow) for v in obj}
     return obj
 
 
 def redact(obj: Any, allowlist: Iterable[str] | None = None) -> Any:
-    """Return a redacted copy of *obj* (string or dict)."""
-    if allowlist is not None:
-        global _ALLOWLIST
-        prev = _ALLOWLIST
-        _ALLOWLIST = set(allowlist)
-        try:
-            return _redact(deepcopy(obj))
-        finally:
-            _ALLOWLIST = prev
-    return _redact(deepcopy(obj))
+    """Return a redacted copy of *obj* (string or mapping).
+
+    The redaction is performed on a deepcopy of *obj* so the caller's object is
+    never mutated.  ``allowlist`` specifies keys in mappings that should not be
+    redacted.
+    """
+
+    allow = _DEFAULT_ALLOWLIST if allowlist is None else set(allowlist)
+    return _redact(deepcopy(obj), allow)
+
+
+def reset_counters() -> None:
+    """Reset internal counters (primarily for tests)."""
+    global APPLIED_TOTAL, ERROR_TOTAL
+    APPLIED_TOTAL = 0
+    ERROR_TOTAL = 0
 
 __all__ = [
     "redact",
@@ -172,4 +180,5 @@ __all__ = [
     "ERROR_COUNTER",
     "APPLIED_TOTAL",
     "ERROR_TOTAL",
+    "reset_counters",
 ]
