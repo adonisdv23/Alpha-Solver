@@ -1,4 +1,4 @@
-.PHONY: run test test-gates fmt lint env-check clean
+.PHONY: run test test-gates fmt lint env-check clean smoke release
 
 run:
 	uvicorn service.app:app --host 0.0.0.0 --port 8000
@@ -21,6 +21,12 @@ env-check:
 
 clean:
 	rm -rf **/__pycache__ .pytest_cache .ruff_cache
+
+smoke:
+	python -c "from tests.test_smoke_quickstart import run_smoke_suite; run_smoke_suite()"
+
+release:
+	python scripts/release.py --version 0.1.0
 
 .PHONY: cli cli-test
 
