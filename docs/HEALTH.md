@@ -1,7 +1,18 @@
 # Health Endpoint
 
-The service exposes `GET /health` to provide a quick status overview of core
-runtime dependencies. The response is JSON with the following shape:
+`alpha.api.health.get_health` returns a dictionary describing the health of the
+application and its dependencies. The data is suitable for wiring into a `/health`
+HTTP endpoint but no web server is required for tests.
+
+```python
+from alpha.api.health import get_health
+from fakeredis import FakeRedis
+
+# succeed with all dependencies healthy
+get_health(FakeRedis(), vectordb_ok=True, provider_ok=True)
+```
+
+The payload has the following shape:
 
 ```json
 {
@@ -9,19 +20,9 @@ runtime dependencies. The response is JSON with the following shape:
   "redis": "ok|down",
   "vectordb": "ok|down",
   "provider": "ok|down",
-  "ts": 1697049600.0
+  "ts": "2024-01-01T00:00:00+00:00"
 }
 ```
 
-Field meanings:
-
-- **app** – always `"ok"` when the handler runs.
-- **redis** – result of a lightweight `PING` against the configured Redis
-  instance.
-- **vectordb** – status of the vector database backend.
-- **provider** – whether the model provider client can be imported and is
-  available.
-- **ts** – UNIX timestamp recorded when the check was executed.
-
-Each dependency probe is designed to complete quickly so the endpoint responds
-within ~50 ms on a warm cache.
+Each probe is lightweight so a call should complete in well under 50 ms on a
+warm cache.

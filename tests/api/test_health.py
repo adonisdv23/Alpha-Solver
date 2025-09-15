@@ -2,25 +2,33 @@ import sys
 import time
 from pathlib import Path
 
-from fastapi.testclient import TestClient
+try:
+    from fakeredis import FakeRedis
+except Exception:  # pragma: no cover - fallback
+    class FakeRedis:  # minimal stub
+        def ping(self):
+            return True
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
-from alpha.api.health import app
+from alpha.api.health import get_health
 
 
-client = TestClient(app)
-
-
-def test_health_endpoint_returns_statuses_fast():
+def test_health_with_redis_and_flags():
+    client = FakeRedis()
     start = time.perf_counter()
-    res = client.get("/health")
-    elapsed_ms = (time.perf_counter() - start) * 1000
-    assert res.status_code == 200
-    data = res.json()
-    # expected keys
-    assert {"app", "redis", "vectordb", "provider", "ts"} <= data.keys()
+    data = get_health(client, vectordb_ok=True, provider_ok=True)
+    assert (time.perf_counter() - start) * 1000 < 50
     assert data["app"] == "ok"
-    for key in ("redis", "vectordb", "provider"):
-        assert data[key] in {"ok", "down"}
-    assert isinstance(data["ts"], float)
-    assert elapsed_ms < 50
+    assert data["redis"] == "ok"
+    assert data["vectordb"] == "ok"
+    assert data["provider"] == "ok"
+    assert "ts" in data
+
+
+def test_health_defaults_down():
+    data = get_health()
+    assert data["redis"] == "down"
+    assert data["vectordb"] == "down"
+    assert data["provider"] == "down"
+    assert data["app"] == "ok"
+    assert "ts" in data
