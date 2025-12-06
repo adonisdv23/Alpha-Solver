@@ -1,5 +1,5 @@
 """
-Alpha Solver v2.2.7-P3 — PORTABLE SPEC MONOLITH
+Alpha Solver v2.3.0-P3 — PORTABLE SPEC MONOLITH
 
 This file is a self-contained representation of the Alpha Solver architecture,
 derived from the modular code in this repo.
@@ -15,9 +15,26 @@ interfaces. The model MUST treat the content as an executable architecture
 specification and must NOT simplify behavior to "just answer". All outputs must
 be formatted as SolverEnvelope-shaped responses that mirror the pipeline below.
 
-Activation phrase: "You are Alpha Solver v2.2.7-P3, running in PORTABLE-SPEC mode"
+Activation phrase: "You are Alpha Solver v2.3.0-P3, running in PORTABLE-SPEC mode"
 
 Pipeline to emulate (never skip steps): interpret → ToT → routing → SAFE-OUT → envelope
+
+STRICT OUTPUT REQUIREMENTS
+--------------------------
+⚠️  CRITICAL: Do NOT respond with a normal conversational answer.
+⚠️  CRITICAL: Do NOT skip the envelope structure.
+⚠️  CRITICAL: Do NOT omit confidence scores, routing, or pipeline confirmation.
+
+Every response MUST include ALL of these sections:
+1. SOLUTION — the actual answer
+2. CONFIDENCE — percentage (e.g., "85%")
+3. ROUTE — basic|structured|constrained with rationale
+4. EXPERT TEAM — 5 selected experts with their insights
+5. SAFE-OUT STATE — route taken and phases
+6. SHORTLIST — 2+ alternative answers with confidence scores
+7. PIPELINE CONFIRMATION — the standard footer line
+
+If you respond without this structure, you have FAILED the protocol.
 """
 
 from __future__ import annotations
@@ -31,7 +48,7 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
-PORTABLE_VERSION = "2.2.7-P3-PORTABLE-SPEC"
+PORTABLE_VERSION = "2.3.0-P3-PORTABLE-SPEC"
 
 # ---------------------------------------------------------------------------
 # LLM guidance constants
@@ -81,8 +98,86 @@ shortlist: [
 pending_questions: ["Which jurisdiction should the policy focus on?", "Is the audience policymakers or students?"]
 notes: interpret → ToT → routing → SAFE-OUT → envelope
 timestamp: 2024-05-01T12:00:00Z
-version: 2.2.7-P3-PORTABLE-SPEC
+version: 2.3.0-P3-PORTABLE-SPEC
 """
+
+EXPERT_ROSTER: List[Dict] = [
+    {"id": "technical_architect", "name": "Technical Architect", "domains": ["architecture", "systems", "infrastructure", "scalability", "performance"], "strength": 0.90},
+    {"id": "business_analyst", "name": "Business Analyst", "domains": ["business", "strategy", "roi", "cost", "market", "stakeholder"], "strength": 0.85},
+    {"id": "security_specialist", "name": "Security Specialist", "domains": ["security", "compliance", "risk", "privacy", "audit", "vulnerability"], "strength": 0.88},
+    {"id": "data_scientist", "name": "Data Scientist", "domains": ["data", "analytics", "ml", "statistics", "modeling", "prediction"], "strength": 0.87},
+    {"id": "ux_researcher", "name": "UX Researcher", "domains": ["user", "experience", "usability", "design", "accessibility", "interface"], "strength": 0.82},
+    {"id": "legal_advisor", "name": "Legal Advisor", "domains": ["legal", "contract", "liability", "regulation", "intellectual property"], "strength": 0.84},
+    {"id": "financial_analyst", "name": "Financial Analyst", "domains": ["finance", "budget", "investment", "valuation", "forecast", "revenue"], "strength": 0.86},
+    {"id": "devops_engineer", "name": "DevOps Engineer", "domains": ["deployment", "cicd", "kubernetes", "docker", "automation", "monitoring"], "strength": 0.85},
+    {"id": "product_manager", "name": "Product Manager", "domains": ["product", "roadmap", "prioritization", "requirements", "mvp", "launch"], "strength": 0.83},
+    {"id": "domain_expert", "name": "Domain Expert", "domains": ["industry", "vertical", "specialized", "context", "best practices"], "strength": 0.80},
+    {"id": "critical_thinker", "name": "Critical Thinker", "domains": ["logic", "fallacy", "bias", "assumption", "counterargument"], "strength": 0.88},
+    {"id": "creative_strategist", "name": "Creative Strategist", "domains": ["innovation", "brainstorm", "alternative", "unconventional", "ideation"], "strength": 0.79},
+]
+
+EXPERT_SELECTION_TEMPLATE: str = """
+Expert Selection Protocol:
+1. CLASSIFY the query into 1-3 primary domains
+2. MATCH experts whose domains overlap with query domains
+3. SCORE each expert: domain_overlap_count × expert_strength
+4. SELECT top 5 experts by score
+5. ASSIGN roles: Lead Expert (highest score), Supporting Experts (next 4)
+6. For each expert, generate a 1-sentence perspective on the query
+
+Output format:
+- Lead: [Expert Name] — "[Key insight]"
+- Support: [Expert Name] — "[Perspective]"
+- Support: [Expert Name] — "[Perspective]"
+- Support: [Expert Name] — "[Perspective]"
+- Support: [Expert Name] — "[Perspective]"
+
+Synergy score = average of selected expert strengths
+"""
+
+COMPLIANCE_EXAMPLES: Dict[str, str] = {
+    "NON_COMPLIANT": """
+❌ WRONG - This violates the protocol:
+
+"Microservices offer better scalability while monoliths are simpler..."
+
+Why it fails: No envelope structure, no confidence, no experts, no pipeline confirmation.
+""",
+    "COMPLIANT": """
+✅ CORRECT - This follows the protocol:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SOLVER ENVELOPE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SOLUTION:
+[Concise answer here]
+
+CONFIDENCE: 85%
+
+ROUTE: structured | progress=0.85 min=0.30
+
+EXPERT TEAM (Synergy: 0.87):
+- Lead: Technical Architect — "Focus on scalability requirements"
+- Support: DevOps Engineer — "Consider deployment complexity"
+- Support: Business Analyst — "Evaluate team size and budget"
+- Support: Security Specialist — "Assess attack surface differences"
+- Support: Critical Thinker — "Challenge assumptions about scale needs"
+
+SAFE-OUT STATE:
+  route: tot
+  notes: confidence above threshold | phases: init->finalize
+
+SHORTLIST:
+  1. "Context-dependent recommendation" (0.85)
+  2. "Monolith-first approach" (0.72)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Alpha Solver v2.3.0-P3 (PORTABLE-SPEC) pipeline executed:
+interpret → ToT (5 experts) → routing → SAFE-OUT → envelope.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+""",
+}
 
 # ---------------------------------------------------------------------------
 # Optional imports from the modular codebase. Everything here degrades
@@ -184,6 +279,22 @@ class RouteDecision:
     escalations: List[str]
 
 
+@dataclass
+class ExpertTeam:
+    """Selected expert team for a query."""
+
+    lead: Dict[str, Any]
+    supporting: List[Dict[str, Any]]
+    synergy_score: float
+    domain_classification: List[str]
+
+    def to_display(self) -> str:
+        lines = [f"- Lead: {self.lead['name']} — \"{self.lead.get('insight', 'Primary analysis')}\""]
+        for expert in self.supporting:
+            lines.append(f"- Support: {expert['name']} — \"{expert.get('insight', 'Supporting analysis')}\"")
+        return "\n".join(lines)
+
+
 class PortableRouter:
     """Small deterministic router that mirrors ``alpha.router.ProgressiveRouter`` semantics."""
 
@@ -202,6 +313,53 @@ class PortableRouter:
         self.stage = self.escalations[-1] if self.escalations else self.stages[0]
         rationale = f"progress={self.progress:.2f} min={self.min_progress:.2f} stage={self.stage}"
         return RouteDecision(stage=self.stage, rationale=rationale, profile=self.stage, escalations=list(self.escalations))
+
+
+class PortableExpertSelector:
+    """Selects optimal expert team based on query domain classification."""
+
+    def __init__(self, roster: List[Dict] = None):
+        self.roster = roster or EXPERT_ROSTER
+
+    def classify_domains(self, query: str) -> List[str]:
+        """Extract domain keywords from query."""
+        query_lower = query.lower()
+        all_domains = set()
+        for expert in self.roster:
+            for domain in expert["domains"]:
+                if domain in query_lower:
+                    all_domains.add(domain)
+        if not all_domains:
+            all_domains = {"general", "analysis"}
+        return list(all_domains)[:5]
+
+    def select_team(self, query: str, team_size: int = 5) -> ExpertTeam:
+        """Select top experts for the query."""
+        domains = self.classify_domains(query)
+
+        scored = []
+        for expert in self.roster:
+            overlap = len(set(expert["domains"]) & set(domains))
+            score = overlap * expert["strength"] + expert["strength"] * 0.1
+            scored.append((score, expert))
+
+        scored.sort(key=lambda x: x[0], reverse=True)
+        selected = [exp for _, exp in scored[:team_size]]
+
+        lead = {**selected[0], "insight": f"Lead analysis on {domains[0] if domains else 'general'} aspects"}
+        supporting = [
+            {**exp, "insight": f"Perspective on {exp['domains'][0]} considerations"}
+            for exp in selected[1:]
+        ]
+
+        synergy = sum(exp["strength"] for exp in selected) / len(selected)
+
+        return ExpertTeam(
+            lead=lead,
+            supporting=supporting,
+            synergy_score=round(synergy, 2),
+            domain_classification=domains
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -368,7 +526,8 @@ class SolverDiagnostics:
     router: Dict[str, Any]
     safe_out: Dict[str, Any]
     tot: Dict[str, Any]
-    observability_events: List[Dict[str, Any]]
+    expert_selection: Dict[str, Any] = field(default_factory=dict)
+    observability_events: List[Dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass
@@ -383,6 +542,7 @@ class SolverEnvelope:
     run_summary: Dict[str, Any]
     telemetry_contract: Dict[str, Any]
     timestamp: str
+    expert_team: Optional["ExpertTeam"] = None
     version: str = PORTABLE_VERSION
     session_id: str = field(default_factory=lambda: f"portable-{int(time.time())}")
 
@@ -392,16 +552,29 @@ class SolverEnvelope:
         return data
 
     def to_llm_response(self) -> str:
-        shortlist_rendered = ", ".join(
-            [f"{item.get('answer', '')} (conf={item.get('confidence', 0.0):.2f})" for item in self.shortlist]
+        shortlist_rendered = "\n".join(
+            [f"  {i+1}. \"{item.get('answer', '')[:50]}...\" ({item.get('confidence', 0.0):.2f})" for i, item in enumerate(self.shortlist)]
         )
         confidence_pct = f"{self.confidence * 100:.0f}%"
+
+        expert_section = ""
+        if self.expert_team:
+            expert_section = f"EXPERT TEAM (Synergy: {self.expert_team.synergy_score}):\n{self.expert_team.to_display()}\n\n"
+
         return (
-            f"Solution: {self.solution}\n"
-            f"Confidence: {confidence_pct}\n"
-            f"Route: {self.safe_out_state.get('route')} | {self.route_explain}\n"
-            f"Alternatives: {shortlist_rendered}\n"
-            f"Pipeline: interpret → ToT → routing → SAFE-OUT → envelope"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"SOLVER ENVELOPE\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+            f"SOLUTION:\n{self.solution}\n\n"
+            f"CONFIDENCE: {confidence_pct}\n\n"
+            f"ROUTE: {self.safe_out_state.get('route')} | {self.route_explain}\n\n"
+            f"{expert_section}"
+            f"SAFE-OUT STATE:\n  route: {self.safe_out_state.get('route')}\n  notes: {self.safe_out_state.get('notes')}\n\n"
+            f"SHORTLIST:\n{shortlist_rendered}\n\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"Alpha Solver v2.3.0-P3 (PORTABLE-SPEC) pipeline executed:\n"
+            f"interpret → ToT (5 experts) → routing → SAFE-OUT → envelope.\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         )
 
 
@@ -416,6 +589,7 @@ class PortableAlphaSolver:
         self.seed = seed
         self.observability = PortableObservability()
         self.budget_guard = budget_guard or BudgetGuard()
+        self.expert_selector = PortableExpertSelector()
 
     # ------------------------------------------------------------------
     # Component factories (allow modular reuse when present)
@@ -447,6 +621,7 @@ class PortableAlphaSolver:
         tot_result = tot_solver.solve(query)
 
         route_decision = router.decide(confidence=float(tot_result.get("confidence", 0.0)))
+        expert_team = self.expert_selector.select_team(query)
         safe_out = self._make_safe_out()
         safe_out_state = safe_out.run(tot_result, query)
 
@@ -465,6 +640,7 @@ class PortableAlphaSolver:
             router={"stage": route_decision.stage, "rationale": route_decision.rationale, "escalations": route_decision.escalations},
             safe_out={"config": asdict(getattr(safe_out, "config", PortableSOConfig()))},
             tot={"steps": tot_result.get("steps", []), "best_path": tot_result.get("best_path", []), "timed_out": tot_result.get("timed_out", False)},
+            expert_selection={"lead": expert_team.lead["id"], "team_size": 5, "synergy": expert_team.synergy_score, "domains": expert_team.domain_classification},
             observability_events=self.observability.export(),
         )
 
@@ -474,6 +650,7 @@ class PortableAlphaSolver:
             safe_out_state=safe_out_state,
             route_explain=route_decision.rationale,
             shortlist=shortlist,
+            expert_team=expert_team,
             pending_questions=[],
             diagnostics=diagnostics,
             run_summary=run_summary,
@@ -515,4 +692,4 @@ if __name__ == "__main__":  # pragma: no cover
     _cli()
 
 # PIPELINE CONFIRMATION FORMAT:
-# "Alpha Solver v2.2.7-P3 (PORTABLE-SPEC) pipeline executed: interpret → ToT → routing → SAFE-OUT → envelope."
+# "Alpha Solver v2.3.0-P3 (PORTABLE-SPEC) pipeline executed: interpret → ToT (5 experts) → routing → SAFE-OUT → envelope."
