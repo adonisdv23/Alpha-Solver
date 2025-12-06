@@ -1,5 +1,5 @@
 """
-Alpha Solver v2.2.6-P3 — PORTABLE SPEC MONOLITH
+Alpha Solver v2.2.7-P3 — PORTABLE SPEC MONOLITH
 
 This file is a self-contained representation of the Alpha Solver architecture,
 derived from the modular code in this repo.
@@ -7,6 +7,17 @@ It is designed for AI-assisted editing environments (ChatGPT / Claude / DeepSeek
 Do NOT remove SAFE-OUT, routing, budget guard, determinism, observability,
 or the envelope shape. Real production code also exists in modular form in
 this repository.
+
+LLM_PERSONA_PROTOCOL
+--------------------
+This file is intended to be loaded directly as a system prompt for web LLM chat
+interfaces. The model MUST treat the content as an executable architecture
+specification and must NOT simplify behavior to "just answer". All outputs must
+be formatted as SolverEnvelope-shaped responses that mirror the pipeline below.
+
+Activation phrase: "You are Alpha Solver v2.2.7-P3, running in PORTABLE-SPEC mode"
+
+Pipeline to emulate (never skip steps): interpret → ToT → routing → SAFE-OUT → envelope
 """
 
 from __future__ import annotations
@@ -20,7 +31,58 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
-PORTABLE_VERSION = "2.2.6-P3-PORTABLE-SPEC"
+PORTABLE_VERSION = "2.2.7-P3-PORTABLE-SPEC"
+
+# ---------------------------------------------------------------------------
+# LLM guidance constants
+# ---------------------------------------------------------------------------
+EXAMPLE_QUERIES: List[Dict] = [
+    {
+        "query": "What is the capital of France?",
+        "expected_route": "basic",
+        "expected_confidence": 0.92,
+        "reasoning_trace": "Interpret → brief ToT confirming Paris across recall and geography branches",
+    },
+    {
+        "query": "Compare the economic impacts of carbon taxes versus cap-and-trade systems.",
+        "expected_route": "structured",
+        "expected_confidence": 0.60,
+        "reasoning_trace": "Interpret → ToT branches: definitions, historical examples, trade-offs; synthesize contrasting outcomes",
+    },
+    {
+        "query": "Give legal advice on forming a corporation without jurisdiction details.",
+        "expected_route": "constrained",
+        "expected_confidence": 0.38,
+        "reasoning_trace": "Interpret → ToT considers ethics, jurisdiction gaps, safety; SAFE-OUT triggered to constrain guidance",
+    },
+]
+
+LLM_REASONING_TEMPLATE: str = """
+Tree-of-Thought execution guidance for LLMs:
+- TEMPLATE_FUNCS (named strategies):
+  1) Rephrase
+  2) Decompose
+  3) Edge Cases
+  4) Counterpoints
+  5) Synthesize
+- Score each branch on relevance, completeness, and confidence. Average the three to produce the branch score.
+- Continue exploring until a branch score >= 0.70 or depth >= 5; then select the best-scoring path.
+- Prefer concise, evaluative notes over verbose narration.
+"""
+
+ENVELOPE_OUTPUT_EXAMPLE: str = """
+solution: Provide a concise comparison of carbon taxes vs cap-and-trade with pros/cons and real-world examples.
+confidence: 72%
+route: SAFE-OUT (applied CoT fallback)
+shortlist: [
+  {"answer": "Initial ToT summary of carbon pricing mechanisms", "confidence": 0.58},
+  {"answer": "Refined SAFE-OUT summary with cautions", "confidence": 0.72}
+]
+pending_questions: ["Which jurisdiction should the policy focus on?", "Is the audience policymakers or students?"]
+notes: interpret → ToT → routing → SAFE-OUT → envelope
+timestamp: 2024-05-01T12:00:00Z
+version: 2.2.7-P3-PORTABLE-SPEC
+"""
 
 # ---------------------------------------------------------------------------
 # Optional imports from the modular codebase. Everything here degrades
@@ -254,6 +316,13 @@ class PortableSafeOut:
         self.rng = random.Random(config.seed)
 
     def _cot(self, query: str) -> Dict[str, Any]:
+        """LLM fallback playbook for CoT when confidence is low.
+
+        - Re-examine the query from first principles and restate the goal.
+        - Identify missing context or constraints that block a high-confidence answer.
+        - Provide a best-effort response that marks uncertainty explicitly.
+        - Offer concise follow-up questions to gather the missing details when doubt remains.
+        """
         # Deterministic pseudo chain-of-thought fallback
         steps = [f"Step {i+1}: explore {query}" for i in range(self.config.max_cot_steps)]
         conf = min(0.65, 0.45 + 0.02 * len(query.split()))
@@ -321,6 +390,19 @@ class SolverEnvelope:
         data = asdict(self)
         data["diagnostics"] = asdict(self.diagnostics)
         return data
+
+    def to_llm_response(self) -> str:
+        shortlist_rendered = ", ".join(
+            [f"{item.get('answer', '')} (conf={item.get('confidence', 0.0):.2f})" for item in self.shortlist]
+        )
+        confidence_pct = f"{self.confidence * 100:.0f}%"
+        return (
+            f"Solution: {self.solution}\n"
+            f"Confidence: {confidence_pct}\n"
+            f"Route: {self.safe_out_state.get('route')} | {self.route_explain}\n"
+            f"Alternatives: {shortlist_rendered}\n"
+            f"Pipeline: interpret → ToT → routing → SAFE-OUT → envelope"
+        )
 
 
 class PortableAlphaSolver:
@@ -431,3 +513,6 @@ def _cli() -> None:
 
 if __name__ == "__main__":  # pragma: no cover
     _cli()
+
+# PIPELINE CONFIRMATION FORMAT:
+# "Alpha Solver v2.2.7-P3 (PORTABLE-SPEC) pipeline executed: interpret → ToT → routing → SAFE-OUT → envelope."
