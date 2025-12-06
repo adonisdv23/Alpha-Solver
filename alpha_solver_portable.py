@@ -488,9 +488,11 @@ class PortableSafeOut:
 
     def run(self, tot_result: Dict[str, Any], query: str) -> Dict[str, Any]:
         confidence = float(tot_result.get("confidence", 0.0))
+        initial_confidence = confidence
         phases: List[str] = ["init"]
         if confidence >= self.config.low_conf_threshold:
             route = "tot"
+            reason = "confidence_above_threshold"
             notes = "confidence above threshold"
             cot_result = None
         else:
@@ -499,9 +501,11 @@ class PortableSafeOut:
             if cot_result:
                 route = "cot_fallback"
                 confidence = cot_result.get("confidence", confidence)
+                reason = "low_confidence_tot_fallback_to_cot"
                 notes = "applied CoT fallback"
             else:
                 route = "best_effort"
+                reason = "low_confidence_no_fallback_available"
                 notes = "no fallback available"
         phases.append("finalize")
         answer_src = cot_result or tot_result
@@ -509,12 +513,14 @@ class PortableSafeOut:
             "final_answer": answer_src.get("answer", ""),
             "route": route,
             "confidence": confidence,
-            "reason": tot_result.get("reason", "ok" if route == "tot" else "low_confidence"),
-            "notes": f"{notes} | phases: {'->'.join(phases)}",
+            "reason": tot_result.get("reason", reason),
+            "notes": f"route={route} | initial_confidence={initial_confidence:.2f} | {notes} | phases: {'->'.join(phases)}",
             "tot": tot_result,
             "cot": cot_result,
             "phases": phases,
             "recovery_notes": "" if route == "tot" else "used portable fallback",
+            "policy_profile": "default",
+            "thresholds": {"low_conf_threshold": float(self.config.low_conf_threshold)},
         }
 
 
@@ -542,6 +548,7 @@ class SolverEnvelope:
     run_summary: Dict[str, Any]
     telemetry_contract: Dict[str, Any]
     timestamp: str
+    meta: Dict[str, Any] = field(default_factory=dict)
     expert_team: Optional["ExpertTeam"] = None
     version: str = PORTABLE_VERSION
     session_id: str = field(default_factory=lambda: f"portable-{int(time.time())}")
@@ -594,15 +601,17 @@ class PortableAlphaSolver:
     # ------------------------------------------------------------------
     # Component factories (allow modular reuse when present)
     # ------------------------------------------------------------------
-    def _make_tot(self) -> Any:
+    def _make_tot(self, seed: Optional[int] = None) -> Any:
+        seed = seed if seed is not None else self.seed
         if ModularToTSolver is not None:  # pragma: no cover - modular path
-            return ModularToTSolver(seed=self.seed, branching_factor=3, score_threshold=0.70, max_depth=5)
-        return PortableToTSolver(seed=self.seed, budget_guard=self.budget_guard)
+            return ModularToTSolver(seed=seed, branching_factor=3, score_threshold=0.70, max_depth=5)
+        return PortableToTSolver(seed=seed, budget_guard=self.budget_guard)
 
-    def _make_safe_out(self) -> Any:
+    def _make_safe_out(self, seed: Optional[int] = None) -> Any:
+        seed = seed if seed is not None else self.seed
         if ModularSafeOut is not None and ModularSOConfig is not None:  # pragma: no cover
-            return ModularSafeOut(ModularSOConfig(seed=self.seed))
-        return PortableSafeOut(PortableSOConfig(seed=self.seed))
+            return ModularSafeOut(ModularSOConfig(seed=seed))
+        return PortableSafeOut(PortableSOConfig(seed=seed))
 
     def _make_router(self) -> PortableRouter:
         return PortableRouter()
@@ -612,17 +621,27 @@ class PortableAlphaSolver:
     # ------------------------------------------------------------------
     def solve(self, query: str, *, deterministic: bool = False, context: Optional[Dict[str, Any]] = None) -> SolverEnvelope:
         context = context or {}
+        vertical_id = context.get("vertical_id", "generic")
+        routing_profile_id = context.get("routing_profile_id", "default")
         seed = self.seed if deterministic else context.get("seed", self.seed)
         random.seed(seed)
-        self.observability.log_event("solve_start", query=query, deterministic=deterministic)
+        self.observability.log_event(
+            "solve_start",
+            query=query,
+            deterministic=deterministic,
+            event_type="lifecycle",
+            stage="start",
+            vertical_id=vertical_id,
+            routing_profile_id=routing_profile_id,
+        )
 
-        tot_solver = self._make_tot()
+        tot_solver = self._make_tot(seed=seed)
         router = self._make_router()
         tot_result = tot_solver.solve(query)
 
         route_decision = router.decide(confidence=float(tot_result.get("confidence", 0.0)))
         expert_team = self.expert_selector.select_team(query)
-        safe_out = self._make_safe_out()
+        safe_out = self._make_safe_out(seed=seed)
         safe_out_state = safe_out.run(tot_result, query)
 
         shortlist = [
@@ -634,6 +653,8 @@ class PortableAlphaSolver:
             "accounting": tot_result.get("budget", self.budget_guard.summary()),
             "deterministic": bool(deterministic),
             "seed": seed,
+            "vertical_id": vertical_id,
+            "routing_profile_id": routing_profile_id,
         }
 
         diagnostics = SolverDiagnostics(
@@ -656,17 +677,72 @@ class PortableAlphaSolver:
             run_summary=run_summary,
             telemetry_contract={"observability": "portable"},
             timestamp=datetime.now(timezone.utc).isoformat(),
+            meta={"vertical_id": vertical_id, "routing_profile_id": routing_profile_id},
             version=PORTABLE_VERSION,
             session_id=self.observability.session_id,
         )
 
-        self.observability.log_event("solve_end", outcome="ok", confidence=envelope.confidence)
+        env_dict = envelope.to_dict()
+        validation = validate_envelope_dict(env_dict)
+        if not validation["ok"]:
+            self.observability.log_event(
+                "envelope_validation_failed",
+                event_type="validation",
+                stage="post_solve",
+                errors=validation["errors"],
+                error_count=len(validation["errors"]),
+            )
+
+        self.observability.log_event(
+            "solve_end",
+            outcome="ok",
+            confidence=envelope.confidence,
+            event_type="lifecycle",
+            stage="end",
+            vertical_id=vertical_id,
+            routing_profile_id=routing_profile_id,
+        )
         return envelope
 
 
 # ---------------------------------------------------------------------------
 # CLI entrypoint
 # ---------------------------------------------------------------------------
+
+
+def validate_envelope_dict(env: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Lightweight validation for SolverEnvelope dicts.
+    Returns {"ok": bool, "errors": List[str]}.
+    NEVER raises exceptions.
+    """
+    errors: List[str] = []
+
+    required_top = [
+        "solution",
+        "confidence",
+        "safe_out_state",
+        "route_explain",
+        "shortlist",
+        "diagnostics",
+        "run_summary",
+        "timestamp",
+        "version",
+        "session_id",
+    ]
+
+    for key in required_top:
+        if key not in env:
+            errors.append(f"missing top-level field: {key}")
+
+    if not isinstance(env.get("confidence"), (int, float)):
+        errors.append("confidence must be numeric")
+
+    if not isinstance(env.get("safe_out_state"), dict):
+        errors.append("safe_out_state must be a dict")
+
+    return {"ok": len(errors) == 0, "errors": errors}
+
 
 def _cli() -> None:
     parser = argparse.ArgumentParser(description="Portable Alpha Solver")
