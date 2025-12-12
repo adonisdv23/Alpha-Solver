@@ -75,22 +75,55 @@ def test_validate_negative_threshold():
 
 def _run_check_env(extra_env):
     env = os.environ.copy()
+    for var in ("OPENAI_API_KEY", "ANTHROPIC_API_KEY", "GOOGLE_API_KEY"):
+        env.pop(var, None)
     env.update(extra_env)
     return subprocess.run(
         [sys.executable, "scripts/check_env.py"], env=env, capture_output=True, text=True
     )
 
 
-def test_check_env_success():
-    result = _run_check_env({"MODEL_PROVIDER": "openai", "OPENAI_API_KEY": "sk"})
+@pytest.mark.parametrize(
+    ("provider", "key_var"),
+    [
+        ("openai", "OPENAI_API_KEY"),
+        ("anthropic", "ANTHROPIC_API_KEY"),
+        ("gemini", "GOOGLE_API_KEY"),
+        ("google", "GOOGLE_API_KEY"),
+    ],
+)
+def test_check_env_success_with_provider_keys(provider, key_var):
+    result = _run_check_env({"MODEL_PROVIDER": provider, key_var: "secret"})
     assert result.returncode == 0
     assert "Environment looks good" in result.stdout
 
 
-def test_check_env_missing_var():
-    result = _run_check_env({"MODEL_PROVIDER": "openai"})
+@pytest.mark.parametrize(
+    ("provider", "key_var"),
+    [
+        ("openai", "OPENAI_API_KEY"),
+        ("anthropic", "ANTHROPIC_API_KEY"),
+        ("gemini", "GOOGLE_API_KEY"),
+        ("google", "GOOGLE_API_KEY"),
+    ],
+)
+def test_check_env_missing_var(provider, key_var):
+    result = _run_check_env({"MODEL_PROVIDER": provider})
     assert result.returncode != 0
-    assert "OPENAI_API_KEY" in result.stdout
+    assert key_var in result.stdout
+
+
+@pytest.mark.parametrize("provider", ["local", "none"])
+def test_check_env_local_provider_skips_external_keys(provider):
+    result = _run_check_env({"MODEL_PROVIDER": provider})
+    assert result.returncode == 0
+    assert "Environment looks good" in result.stdout
+
+
+def test_check_env_requires_model_provider():
+    result = _run_check_env({"MODEL_PROVIDER": ""})
+    assert result.returncode != 0
+    assert "MODEL_PROVIDER" in result.stdout
 
 
 def test_redaction(caplog):

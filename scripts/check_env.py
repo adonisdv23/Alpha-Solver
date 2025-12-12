@@ -10,8 +10,8 @@ import os
 import sys
 from typing import List
 
-REQUIRED_VARS = ["MODEL_PROVIDER"]
 SECRET_KEYS = ("KEY", "TOKEN", "SECRET")
+_NO_KEY_PROVIDERS = {"local", "none"}
 
 
 def _is_truthy(value: str | None) -> bool:
@@ -22,15 +22,35 @@ def _print(msg: str) -> None:
     sys.stdout.write(msg + "\n")
 
 
+def _required_keys_for_provider(provider: str) -> List[str]:
+    """Return the API keys required for the given provider."""
+    if provider == "openai":
+        return ["OPENAI_API_KEY"]
+    if provider == "anthropic":
+        return ["ANTHROPIC_API_KEY"]
+    if provider in {"gemini", "google"}:
+        return ["GOOGLE_API_KEY"]
+    return []
+
+
+def _missing(var: str) -> bool:
+    value = os.getenv(var)
+    return value is None or not value.strip()
+
+
 def main() -> int:
     missing: List[str] = []
-    for var in REQUIRED_VARS:
-        if not os.getenv(var):
-            missing.append(var)
+    provider_raw = os.getenv("MODEL_PROVIDER", "")
+    if provider_raw is None or not provider_raw.strip():
+        missing.append("MODEL_PROVIDER")
+        provider = ""
+    else:
+        provider = provider_raw.strip().lower()
 
-    provider = os.getenv("MODEL_PROVIDER", "").lower()
-    if provider == "openai" and not os.getenv("OPENAI_API_KEY"):
-        missing.append("OPENAI_API_KEY")
+    if provider and provider not in _NO_KEY_PROVIDERS:
+        for var in _required_keys_for_provider(provider):
+            if _missing(var):
+                missing.append(var)
 
     if missing:
         _print("Missing required environment variables:")
