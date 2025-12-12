@@ -102,9 +102,19 @@ class AlphaSolver:
         sm = SafeOutStateMachine(cfg)
         envelope = sm.run(tot_result, query)
 
+        router_stage = router.stage if router else "basic"
+        if (
+            router
+            and multi_branch
+            and router_stage
+            == (router.escalation[0] if router.escalation else "basic")
+        ):
+            # Surface that we are in a ToT routing path even if cache hits skipped escalation.
+            router_stage = "tot"
+
         envelope["diagnostics"] = {
             "tot": tot_result,
-            "router": {"stage": router.stage if router else "basic"},
+            "router": {"stage": router_stage},
             "agents_v12": {
                 "enabled": agents_cfg.enable_agents_v12,
                 "order": agents_cfg.agents_v12_order,
