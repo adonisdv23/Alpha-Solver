@@ -7,6 +7,8 @@ priority: P2A
 track: RES_Infra
 spec_version: 1.0
 ---
+# NEW-RATE-001 · API Rate Limiting
+
 ## Goal
 Introduce Redis-backed token bucket rate limiting for tenant/global scopes.
 ## Acceptance Criteria
