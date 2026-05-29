@@ -145,7 +145,7 @@ See [docs/DETERMINISM.md](docs/DETERMINISM.md) and [docs/BUDGETING.md](docs/BUDG
 
 ## Architecture overview
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). For the role of the portable, modular/reference, bridge, and CLI entrypoint files, see [docs/ENTRYPOINTS.md](docs/ENTRYPOINTS.md).
 
 ## Roadmap
 
