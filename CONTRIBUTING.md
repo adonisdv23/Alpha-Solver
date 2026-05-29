@@ -4,6 +4,8 @@
 
 1. Spec Kit → 2. Codex → 3. PR → 4. CI → 5. Squash & Merge
 
+AI coding agents should also follow the repo-level instructions in `AGENTS.md`.
+
 ## Specs
 
 - Specs live under `.specs/` (see `.specs/README.md` for structure, sections, and workflow).
