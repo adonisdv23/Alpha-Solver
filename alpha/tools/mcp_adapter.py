@@ -22,6 +22,7 @@ class McpAdapter:
 
     DEFAULT_TIMEOUT_MS = 10_000
     DEFAULT_REDACT_FIELDS = {"email", "phone_number", "full_name", "address"}
+    DOMAINLESS_TOOLS = {"gsheets_write"}
 
     def __init__(self, config: Optional[Mapping[str, Any]] = None) -> None:
         self.config = dict(config or {})
@@ -53,7 +54,8 @@ class McpAdapter:
 
         call_fn = self._tools[tool_name]
         domain = self._extract_domain(payload)
-        self._enforce_allowlist(domain)
+        if domain is not None or tool_name not in self.DOMAINLESS_TOOLS:
+            self._enforce_allowlist(domain)
 
         start = time.perf_counter()
         redactions: List[str] = []
