@@ -33,6 +33,7 @@ This file gives repo-level operating instructions for AI coding agents working o
 
 - `alpha_solver_portable.py` is the portable standalone behavior contract.
 - `alpha-solver-v91-python.py` and `alpha_solver_entry.py` are modular/reference entrypoint paths.
+- `docs/ENTRYPOINTS.md` documents the portable, modular/reference, bridge, and CLI entrypoint roles.
 - `.specs/INDEX.md` should stay synchronized when adding specs.
 - `.env.example` and `scripts/check_env.py` define current environment expectations.
 
