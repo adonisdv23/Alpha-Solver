@@ -7,6 +7,8 @@ priority: P2A
 track: RES_RAG
 spec_version: 1.0
 ---
+# EPIC_RAG_001 · RAG & Semantic Cache Pack
+
 ## Goal
 Deterministic RAG broker with semantic cache (TTL + LFU/LRU) and policy guardrails.
 

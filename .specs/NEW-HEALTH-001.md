@@ -7,6 +7,8 @@ priority: P2A
 track: RES_Infra
 spec_version: 1.0
 ---
+# NEW-HEALTH-001 · Health Check Endpoints
+
 ## Goal
 Expose /health with dependency checks (Redis, VectorDB, provider ping).
 ## Acceptance Criteria

@@ -7,7 +7,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 | `AS-145.md` | CODE SPEC — AS-145 · Tool Adapters: Playwright + GSheets (MVP hardening) (RES_05) |
 | `AS-148.md` | CODE SPEC — AS-148 · Policy & PII Gateway (DR_TRACK_A) |
 | `AUTH-SESSION-001.md` | AUTH-SESSION-001 · Dashboard Login + Session |
-| `EPIC_RAG_001.md` | Goal |
+| `EPIC_RAG_001.md` | EPIC_RAG_001 · RAG & Semantic Cache Pack |
 | `FINOPS-BUDGET-001.md` | FINOPS-BUDGET-001 · Budget Guardrails |
 | `MCP-001.md` | CODE SPEC — MCP-001 · MCP Registry Loader & Wiring (MCP) |
 | `MCP-002.md` | CODE SPEC — MCP-002 · Router decision rule (MCP) |
@@ -28,8 +28,8 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 | `NEW-017.md` | CODE SPEC — NEW-017 · Prompt Quality Pack (rubrics + evaluator) (RES_01) |
 | `NEW-024.md` | CODE SPEC — NEW-024 · JWT Service-to-Service Authentication (DR_TRACK_A) |
 | `NEW-045.md` | Spec: NEW-045 · Pilot Readiness & Release v0.1 |
-| `NEW-HEALTH-001.md` | Goal |
-| `NEW-RATE-001.md` | Goal |
+| `NEW-HEALTH-001.md` | NEW-HEALTH-001 · Health Check Endpoints |
+| `NEW-RATE-001.md` | NEW-RATE-001 · API Rate Limiting |
 | `OBS-ALERTS-001.md` | CODE SPEC — OBS-ALERTS-001 · Prometheus Alerts + CI Validation (RES_Dash) |
 | `RES-03.md` | CODE SPEC — RES-03 · Decision Rules & Scoring (RES) |
 | `RES-04.md` | CODE SPEC — RES-04 · Confidence & Budget Gates (RES) |
