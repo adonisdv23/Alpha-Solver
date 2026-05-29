@@ -10,7 +10,7 @@ This file gives repo-level operating instructions for AI coding agents working o
 - Existing specs should not be moved or renamed casually.
 - New feature or bugfix work should start from or update a spec unless the user explicitly requests exploratory work.
 - Backlog spreadsheets are external planning/status ledgers, not repo implementation contracts.
-- `data/alpha_solver_master_table_v0_7_0.*` is a registry export, not a backlog.
+- `data/alpha_solver_master_table_v0_7_0.*` is a registry export/provenance artifact, not a backlog; see `data/README.md` before using or moving it.
 
 ## Agent Workflow
 
