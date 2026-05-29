@@ -13,6 +13,9 @@ Topics: reasoning, router, mcp, observability, replay, determinism, budget, prom
 
 Alpha Solver is a reasoning/routing layer with optional MCP tool calls. It ships gates, scoring, observability, replay, determinism, and a budget guard.
 
+See [docs/OPERATING_GUIDE.md](docs/OPERATING_GUIDE.md) for the working
+process: roles, when specs are required, and how PRs are reviewed and merged.
+
 ## Status
 
 MVP ready; P0 & P1 merged:

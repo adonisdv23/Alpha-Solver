@@ -11,6 +11,9 @@ This file gives repo-level operating instructions for AI coding agents working o
 - New feature or bugfix work should start from or update a spec unless the user explicitly requests exploratory work.
 - Backlog spreadsheets are external planning/status ledgers, not repo implementation contracts.
 - `data/alpha_solver_master_table_v0_7_0.*` is a registry export/provenance artifact, not a backlog; see `data/README.md` before using or moving it.
+- `docs/OPERATING_GUIDE.md` describes the operator workflow (roles, spec rules,
+  inspect-only vs implement, backlog updates). This file (`AGENTS.md`) remains
+  the canonical agent instruction set; the Operating Guide does not override it.
 
 ## Agent Workflow
 
