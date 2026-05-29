@@ -1,31 +1,93 @@
 # Alpha Solver Quickstart
 
-This guide gets you running Alpha Solver in under five minutes.
+This guide gets you running Alpha Solver from a fresh macOS checkout.
 
-## 1. Clone & Install
+## 1. Confirm Python 3.12+
+
+Alpha Solver requires Python 3.12 or newer:
+
 ```bash
-git clone https://example.com/alpha-solver.git
-cd alpha-solver
-pip install -r requirements.txt
+python3 --version
 ```
 
-## 2. Configure Environment
-Copy the example environment and edit as needed:
+If needed, install a current Python first. For example, with Homebrew:
+
+```bash
+brew install python@3.12
+```
+
+## 2. Clone and install
+
+```bash
+git clone https://github.com/adonisdv23/Alpha-Solver.git
+cd Alpha-Solver
+
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+If your Python 3.12+ executable has a different name, use that executable when creating `.venv`.
+
+## 3. Configure environment
+
+Copy the example environment file:
+
 ```bash
 cp .env.example .env
 ```
 
-## 3. Validate Setup
-Run the environment checker and tests:
+Set `MODEL_PROVIDER` in `.env`:
+
 ```bash
-make env-check
-make test
+MODEL_PROVIDER=local
 ```
 
-## 4. Start the Server
+Use `local` for offline checks. For a real remote provider, set the matching API key as well:
+
+- `MODEL_PROVIDER=openai` requires `OPENAI_API_KEY`.
+- `MODEL_PROVIDER=anthropic` requires `ANTHROPIC_API_KEY`.
+- `MODEL_PROVIDER=gemini` or `MODEL_PROVIDER=google` requires `GOOGLE_API_KEY`.
+
+## 4. Validate setup
+
+```bash
+set -a
+source .env
+set +a
+python scripts/check_env.py
+```
+
+For a local/offline validation without editing `.env`, run:
+
+```bash
+MODEL_PROVIDER=local python scripts/check_env.py
+```
+
+## 5. Run smoke checks
+
+```bash
+python cli/alpha_solver_cli.py --help
+python alpha_solver_cli.py --help
+python -m alpha.cli --help
+python alpha_solver_portable.py "Summarize Alpha Solver restart state" --json --deterministic
+```
+
+## 6. Run tests
+
+```bash
+python -m pytest -q
+```
+
+## Optional server command
+
+If you have installed the service dependencies needed by your environment, start the API server with:
+
 ```bash
 make run
 ```
-The API is now available at [http://localhost:8000](http://localhost:8000).
 
-Codespaces users can run the same commands in the integrated terminal.
+The API is then available at [http://localhost:8000](http://localhost:8000).
+
+Codespaces users can run the same repository commands in the integrated terminal.

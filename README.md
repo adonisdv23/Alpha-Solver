@@ -5,13 +5,13 @@ Topics: reasoning, router, mcp, observability, replay, determinism, budget, prom
 
 # Alpha Solver
 
-[![CI](https://github.com/alpha-solver/alpha-solver/actions/workflows/ci.yml/badge.svg)](https://github.com/alpha-solver/alpha-solver/actions/workflows/ci.yml)
-[![Tests](https://github.com/alpha-solver/alpha-solver/actions/workflows/tests.yml/badge.svg)](https://github.com/alpha-solver/alpha-solver/actions/workflows/tests.yml)
+[![CI](https://github.com/adonisdv23/Alpha-Solver/actions/workflows/ci.yml/badge.svg)](https://github.com/adonisdv23/Alpha-Solver/actions/workflows/ci.yml)
+[![Tests](https://github.com/adonisdv23/Alpha-Solver/actions/workflows/tests.yml/badge.svg)](https://github.com/adonisdv23/Alpha-Solver/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ## What is Alpha Solver?
 
-A reasoning/routing layer with optional MCP tool calls. Ships gates, scoring, observability, replay, determinism & budget guard.
+Alpha Solver is a reasoning/routing layer with optional MCP tool calls. It ships gates, scoring, observability, replay, determinism, and a budget guard.
 
 ## Status
 
@@ -23,56 +23,138 @@ MVP ready; P0 & P1 merged:
 - Determinism harness
 - Budget guard
 
-## Quickstart
+## Fresh macOS setup
+
+Alpha Solver requires Python 3.12 or newer. On a fresh Mac, first confirm your Python version:
 
 ```bash
-# clone + deps
-python -m pip install -U pip
-pip install -r requirements.txt
-
-# run example
-python Alpha\ Solver.py
-
-# run tests (fast)
-pytest -q
-
-# targeted suites
-pytest -q -k "policy or gates or mcp or determinism or budget or observability"
+python3 --version
 ```
 
-## Using ChatGPT-5 via API (env-first)
+If that prints a version older than 3.12, install a newer Python before continuing. One common macOS option is Homebrew:
 
 ```bash
-export OPENAI_API_KEY=...
-export ALPHA_MODEL="gpt-5"           # or your provider/model key
-python Alpha\ Solver.py
+brew install python@3.12
 ```
 
-### Config
+Then clone the real repository and install dependencies in a virtual environment:
 
-Models and providers read from environment (`ALPHA_MODEL`, `ALPHA_PROVIDER`) or CLI flags. See `alpha.config.loader.load_config` for overrides.
+```bash
+git clone https://github.com/adonisdv23/Alpha-Solver.git
+cd Alpha-Solver
 
-### Record / Replay / Metrics
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+If `python3.12` is not the executable name on your machine, use any Python 3.12+ executable for the `venv` command.
+
+## Configure environment
+
+Copy the example environment file and set `MODEL_PROVIDER` for your setup:
+
+```bash
+cp .env.example .env
+```
+
+For local/offline checks, use:
+
+```bash
+MODEL_PROVIDER=local
+```
+
+For a remote provider, set `MODEL_PROVIDER` and the matching API key in `.env`:
+
+```bash
+# OpenAI
+MODEL_PROVIDER=openai
+OPENAI_API_KEY=...
+
+# Anthropic
+MODEL_PROVIDER=anthropic
+ANTHROPIC_API_KEY=...
+
+# Google Gemini
+MODEL_PROVIDER=gemini   # or: google
+GOOGLE_API_KEY=...
+```
+
+Provider values accepted by the environment checker include `local`, `openai`, `anthropic`, `gemini`, and `google`. API keys are only required when using a real remote provider: `OPENAI_API_KEY` for `openai`, `ANTHROPIC_API_KEY` for `anthropic`, and `GOOGLE_API_KEY` for `gemini` or `google`.
+
+Load the `.env` file into your shell, then validate the environment:
+
+```bash
+set -a
+source .env
+set +a
+python scripts/check_env.py
+```
+
+You can also validate local/offline configuration without editing `.env`:
+
+```bash
+MODEL_PROVIDER=local python scripts/check_env.py
+```
+
+## Smoke checks and common commands
+
+Use these commands to confirm the checkout is runnable:
+
+```bash
+python cli/alpha_solver_cli.py --help
+python alpha_solver_cli.py --help
+python -m alpha.cli --help
+python alpha_solver_portable.py "Summarize Alpha Solver restart state" --json --deterministic
+python -m pytest -q
+```
+
+Runnable tracked entrypoints include:
+
+- `alpha_solver_portable.py`
+- `alpha_solver_cli.py`
+- `cli/alpha_solver_cli.py`
+- `alpha_solver_entry.py`
+- `python -m alpha.cli`
+
+## CLI usage
+
+The offline CLI wrapper exposes commands such as `run`, `replay`, `gates`, `finops`, and `traces`:
+
+```bash
+python cli/alpha_solver_cli.py --help
+echo "hello world" | python cli/alpha_solver_cli.py run
+```
+
+The package CLI is also available from the repository checkout:
+
+```bash
+python -m alpha.cli --help
+```
+
+See [docs/CLI.md](docs/CLI.md) for more CLI examples.
+
+## Record / Replay / Metrics
 
 See [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md).
 
-### Determinism & Budget guard
+## Determinism & Budget guard
 
 See [docs/DETERMINISM.md](docs/DETERMINISM.md) and [docs/BUDGETING.md](docs/BUDGETING.md).
 
-### Architecture overview
+## Architecture overview
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-### Roadmap
+## Roadmap
 
 See [docs/ROADMAP.md](docs/ROADMAP.md).
 
-### Contributing
+## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License / Support
 
 Licensed under the [MIT License](LICENSE). Issues and feature requests welcome via GitHub.
-
