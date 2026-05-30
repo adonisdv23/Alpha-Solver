@@ -4,7 +4,7 @@ A practical status matrix for Alpha Solver runtime surfaces. This document tells
 
 This document does not replace `.specs/`. Specs define intended behavior. This document summarizes current runtime truth.
 
-Provider environment validation does not prove live provider usability. Remote-provider modes can require the presence of API-key environment variables, but current validated paths do not perform live LLM provider API calls by default.
+Provider environment validation does not prove live provider usability. Remote-provider modes can require the presence of API-key environment variables, but default validated paths do not perform live LLM provider API calls. OpenAI provider execution in FastAPI `/v1/solve` is explicitly opt-in via `MODEL_PROVIDER=openai` and still requires `OPENAI_API_KEY` for live use.
 
 ## Status Legend
 
@@ -27,10 +27,10 @@ Provider environment validation does not prove live provider usability. Remote-p
 | Root CLI: `alpha_solver_cli.py` | Verified local/offline | Root Tree-of-Thought CLI invokes local `_tree_of_thought` behavior and prints JSON. | No live provider client execution. | None for local CLI use. | `docs/ENTRYPOINTS.md`, `docs/CLI.md`, and CLI smoke tests. |
 | Package CLI: `python -m alpha.cli` | Verified local/offline | Package CLI supports local solve/eval/gate/budget/router commands from repo checkout. | No live provider client execution. | None for local CLI use; dataset/report inputs may be needed for specific subcommands. | `docs/CLI.md`, `alpha/cli/main.py`, and CLI tests. |
 | Command CLI: `cli/alpha_solver_cli.py` | Verified local/offline | Command-oriented CLI supports local run/replay/gates/finops/traces-style workflows. | No live provider client execution. | None for local CLI use; replay input files may be needed for replay. | `docs/ENTRYPOINTS.md`, `docs/CLI.md`, and CLI tests. |
-| FastAPI service `/v1/solve` | Verified local/offline / Partial | Existing route calls local deterministic ToT/ReAct-style runtime paths and is covered by service/API tests. | Live OpenAI provider execution is specified for the future but is not implemented in `/v1/solve` yet. | None for local API tests; service runtime dependencies depend on deployment mode. | Service tests and `.specs/PROVIDER-OPENAI-001.md` for future provider behavior. |
+| FastAPI service `/v1/solve` | Verified local/offline / Partial | Existing route calls local deterministic ToT/ReAct-style runtime paths by default and is covered by service/API tests. When `MODEL_PROVIDER=openai` is explicitly selected, the route can execute through the OpenAI provider client foundation. | Deeper provider telemetry, budget accounting, replay integration, and full SAFE-OUT/fallback orchestration remain follow-up work. | None for local API tests; live OpenAI use requires `OPENAI_API_KEY`. Default CI uses fake/mocked provider tests and makes no live calls. | Service tests and `.specs/PROVIDER-OPENAI-001.md`. |
 | `.env.example` | Verified local/offline | Defaults to `MODEL_PROVIDER=local`, the safe local/offline environment value. | Placeholder key examples do not enable or prove real remote LLM execution. | None when left at `MODEL_PROVIDER=local`. | `.env.example` and `scripts/check_env.py`. |
 | `scripts/check_env.py` | Env-validation only | Validates `MODEL_PROVIDER`, expected key-variable presence, and basic config invariants. | It does not perform remote provider API pings or prove provider usability. | Provider-specific key variables are required only for remote-provider env-validation modes. | `scripts/check_env.py`; keep default checks credential-free. |
-| OpenAI provider mode | Env-validation only / Placeholder / future | `MODEL_PROVIDER=openai` can require/check `OPENAI_API_KEY` presence through `scripts/check_env.py`. | No real OpenAI provider execution is implemented yet. | `OPENAI_API_KEY` for env validation only; no key is required for default local/offline mode. | `.specs/PROVIDER-OPENAI-001.md`. |
+| OpenAI provider mode | Partial / explicitly opt-in | `MODEL_PROVIDER=openai` can require/check `OPENAI_API_KEY` through `scripts/check_env.py`; `alpha.providers.openai` provides the client foundation; FastAPI `/v1/solve` can route through that client only when OpenAI is explicitly selected. | Default local/offline workflows do not call OpenAI; live smoke tests and deeper runtime integrations remain follow-up. | `OPENAI_API_KEY` for live OpenAI use; no key is required for default local/offline mode or default CI. | `.specs/PROVIDER-OPENAI-001.md`, `alpha/providers/`, and service API tests. |
 | Anthropic provider mode | Env-validation only / Placeholder / future | `MODEL_PROVIDER=anthropic` can require/check `ANTHROPIC_API_KEY` presence through `scripts/check_env.py`. | No real Anthropic provider execution is implemented. | `ANTHROPIC_API_KEY` for env validation only. | Future provider spec would be required before behavior changes. |
 | Gemini/Google provider mode | Env-validation only / Placeholder / future | `MODEL_PROVIDER=gemini` or `MODEL_PROVIDER=google` can require/check `GOOGLE_API_KEY` presence through `scripts/check_env.py`. | No real Gemini/Google provider execution is implemented. | `GOOGLE_API_KEY` for env validation only. | Future provider spec would be required before behavior changes. |
 | Deepseek adapter | Mocked / simulated / Placeholder / future | A Deepseek prompt adapter can render prompt dictionaries. | `deepseek` is not accepted by the current env checker and no real Deepseek provider execution is implemented. | None for prompt-rendering tests; live execution is not available. | Existing adapter code/tests; future provider spec required for real execution. |
@@ -57,7 +57,7 @@ Provider environment validation does not prove live provider usability. Remote-p
 | ------------- | ------------------------ | ------------- | -------------------------- | ----------- | ----- |
 | `local` | Yes | No | No | Yes | Safe verified default for local/offline checks. |
 | `none` | Yes | No | No | Acceptable for no-key validation | Accepted by the env checker for no-key local validation. |
-| `openai` | Yes | `OPENAI_API_KEY` | Provider client foundation only | No | A minimal `alpha.providers.openai` client exists with fake/mocked tests; `/v1/solve` live OpenAI integration and default live calls remain not implemented. |
+| `openai` | Yes | `OPENAI_API_KEY` | Explicit opt-in for `/v1/solve` | No | A minimal `alpha.providers.openai` client exists with fake/mocked tests; `/v1/solve` uses it only when `MODEL_PROVIDER=openai`. Default CI and local/offline tests make no live calls. |
 | `anthropic` | Yes | `ANTHROPIC_API_KEY` | No | No | Env validation requires key presence only; no live Anthropic execution is implemented. |
 | `gemini` | Yes | `GOOGLE_API_KEY` | No | No | Env validation requires key presence only; no live Gemini execution is implemented. |
 | `google` | Yes | `GOOGLE_API_KEY` | No | No | Alias-style env-check mode for Google/Gemini key validation; no live Google provider execution is implemented. |
@@ -66,9 +66,9 @@ Provider environment validation does not prove live provider usability. Remote-p
 
 ## Known Gaps
 
-1. The minimal OpenAI provider client foundation exists, but `/v1/solve` live OpenAI integration and production remote execution remain follow-up work.
-2. Runtime readiness should be updated after provider implementation PRs.
-3. Remote provider modes currently validate env-var presence only; they do not prove live provider usability.
+1. The minimal OpenAI provider client foundation exists and `/v1/solve` has explicit opt-in OpenAI provider integration, but production hardening remains follow-up work.
+2. Default local/offline behavior remains unchanged and default CI still uses fake/mocked provider tests with no live calls.
+3. Remote provider env validation does not prove live provider usability.
 4. Some external-tool surfaces may be simulated, credentialed, or service-dependent.
 5. Placeholder health/rate-limit targets should not be mistaken for complete implementations.
 6. Rate limiting needs separate follow-up for the Redis/SlowAPI mismatch if still relevant.

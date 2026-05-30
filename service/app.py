@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import json
 import logging
+import os
 import time
 import uuid
 from collections import defaultdict, deque
@@ -43,6 +44,9 @@ from pydantic import BaseModel, Field
 from prometheus_client import generate_latest, start_http_server
 
 from alpha_solver_entry import _tree_of_thought
+from alpha.providers import OpenAIProviderClient, ProviderError, ProviderRequest, ProviderResult
+from service.models.modelset_registry import ModelSet, ModelSetRegistry
+from service.models.modelset_resolver import ModelSetResolver
 from alpha.core.config import APISettings
 from alpha.core.telemetry import record_rate_limit, record_request, record_safe_out
 from .security import validate_api_key, sanitize_query
@@ -143,6 +147,128 @@ app.add_middleware(
 )
 
 
+def _is_openai_provider_enabled() -> bool:
+    """Return True only for explicit OpenAI provider opt-in."""
+    return os.getenv("MODEL_PROVIDER", "local").strip().lower() == "openai"
+
+
+def _get_model_set(request: Request, params: Dict[str, Any]) -> ModelSet:
+    requested = params.get("model_set") or os.getenv("MODEL_SET")
+    route_explain: Dict[str, str] = {}
+    registry = getattr(request.app.state, "model_set_registry", None)
+    if registry is None:
+        registry = ModelSetRegistry()
+        request.app.state.model_set_registry = registry
+    resolver = ModelSetResolver(registry)
+    model_set, _reason = resolver.resolve(
+        requested=str(requested) if requested else None,
+        headers=request.headers,
+        tenant_default=params.get("tenant_model_set"),
+        route_explain=route_explain,
+    )
+    return model_set
+
+
+def _provider_client_factory(model_set: ModelSet) -> OpenAIProviderClient:
+    return OpenAIProviderClient(price_hint=model_set.price_hint)
+
+
+def _get_provider_client(request: Request, model_set: ModelSet) -> Any:
+    factory = getattr(request.app.state, "provider_client_factory", None)
+    if factory is None:
+        factory = _provider_client_factory
+    return factory(model_set)
+
+
+def _optional_number(params: Dict[str, Any], key: str) -> Any:
+    value = params.get(key)
+    return value if isinstance(value, (int, float)) and not isinstance(value, bool) else None
+
+
+def _optional_int(params: Dict[str, Any], key: str) -> int | None:
+    value = params.get(key)
+    return value if isinstance(value, int) and not isinstance(value, bool) else None
+
+
+def _build_provider_request(
+    *,
+    query: str,
+    params: Dict[str, Any],
+    strategy: Any,
+    request: Request,
+    model_set: ModelSet,
+) -> ProviderRequest:
+    route = str(strategy or params.get("route") or "tot")
+    tenant = params.get("tenant") or request.headers.get("X-Tenant-ID")
+    system = params.get("system")
+    return ProviderRequest(
+        prompt=query,
+        system=system if isinstance(system, str) and system else None,
+        model=model_set.model,
+        max_tokens=model_set.max_tokens,
+        timeout_ms=model_set.timeout_ms,
+        temperature=_optional_number(params, "temperature"),
+        seed=_optional_int(params, "seed"),
+        metadata={
+            "request_id": getattr(request.state, "request_id", None),
+            "route": route,
+            "model_set": model_set.name,
+            "tenant": str(tenant) if tenant else None,
+        },
+    )
+
+
+def _provider_success_response(result: ProviderResult, model_set: ModelSet) -> Dict[str, Any]:
+    return {
+        "final_answer": result.text,
+        "meta": {
+            "provider": result.provider,
+            "model": result.model,
+            "model_set": model_set.name,
+            "finish_reason": result.finish_reason,
+            "request_id": result.request_id,
+            "usage": {
+                "input_tokens": result.usage.input_tokens,
+                "output_tokens": result.usage.output_tokens,
+                "total_tokens": result.usage.total_tokens,
+            },
+            "cost": {
+                "estimated_usd": result.cost.estimated_usd,
+                "source": result.cost.source,
+            },
+            "latency_ms": result.latency_ms,
+        },
+    }
+
+
+def _provider_error_status(error: ProviderError) -> int:
+    return {
+        "missing_credentials": 503,
+        "auth": 502,
+        "rate_limit": 429,
+        "timeout": 504,
+        "network": 503,
+        "provider_5xx": 502,
+        "invalid_request": 400,
+        "content_filter": 400,
+        "unknown": 502,
+    }.get(error.category, 502)
+
+
+def _provider_error_response(error: ProviderError) -> JSONResponse:
+    return JSONResponse(
+        status_code=_provider_error_status(error),
+        content={
+            "final_answer": f"SAFE-OUT: {error.safe_message}",
+            "error": {
+                "provider": error.provider,
+                "category": error.category,
+                "retryable": error.retryable,
+            },
+        },
+    )
+
+
 class StrategyEnum(str, Enum):
     cot = "cot"
     react = "react"
@@ -234,6 +360,34 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
     params = req.context or {}
     strategy = req.strategy or params.get("strategy")
     request.state.strategy = strategy
+
+    if _is_openai_provider_enabled():
+        model_set = _get_model_set(request, params)
+        provider_request = _build_provider_request(
+            query=query,
+            params=params,
+            strategy=strategy,
+            request=request,
+            model_set=model_set,
+        )
+        try:
+            provider_client = _get_provider_client(request, model_set)
+            provider_result = provider_client.execute(provider_request)
+        except ProviderError as exc:
+            record_safe_out(request.url.path)
+            return _provider_error_response(exc)
+        except Exception:
+            record_safe_out(request.url.path)
+            safe_error = ProviderError(
+                provider="openai",
+                category="unknown",
+                retryable=False,
+                safe_message="OpenAI request failed.",
+                request_id=provider_request.request_id,
+            )
+            return _provider_error_response(safe_error)
+        return JSONResponse(_provider_success_response(provider_result, model_set))
+
     start = time.time()
     if strategy == "react":
         from alpha.reasoning.react_lite import run_react_lite
