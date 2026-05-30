@@ -24,6 +24,7 @@ packages = [
     "alpha",
     "alpha.core",
     "alpha.adapters",
+    "alpha.providers",
     "alpha.executors",
     "alpha.reasoning",
     "alpha.router",
