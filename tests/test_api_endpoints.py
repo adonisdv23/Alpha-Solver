@@ -9,6 +9,10 @@ os.environ.setdefault("RATE_LIMIT_PER_MINUTE", "2")
 from fastapi.testclient import TestClient
 
 from alpha.providers import (
+    PROVIDER_REQUEST_COMPLETED,
+    PROVIDER_REQUEST_FAILED,
+    PROVIDER_REQUEST_STARTED,
+    PROVIDER_REQUEST_TIMEOUT,
     FakeProviderClient,
     ProviderCost,
     ProviderError,
@@ -23,12 +27,19 @@ def _clear_provider_factory():
         delattr(app.state, "provider_client_factory")
 
 
+def _clear_provider_telemetry_sink():
+    if hasattr(app.state, "provider_telemetry_sink"):
+        delattr(app.state, "provider_telemetry_sink")
+
+
 @pytest.fixture(autouse=True)
 def _default_local_provider(monkeypatch):
     monkeypatch.setenv("MODEL_PROVIDER", "local")
     _clear_provider_factory()
+    _clear_provider_telemetry_sink()
     yield
     _clear_provider_factory()
+    _clear_provider_telemetry_sink()
 
 
 def _client():
@@ -85,6 +96,8 @@ def test_solve_local_mode_ignores_provider_factory(monkeypatch):
     app.state.provider_client_factory = lambda _model_set: (_ for _ in ()).throw(
         AssertionError("provider should not be used in local mode")
     )
+    provider_events = []
+    app.state.provider_telemetry_sink = provider_events.append
 
     def fake_solver(query: str, **kwargs):
         return {"final_answer": f"local:{query}"}
@@ -95,7 +108,9 @@ def test_solve_local_mode_ignores_provider_factory(monkeypatch):
 
     assert resp.status_code == 200
     assert resp.json() == {"final_answer": "local:hi"}
+    assert provider_events == []
     _clear_provider_factory()
+    _clear_provider_telemetry_sink()
 
 
 def test_solve_openai_mode_uses_fake_provider_and_returns_normalized_text(monkeypatch):
@@ -111,11 +126,13 @@ def test_solve_openai_mode_uses_fake_provider_and_returns_normalized_text(monkey
                 cost=ProviderCost(estimated_usd=0.001, source="price_hint"),
                 latency_ms=12,
                 request_id="req-test",
-                raw_metadata={"raw": "must-not-leak"},
+                raw_metadata={"raw": "must-not-leak", "provider_request_id": "openai-req-1"},
             )
         ]
     )
     app.state.provider_client_factory = lambda _model_set: fake
+    provider_events = []
+    app.state.provider_telemetry_sink = provider_events.append
     client, key = _client()
 
     resp = client.post(
@@ -146,6 +163,44 @@ def test_solve_openai_mode_uses_fake_provider_and_returns_normalized_text(monkey
     }
     assert "raw" not in str(body)
 
+    assert [event["event"] for event in provider_events] == [
+        PROVIDER_REQUEST_STARTED,
+        PROVIDER_REQUEST_COMPLETED,
+    ]
+    started, completed = provider_events
+    assert started == {
+        "event": PROVIDER_REQUEST_STARTED,
+        "provider": "openai",
+        "model": "gpt-5-mini",
+        "model_set": "cost_saver",
+        "route": "tot",
+        "request_id": "req-test",
+        "status": "started",
+        "tenant": "tenant-a",
+    }
+    assert completed["provider"] == "openai"
+    assert completed["model"] == "gpt-test"
+    assert completed["model_set"] == "cost_saver"
+    assert completed["route"] == "tot"
+    assert completed["request_id"] == "req-test"
+    assert completed["status"] == "completed"
+    assert completed["tenant"] == "tenant-a"
+    assert completed["retry_count"] == 0
+    assert completed["latency_ms"] == 12
+    assert completed["input_tokens"] == 3
+    assert completed["output_tokens"] == 5
+    assert completed["total_tokens"] == 8
+    assert completed["estimated_cost_usd"] == 0.001
+    assert completed["cost_source"] == "price_hint"
+    assert completed["finish_reason"] == "stop"
+    assert completed["provider_request_id"] == "openai-req-1"
+    serialized_events = str(provider_events)
+    assert "hello provider" not in serialized_events
+    assert "system prompt" not in serialized_events
+    assert "must-not-leak" not in serialized_events
+    assert "Authorization" not in serialized_events
+    assert "Bearer" not in serialized_events
+
     assert len(fake.requests) == 1
     provider_request = fake.requests[0]
     assert provider_request.prompt == "hello provider"
@@ -160,6 +215,7 @@ def test_solve_openai_mode_uses_fake_provider_and_returns_normalized_text(monkey
     assert provider_request.metadata["model_set"] == "cost_saver"
     assert provider_request.metadata["tenant"] == "tenant-a"
     _clear_provider_factory()
+    _clear_provider_telemetry_sink()
 
 
 def test_solve_openai_missing_credentials_returns_safe_response(monkeypatch):
@@ -206,6 +262,8 @@ def test_solve_openai_provider_errors_return_safe_responses(monkeypatch, categor
         ]
     )
     app.state.provider_client_factory = lambda _model_set: fake
+    provider_events = []
+    app.state.provider_telemetry_sink = provider_events.append
     client, key = _client()
 
     resp = client.post(
@@ -220,4 +278,24 @@ def test_solve_openai_provider_errors_return_safe_responses(monkeypatch, categor
     assert category in body_text
     assert secret not in body_text
     assert len(fake.requests) == 1
+    assert [event["event"] for event in provider_events] == [
+        PROVIDER_REQUEST_STARTED,
+        PROVIDER_REQUEST_TIMEOUT if category == "timeout" else PROVIDER_REQUEST_FAILED,
+    ]
+    failure_event = provider_events[1]
+    assert failure_event["provider"] == "openai"
+    assert failure_event["model"] == "gpt-5"
+    assert failure_event["model_set"] == "default"
+    assert failure_event["route"] == "tot"
+    assert failure_event["request_id"] == "req-error"
+    assert failure_event["status"] == ("timeout" if category == "timeout" else "failed")
+    assert failure_event["error_category"] == category
+    assert failure_event["retryable"] is True
+    assert failure_event["retry_count"] == 0
+    assert failure_event["safe_message"] == f"safe {category} message"
+    serialized_events = str(provider_events)
+    assert secret not in serialized_events
+    assert "Authorization" not in serialized_events
+    assert "Bearer" not in serialized_events
     _clear_provider_factory()
+    _clear_provider_telemetry_sink()

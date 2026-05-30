@@ -66,6 +66,7 @@ class ProviderResult:
     latency_ms: int
     request_id: str | None = None
     raw_metadata: Mapping[str, Any] = field(default_factory=dict)
+    retry_count: int = 0
 
 
 @dataclass(frozen=True)
@@ -76,6 +77,7 @@ class ProviderError(Exception):
     safe_message: str
     status_code: int | None = None
     request_id: str | None = None
+    retry_count: int = 0
 
     def __post_init__(self) -> None:
         Exception.__init__(self, self.safe_message)

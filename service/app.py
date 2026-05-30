@@ -44,7 +44,18 @@ from pydantic import BaseModel, Field
 from prometheus_client import generate_latest, start_http_server
 
 from alpha_solver_entry import _tree_of_thought
-from alpha.providers import OpenAIProviderClient, ProviderError, ProviderRequest, ProviderResult
+from alpha.providers import (
+    PROVIDER_REQUEST_COMPLETED,
+    PROVIDER_REQUEST_FAILED,
+    PROVIDER_REQUEST_STARTED,
+    PROVIDER_REQUEST_TIMEOUT,
+    OpenAIProviderClient,
+    ProviderError,
+    ProviderRequest,
+    ProviderResult,
+    build_provider_event,
+    emit_provider_event,
+)
 from service.models.modelset_registry import ModelSet, ModelSetRegistry
 from service.models.modelset_resolver import ModelSetResolver
 from alpha.core.config import APISettings
@@ -218,6 +229,92 @@ def _build_provider_request(
     )
 
 
+def _provider_request_metadata(provider_request: ProviderRequest) -> dict[str, str | None]:
+    return {
+        "request_id": provider_request.request_id,
+        "route": str(provider_request.metadata.get("route"))
+        if provider_request.metadata.get("route") is not None
+        else None,
+        "model_set": str(provider_request.metadata.get("model_set"))
+        if provider_request.metadata.get("model_set") is not None
+        else None,
+        "tenant": str(provider_request.metadata.get("tenant"))
+        if provider_request.metadata.get("tenant") is not None
+        else None,
+    }
+
+
+def _emit_provider_telemetry(
+    request: Request, event: dict[str, Any]
+) -> None:
+    sink = getattr(request.app.state, "provider_telemetry_sink", None)
+    emit_provider_event(event, sink=sink if callable(sink) else None)
+
+
+def _provider_request_started_event(provider_request: ProviderRequest) -> dict[str, Any]:
+    metadata = _provider_request_metadata(provider_request)
+    return build_provider_event(
+        PROVIDER_REQUEST_STARTED,
+        provider="openai",
+        model=provider_request.model,
+        model_set=metadata["model_set"],
+        route=metadata["route"],
+        request_id=metadata["request_id"],
+        tenant=metadata["tenant"],
+        status="started",
+    )
+
+
+def _provider_request_completed_event(
+    provider_request: ProviderRequest, result: ProviderResult
+) -> dict[str, Any]:
+    metadata = _provider_request_metadata(provider_request)
+    provider_request_id = result.raw_metadata.get("provider_request_id")
+    return build_provider_event(
+        PROVIDER_REQUEST_COMPLETED,
+        provider=result.provider,
+        model=result.model,
+        model_set=metadata["model_set"],
+        route=metadata["route"],
+        request_id=result.request_id or metadata["request_id"],
+        tenant=metadata["tenant"],
+        status="completed",
+        retry_count=result.retry_count,
+        latency_ms=result.latency_ms,
+        input_tokens=result.usage.input_tokens,
+        output_tokens=result.usage.output_tokens,
+        total_tokens=result.usage.total_tokens,
+        estimated_cost_usd=result.cost.estimated_usd,
+        cost_source=result.cost.source,
+        finish_reason=result.finish_reason,
+        provider_request_id=str(provider_request_id) if provider_request_id is not None else None,
+    )
+
+
+def _provider_request_error_event(
+    provider_request: ProviderRequest, error: ProviderError
+) -> dict[str, Any]:
+    metadata = _provider_request_metadata(provider_request)
+    event_name = (
+        PROVIDER_REQUEST_TIMEOUT if error.category == "timeout" else PROVIDER_REQUEST_FAILED
+    )
+    return build_provider_event(
+        event_name,
+        provider=error.provider,
+        model=provider_request.model,
+        model_set=metadata["model_set"],
+        route=metadata["route"],
+        request_id=error.request_id or metadata["request_id"],
+        tenant=metadata["tenant"],
+        status="timeout" if error.category == "timeout" else "failed",
+        retry_count=error.retry_count,
+        error_category=error.category,
+        retryable=error.retryable,
+        status_code=error.status_code,
+        safe_message=error.safe_message,
+    )
+
+
 def _provider_success_response(result: ProviderResult, model_set: ModelSet) -> Dict[str, Any]:
     return {
         "final_answer": result.text,
@@ -372,8 +469,14 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
         )
         try:
             provider_client = _get_provider_client(request, model_set)
+            _emit_provider_telemetry(
+                request, _provider_request_started_event(provider_request)
+            )
             provider_result = provider_client.execute(provider_request)
         except ProviderError as exc:
+            _emit_provider_telemetry(
+                request, _provider_request_error_event(provider_request, exc)
+            )
             record_safe_out(request.url.path)
             return _provider_error_response(exc)
         except Exception:
@@ -385,7 +488,13 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
                 safe_message="OpenAI request failed.",
                 request_id=provider_request.request_id,
             )
+            _emit_provider_telemetry(
+                request, _provider_request_error_event(provider_request, safe_error)
+            )
             return _provider_error_response(safe_error)
+        _emit_provider_telemetry(
+            request, _provider_request_completed_event(provider_request, provider_result)
+        )
         return JSONResponse(_provider_success_response(provider_result, model_set))
 
     start = time.time()

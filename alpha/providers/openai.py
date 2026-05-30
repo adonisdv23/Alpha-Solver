@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import os
 import time
+from dataclasses import replace
 from collections.abc import Callable, Mapping
 from typing import Any
 
@@ -75,9 +76,12 @@ class OpenAIProviderClient:
                 latency_ms = int((time.monotonic() - started) * 1000)
                 if response.status_code >= 400:
                     raise self._error_from_response(response, request.request_id)
-                return self._result_from_response(response, request, latency_ms)
+                return replace(
+                    self._result_from_response(response, request, latency_ms),
+                    retry_count=attempt,
+                )
             except ProviderError as exc:
-                last_error = exc
+                last_error = replace(exc, retry_count=attempt)
             except httpx.TimeoutException:
                 last_error = ProviderError(
                     provider=_OPENAI_PROVIDER,
@@ -85,6 +89,7 @@ class OpenAIProviderClient:
                     retryable=True,
                     safe_message="OpenAI request timed out.",
                     request_id=request.request_id,
+                    retry_count=attempt,
                 )
             except httpx.RequestError:
                 last_error = ProviderError(
@@ -93,6 +98,7 @@ class OpenAIProviderClient:
                     retryable=True,
                     safe_message="OpenAI request failed due to a network error.",
                     request_id=request.request_id,
+                    retry_count=attempt,
                 )
             except ValueError:
                 last_error = ProviderError(
@@ -101,6 +107,7 @@ class OpenAIProviderClient:
                     retryable=False,
                     safe_message="OpenAI response could not be decoded safely.",
                     request_id=request.request_id,
+                    retry_count=attempt,
                 )
 
             if (

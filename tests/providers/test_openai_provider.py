@@ -63,6 +63,7 @@ def test_openai_api_key_can_come_from_environment(monkeypatch):
     result = OpenAIProviderClient(transport=httpx.MockTransport(handler)).execute(_request())
 
     assert result.text == "ok"
+    assert result.retry_count == 0
     assert seen["authorization"] == f"Bearer {SECRET}"
     assert SECRET not in repr(result)
     assert SECRET not in json.dumps(result.raw_metadata)
@@ -177,6 +178,7 @@ def test_retry_behavior_is_bounded_for_retryable_failures():
     result = _client_for(handler, backoff=backoffs.append).execute(_request())
 
     assert result.text == "ok"
+    assert result.retry_count == 1
     assert len(calls) == 2
     assert backoffs == [1]
 
@@ -193,6 +195,7 @@ def test_retry_stops_after_one_retry():
 
     assert excinfo.value.category == "provider_5xx"
     assert excinfo.value.retryable is True
+    assert excinfo.value.retry_count == 1
     assert len(calls) == 2
 
 
