@@ -4,7 +4,15 @@ from __future__ import annotations
 
 from typing import Any, Mapping
 
-ALLOWED_PROVIDERS = {"openai", "dummy"}
+# User-facing provider values mirror scripts/check_env.py. Accepting a
+# provider here validates configuration shape only; it does not imply that
+# remote LLM API execution is implemented.
+USER_FACING_PROVIDERS = {"local", "none", "openai", "anthropic", "gemini", "google"}
+
+# Internal/test-only provider retained for config-loader tests and local harnesses.
+# Do not document this as a user-facing remote provider.
+INTERNAL_TEST_PROVIDERS = {"dummy"}
+ALLOWED_PROVIDERS = USER_FACING_PROVIDERS | INTERNAL_TEST_PROVIDERS
 SECRET_SUFFIXES = ("KEY", "TOKEN", "SECRET")
 
 
@@ -57,4 +65,9 @@ def validate(config: Mapping[str, Any]) -> None:
                     raise ValueError("Secret keys should not appear in configuration output")
 
 
-__all__ = ["validate"]
+__all__ = [
+    "validate",
+    "ALLOWED_PROVIDERS",
+    "INTERNAL_TEST_PROVIDERS",
+    "USER_FACING_PROVIDERS",
+]
