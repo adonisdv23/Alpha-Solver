@@ -53,7 +53,9 @@ from alpha.providers import (
     ProviderError,
     ProviderRequest,
     ProviderResult,
+    build_provider_accounting_record,
     build_provider_event,
+    emit_provider_accounting,
     emit_provider_event,
 )
 from service.models.modelset_registry import ModelSet, ModelSetRegistry
@@ -143,6 +145,7 @@ app.add_middleware(_SimpleTracingMiddleware)
 app.state.config = cfg
 app.state.ready = True
 app.state.start_time = time.time()
+app.state.provider_accounting_sink = None
 
 # expose Prometheus metrics on a dedicated port
 start_http_server(9000)
@@ -251,6 +254,13 @@ def _emit_provider_telemetry(
     emit_provider_event(event, sink=sink if callable(sink) else None)
 
 
+def _emit_provider_accounting(
+    request: Request, record: dict[str, Any]
+) -> None:
+    sink = getattr(request.app.state, "provider_accounting_sink", None)
+    emit_provider_accounting(record, sink=sink if callable(sink) else None)
+
+
 def _provider_request_started_event(provider_request: ProviderRequest) -> dict[str, Any]:
     metadata = _provider_request_metadata(provider_request)
     return build_provider_event(
@@ -287,6 +297,21 @@ def _provider_request_completed_event(
         estimated_cost_usd=result.cost.estimated_usd,
         cost_source=result.cost.source,
         finish_reason=result.finish_reason,
+        provider_request_id=str(provider_request_id) if provider_request_id is not None else None,
+    )
+
+
+def _provider_accounting_record(
+    provider_request: ProviderRequest, result: ProviderResult
+) -> dict[str, Any]:
+    metadata = _provider_request_metadata(provider_request)
+    provider_request_id = result.raw_metadata.get("provider_request_id")
+    return build_provider_accounting_record(
+        result=result,
+        model_set=metadata["model_set"],
+        route=metadata["route"],
+        request_id=metadata["request_id"],
+        tenant=metadata["tenant"],
         provider_request_id=str(provider_request_id) if provider_request_id is not None else None,
     )
 
@@ -494,6 +519,9 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
             return _provider_error_response(safe_error)
         _emit_provider_telemetry(
             request, _provider_request_completed_event(provider_request, provider_result)
+        )
+        _emit_provider_accounting(
+            request, _provider_accounting_record(provider_request, provider_result)
         )
         return JSONResponse(_provider_success_response(provider_result, model_set))
 
