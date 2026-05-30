@@ -1,330 +1,310 @@
 # Alpha Solver Operator & Technology Manual
 
-## 1. Purpose
+## 1. Purpose of This Manual
 
-This manual is the operator-facing bridge across Alpha Solver setup, repository architecture, runtime truth, tool roles, pull request workflow, backlog workflow, and known gaps. It is written for a solo non-developer operator who uses ChatGPT for planning and review, Codex for repository edits and validation, GitHub for pull request review and merging, and Claude as optional drafting or review support.
+This manual is the operator-facing control document for Alpha Solver development.
+It ties together current runtime state, source-of-truth rules, tool roles,
+pull-request review, backlog discipline, and the remaining roadmap.
 
-This manual does not replace:
+It explains:
 
-- `.specs/`, which contains implementation contracts.
-- `docs/OPERATING_GUIDE.md`, which defines the lightweight operating workflow.
-- `docs/RUNTIME_READINESS.md`, which records current runtime status and known gaps.
-- Repo code, tests, and CI evidence, which remain the source of current behavior.
+- what Alpha Solver currently does;
+- what is verified, partial, mocked, specified, or not implemented;
+- which files are source of truth;
+- which tools to use for each kind of task;
+- how to review PRs safely;
+- how to avoid overclaiming runtime readiness;
+- what remains on the roadmap.
 
-Use this document as a practical map. When it disagrees with repo evidence, inspect the repo and update the manual instead of relying on memory.
+This manual is not a replacement for code, tests, specs, or CI evidence. It is
+the human operating guide that helps the operator use those sources in the right
+order.
 
 ## 2. Current State Snapshot
 
-Alpha Solver is currently local/offline by default. The default `.env.example` sets `MODEL_PROVIDER=local`, and local checks do not require OpenAI, Anthropic, or Google credentials.
+### 2.1 Verified default behavior
 
-Current repo-grounded state:
+Current default behavior is local/offline and credential-free:
 
-- Local/offline operation remains the verified default.
-- Provider environment validation has been corrected so `scripts/check_env.py` validates provider configuration only.
-- `.specs/PROVIDER-OPENAI-001.md` defines the OpenAI provider contract.
-- The OpenAI provider client foundation exists in `alpha.providers.openai`.
-- FastAPI `/v1/solve` can route through the OpenAI provider only when `MODEL_PROVIDER=openai` is explicitly enabled.
-- Default CI remains credential-free and makes no live OpenAI calls.
+- Local/offline remains the default operating mode.
+- `.env.example` defaults to `MODEL_PROVIDER=local`.
+- Default CI remains credential-free and network-free for provider behavior.
+- `scripts/check_env.py` validates configuration and environment-variable
+  presence only. It does not prove live provider usability, billing, quota,
+  model access, or network connectivity.
 - Prompt adapters remain prompt renderers, not provider clients.
 - The portable solver remains local/offline.
-- CLI remote provider execution has not been added.
-- This manual does not claim production-hardened OpenAI use.
 
-Treat OpenAI provider execution as an explicit opt-in service path. Minimal no-secret lifecycle telemetry and account-only post-call cost accounting now exist for successful FastAPI `/v1/solve` OpenAI calls; follow-up hardening is still needed for budget enforcement, SAFE-OUT and fallback orchestration, replay and determinism integration, expanded observability, and optional gated live smoke testing.
+### 2.2 FastAPI `/v1/solve` current state
+
+FastAPI `/v1/solve` has a local default path and an explicit OpenAI provider
+path:
+
+- `/v1/solve` supports local/offline behavior by default.
+- `/v1/solve` can enter the OpenAI provider path only when
+  `MODEL_PROVIDER=openai`.
+- The OpenAI provider path requires `OPENAI_API_KEY` at runtime for live use.
+- OpenAI provider use remains explicit opt-in.
+- Default CI uses fake/mocked provider tests, not live OpenAI calls.
+
+### 2.3 Implemented OpenAI provider capabilities
+
+Implemented:
+
+- OpenAI provider client foundation.
+- Explicit `/v1/solve` OpenAI provider integration.
+- Provider lifecycle telemetry:
+  - `provider.request.started`
+  - `provider.request.completed`
+  - `provider.request.failed`
+  - `provider.request.timeout`
+- Success-only post-call provider cost accounting:
+  - `provider.cost.recorded`
+- Structured provider SAFE-OUT response normalization for OpenAI provider
+  failures.
+- No-secret, allowlist-based telemetry/accounting/SAFE-OUT response
+  construction.
+
+### 2.4 Not implemented
+
+Not implemented:
+
+- Optional gated live OpenAI smoke test.
+- Hard or soft budget enforcement.
+- Pre-call budget blocking.
+- Persistent tenant budgets.
+- Real billing integration.
+- Local fallback after provider failure.
+- `provider.fallback.local` emission.
+- CLI remote provider execution.
+- Portable solver remote provider execution.
+- Production SLO enforcement.
+- Full replay/determinism integration for provider paths.
+- Expanded Prometheus/Grafana/OpenTelemetry provider observability.
+- Production hardening.
 
 ## 3. Source-of-Truth Hierarchy
 
-Use this hierarchy when sources disagree:
+Use this hierarchy when documents, agents, backlog rows, or memory disagree:
 
-1. Current user instruction or explicit operator decision.
-2. GitHub repo `main` for code, docs, specs, tests, and history.
-3. `.specs/` for implementation contracts and behavior intent.
-4. `docs/RUNTIME_READINESS.md` for current runtime truth and known gaps.
-5. `docs/OPERATING_GUIDE.md` for workflow.
-6. External backlog workbook for planning and evidence ledger entries.
-7. External model outputs from ChatGPT, Codex, Claude, or any other assistant as advisory only.
+1. **Repo code and tests** — current executable truth.
+2. **`.specs/*.md`** — implementation contracts and boundaries.
+3. **`docs/RUNTIME_READINESS.md`** — current runtime status: verified, partial,
+   mocked, placeholder, future.
+4. **`docs/OPERATING_GUIDE.md`** — workflow rules for planning, specs, PRs,
+   merges, and source discipline.
+5. **`docs/OPERATOR_TECHNOLOGY_MANUAL.md`** — human-readable operating
+   synthesis.
+6. **`README.md`** — entry navigation and onboarding pointer.
+7. **Backlog spreadsheet / changelog / operating log** — planning and evidence
+   ledger, not runtime truth.
+8. **ChatGPT, Codex, Claude, or other assistant output** — advisory unless tied
+   to inspected files, commits, PRs, tests, or CI evidence.
 
-Warnings:
+Key distinction:
 
-- Do not let Claude, Codex, or ChatGPT silently override repo truth.
-- Do not treat stale backlog rows as implementation evidence without repo confirmation.
-- Do not treat old summaries, copied spec bodies, or prior chat memory as proof that code exists.
-- When in doubt, inspect files, tests, PRs, and CI results.
+- `.specs/` says what should be built.
+- Runtime Readiness says what currently works or is still partial/future.
+- Operating Guide says how work should happen.
+- Operator Manual explains how the operator should run the project.
+- Backlog spreadsheets track history, pending tasks, and decisions.
 
-## 4. Technology Stack
+## 4. Technology Stack and Runtime Surfaces
 
-The current technology stack visible in the repo includes:
+### 4.1 Core repo surfaces
 
-| Layer | Current repo evidence | Operator meaning |
+| Surface | Role | Operator rule |
 | --- | --- | --- |
-| Language | Python 3.12+ | Use Python 3.12 or newer for normal local development and CI alignment. |
-| Web service | FastAPI, Starlette, Pydantic | Service endpoints, request validation, and response models. |
-| ASGI server | Uvicorn | Local service runner for FastAPI. |
-| HTTP client | httpx | Used for HTTP client behavior, including the OpenAI provider path. |
-| Metrics | prometheus-client | Prometheus-format metrics support exists, with deployment wiring still separate. |
-| Config and validation | PyYAML, jsonschema | Registry/config/document validation support. |
-| Testing | pytest | Default Python test framework. |
-| CI | GitHub Actions | Pull request validation and merge gate. |
-| Provider path | `alpha.providers.openai` | Minimal OpenAI provider client foundation. |
-| Model sets | `service/models/`, `service/config/model_sets.yaml` | Model-set registry and resolver for service routing/config. |
-| Local reasoning | `alpha/reasoning/`, Tree-of-Thought and ReAct-style paths | Offline reasoning paths remain baseline behavior. |
-| Docs/spec workflow | `.specs/`, `docs/`, `AGENTS.md` | Specs define behavior contracts, docs explain operation and status. |
+| `alpha_solver_portable.py` | Portable standalone behavior contract. | Keep local/offline unless explicitly approved and spec-backed. Do not casually edit. |
+| `alpha-solver-v91-python.py` | Modular/reference entrypoint path. | Treat as a sensitive entrypoint; consult `docs/ENTRYPOINTS.md` before changes. |
+| `alpha_solver_entry.py` | Bridge/root entrypoint path. | Treat as part of entrypoint compatibility. |
+| `alpha_solver_cli.py` | Root CLI wrapper/entrypoint. | CLI remote provider execution is not implemented. |
+| `cli/alpha_solver_cli.py` | CLI implementation surface. | Preserve local/offline behavior unless a spec approves remote provider execution. |
+| `service/app.py` | FastAPI app and `/v1/solve` integration point. | Local by default; OpenAI provider path only by explicit `MODEL_PROVIDER=openai`. |
+| `alpha/providers/base.py` | Provider request/result/error data contracts. | Do not broaden provider behavior without a provider spec. |
+| `alpha/providers/openai.py` | OpenAI provider client foundation. | Live use requires private credentials and is not production-hardened. |
+| `alpha/providers/telemetry.py` | No-secret provider lifecycle telemetry helpers. | Emit only allowlisted safe fields. |
+| `alpha/providers/accounting.py` | No-secret success-path provider cost accounting helpers. | Accounting records are not budget enforcement. |
+| `alpha/providers/safeout.py` | Structured provider SAFE-OUT response helpers. | Normalize failures safely; do not imply local fallback. |
+| `alpha/providers/*` | Provider abstractions, fake provider support, OpenAI provider path. | Default CI should stay fake/mocked for live-provider behavior. |
+| Prompt adapters | Prompt rendering for provider families. | Prompt rendering is not provider execution. |
+| `.specs/` | Implementation contracts and boundaries. | Add/update specs before behavior-changing work. |
+| `docs/` | Operator docs, runtime readiness, entrypoint docs, architecture and references. | Update when runtime claims or workflows change. |
+| `tests/` | Executable verification and fake/mocked provider coverage. | Add/update focused tests for behavior changes. |
+| `.env.example` | Safe default environment template. | Keep local/offline as the default. |
+| `scripts/check_env.py` | Environment/configuration checker. | Validates shape and required env vars only; no live provider calls. |
 
-Do not invent extra infrastructure when planning work. If a technology is not in the repo or not proven by CI/runtime evidence, label it as future work or external dependency.
+### 4.2 Provider path
 
-## 5. Repository Architecture Map
+Current OpenAI provider lifecycle for FastAPI `/v1/solve`:
 
-| Area | Files / folders | Purpose | Current readiness |
-| --- | --- | --- | --- |
-| Specs | `.specs/` | Implementation contracts, templates, provider contract, spec index. | Active source for behavior intent. Do not move or rename specs casually. |
-| Docs | `docs/` | Operator guides, runtime readiness, entrypoint docs, CLI docs, architecture and operational references. | Active documentation. Some docs intentionally mark placeholders and known gaps. |
-| Service | `service/` | FastAPI app, health, metrics, auth, policy, model sets, replay, budget, MCP, adapters. | Mixed readiness. Core local service paths and selected tests exist; some production-style targets are partial or future. |
-| Providers | `alpha/providers/` | Provider abstractions, fake provider test support, OpenAI provider client. | OpenAI client foundation exists with fake/mocked testing; live hardening remains follow-up. |
-| Prompt adapters | `alpha/adapters/` | Prompt rendering for provider families and instruction formatting. | Local prompt rendering only. Do not treat adapters as provider clients. |
-| Core | `alpha/core/` | Routing, budgets, gates, determinism, observability, loaders, policy, replay, prompt writer. | Local/offline core functionality exists; broad behavior changes require specs. |
-| Reasoning | `alpha/reasoning/` | Tree-of-Thought, Chain-of-Thought, ReAct-lite, scoring, cache/logging helpers. | Local/offline reasoning baseline. |
-| Python client | `clients/python/` | Client SDK packaging and helper code. | Existing client surface. Auth hardening remains a known future area. |
-| CLI | `cli/`, `alpha_solver_cli.py`, `alpha.cli` | Local command workflows, run/replay/gates/finops/traces-style commands, root CLI wrapper. | Local/offline. Remote provider CLI execution is not implemented. |
-| Scripts | `scripts/` | Environment checks, benchmarks, release helpers, registry validation, replay and audit utilities. | Useful local tooling. `scripts/check_env.py` validates configuration only. |
-| Tests | `tests/` | Unit, integration, CLI, service, provider, docs, and validation tests. | CI-backed test suite. Full local pytest may depend on Python version and environment. |
-| Registries | `registries/` | Routing, regions, tools, risks, policy, MCP registry, priors, budget and SLA config. | Repo config/provenance data. Validate before changing behavior. |
-| Data | `data/` | Registry export/provenance artifacts and datasets. | `alpha_solver_master_table_v0_7_0.*` is not a backlog workbook. Do not modify as backlog. |
+1. Operator explicitly sets `MODEL_PROVIDER=openai`.
+2. `/v1/solve` builds a `ProviderRequest` from request/query/model-set data.
+3. Service emits `provider.request.started`.
+4. OpenAI provider client executes.
+5. On success:
+   - emits `provider.request.completed`;
+   - emits `provider.cost.recorded`;
+   - returns the provider success response.
+6. On failure:
+   - emits `provider.request.failed` or `provider.request.timeout`;
+   - records the SAFE-OUT metric;
+   - returns a structured provider SAFE-OUT response;
+   - emits no cost accounting;
+   - executes no local fallback.
 
-## 6. Entrypoints
+### 4.3 Local/offline path
 
-Alpha Solver intentionally keeps several entrypoint files because they serve different roles. Do not rename, delete, merge, or consolidate them casually.
+Default local/offline behavior is preserved:
 
-| Entrypoint | Role | Runtime posture | Operator guidance |
-| --- | --- | --- | --- |
-| `alpha_solver_portable.py` | Portable standalone behavior contract and monolith. | Local/offline. | Sensitive behavior contract. Avoid editing unless explicitly scoped and spec-backed. |
-| `alpha-solver-v91-python.py` | Modular/reference compatibility entrypoint. | Local/modular reference path. | Use for architecture grounding and compatibility, not as disposable legacy code. |
-| `alpha_solver_entry.py` | Import bridge that loads the hyphenated reference file and re-exports `AlphaSolver`. | Local compatibility bridge. | Keep because Python imports cannot directly import the hyphenated filename. |
-| `alpha_solver_cli.py` | Root CLI wrapper over the compatibility entry path. | Local/offline Tree-of-Thought CLI. | Useful smoke path. Not a remote provider CLI. |
-| `cli/alpha_solver_cli.py` | Command-oriented CLI for repo workflows such as run, replay, gates, finops, and traces. | Local/offline command workflows. | Use for local validation and operator commands. |
-| `python -m alpha.cli` | Package CLI entrypoint. | Local/offline package CLI. | Useful when validating installed/package-style command access. |
-| FastAPI `/v1/solve` | Service/API solve endpoint. | Local by default; OpenAI only with explicit `MODEL_PROVIDER=openai`. | This is the current explicit opt-in OpenAI provider integration surface. |
+- Default local path is safe to run without provider API keys.
+- `.env.example` keeps `MODEL_PROVIDER=local`.
+- No provider telemetry or provider cost accounting is emitted in local/offline
+  mode.
+- Local/offline behavior is the baseline for normal development, docs-only PRs,
+  and default CI.
 
-## 7. Runtime Modes
+## 5. Tool Roles
 
-| Mode | How enabled | What works | What does not work | Use when |
-| --- | --- | --- | --- | --- |
-| Local/offline default | Use repo defaults and keep `.env.example` style `MODEL_PROVIDER=local`. | Local solver, local CLI, local service behavior, fake/mocked tests, no provider keys. | No live remote LLM execution. | Normal development, docs-only PRs, most tests, safe operator checks. |
-| `MODEL_PROVIDER=local` | Set `MODEL_PROVIDER=local`. | Environment check passes without provider keys; local/offline paths remain baseline. | Does not call OpenAI, Anthropic, or Google. | Default local configuration. |
-| `MODEL_PROVIDER=none` | Set `MODEL_PROVIDER=none`. | Environment check accepts no-key validation. | Does not represent a live provider. | No-key config validation and local-only scenarios. |
-| `MODEL_PROVIDER=openai` | Set `MODEL_PROVIDER=openai` and provide `OPENAI_API_KEY`. | FastAPI `/v1/solve` can opt into the OpenAI provider path. | CLI remote execution is not implemented; live usability is not proven by env validation alone; production hardening remains future work. | Explicit OpenAI service testing with private credentials and scoped expectations. |
-| Fake/mocked provider tests | Use tests/fakes/mocked transports. | Provider contracts and service integration can be tested without live credentials. | Does not prove account access, model availability, quota, or live network behavior. | Default CI and safe provider development. |
-| Optional future live OpenAI smoke test | Not currently implemented. Future gated mode should require explicit flags and `OPENAI_API_KEY`. | Would prove minimal live connectivity only when deliberately enabled. | Must not run in default CI; not a substitute for production hardening. | Future provider readiness checks after a spec defines scope. |
+### 5.1 ChatGPT
 
-## 8. OpenAI Provider Status
+Use ChatGPT for:
 
-`.specs/PROVIDER-OPENAI-001.md` defines the OpenAI provider contract. The repo now includes the `alpha.providers.openai` client foundation, and FastAPI `/v1/solve` can use it only when `MODEL_PROVIDER=openai` is explicitly set.
+- project strategy;
+- architecture sequencing;
+- prompt creation for Codex or Claude;
+- PR review assistance;
+- comparing Codex and Claude outputs;
+- detecting scope creep;
+- deciding what should be merged, refined, or deferred;
+- converting findings into next prompts.
 
-Default CI makes no live OpenAI calls. Real live use requires a private `OPENAI_API_KEY`, compatible OpenAI account access, a supported model, network access, and operator acceptance that this path is not yet production-hardened.
+Do not rely on ChatGPT alone to claim repo state unless it has inspected the
+relevant PR, files, terminal output, or CI evidence.
 
-Minimal no-secret provider lifecycle telemetry exists for the explicit FastAPI `/v1/solve` OpenAI path. Successful OpenAI provider results also emit account-only post-call `provider.cost.recorded` records from already-computed provider usage/cost into a safe accounting sink. OpenAI provider failures on this path now return structured no-secret SAFE-OUT response normalization only; local fallback remains unimplemented/deferred, and `provider.fallback.local` must only be emitted if an actual fallback executes in a future implementation. Provider lifecycle telemetry semantics remain unchanged, provider cost accounting remains success-only, optional live OpenAI smoke testing remains future work, and production hardening remains future work.
+### 5.2 Codex
 
-| Layer | Status | Notes |
-| --- | --- | --- |
-| Env validation | implemented | checks key presence only |
-| Provider client | implemented | fake/mocked tested |
-| `/v1/solve` integration | implemented opt-in | `MODEL_PROVIDER=openai` |
-| CLI remote execution | not implemented | local/offline only |
-| Portable solver remote execution | not implemented / intentionally avoided | local behavior contract |
-| Live OpenAI CI test | not implemented | must be gated |
+Use Codex for:
 
-## 9. Setup and Install Workflow
+- implementation PRs;
+- focused repo edits;
+- tests;
+- specs;
+- runtime docs;
+- CI-safe changes;
+- one task per PR.
 
-Recommended local setup:
+Best Codex pattern:
 
-1. Clone the repository.
-2. Use Python 3.12 or newer.
-3. Create and activate a virtual environment.
-4. Install dependencies through the current supported path.
-5. Copy `.env.example` to `.env`.
-6. Keep `MODEL_PROVIDER=local` unless intentionally testing OpenAI.
-7. Run the environment checker.
+1. New task thread per PR.
+2. Precise objective.
+3. Explicit files to inspect.
+4. Explicit forbidden changes.
+5. Acceptance criteria.
+6. Validation commands.
+7. Expected PR body.
+8. Suggested squash title and extended description.
 
-Example:
+Avoid:
 
-```bash
-git clone https://github.com/adonisdv23/Alpha-Solver.git
-cd Alpha-Solver
-python3.12 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-cp .env.example .env
-set -a && source .env && set +a
-python scripts/check_env.py
-```
+- vague prompts;
+- multi-lane PRs;
+- “fix everything” tasks;
+- changing tests, docs, runtime, and CI all at once unless explicitly required.
 
-Notes:
+### 5.3 Claude Code
 
-- `pyproject.toml` lists runtime dependencies for package metadata.
-- `requirements.txt` remains supported by the README setup path.
-- Do not commit `.env`.
-- Do not paste real secrets into prompts, screenshots, logs, PR bodies, or docs.
+Use Claude Code for:
 
-## 10. Environment Variables and Secrets
+- read-only audits;
+- long-form document review;
+- contradiction detection;
+- second-opinion architecture review;
+- docs/spec work when Codex is unavailable;
+- small controlled edits with explicit approval.
 
-Common environment variables currently visible in repo setup and docs:
+Claude Code session hygiene:
 
-| Variable | Purpose | Secret? | Notes |
-| --- | --- | --- | --- |
-| `MODEL_PROVIDER` | Selects provider mode for environment validation and service provider opt-in. | No | Accepted by env checker: `local`, `none`, `openai`, `anthropic`, `gemini`, `google`. |
-| `OPENAI_API_KEY` | Required for OpenAI provider key presence validation and real OpenAI service use. | Yes | Needed only when intentionally using `MODEL_PROVIDER=openai`. |
-| `ANTHROPIC_API_KEY` | Required for Anthropic key presence validation. | Yes | Env validation only; no live Anthropic provider execution is implemented. |
-| `GOOGLE_API_KEY` | Required for Gemini/Google key presence validation. | Yes | Env validation only; no live Google/Gemini provider execution is implemented. |
-| `API_KEY` | Service/auth style key referenced in service/auth docs and configuration surfaces. | Yes | Treat as a secret when used in any local or deployed environment. |
-| `DEBUG` | Debug mode flag. | No | `.env.example` sets `DEBUG=false`. |
-| `PROD` | Production mode flag. | No | `.env.example` sets `PROD=false`. `scripts/check_env.py` rejects `PROD=true` with `DEBUG=true`. |
+- New lane = new Claude Code session.
+- Same lane follow-up = same Claude session.
+- After merge = new Claude session.
+- Ask Claude to use targeted inspection first.
+- Avoid broad repo exploration unless required.
+- Do not rely on long-running Claude sessions as repo truth.
 
-Secret rules:
+Mode guidance:
 
-- No real secrets in repo files.
-- No real secrets in prompts to ChatGPT, Codex, Claude, or other assistants.
-- No real secrets in logs, screenshots, test output, PR bodies, docs, trace files, snapshots, or telemetry examples.
-- Missing-key errors may name the variable, but must never include the value.
-- `scripts/check_env.py` checks configuration only. It does not prove live provider usability, valid billing, quota, model access, or network connectivity.
+- Plan mode = audit/planning artifact.
+- Accept edits = controlled implementation.
+- Auto mode = avoid for this project for now.
 
-## 11. How to Run and Validate Locally
+### 5.4 GitHub web UI
 
-Common local validation commands:
+Use GitHub web UI for:
 
-```bash
-python scripts/check_env.py
-python alpha_solver_cli.py --help
-python cli/alpha_solver_cli.py --help
-python -m alpha.cli --help
-python alpha_solver_portable.py "Summarize Alpha Solver restart state" --json --deterministic
-python -m pytest tests/api/test_solve.py -q
-python -m pytest tests/providers -q
-python -m pytest tests/cli/test_alpha_solver_cli.py -q
-```
+- reviewing changed files;
+- checking CI;
+- editing tiny docs/spec changes if agents are unavailable;
+- squash merging;
+- confirming merge state.
 
-Use focused commands for the PR scope first. For docs-only changes, `git diff --check` plus existence or heading checks is usually enough unless the docs add or change runnable commands.
+### 5.5 Manual editing
 
-Full `python -m pytest -q` is useful when practical, but do not overstate it. If a full run fails because of a known unrelated issue, report the exact command, environment, and failure summary instead of hiding it.
+Manual editing is acceptable for:
 
-## 12. Testing and Validation Workflow
+- tiny docs/spec changes;
+- typo fixes;
+- small table updates;
+- obvious one-line navigation links.
 
-Use this pattern for most PRs:
+Avoid manual editing for:
 
-1. Run the most focused tests or checks for the changed files.
-2. Run `git diff --check` before committing.
-3. Run full pytest when practical for behavior-changing work.
-4. Use GitHub Actions as the merge gate.
-5. If a failure appears unrelated, identify it clearly and avoid folding unrelated fixes into the PR unless the operator approves a scope change.
-6. Do not add default live provider tests. Live provider tests must be explicitly gated in a future spec.
+- provider code;
+- tests;
+- CI workflows;
+- runtime behavior;
+- security-sensitive logic;
+- any change requiring multi-file consistency.
 
-For docs-only PRs:
+## 6. PR Workflow
 
-- Confirm changed files are docs-only.
-- Run `git diff --check`.
-- Verify new docs exist and key headings are present.
-- Do not run full pytest as ceremony unless the doc changes require it.
+Standard PR workflow:
 
-## 13. Codex Workflow
+1. Identify the lane.
+2. Decide whether a planning audit is required.
+3. If architecture-sensitive, ask Codex and/or Claude for read-only audit.
+4. Convert the audit into a narrow implementation prompt.
+5. Use one Codex thread per PR.
+6. Review PR:
+   - changed files;
+   - diff;
+   - tests;
+   - CI;
+   - forbidden changes;
+   - docs/spec alignment.
+7. Squash merge with clean title and extended description.
+8. Update runtime/docs/backlog if needed.
+9. Move to the next lane.
 
-Codex is the repository execution tool. Use a new Codex thread for each PR so context and scope stay clean.
+Merge checklist:
 
-Codex should:
+- Does the PR match the requested lane?
+- Did it change forbidden files?
+- Did it add live calls to default CI?
+- Did it change local/offline default?
+- Did it expose secrets, prompts, raw payloads, or raw exceptions?
+- Did it overclaim readiness?
+- Did tests run?
+- Is CI green?
+- Does the squash title match the lane?
+- Does the extended description preserve scope boundaries?
 
-- Inspect the repo and relevant specs before implementation.
-- Keep one task per thread.
-- Create or update a spec before behavior-changing code unless the operator explicitly scopes exploratory or docs-only work.
-- Make narrow file changes.
-- Run focused validation.
-- Commit changes and open a PR.
-- Return files changed, validation run, PR URL, suggested squash title, and extended description.
-
-Codex should not:
-
-- Change broad areas without explicit scope.
-- Modify source, tests, specs, CI, env files, package metadata, or backlog workbooks in a docs-only PR.
-- Treat placeholder docs as implemented behavior.
-- Rename or delete sensitive entrypoints casually.
-- Paste secrets into output.
-
-Codex task checklist:
-
-- [ ] State the approved scope and files allowed to change.
-- [ ] Inspect `AGENTS.md`, relevant specs, and relevant docs.
-- [ ] Confirm whether the change is docs-only or behavior-changing.
-- [ ] If behavior-changing, link or create the spec first.
-- [ ] Implement only the approved scope.
-- [ ] Run focused validation and `git diff --check`.
-- [ ] Commit on the current branch.
-- [ ] Open the PR with title, motivation, files changed, summary, validation, docs-only/source-change confirmation, and suggested squash text.
-- [ ] Return PR URL and exact commands run.
-
-## 14. Claude Workflow and Limitations
-
-Claude can be useful for drafting, critique, and architecture review, but do not assume it has repository write access.
-
-Important limitations:
-
-- Claude Project/chat may be read-only or drafting-only unless it has explicit GitHub write tools.
-- Switching from Haiku to Opus can improve reasoning quality, but it does not grant GitHub write access.
-- Claude output is advisory unless backed by repo inspection, a branch, commits, PRs, and CI evidence.
-- Do not rely on Claude to push code unless it proves it can create branches, commit changes, open PRs, and inspect CI.
-- Use a new Claude Code session for a new work lane or after a merge; use the same Claude session only for same-lane follow-up.
-- Ask Claude to inspect targeted files first and avoid broad repo exploration unless needed. Do not treat a long-running Claude session as repo truth.
-
-Good Claude uses:
-
-- Drafting manuals or spec language.
-- Reviewing architecture explanations.
-- Critiquing prompts before sending to Codex.
-- Comparing docs for consistency when given exact file excerpts.
-
-Claude capability-check checklist:
-
-- [ ] Can it inspect current repo files, not just uploaded snippets?
-- [ ] Can it create a branch?
-- [ ] Can it commit changes?
-- [ ] Can it open a GitHub PR?
-- [ ] Can it report a PR URL?
-- [ ] Can it inspect GitHub Actions results?
-- [ ] Can it prove the exact files changed?
-
-If any answer is no, treat Claude as drafting/review support only.
-
-## 15. ChatGPT Review Role
-
-ChatGPT is best used as the operator's planning and review assistant.
-
-Use ChatGPT to:
-
-- Design Codex prompts.
-- Clarify PR scope and acceptance criteria.
-- Review Codex summaries and changed-file lists.
-- Review PR diffs when file excerpts or links are provided.
-- Provide merge recommendations based on evidence.
-- Track roadmap order and backlog cleanup strategy.
-- Draft and refine manuals, operating notes, and workbook update language.
-
-ChatGPT should not claim tests passed unless that is verified by Codex output, terminal output, GitHub Actions, or another concrete tool result. Treat ChatGPT memory as advisory, not as repo truth.
-
-## 16. PR Review and Squash Merge Workflow
-
-Before merging a PR:
-
-1. Verify changed files match scope.
-2. Verify GitHub Actions are green or that any failure is understood and accepted by the operator.
-3. Inspect diffs for scope creep.
-4. Check docs, tests, specs, and source consistency.
-5. Confirm no secrets or local files were committed.
-6. Use the suggested squash merge title if accurate.
-7. Use an extended description that records what changed and what did not change.
-8. Record the PR number, merge commit, validation, status, and next action in the backlog workbook when applicable.
-
-Extended description template:
+Suggested squash description shape:
 
 ```text
 Summary:
-- <main change 1>
-- <main change 2>
+- <main change>
+- <main change>
 
 Validation:
 - <command or CI result>
@@ -337,166 +317,232 @@ Follow-up:
 - <known gap or next action, if any>
 ```
 
-For squash merges, prefer a concise title such as `Add operator and technology manual` and a body that explains motivation, files changed, validation, and explicit scope exclusions.
+## 7. Current Provider/OpenAI Truth
 
-## 17. Backlog and Workbook Workflow
+### 7.1 What exists
 
-The backlog workbook is a planning and evidence ledger. It is not the source of code truth.
+- OpenAI provider client.
+- Explicit `/v1/solve` OpenAI provider path.
+- Provider lifecycle telemetry.
+- Success-only cost accounting.
+- Structured provider SAFE-OUT responses.
+- Provider failure normalization.
+- Fake/mocked CI coverage.
 
-Rules:
+### 7.2 What does not exist
 
-- Always use the latest uploaded workbook as the base when generating a new version.
-- Record PR number, merge commit, validation, status, next action, and any known follow-up.
-- Do not hallucinate workbook state from memory.
-- Do not mark a row implemented without repo evidence.
-- Keep the live queue small and actionable.
-- Park research and long-horizon items separately so the live queue remains useful.
-- Do not modify backlog workbooks from repo tasks unless the operator explicitly asks for a workbook artifact.
+- Live OpenAI smoke test.
+- Production-readiness guarantee.
+- Live provider reliability guarantee.
+- Budget enforcement.
+- Local fallback after provider failure.
+- `provider.fallback.local`.
+- CLI remote execution.
+- Portable solver remote execution.
 
-Evidence should point back to repo artifacts: merged PRs, commit hashes, specs, tests, CI results, and docs.
+### 7.3 Current operator rule
 
-## 18. Runtime Readiness and Known Gaps
+Passing `scripts/check_env.py` means configuration shape is valid. It does not
+mean OpenAI works live.
 
-`docs/RUNTIME_READINESS.md` is the current runtime truth document. This manual summarizes major known gaps, but Runtime Readiness should be updated when runtime status changes.
+OpenAI live readiness requires:
 
-Known gaps and future work include:
+- valid `OPENAI_API_KEY`;
+- account access;
+- model access;
+- billing/quota;
+- network availability;
+- successful gated live test, once implemented.
 
-- Provider budget enforcement, persistence, billing integration, and production cost controls; only account-only post-call `/v1/solve` OpenAI success-path accounting exists today.
-- Expanded provider observability beyond minimal `/v1/solve` OpenAI lifecycle events.
-- Provider local fallback hardening; structured provider SAFE-OUT response normalization exists for explicit `/v1/solve` OpenAI failures, but fallback execution and `provider.fallback.local` remain deferred.
-- Optional gated live OpenAI smoke test.
-- Model-set live usability and account access validation.
-- Rate-limit Redis/SlowAPI mismatch.
-- Placeholder health/rate-limit targets.
-- Metrics/Grafana/Docker hardening.
-- Simulated Google Sheets / Playwright live readiness decisions.
-- SDK auth hardening.
-- Production SLO enforcement.
+## 8. Runtime Readiness Summary
 
-Do not claim live production readiness from placeholders, docs, fake tests, env validation, or planned roadmap rows.
+The Operator Manual summarizes Runtime Readiness; it should not duplicate every
+readiness row. `docs/RUNTIME_READINESS.md` remains the detailed source for:
 
-## 19. Live Queue and Remaining Roadmap
+- verified local/offline behavior;
+- env-validation-only behavior;
+- mocked/simulated behavior;
+- partial runtime features;
+- placeholder/future features;
+- external-service requirements;
+- non-implemented surfaces.
 
-Ranked remaining roadmap:
+When runtime status changes, update Runtime Readiness first or in the same PR as
+this manual. Do not use this manual to create behavior that code does not
+implement.
 
-1. Provider budget enforcement, persistence, and production cost controls.
-2. Provider local fallback orchestration and `provider.fallback.local` emission only when actual fallback executes.
-3. Optional gated live OpenAI smoke test.
+## 9. Backlog and Operating Ledger Sync
+
+### 9.1 Purpose
+
+The backlog spreadsheet is the planning and tracking ledger.
+
+It should track:
+
+- completed PRs;
+- specs added;
+- implemented capabilities;
+- deferred tasks;
+- known gaps;
+- next actions;
+- ownership/tool recommendation;
+- current status;
+- evidence links.
+
+### 9.2 What the backlog is not
+
+The backlog is not runtime truth. If the backlog disagrees with code, tests,
+specs, or Runtime Readiness, update the backlog rather than overriding the repo.
+
+Do not modify backlog workbooks from repo tasks unless the operator explicitly
+asks for a workbook artifact.
+
+### 9.3 Required backlog sync after provider stabilization
+
+Add or update rows for:
+
+- provider env validation/local default;
+- OpenAI provider spec;
+- OpenAI provider client;
+- `/v1/solve` OpenAI integration;
+- package dependency reconciliation;
+- Runtime Readiness matrix;
+- Operator & Technology Manual;
+- Python 3.14 math compatibility;
+- provider telemetry;
+- provider budget/cost accounting;
+- provider SAFE-OUT response normalization;
+- optional gated live OpenAI smoke;
+- future budget enforcement;
+- future fallback orchestration;
+- future CLI remote execution;
+- future portable provider integration.
+
+### 9.4 Backlog fields to use
+
+Recommended columns:
+
+- ID
+- Task name
+- Lane
+- Status
+- Priority
+- Source of truth
+- PR number
+- Spec file
+- Runtime/docs impacted
+- Owner/tool
+- Validation evidence
+- Deferred dependencies
+- Next action
+- Notes
+
+## 10. Common Failure Modes
+
+### 10.1 Spec mistaken for runtime truth
+
+Risk: a spec says something should exist, but code does not implement it.
+
+Correction: check code, tests, and Runtime Readiness.
+
+### 10.2 Env validation mistaken for live provider readiness
+
+Risk: `scripts/check_env.py` passes and the operator assumes OpenAI is
+live-verified.
+
+Correction: remember it checks env/config only.
+
+### 10.3 Claude stale session
+
+Risk: Claude inspects an old branch after a merge.
+
+Correction: start a new Claude session after merges.
+
+### 10.4 Codex scope expansion
+
+Risk: Codex implements related future work not requested.
+
+Correction: use forbidden-changes lists and review diffs carefully.
+
+### 10.5 Fallback event without actual fallback
+
+Risk: `provider.fallback.local` is emitted for SAFE-OUT-only behavior.
+
+Correction: reject the change. `provider.fallback.local` can only emit when
+actual local fallback executes.
+
+### 10.6 Overclaiming production readiness
+
+Risk: docs imply the provider path is production-ready.
+
+Correction: say explicit opt-in service path exists, but production hardening
+remains future work.
+
+## 11. Remaining Roadmap
+
+### 11.1 Near-term
+
+1. Optional gated OpenAI live smoke, Codex later.
+2. Backlog spreadsheet sync.
+3. Final Operator & Technology Manual refresh.
 4. Rate-limit/health placeholder cleanup.
-5. Metrics/Grafana/runtime hardening and expanded provider observability.
-6. Simulated adapter live-readiness decisions.
-7. SDK/auth hardening.
+5. Expanded provider observability or metrics hardening.
 
-Decision rule:
+### 11.2 Later
 
-- Do not start provider budget enforcement/persistence, expanded provider observability, or SAFE-OUT/fallback orchestration without clear scope and a spec if the change is broad.
-- Prefer narrow PRs that retire one known gap at a time.
-- Keep default CI credential-free unless a future spec adds explicitly gated live tests.
+1. Budget enforcement and persistence.
+2. Local fallback orchestration, opt-in only.
+3. `provider.fallback.local`, only if actual fallback executes.
+4. Replay/determinism integration.
+5. CLI remote provider execution.
+6. Portable solver provider integration, only if explicitly approved.
+7. Production SLO/hardening.
 
-## 20. When Codex Credits Run Out
+Roadmap items are not blockers for current local/offline operation. They are
+known future lanes that should be scoped into narrow specs and PRs before
+implementation.
 
-If Codex credits run out:
+## 12. Operator Quick-Use Playbook
 
-- Pause code PRs unless the change is very small and clearly understood.
-- Use Claude for review, drafting, and manual/spec critique if helpful.
-- Use ChatGPT for prompts, PR review support, merge decision support, and backlog wording.
-- Use GitHub Actions and repo evidence as truth.
-- Avoid manual code changes unless they are very small, low risk, and easy to review.
-- Resume Codex for implementation when credits return.
+### If you want to implement code
 
-Do not let credit pressure create broad manual edits, untested code changes, or source-of-truth drift.
+Use Codex.
 
-## 21. Common Failure Modes
+### If you want to inspect or critique architecture
 
-| Failure mode | Why it is risky | Safer response |
-| --- | --- | --- |
-| Stale docs overclaim runtime. | Operators may believe a future target already works. | Check `docs/RUNTIME_READINESS.md`, tests, and code before claiming readiness. |
-| Provider env validation mistaken for live provider usability. | Key presence does not prove model access, quota, billing, or network behavior. | Say env-validation only unless a live gated test proves more. |
-| Broad PRs mix docs, code, specs, tests, and CI. | Review becomes hard and regressions hide. | Split into narrow PRs. |
-| Workbook treated as repo truth. | Planning rows may be stale. | Confirm with repo files, PRs, commits, tests, and CI. |
-| Claude read-only mistaken for repo write access. | Drafts may be mistaken for committed changes. | Require branch, commit, PR URL, and CI evidence. |
-| Secrets pasted into prompts/logs. | Credentials can leak outside the repo. | Use placeholders and rotate any exposed secret. |
-| Portable solver edited as if disposable. | It is a behavior contract. | Touch only with explicit scope and review SAFE-OUT/routing/envelope effects. |
-| Prompt adapters mistaken for provider clients. | Prompt rendering can be confused with live provider execution. | Keep provider execution in provider client paths. |
+Use Claude Code Plan mode or ChatGPT.
 
-## 22. Operator Checklists
+### If you want to review a PR
 
-### Starting a new Codex task
+Bring the PR link and Codex/Claude notes to ChatGPT.
 
-- [ ] Define the desired PR title and scope.
-- [ ] List allowed files or file categories.
-- [ ] State forbidden changes, such as source/test/spec/CI/env/package metadata changes for docs-only work.
-- [ ] Include relevant current runtime truth.
-- [ ] Ask Codex to inspect repo files before editing.
-- [ ] Ask for files changed, summary, validation, PR URL, squash title, and extended description.
+### If you want a tiny docs/spec update and agents are unavailable
 
-### Reviewing a PR
+Use GitHub web UI manually.
 
-- [ ] Changed files match the requested scope.
-- [ ] Diff does not include unrelated cleanup.
-- [ ] Docs do not overclaim runtime readiness.
-- [ ] Specs are updated when behavior changes.
-- [ ] Tests are added or updated for behavior changes.
-- [ ] Validation output is concrete.
-- [ ] No secrets, local env files, generated noise, or backlog workbooks were committed.
+### If live provider behavior is involved
 
-### Squash merging
+Do not add it to default CI. Gate it. Spec it first.
 
-- [ ] CI is green or accepted with a documented reason.
-- [ ] Squash title is accurate.
-- [ ] Extended description lists motivation, summary, validation, and scope confirmations.
-- [ ] Follow-ups are recorded.
-- [ ] PR number and merge commit are captured for the backlog workbook when applicable.
+### If secrets are involved
 
-### Updating backlog
+Never paste secrets into prompts, PR bodies, docs, tests, logs, screenshots, or
+telemetry examples.
 
-- [ ] Start from the latest uploaded workbook.
-- [ ] Record PR number.
-- [ ] Record merge commit.
-- [ ] Record validation evidence.
-- [ ] Update status and next action.
-- [ ] Keep live queue small.
-- [ ] Do not mark implementation complete from memory.
+## 13. Final Manual Acceptance Criteria
 
-### Deciding whether a task needs a spec
+This manual is ready when:
 
-- [ ] Does it change runtime behavior?
-- [ ] Does it change API, solver, routing, SAFE-OUT, budget, determinism, observability, replay, MCP, auth, policy, rate-limit, or provider behavior?
-- [ ] Does it change expected outputs or envelopes?
-- [ ] Does it retire or redefine a placeholder target?
-- [ ] If yes to any of these, create or update a spec before code changes.
-- [ ] If it is docs-only or process-only and does not change expected behavior, a spec is usually not required.
-
-### Deciding whether Claude can be used
-
-- [ ] Is the task drafting, review, or critique? Claude can help.
-- [ ] Does the task require repo writes? Confirm Claude has GitHub write tools first.
-- [ ] Can Claude create a branch, commit, open a PR, and inspect CI?
-- [ ] If not, use Claude output only as advisory text.
-- [ ] Verify any Claude claims against repo files and CI.
-
-### Checking runtime readiness
-
-- [ ] Read `docs/RUNTIME_READINESS.md`.
-- [ ] Check relevant specs.
-- [ ] Inspect implementation files.
-- [ ] Check tests and CI.
-- [ ] Separate local/offline, fake/mocked, env-validation only, service-dependent, and live-provider behavior.
-- [ ] Record known gaps instead of smoothing them over.
-
-## 23. Glossary
-
-| Term | Meaning |
-| --- | --- |
-| local/offline mode | Alpha Solver behavior that runs without live remote LLM credentials or remote provider calls. This is the default baseline. |
-| provider client | Code that executes or prepares execution against a model provider API, such as `alpha.providers.openai`. |
-| prompt adapter | Code that renders prompts for a provider family. It is not proof of live provider execution. |
-| SAFE-OUT | Safety fallback behavior that returns safe, bounded responses when normal solving or provider execution cannot proceed safely. |
-| SolverEnvelope | The structured solver response shape/contract referenced by portable and service behavior. |
-| Runtime Readiness | The repo document that records what is verified, partial, env-validation only, mocked, service-dependent, or future work. |
-| Operating Guide | The repo document that explains the solo operator workflow, roles, specs, PR review, and backlog update loop. |
-| `.specs` | The implementation contract directory. Behavior-changing work should start from or update specs. |
-| Live Queue | The small set of actionable next backlog items the operator intends to work on soon. |
-| provider smoke test | A small test intended to prove a provider path can connect and return a minimal response. Live provider smoke tests must be gated and are not default CI today. |
-| fake/mocked test | A test using fake clients, mocked transports, or fixtures instead of real external provider calls. Safe for default CI. |
-| env-validation only | A check that required environment variables are present and basic config is valid. It does not prove live provider usability. |
+- It matches current repo state after the provider telemetry, accounting, and
+  SAFE-OUT stabilization work reflected in Runtime Readiness.
+- It does not claim a live OpenAI smoke test exists unless implemented.
+- It says optional live smoke is planned/deferred.
+- It distinguishes specs from runtime truth.
+- It explains Codex, Claude, ChatGPT, GitHub, and manual editing roles.
+- It includes Claude session hygiene.
+- It includes backlog spreadsheet sync rules.
+- It lists remaining roadmap items without turning them into blockers.
+- It avoids production-readiness overclaims.
+- It gives the operator a clear next action: keep default work local/offline,
+  use Codex for narrow PRs, update the backlog from repo evidence, and defer
+  live-provider proof until an explicitly gated smoke-test lane is implemented.
