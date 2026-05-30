@@ -30,7 +30,7 @@ Current repo-grounded state:
 - CLI remote provider execution has not been added.
 - This manual does not claim production-hardened OpenAI use.
 
-Treat OpenAI provider execution as an explicit opt-in service path that still needs follow-up hardening for telemetry, budget accounting, SAFE-OUT and fallback orchestration, replay and determinism integration, and optional gated live smoke testing.
+Treat OpenAI provider execution as an explicit opt-in service path. Minimal no-secret lifecycle telemetry now exists for FastAPI `/v1/solve`; follow-up hardening is still needed for budget accounting, SAFE-OUT and fallback orchestration, replay and determinism integration, expanded observability, and optional gated live smoke testing.
 
 ## 3. Source-of-Truth Hierarchy
 
@@ -121,7 +121,7 @@ Alpha Solver intentionally keeps several entrypoint files because they serve dif
 
 Default CI makes no live OpenAI calls. Real live use requires a private `OPENAI_API_KEY`, compatible OpenAI account access, a supported model, network access, and operator acceptance that this path is not yet production-hardened.
 
-Follow-up work remains for provider telemetry, budget and cost accounting, deeper SAFE-OUT and fallback orchestration, replay/determinism integration, no-secret guarantees across expanded telemetry, and optional gated live smoke tests.
+Minimal no-secret provider lifecycle telemetry exists for the explicit FastAPI `/v1/solve` OpenAI path. Follow-up work remains for provider budget and cost accounting, deeper SAFE-OUT and fallback orchestration, replay/determinism integration, expanded metrics/tracing hardening, and optional gated live smoke tests.
 
 | Layer | Status | Notes |
 | --- | --- | --- |
@@ -359,8 +359,8 @@ Evidence should point back to repo artifacts: merged PRs, commit hashes, specs, 
 
 Known gaps and future work include:
 
-- Provider telemetry.
 - Provider budget/cost accounting.
+- Expanded provider observability beyond minimal `/v1/solve` OpenAI lifecycle events.
 - Provider SAFE-OUT and fallback hardening.
 - Optional gated live OpenAI smoke test.
 - Model-set live usability and account access validation.
@@ -377,18 +377,17 @@ Do not claim live production readiness from placeholders, docs, fake tests, env 
 
 Ranked remaining roadmap:
 
-1. Provider telemetry.
-2. Provider budget/cost accounting.
-3. Provider SAFE-OUT/fallback orchestration.
-4. Optional gated live OpenAI smoke test.
-5. Rate-limit/health placeholder cleanup.
-6. Metrics/Grafana/runtime hardening.
-7. Simulated adapter live-readiness decisions.
-8. SDK/auth hardening.
+1. Provider budget/cost accounting.
+2. Provider SAFE-OUT/fallback orchestration.
+3. Optional gated live OpenAI smoke test.
+4. Rate-limit/health placeholder cleanup.
+5. Metrics/Grafana/runtime hardening and expanded provider observability.
+6. Simulated adapter live-readiness decisions.
+7. SDK/auth hardening.
 
 Decision rule:
 
-- Do not start provider telemetry, budget/cost accounting, or SAFE-OUT/fallback orchestration without clear scope and a spec if the change is broad.
+- Do not start provider budget/cost accounting, expanded provider observability, or SAFE-OUT/fallback orchestration without clear scope and a spec if the change is broad.
 - Prefer narrow PRs that retire one known gap at a time.
 - Keep default CI credential-free unless a future spec adds explicitly gated live tests.
 

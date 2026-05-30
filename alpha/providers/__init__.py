@@ -10,6 +10,14 @@ from .base import (
 )
 from .fake import FakeProviderClient
 from .openai import OpenAIProviderClient
+from .telemetry import (
+    PROVIDER_REQUEST_COMPLETED,
+    PROVIDER_REQUEST_FAILED,
+    PROVIDER_REQUEST_STARTED,
+    PROVIDER_REQUEST_TIMEOUT,
+    build_provider_event,
+    emit_provider_event,
+)
 
 __all__ = [
     "FakeProviderClient",
@@ -20,4 +28,10 @@ __all__ = [
     "ProviderRequest",
     "ProviderResult",
     "ProviderUsage",
+    "PROVIDER_REQUEST_COMPLETED",
+    "PROVIDER_REQUEST_FAILED",
+    "PROVIDER_REQUEST_STARTED",
+    "PROVIDER_REQUEST_TIMEOUT",
+    "build_provider_event",
+    "emit_provider_event",
 ]
