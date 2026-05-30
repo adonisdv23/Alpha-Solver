@@ -212,44 +212,119 @@ secret-bearing config values, or other secret-bearing fields.
 - Missing credential errors may name `OPENAI_API_KEY` but must not include its value.
 - Optional live smoke tests require both `ALPHA_LIVE_OPENAI=1` and `OPENAI_API_KEY`; default CI must not require secrets.
 
-## 13. LIVE-SMOKE-OPENAI-001 optional live smoke contract
+## 13. LIVE-SMOKE-OPENAI-001 · Optional gated live smoke
 
-`LIVE-SMOKE-OPENAI-001` defines future optional live OpenAI smoke coverage
-for FastAPI `/v1/solve`. This contract is not implemented yet and must not be
-confused with the implemented OpenAI provider client foundation, implemented
-`/v1/solve` OpenAI integration, implemented provider lifecycle telemetry,
-implemented success-only provider cost accounting, or implemented structured
-provider SAFE-OUT normalization.
+`LIVE-SMOKE-OPENAI-001` specifies the optional live OpenAI smoke coverage for
+the explicit FastAPI `/v1/solve` OpenAI provider path. The skipped-by-default
+live smoke test exists. Operator live verification may still be pending unless
+that gated smoke has been manually run with real credentials in the target
+environment.
 
-Future implementation requirements:
+This section aligns the provider spec with the implemented skipped-by-default
+smoke test while preserving local/offline defaults, no-secret behavior, and
+credential-free/network-free default pytest and CI.
 
-- The smoke must be skipped by default unless explicit live gates are present.
-- The required live gates are `ALPHA_LIVE_OPENAI=1`, a non-empty
-  `OPENAI_API_KEY`, and test-controlled `MODEL_PROVIDER=openai`.
-- Default CI must remain credential-free and network-free, with no live OpenAI
-  calls.
-- `scripts/check_env.py` remains env/config validation only. It must not become
-  a live OpenAI ping and must not be treated as proof of live provider usability.
-- The smoke should assert provider-backed FastAPI `/v1/solve` success through
-  the OpenAI provider path.
-- The smoke should assert telemetry emits `provider.request.started` and
+### Current implemented scope
+
+- The skipped-by-default live smoke test exists for the explicit FastAPI
+  `/v1/solve` OpenAI provider path.
+- The smoke uses, sets, or requires `MODEL_PROVIDER=openai` for that provider
+  path.
+- The smoke is intended to prove minimal real-account viability for
+  authentication, model access, network path, service routing,
+  provider-backed response, lifecycle telemetry, and success-path cost
+  accounting in the environment where it is run.
+- Passing the gated smoke only proves the OpenAI `/v1/solve` provider path
+  worked in that environment at that time.
+- Passing the gated smoke does not prove production readiness.
+
+### Gates and skip behavior
+
+- The smoke requires `ALPHA_LIVE_OPENAI=1`.
+- The smoke requires a non-empty `OPENAI_API_KEY`.
+- The smoke sets or uses `MODEL_PROVIDER=openai` as test setup for the OpenAI
+  provider path.
+- Without the live gate or key, the test skips before any provider client,
+  service request, or network call.
+- Default pytest/CI remains credential-free and network-free.
+- `scripts/check_env.py` remains config/env validation only. It must not ping
+  OpenAI and must not be treated as proof of live provider usability.
+
+### Pytest markers and optional operator command
+
+The implemented live smoke is selected with registered pytest markers:
+
+- `live`
+- `openai`
+
+Operators may run the gated smoke manually with real credentials when live
+verification is desired. The command must not print, commit, snapshot, or expose
+real API keys:
+
+```bash
+ALPHA_LIVE_OPENAI=1 MODEL_PROVIDER=openai OPENAI_API_KEY="$OPENAI_API_KEY" python -m pytest -q -m "live and openai" tests/providers/test_openai_live_smoke.py
+```
+
+### Stable assertions
+
+The live smoke should assert only stable service-path behavior:
+
+- HTTP 200 on success.
+- JSON body includes non-empty `final_answer`.
+- `meta.provider == "openai"`.
+- `meta.model` is non-empty.
+- `meta.model_set` matches the requested low-cost model set, likely
+  `cost_saver`.
+- Provider telemetry emits `provider.request.started` and
   `provider.request.completed`.
-- The smoke should assert exactly one success-only `provider.cost.recorded`
-  event.
-- The smoke may use future pytest markers such as `live` and `openai`, but no
-  marker registration or test file is part of this spec/docs alignment PR.
-- The smoke must not expose API keys, Authorization headers, Bearer tokens, raw
-  prompts, raw system prompts, raw provider request/response payloads, raw
-  metadata dumps, env/config dumps, or raw exception strings.
-- The smoke must not claim or imply production readiness, budget enforcement,
-  fallback behavior, `provider.fallback.local` emission, CLI remote provider
-  execution, or portable solver remote provider execution.
+- Provider accounting emits exactly one `provider.cost.recorded` on success.
+- No API key, Authorization header, Bearer token, raw prompt, raw system
+  prompt, raw provider payload, raw metadata dump, or raw exception string
+  appears in response, telemetry, accounting, logs, snapshots, or assertion
+  output.
 
-Out of scope for this contract: implementing the smoke test, registering pytest
-markers, changing workflows, changing `.env.example`, changing
-`scripts/check_env.py`, changing runtime/source code, adding live OpenAI calls,
-adding budget enforcement, adding local fallback, changing CLI provider behavior,
-or changing portable solver provider behavior.
+### Boundaries and non-goals
+
+The live smoke does not prove:
+
+- production readiness;
+- provider reliability;
+- benchmark quality;
+- deterministic output;
+- full budget enforcement;
+- full SAFE-OUT/fallback orchestration;
+- fallback behavior;
+- CLI remote execution;
+- portable solver remote execution.
+
+Budget enforcement is not implemented. Local fallback after provider failure is
+not implemented. `provider.fallback.local` is not emitted. CLI remote provider
+execution is not implemented. Portable solver remote provider execution is not
+implemented. Production hardening is not implemented.
+
+### CI/workflow boundaries
+
+- Do not add live OpenAI calls to default PR/push CI.
+- Do not add live OpenAI calls to nightly scheduled workflows in this scope.
+- A future manual `workflow_dispatch` secret-gated workflow may be considered
+  separately, but is not part of this alignment.
+- Existing fake/mocked provider tests remain the default CI source of truth.
+- Default pytest/CI remains credential-free and network-free.
+
+### Safety
+
+- No real API keys in docs, tests, examples, PR body, snapshots, or logs.
+- Do not update `scripts/check_env.py` to ping OpenAI.
+- Do not store live responses as artifacts by default.
+- Do not claim live OpenAI readiness unless the gated smoke actually runs and
+  passes with real credentials.
+- Do not claim production readiness from the live smoke.
+
+Out of scope for this alignment: changing the smoke test, changing workflows,
+changing `.env.example`, changing `scripts/check_env.py`, changing
+runtime/source code, adding live OpenAI calls, adding budget enforcement,
+adding local fallback, changing CLI provider behavior, or changing portable
+solver provider behavior.
 
 ## 14. Test plan
 
