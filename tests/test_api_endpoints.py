@@ -56,6 +56,34 @@ def _client():
     return TestClient(app), key
 
 
+def _assert_provider_safe_out_schema(
+    body, *, category, retryable, request_id, retry_count=0, status_code=None
+):
+    assert set(body) == {"final_answer", "safe_out", "error"}
+    assert body["safe_out"] is True
+    assert body["final_answer"].startswith("SAFE-OUT: ")
+    assert set(body["error"]) == {
+        "provider",
+        "category",
+        "retryable",
+        "request_id",
+        "retry_count",
+        "status_code",
+    }
+    assert body["error"]["provider"] == "openai"
+    assert body["error"]["category"] == category
+    assert body["error"]["retryable"] is retryable
+    assert body["error"]["request_id"] == request_id
+    assert body["error"]["retry_count"] == retry_count
+    assert body["error"]["status_code"] == status_code
+
+
+def _assert_no_fallback_telemetry(provider_events):
+    event_names = [event["event"] for event in provider_events]
+    assert "provider.fallback.local" not in event_names
+    assert all("fallback" not in event_name for event_name in event_names)
+
+
 def test_health_ready_and_openapi():
     client, key = _client()
     assert client.get("/healthz").status_code == 200
@@ -118,6 +146,7 @@ def test_solve_local_mode_ignores_provider_factory(monkeypatch):
 
     assert resp.status_code == 200
     assert resp.json() == {"final_answer": "local:hi"}
+    assert "safe_out" not in resp.json()
     assert provider_events == []
     assert provider_accounting_records == []
     _clear_provider_factory()
@@ -276,10 +305,16 @@ def test_solve_openai_missing_credentials_returns_safe_response(monkeypatch):
         headers={"X-API-Key": key, "X-Request-ID": "req-missing"},
     )
 
+    body = resp.json()
     body_text = resp.text
     assert resp.status_code == 503
-    assert "SAFE-OUT" in body_text
-    assert "missing_credentials" in body_text
+    _assert_provider_safe_out_schema(
+        body,
+        category="missing_credentials",
+        retryable=False,
+        request_id="req-missing",
+        status_code=None,
+    )
     assert "OPENAI_API_KEY" in body_text
     assert secret not in body_text
     assert provider_accounting_records == []
@@ -320,9 +355,16 @@ def test_solve_openai_provider_errors_return_safe_responses(monkeypatch, categor
         headers={"X-API-Key": key, "X-Request-ID": "req-error"},
     )
 
+    body = resp.json()
     body_text = resp.text
     assert resp.status_code == status
-    assert "SAFE-OUT" in body_text
+    _assert_provider_safe_out_schema(
+        body,
+        category=category,
+        retryable=True,
+        request_id="req-error",
+        status_code=None,
+    )
     assert category in body_text
     assert secret not in body_text
     assert len(fake.requests) == 1
@@ -330,6 +372,7 @@ def test_solve_openai_provider_errors_return_safe_responses(monkeypatch, categor
         PROVIDER_REQUEST_STARTED,
         PROVIDER_REQUEST_TIMEOUT if category == "timeout" else PROVIDER_REQUEST_FAILED,
     ]
+    _assert_no_fallback_telemetry(provider_events)
     assert provider_accounting_records == []
     failure_event = provider_events[1]
     assert failure_event["provider"] == "openai"
@@ -373,15 +416,23 @@ def test_solve_openai_unknown_provider_exception_emits_no_accounting(monkeypatch
     )
 
     assert resp.status_code == 502
+    body = resp.json()
     body_text = resp.text
-    assert "SAFE-OUT" in body_text
-    assert "OpenAI request failed." in body_text
+    _assert_provider_safe_out_schema(
+        body,
+        category="unknown",
+        retryable=False,
+        request_id="req-unknown",
+        status_code=None,
+    )
+    assert body["final_answer"] == "SAFE-OUT: OpenAI request failed."
     assert secret not in body_text
     assert provider_accounting_records == []
     assert [event["event"] for event in provider_events] == [
         PROVIDER_REQUEST_STARTED,
         PROVIDER_REQUEST_FAILED,
     ]
+    _assert_no_fallback_telemetry(provider_events)
     serialized_events = str(provider_events)
     assert secret not in serialized_events
     assert "PROMPT-MUST-NOT-LEAK" not in serialized_events
