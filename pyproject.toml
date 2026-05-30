@@ -80,6 +80,8 @@ markers = [
     "budget",
     "policy",
     "metrics",
+    "live: tests that require explicit live external-service gates",
+    "openai: tests specific to the OpenAI provider",
 ]
 
 
