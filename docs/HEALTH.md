@@ -4,7 +4,7 @@
 
 `NEW-HEALTH-001` remains an unresolved alpha-layer placeholder/spec target. It is not implemented as written by the current service-layer health and readiness behavior.
 
-The currently implemented service-layer `/health` and `/ready` behavior is documented in [`docs/HEALTH_READINESS.md`](HEALTH_READINESS.md) and implemented through the service references below. That implemented behavior has different schema and dependency expectations from `NEW-HEALTH-001`.
+The currently implemented service-layer `/health` and `/ready` behavior is documented in [`docs/HEALTH_READINESS.md`](HEALTH_READINESS.md) and implemented through the service references below. That implemented behavior has different schema and dependency expectations from `NEW-HEALTH-001`: current `/health` and `/ready` do not check Redis, VectorDB, or perform live provider pings.
 
 ## Related placeholder targets
 

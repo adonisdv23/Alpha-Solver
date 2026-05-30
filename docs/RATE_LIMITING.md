@@ -4,7 +4,7 @@
 
 `NEW-RATE-001` remains unresolved/partial as a Redis-backed alpha-layer middleware target. It is not implemented as written by the current in-memory service and tenant rate limiting behavior.
 
-The currently implemented in-memory tenant limiter behavior is documented in [`docs/TENANCY_LIMITS.md`](TENANCY_LIMITS.md). Current service API-key rate limiting exists in `service/app.py`. These existing in-memory service and tenant limiters are not the same as the Redis-backed tenant/global token bucket behavior described by `NEW-RATE-001`.
+The currently implemented in-memory tenant limiter behavior is documented in [`docs/TENANCY_LIMITS.md`](TENANCY_LIMITS.md). Current service API-key rate limiting is in-process sliding-window behavior in `service/app.py`. Current tenant limiting is in-memory token-bucket/quota behavior in `service/tenancy/limiter.py` and `service/middleware/tenant_middleware.py`. These existing in-process/in-memory service and tenant limiters are not the same as the Redis-backed tenant/global token bucket behavior described by `NEW-RATE-001`; Redis-backed tenant/global rate limiting is not implemented.
 
 ## Related placeholder targets
 
