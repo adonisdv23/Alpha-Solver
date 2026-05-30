@@ -41,7 +41,7 @@ OPENAI_KEY_ENV = "OPENAI_API_KEY"
 DATASET_VERSION = "answer_quality_operator_cases_v0.1"
 TREATMENT_VERSION = "alpha_solver_operator_discipline_v0.1"
 EVIDENCE_DISCLAIMER = "Evidence, not proof: this gated MVP eval is a small smoke signal only."
-DEFAULT_MODEL = "gpt-5-mini"
+DEFAULT_MODEL = "gpt-5.4-mini"
 DEFAULT_TEMPERATURE = 0.0
 DEFAULT_MAX_TOKENS = 220
 DEFAULT_TIMEOUT_MS = 45_000
@@ -462,7 +462,7 @@ def write_artifacts(
                 f"cases={len(cases)}",
                 f"live={not dry_run}",
                 f"predictions={manifest_predictions}",
-                "Artifacts exclude raw provider request/response dumps, environment dumps, and API keys.",
+                "Artifacts contain only redacted provider text, scoring metadata, and run summaries.",
             ]
         )
         + "\n",

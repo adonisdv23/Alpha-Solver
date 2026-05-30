@@ -64,6 +64,15 @@ def test_quality_gate_config_is_referenced():
     assert aq.answer_quality_success_criteria(gate)["minimum_margin"] == 0.05
 
 
+def test_default_model_uses_known_working_live_mini_model(monkeypatch):
+    monkeypatch.delenv("ALPHA_AQ_MODEL", raising=False)
+
+    args = aq.parse_args([])
+
+    assert aq.DEFAULT_MODEL == "gpt-5.4-mini"
+    assert args.model == "gpt-5.4-mini"
+
+
 def test_default_dry_run_needs_no_key_and_makes_no_provider_calls(monkeypatch, tmp_path):
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     monkeypatch.delenv("ALPHA_LIVE_ANSWER_QUALITY", raising=False)
@@ -186,6 +195,11 @@ def test_artifact_redaction_excludes_secrets_and_raw_metadata(monkeypatch, tmp_p
     assert "raw_metadata" not in combined
     assert "must-not-be-written" not in combined
     assert "Evidence, not proof" in combined
+    readme = (artifact_dir / "README.txt").read_text(encoding="utf-8")
+    assert "raw provider request" not in readme
+    assert "raw provider response" not in readme
+    assert "environment dump" not in readme
+    assert "OPENAI_API_KEY" not in readme
 
 
 def test_disputed_cases_are_rejected(tmp_path):
