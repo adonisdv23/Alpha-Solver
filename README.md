@@ -56,37 +56,35 @@ If `python3.12` is not the executable name on your machine, use any Python 3.12+
 
 ## Configure environment
 
-Copy the example environment file and set `MODEL_PROVIDER` for your setup:
+Copy the example environment file for the verified local/offline default:
 
 ```bash
 cp .env.example .env
 ```
 
-For local/offline checks, use:
+The sample file uses `MODEL_PROVIDER=local`. This is the safe default for local checks and does not require OpenAI, Anthropic, or Google credentials. `MODEL_PROVIDER=none` is also accepted by the environment checker for no-key local validation.
+
+Remote-provider modes currently have environment-variable validation only. The checker verifies that the expected key variable is present; it does not call a remote LLM API and does not prove that a remote provider is usable. Do not add real secrets to source-controlled files.
+
+If you are doing provider-specific work, set `MODEL_PROVIDER` and the matching placeholder or secret in your private `.env`:
 
 ```bash
-MODEL_PROVIDER=local
-```
-
-For a remote provider, set `MODEL_PROVIDER` and the matching API key in `.env`:
-
-```bash
-# OpenAI
+# OpenAI env-var presence check
 MODEL_PROVIDER=openai
-OPENAI_API_KEY=...
+OPENAI_API_KEY=placeholder
 
-# Anthropic
+# Anthropic env-var presence check
 MODEL_PROVIDER=anthropic
-ANTHROPIC_API_KEY=...
+ANTHROPIC_API_KEY=placeholder
 
-# Google Gemini
+# Google Gemini env-var presence check
 MODEL_PROVIDER=gemini   # or: google
-GOOGLE_API_KEY=...
+GOOGLE_API_KEY=placeholder
 ```
 
-Provider values accepted by the environment checker include `local`, `openai`, `anthropic`, `gemini`, and `google`. API keys are only required when using a real remote provider: `OPENAI_API_KEY` for `openai`, `ANTHROPIC_API_KEY` for `anthropic`, and `GOOGLE_API_KEY` for `gemini` or `google`.
+Provider values accepted by the environment checker are `local`, `none`, `openai`, `anthropic`, `gemini`, and `google`. Unknown provider values fail with an allowed-values message.
 
-Load the `.env` file into your shell, then validate the environment:
+Load the `.env` file into your shell, then validate the environment configuration:
 
 ```bash
 set -a
@@ -95,7 +93,7 @@ set +a
 python scripts/check_env.py
 ```
 
-You can also validate local/offline configuration without editing `.env`:
+You can also validate the local/offline default without editing `.env`:
 
 ```bash
 MODEL_PROVIDER=local python scripts/check_env.py

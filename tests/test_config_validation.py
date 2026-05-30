@@ -126,6 +126,15 @@ def test_check_env_requires_model_provider():
     assert "MODEL_PROVIDER" in result.stdout
 
 
+def test_check_env_unknown_provider_lists_allowed_values():
+    result = _run_check_env({"MODEL_PROVIDER": "foobar"})
+    assert result.returncode != 0
+    assert "Unknown MODEL_PROVIDER" in result.stdout
+    assert "Allowed values" in result.stdout
+    for provider in ("local", "none", "openai", "anthropic", "gemini", "google"):
+        assert provider in result.stdout
+
+
 def test_redaction(caplog):
     with caplog.at_level("DEBUG"):
         load_config(env={"MODEL_PROVIDER": "openai", "OPENAI_API_KEY": "secret"})

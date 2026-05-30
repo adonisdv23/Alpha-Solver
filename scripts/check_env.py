@@ -11,6 +11,7 @@ import sys
 from typing import List
 
 SECRET_KEYS = ("KEY", "TOKEN", "SECRET")
+ALLOWED_PROVIDERS = {"local", "none", "openai", "anthropic", "gemini", "google"}
 _NO_KEY_PROVIDERS = {"local", "none"}
 
 
@@ -47,6 +48,17 @@ def main() -> int:
     else:
         provider = provider_raw.strip().lower()
 
+    if provider and provider not in ALLOWED_PROVIDERS:
+        _print(
+            "Unknown MODEL_PROVIDER "
+            f"{provider!r}. Allowed values: {', '.join(sorted(ALLOWED_PROVIDERS))}."
+        )
+        _print(
+            "This check validates environment variable configuration only; "
+            "it does not perform remote provider API calls."
+        )
+        return 1
+
     if provider and provider not in _NO_KEY_PROVIDERS:
         for var in _required_keys_for_provider(provider):
             if _missing(var):
@@ -63,7 +75,10 @@ def main() -> int:
         _print("Cannot run with PROD=true and DEBUG=true.")
         return 1
 
-    _print("Environment looks good.")
+    _print(
+        "Environment looks good. This validates configuration only; "
+        "no remote provider API calls were made."
+    )
     return 0
 
 
