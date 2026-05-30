@@ -57,7 +57,7 @@ Provider environment validation does not prove live provider usability. Remote-p
 | ------------- | ------------------------ | ------------- | -------------------------- | ----------- | ----- |
 | `local` | Yes | No | No | Yes | Safe verified default for local/offline checks. |
 | `none` | Yes | No | No | Acceptable for no-key validation | Accepted by the env checker for no-key local validation. |
-| `openai` | Yes | `OPENAI_API_KEY` | No | No | Env validation requires key presence, but real OpenAI execution is specified and not implemented. |
+| `openai` | Yes | `OPENAI_API_KEY` | Provider client foundation only | No | A minimal `alpha.providers.openai` client exists with fake/mocked tests; `/v1/solve` live OpenAI integration and default live calls remain not implemented. |
 | `anthropic` | Yes | `ANTHROPIC_API_KEY` | No | No | Env validation requires key presence only; no live Anthropic execution is implemented. |
 | `gemini` | Yes | `GOOGLE_API_KEY` | No | No | Env validation requires key presence only; no live Gemini execution is implemented. |
 | `google` | Yes | `GOOGLE_API_KEY` | No | No | Alias-style env-check mode for Google/Gemini key validation; no live Google provider execution is implemented. |
@@ -66,7 +66,7 @@ Provider environment validation does not prove live provider usability. Remote-p
 
 ## Known Gaps
 
-1. Real OpenAI provider execution is specified in `.specs/PROVIDER-OPENAI-001.md` but not implemented.
+1. The minimal OpenAI provider client foundation exists, but `/v1/solve` live OpenAI integration and production remote execution remain follow-up work.
 2. Runtime readiness should be updated after provider implementation PRs.
 3. Remote provider modes currently validate env-var presence only; they do not prove live provider usability.
 4. Some external-tool surfaces may be simulated, credentialed, or service-dependent.
