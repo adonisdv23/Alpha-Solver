@@ -30,7 +30,7 @@ Current repo-grounded state:
 - CLI remote provider execution has not been added.
 - This manual does not claim production-hardened OpenAI use.
 
-Treat OpenAI provider execution as an explicit opt-in service path. Minimal no-secret lifecycle telemetry now exists for FastAPI `/v1/solve`; follow-up hardening is still needed for budget accounting, SAFE-OUT and fallback orchestration, replay and determinism integration, expanded observability, and optional gated live smoke testing.
+Treat OpenAI provider execution as an explicit opt-in service path. Minimal no-secret lifecycle telemetry and account-only post-call cost accounting now exist for successful FastAPI `/v1/solve` OpenAI calls; follow-up hardening is still needed for budget enforcement, SAFE-OUT and fallback orchestration, replay and determinism integration, expanded observability, and optional gated live smoke testing.
 
 ## 3. Source-of-Truth Hierarchy
 
@@ -121,7 +121,7 @@ Alpha Solver intentionally keeps several entrypoint files because they serve dif
 
 Default CI makes no live OpenAI calls. Real live use requires a private `OPENAI_API_KEY`, compatible OpenAI account access, a supported model, network access, and operator acceptance that this path is not yet production-hardened.
 
-Minimal no-secret provider lifecycle telemetry exists for the explicit FastAPI `/v1/solve` OpenAI path. Follow-up work remains for provider budget and cost accounting, deeper SAFE-OUT and fallback orchestration, replay/determinism integration, expanded metrics/tracing hardening, and optional gated live smoke tests.
+Minimal no-secret provider lifecycle telemetry exists for the explicit FastAPI `/v1/solve` OpenAI path. Successful OpenAI provider results also emit account-only post-call `provider.cost.recorded` records from already-computed provider usage/cost into a safe accounting sink. Follow-up work remains for hard/soft budget enforcement, preflight blocking, persistent budgets, billing integration, SAFE-OUT budget behavior, deeper SAFE-OUT and fallback orchestration, replay/determinism integration, dashboards/tracing hardening, optional gated live smoke tests, CLI budgeting, and portable solver changes.
 
 | Layer | Status | Notes |
 | --- | --- | --- |
@@ -268,6 +268,8 @@ Important limitations:
 - Switching from Haiku to Opus can improve reasoning quality, but it does not grant GitHub write access.
 - Claude output is advisory unless backed by repo inspection, a branch, commits, PRs, and CI evidence.
 - Do not rely on Claude to push code unless it proves it can create branches, commit changes, open PRs, and inspect CI.
+- Use a new Claude Code session for a new work lane or after a merge; use the same Claude session only for same-lane follow-up.
+- Ask Claude to inspect targeted files first and avoid broad repo exploration unless needed. Do not treat a long-running Claude session as repo truth.
 
 Good Claude uses:
 
@@ -359,7 +361,7 @@ Evidence should point back to repo artifacts: merged PRs, commit hashes, specs, 
 
 Known gaps and future work include:
 
-- Provider budget/cost accounting.
+- Provider budget enforcement, persistence, billing integration, and production cost controls; only account-only post-call `/v1/solve` OpenAI success-path accounting exists today.
 - Expanded provider observability beyond minimal `/v1/solve` OpenAI lifecycle events.
 - Provider SAFE-OUT and fallback hardening.
 - Optional gated live OpenAI smoke test.
@@ -377,7 +379,7 @@ Do not claim live production readiness from placeholders, docs, fake tests, env 
 
 Ranked remaining roadmap:
 
-1. Provider budget/cost accounting.
+1. Provider budget enforcement, persistence, and production cost controls.
 2. Provider SAFE-OUT/fallback orchestration.
 3. Optional gated live OpenAI smoke test.
 4. Rate-limit/health placeholder cleanup.
@@ -387,7 +389,7 @@ Ranked remaining roadmap:
 
 Decision rule:
 
-- Do not start provider budget/cost accounting, expanded provider observability, or SAFE-OUT/fallback orchestration without clear scope and a spec if the change is broad.
+- Do not start provider budget enforcement/persistence, expanded provider observability, or SAFE-OUT/fallback orchestration without clear scope and a spec if the change is broad.
 - Prefer narrow PRs that retire one known gap at a time.
 - Keep default CI credential-free unless a future spec adds explicitly gated live tests.
 

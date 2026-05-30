@@ -9,6 +9,7 @@ os.environ.setdefault("RATE_LIMIT_PER_MINUTE", "2")
 from fastapi.testclient import TestClient
 
 from alpha.providers import (
+    PROVIDER_COST_RECORDED,
     PROVIDER_REQUEST_COMPLETED,
     PROVIDER_REQUEST_FAILED,
     PROVIDER_REQUEST_STARTED,
@@ -32,14 +33,21 @@ def _clear_provider_telemetry_sink():
         delattr(app.state, "provider_telemetry_sink")
 
 
+def _clear_provider_accounting_sink():
+    if hasattr(app.state, "provider_accounting_sink"):
+        delattr(app.state, "provider_accounting_sink")
+
+
 @pytest.fixture(autouse=True)
 def _default_local_provider(monkeypatch):
     monkeypatch.setenv("MODEL_PROVIDER", "local")
     _clear_provider_factory()
     _clear_provider_telemetry_sink()
+    _clear_provider_accounting_sink()
     yield
     _clear_provider_factory()
     _clear_provider_telemetry_sink()
+    _clear_provider_accounting_sink()
 
 
 def _client():
@@ -97,7 +105,9 @@ def test_solve_local_mode_ignores_provider_factory(monkeypatch):
         AssertionError("provider should not be used in local mode")
     )
     provider_events = []
+    provider_accounting_records = []
     app.state.provider_telemetry_sink = provider_events.append
+    app.state.provider_accounting_sink = provider_accounting_records.append
 
     def fake_solver(query: str, **kwargs):
         return {"final_answer": f"local:{query}"}
@@ -109,8 +119,10 @@ def test_solve_local_mode_ignores_provider_factory(monkeypatch):
     assert resp.status_code == 200
     assert resp.json() == {"final_answer": "local:hi"}
     assert provider_events == []
+    assert provider_accounting_records == []
     _clear_provider_factory()
     _clear_provider_telemetry_sink()
+    _clear_provider_accounting_sink()
 
 
 def test_solve_openai_mode_uses_fake_provider_and_returns_normalized_text(monkeypatch):
@@ -132,7 +144,9 @@ def test_solve_openai_mode_uses_fake_provider_and_returns_normalized_text(monkey
     )
     app.state.provider_client_factory = lambda _model_set: fake
     provider_events = []
+    provider_accounting_records = []
     app.state.provider_telemetry_sink = provider_events.append
+    app.state.provider_accounting_sink = provider_accounting_records.append
     client, key = _client()
 
     resp = client.post(
@@ -194,6 +208,34 @@ def test_solve_openai_mode_uses_fake_provider_and_returns_normalized_text(monkey
     assert completed["cost_source"] == "price_hint"
     assert completed["finish_reason"] == "stop"
     assert completed["provider_request_id"] == "openai-req-1"
+
+    assert provider_accounting_records == [
+        {
+            "event": PROVIDER_COST_RECORDED,
+            "provider": "openai",
+            "model": "gpt-test",
+            "model_set": "cost_saver",
+            "route": "tot",
+            "request_id": "req-test",
+            "tenant": "tenant-a",
+            "input_tokens": 3,
+            "output_tokens": 5,
+            "total_tokens": 8,
+            "estimated_cost_usd": 0.001,
+            "cost_source": "price_hint",
+            "retry_count": 0,
+            "budget_status": "recorded",
+            "accounting_source": "service:/v1/solve",
+            "provider_request_id": "openai-req-1",
+        }
+    ]
+    serialized_accounting = str(provider_accounting_records)
+    assert "hello provider" not in serialized_accounting
+    assert "system prompt" not in serialized_accounting
+    assert "must-not-leak" not in serialized_accounting
+    assert "Authorization" not in serialized_accounting
+    assert "Bearer" not in serialized_accounting
+
     serialized_events = str(provider_events)
     assert "hello provider" not in serialized_events
     assert "system prompt" not in serialized_events
@@ -216,6 +258,7 @@ def test_solve_openai_mode_uses_fake_provider_and_returns_normalized_text(monkey
     assert provider_request.metadata["tenant"] == "tenant-a"
     _clear_provider_factory()
     _clear_provider_telemetry_sink()
+    _clear_provider_accounting_sink()
 
 
 def test_solve_openai_missing_credentials_returns_safe_response(monkeypatch):
@@ -223,6 +266,8 @@ def test_solve_openai_missing_credentials_returns_safe_response(monkeypatch):
     monkeypatch.setenv("MODEL_PROVIDER", "openai")
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     _clear_provider_factory()
+    provider_accounting_records = []
+    app.state.provider_accounting_sink = provider_accounting_records.append
     client, key = _client()
 
     resp = client.post(
@@ -237,6 +282,7 @@ def test_solve_openai_missing_credentials_returns_safe_response(monkeypatch):
     assert "missing_credentials" in body_text
     assert "OPENAI_API_KEY" in body_text
     assert secret not in body_text
+    assert provider_accounting_records == []
 
 
 @pytest.mark.parametrize(
@@ -263,7 +309,9 @@ def test_solve_openai_provider_errors_return_safe_responses(monkeypatch, categor
     )
     app.state.provider_client_factory = lambda _model_set: fake
     provider_events = []
+    provider_accounting_records = []
     app.state.provider_telemetry_sink = provider_events.append
+    app.state.provider_accounting_sink = provider_accounting_records.append
     client, key = _client()
 
     resp = client.post(
@@ -282,6 +330,7 @@ def test_solve_openai_provider_errors_return_safe_responses(monkeypatch, categor
         PROVIDER_REQUEST_STARTED,
         PROVIDER_REQUEST_TIMEOUT if category == "timeout" else PROVIDER_REQUEST_FAILED,
     ]
+    assert provider_accounting_records == []
     failure_event = provider_events[1]
     assert failure_event["provider"] == "openai"
     assert failure_event["model"] == "gpt-5"
@@ -299,3 +348,43 @@ def test_solve_openai_provider_errors_return_safe_responses(monkeypatch, categor
     assert "Bearer" not in serialized_events
     _clear_provider_factory()
     _clear_provider_telemetry_sink()
+    _clear_provider_accounting_sink()
+
+
+def test_solve_openai_unknown_provider_exception_emits_no_accounting(monkeypatch):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    secret = "raw exception string sentinel sk-test-must-not-leak"
+
+    class ExplodingProvider:
+        def execute(self, provider_request):
+            raise RuntimeError(secret)
+
+    app.state.provider_client_factory = lambda _model_set: ExplodingProvider()
+    provider_events = []
+    provider_accounting_records = []
+    app.state.provider_telemetry_sink = provider_events.append
+    app.state.provider_accounting_sink = provider_accounting_records.append
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={"query": "PROMPT-MUST-NOT-LEAK"},
+        headers={"X-API-Key": key, "X-Request-ID": "req-unknown"},
+    )
+
+    assert resp.status_code == 502
+    body_text = resp.text
+    assert "SAFE-OUT" in body_text
+    assert "OpenAI request failed." in body_text
+    assert secret not in body_text
+    assert provider_accounting_records == []
+    assert [event["event"] for event in provider_events] == [
+        PROVIDER_REQUEST_STARTED,
+        PROVIDER_REQUEST_FAILED,
+    ]
+    serialized_events = str(provider_events)
+    assert secret not in serialized_events
+    assert "PROMPT-MUST-NOT-LEAK" not in serialized_events
+    _clear_provider_factory()
+    _clear_provider_telemetry_sink()
+    _clear_provider_accounting_sink()
