@@ -26,6 +26,9 @@ record. Keep it light enough for one person to run without drift.
 When two sources disagree, the repo wins for code/behavior; `.specs/` wins for
 intent; the workbook never overrides repo evidence.
 
+Runtime status and known gaps are tracked in `docs/RUNTIME_READINESS.md`; this
+guide covers the operating workflow, not feature readiness.
+
 ## 3. Who Does What
 
 - **ChatGPT** — planning, triage, scope clarification, writing Codex prompts,
