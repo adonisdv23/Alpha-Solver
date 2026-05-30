@@ -149,7 +149,7 @@ ProviderError(
 - Use provider token usage when available.
 - Use model-set price hints for estimated cost when available.
 - If usage is unavailable, record cost as unknown instead of guessing.
-- Provider budget decisions should happen before remote calls when estimates exceed hard caps and after calls when actual usage returns.
+- Provider budget decisions are deferred until a future approved implementation; current success-only cost accounting is not budget enforcement.
 - Budget and cost events must not include credentials, raw prompts, or provider headers.
 
 ## 10. Telemetry
@@ -197,7 +197,7 @@ secret-bearing config values, or other secret-bearing fields.
 
 ## 11. SAFE-OUT and fallback
 
-- Provider errors must flow into SAFE-OUT or deterministic local fallback, not raw provider exceptions.
+- Provider errors must flow into SAFE-OUT or, in a future approved implementation, deterministic local fallback; they must not expose raw provider exceptions.
 - `service/app.py` already has generic SAFE-OUT wrapping; provider errors should be mapped intentionally before generic fallback.
 - Do not change `alpha/core/router.py` in the first implementation.
 - Do not change portable SAFE-OUT/envelope behavior.
@@ -212,7 +212,46 @@ secret-bearing config values, or other secret-bearing fields.
 - Missing credential errors may name `OPENAI_API_KEY` but must not include its value.
 - Optional live smoke tests require both `ALPHA_LIVE_OPENAI=1` and `OPENAI_API_KEY`; default CI must not require secrets.
 
-## 13. Test plan
+## 13. LIVE-SMOKE-OPENAI-001 optional live smoke contract
+
+`LIVE-SMOKE-OPENAI-001` defines future optional live OpenAI smoke coverage
+for FastAPI `/v1/solve`. This contract is not implemented yet and must not be
+confused with the implemented OpenAI provider client foundation, implemented
+`/v1/solve` OpenAI integration, implemented provider lifecycle telemetry,
+implemented success-only provider cost accounting, or implemented structured
+provider SAFE-OUT normalization.
+
+Future implementation requirements:
+
+- The smoke must be skipped by default unless explicit live gates are present.
+- The required live gates are `ALPHA_LIVE_OPENAI=1`, a non-empty
+  `OPENAI_API_KEY`, and test-controlled `MODEL_PROVIDER=openai`.
+- Default CI must remain credential-free and network-free, with no live OpenAI
+  calls.
+- `scripts/check_env.py` remains env/config validation only. It must not become
+  a live OpenAI ping and must not be treated as proof of live provider usability.
+- The smoke should assert provider-backed FastAPI `/v1/solve` success through
+  the OpenAI provider path.
+- The smoke should assert telemetry emits `provider.request.started` and
+  `provider.request.completed`.
+- The smoke should assert exactly one success-only `provider.cost.recorded`
+  event.
+- The smoke may use future pytest markers such as `live` and `openai`, but no
+  marker registration or test file is part of this spec/docs alignment PR.
+- The smoke must not expose API keys, Authorization headers, Bearer tokens, raw
+  prompts, raw system prompts, raw provider request/response payloads, raw
+  metadata dumps, env/config dumps, or raw exception strings.
+- The smoke must not claim or imply production readiness, budget enforcement,
+  fallback behavior, `provider.fallback.local` emission, CLI remote provider
+  execution, or portable solver remote provider execution.
+
+Out of scope for this contract: implementing the smoke test, registering pytest
+markers, changing workflows, changing `.env.example`, changing
+`scripts/check_env.py`, changing runtime/source code, adding live OpenAI calls,
+adding budget enforcement, adding local fallback, changing CLI provider behavior,
+or changing portable solver provider behavior.
+
+## 14. Test plan
 
 | Test area | Uses real API key? | Default CI? | Purpose | Required before merge? |
 | --- | --- | --- | --- | --- |
@@ -224,23 +263,23 @@ secret-bearing config values, or other secret-bearing fields.
 | Failure-mode tests | No | Yes | Prove auth, rate-limit, network, provider 5xx, invalid request, content filter, and unknown failures map to typed errors. | Yes |
 | Timeout tests | No | Yes | Prove bounded `timeout_ms` behavior and no hanging API tests using fake clocks/transports. | Yes |
 | Retry/backoff tests | No | Yes | Prove one attempt plus at most one retry for retryable failures and no retry for non-retryable failures. | Yes |
-| Budget/cost tests | No | Yes | Prove token usage, price hints, unknown cost handling, and before/after remote-call budget decisions. | Yes |
+| Budget/cost tests | No | Yes | Prove token usage, price hints, unknown cost handling, and success-only accounting boundaries without implying budget enforcement. | Yes |
 | Telemetry tests | No | Yes | Prove structured provider events include required safe fields and exclude prompt text/secrets by default. | Yes |
 | No-secret logging tests | No | Yes | Prove `OPENAI_API_KEY` values never appear in logs, dumps, telemetry, snapshots, traces, responses, or errors. | Yes |
 | Adapter prompt-rendering regression tests | No | Yes | Prove existing prompt adapters remain renderers and are not overloaded with provider execution. | Yes |
 | Prompt writer regression tests | No | Yes | Prove prompt writer paths remain local/offline and unchanged by provider execution. | Yes |
 | CLI smoke/regression tests | No | Yes | Prove package/root CLI and smoke paths remain local/offline initially. | Yes |
-| Optional live smoke test gated by env | Yes | No | Prove real OpenAI connectivity only when both `ALPHA_LIVE_OPENAI=1` and `OPENAI_API_KEY` are set. | No |
-| Replay determinism tests | No | Yes | Prove deterministic local fallback/replay behavior is preserved and provider failures do not destabilize replay. | Yes |
+| `LIVE-SMOKE-OPENAI-001` optional live smoke test gated by env | Yes | No | Prove provider-backed FastAPI `/v1/solve` success only when `ALPHA_LIVE_OPENAI=1`, non-empty `OPENAI_API_KEY`, and `MODEL_PROVIDER=openai` are explicitly set. | No |
+| Replay determinism tests | No | Yes | Prove deterministic local/replay behavior is preserved and provider failures do not destabilize replay; provider local fallback remains deferred unless separately implemented. | Yes |
 
-## 14. Dependency decision
+## 15. Dependency decision
 
 - Do not add dependencies in the spec-only PR.
 - For implementation, prefer existing `httpx` first unless the implementation spec explicitly chooses the official OpenAI SDK.
 - If the official SDK is later chosen, it must be pinned and mocked at the boundary.
 - No default live calls.
 
-## 15. Runtime readiness doc decision
+## 16. Runtime readiness doc decision
 
 - `docs/RUNTIME_READINESS.md` is useful after this provider spec.
 - It should not replace the spec.
