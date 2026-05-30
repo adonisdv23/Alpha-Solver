@@ -16,6 +16,8 @@ Alpha Solver is a reasoning/routing layer with optional MCP tool calls. It ships
 See [docs/OPERATING_GUIDE.md](docs/OPERATING_GUIDE.md) for the working
 process: roles, when specs are required, and how PRs are reviewed and merged.
 
+See [docs/OPERATOR_TECHNOLOGY_MANUAL.md](docs/OPERATOR_TECHNOLOGY_MANUAL.md) for the operator-facing manual that connects setup, architecture, runtime modes, tool roles, PR workflow, backlog workflow, and known gaps.
+
 See [docs/RUNTIME_READINESS.md](docs/RUNTIME_READINESS.md) for the current
 runtime status matrix: what works locally, what is env-validation only, what is
 mocked/simulated, and what remains future work.
