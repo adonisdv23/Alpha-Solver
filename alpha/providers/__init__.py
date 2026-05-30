@@ -15,6 +15,7 @@ from .accounting import (
 )
 from .fake import FakeProviderClient
 from .openai import OpenAIProviderClient
+from .safeout import build_provider_safe_out_body, provider_safe_out_status
 from .telemetry import (
     PROVIDER_REQUEST_COMPLETED,
     PROVIDER_REQUEST_FAILED,
@@ -39,6 +40,8 @@ __all__ = [
     "PROVIDER_REQUEST_STARTED",
     "PROVIDER_REQUEST_TIMEOUT",
     "build_provider_accounting_record",
+    "build_provider_safe_out_body",
+    "provider_safe_out_status",
     "build_provider_event",
     "emit_provider_accounting",
     "emit_provider_event",

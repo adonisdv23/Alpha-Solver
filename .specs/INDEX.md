@@ -33,6 +33,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 | `OBS-ALERTS-001.md` | CODE SPEC — OBS-ALERTS-001 · Prometheus Alerts + CI Validation (RES_Dash) |
 | `PROVIDER-BUDGET-001.md` | PROVIDER-BUDGET-001 · Post-call Provider Cost Accounting |
 | `PROVIDER-OPENAI-001.md` | PROVIDER-OPENAI-001 · Real OpenAI Provider Execution |
+| `PROVIDER-SAFEOUT-001.md` | PROVIDER-SAFEOUT-001 · Structured Provider SAFE-OUT Responses |
 | `RES-03.md` | CODE SPEC — RES-03 · Decision Rules & Scoring (RES) |
 | `RES-04.md` | CODE SPEC — RES-04 · Confidence & Budget Gates (RES) |
 | `RES-05.md` | CODE SPEC — RES-05 · Tool Adapters (Playwright, GSheets) — MVP stubs (RES) |

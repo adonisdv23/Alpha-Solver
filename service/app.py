@@ -54,9 +54,11 @@ from alpha.providers import (
     ProviderRequest,
     ProviderResult,
     build_provider_accounting_record,
+    build_provider_safe_out_body,
     build_provider_event,
     emit_provider_accounting,
     emit_provider_event,
+    provider_safe_out_status,
 )
 from service.models.modelset_registry import ModelSet, ModelSetRegistry
 from service.models.modelset_resolver import ModelSetResolver
@@ -363,31 +365,10 @@ def _provider_success_response(result: ProviderResult, model_set: ModelSet) -> D
     }
 
 
-def _provider_error_status(error: ProviderError) -> int:
-    return {
-        "missing_credentials": 503,
-        "auth": 502,
-        "rate_limit": 429,
-        "timeout": 504,
-        "network": 503,
-        "provider_5xx": 502,
-        "invalid_request": 400,
-        "content_filter": 400,
-        "unknown": 502,
-    }.get(error.category, 502)
-
-
 def _provider_error_response(error: ProviderError) -> JSONResponse:
     return JSONResponse(
-        status_code=_provider_error_status(error),
-        content={
-            "final_answer": f"SAFE-OUT: {error.safe_message}",
-            "error": {
-                "provider": error.provider,
-                "category": error.category,
-                "retryable": error.retryable,
-            },
-        },
+        status_code=provider_safe_out_status(error),
+        content=build_provider_safe_out_body(error),
     )
 
 

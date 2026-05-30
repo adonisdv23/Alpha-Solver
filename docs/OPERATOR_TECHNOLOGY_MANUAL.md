@@ -121,7 +121,7 @@ Alpha Solver intentionally keeps several entrypoint files because they serve dif
 
 Default CI makes no live OpenAI calls. Real live use requires a private `OPENAI_API_KEY`, compatible OpenAI account access, a supported model, network access, and operator acceptance that this path is not yet production-hardened.
 
-Minimal no-secret provider lifecycle telemetry exists for the explicit FastAPI `/v1/solve` OpenAI path. Successful OpenAI provider results also emit account-only post-call `provider.cost.recorded` records from already-computed provider usage/cost into a safe accounting sink. Follow-up work remains for hard/soft budget enforcement, preflight blocking, persistent budgets, billing integration, SAFE-OUT budget behavior, deeper SAFE-OUT and fallback orchestration, replay/determinism integration, dashboards/tracing hardening, optional gated live smoke tests, CLI budgeting, and portable solver changes.
+Minimal no-secret provider lifecycle telemetry exists for the explicit FastAPI `/v1/solve` OpenAI path. Successful OpenAI provider results also emit account-only post-call `provider.cost.recorded` records from already-computed provider usage/cost into a safe accounting sink. OpenAI provider failures on this path now return structured no-secret SAFE-OUT response normalization only; local fallback remains unimplemented/deferred, and `provider.fallback.local` must only be emitted if an actual fallback executes in a future implementation. Provider lifecycle telemetry semantics remain unchanged, provider cost accounting remains success-only, optional live OpenAI smoke testing remains future work, and production hardening remains future work.
 
 | Layer | Status | Notes |
 | --- | --- | --- |
@@ -363,7 +363,7 @@ Known gaps and future work include:
 
 - Provider budget enforcement, persistence, billing integration, and production cost controls; only account-only post-call `/v1/solve` OpenAI success-path accounting exists today.
 - Expanded provider observability beyond minimal `/v1/solve` OpenAI lifecycle events.
-- Provider SAFE-OUT and fallback hardening.
+- Provider local fallback hardening; structured provider SAFE-OUT response normalization exists for explicit `/v1/solve` OpenAI failures, but fallback execution and `provider.fallback.local` remain deferred.
 - Optional gated live OpenAI smoke test.
 - Model-set live usability and account access validation.
 - Rate-limit Redis/SlowAPI mismatch.
@@ -380,7 +380,7 @@ Do not claim live production readiness from placeholders, docs, fake tests, env 
 Ranked remaining roadmap:
 
 1. Provider budget enforcement, persistence, and production cost controls.
-2. Provider SAFE-OUT/fallback orchestration.
+2. Provider local fallback orchestration and `provider.fallback.local` emission only when actual fallback executes.
 3. Optional gated live OpenAI smoke test.
 4. Rate-limit/health placeholder cleanup.
 5. Metrics/Grafana/runtime hardening and expanded provider observability.
