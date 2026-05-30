@@ -8,7 +8,13 @@ import yaml
 
 from service.auth.jwt_utils import AuthKeyStore
 from service.config.loader import load_config
-from service.config.validators import validate
+from scripts.check_env import ALLOWED_PROVIDERS as CHECK_ENV_ALLOWED_PROVIDERS
+from service.config.validators import (
+    ALLOWED_PROVIDERS as CONFIG_ALLOWED_PROVIDERS,
+    INTERNAL_TEST_PROVIDERS,
+    USER_FACING_PROVIDERS,
+    validate,
+)
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -45,6 +51,24 @@ def test_load_and_validate_default():
     env = {"MODEL_PROVIDER": "openai", "OPENAI_API_KEY": "sk"}
     cfg = load_config(env=env)
     assert cfg["models"]["provider"] == "openai"
+    validate(cfg)
+
+
+def test_load_and_validate_local_provider():
+    cfg = load_config(env={"MODEL_PROVIDER": "local"})
+    assert cfg["models"]["provider"] == "local"
+    validate(cfg)
+
+
+def test_provider_validation_surfaces_do_not_drift():
+    assert USER_FACING_PROVIDERS == CHECK_ENV_ALLOWED_PROVIDERS
+    assert CONFIG_ALLOWED_PROVIDERS == CHECK_ENV_ALLOWED_PROVIDERS | INTERNAL_TEST_PROVIDERS
+    assert INTERNAL_TEST_PROVIDERS == {"dummy"}
+
+
+def test_internal_dummy_provider_is_test_only_but_valid_for_config():
+    cfg = load_config(env={"MODEL_PROVIDER": "dummy"})
+    assert cfg["models"]["provider"] == "dummy"
     validate(cfg)
 
 
@@ -124,6 +148,15 @@ def test_check_env_requires_model_provider():
     result = _run_check_env({"MODEL_PROVIDER": ""})
     assert result.returncode != 0
     assert "MODEL_PROVIDER" in result.stdout
+
+
+def test_check_env_unknown_provider_lists_allowed_values():
+    result = _run_check_env({"MODEL_PROVIDER": "foobar"})
+    assert result.returncode != 0
+    assert "Unknown MODEL_PROVIDER" in result.stdout
+    assert "Allowed values" in result.stdout
+    for provider in ("local", "none", "openai", "anthropic", "gemini", "google"):
+        assert provider in result.stdout
 
 
 def test_redaction(caplog):

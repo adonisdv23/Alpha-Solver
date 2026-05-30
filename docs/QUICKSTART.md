@@ -38,13 +38,15 @@ Copy the example environment file:
 cp .env.example .env
 ```
 
-Set `MODEL_PROVIDER` in `.env`:
+The example file defaults to the verified local/offline mode:
 
 ```bash
 MODEL_PROVIDER=local
 ```
 
-Use `local` for offline checks. For a real remote provider, set the matching API key as well:
+Use `local` for offline checks. `MODEL_PROVIDER=none` is also accepted for no-key local validation. Remote-provider modes currently validate required environment variables only; `python scripts/check_env.py` does not perform remote LLM API calls and does not prove remote provider usability.
+
+For provider-specific environment checks, set the matching key variable in your private `.env`:
 
 - `MODEL_PROVIDER=openai` requires `OPENAI_API_KEY`.
 - `MODEL_PROVIDER=anthropic` requires `ANTHROPIC_API_KEY`.
@@ -59,7 +61,7 @@ set +a
 python scripts/check_env.py
 ```
 
-For a local/offline validation without editing `.env`, run:
+For local/offline validation without editing `.env`, run:
 
 ```bash
 MODEL_PROVIDER=local python scripts/check_env.py
