@@ -154,13 +154,23 @@ ProviderError(
 
 ## 10. Telemetry
 
-Implementations must emit structured telemetry events without secrets:
+The first telemetry implementation is scoped to the FastAPI `/v1/solve` OpenAI
+branch only when `MODEL_PROVIDER=openai` is explicitly configured. Local/offline
+execution remains unchanged, and default CI must continue to use fake/mocked
+provider tests without credentials or live provider calls.
+
+The first implementation must emit structured provider lifecycle telemetry events
+without secrets:
 
 - `provider.request.started`
 - `provider.request.completed`
 - `provider.request.failed`
 - `provider.request.timeout`
-- `provider.fallback.local`
+
+`provider.fallback.local` is conditional/deferred. It must be emitted only when
+an actual local fallback path executes. It must not be emitted for the current
+FastAPI `/v1/solve` OpenAI provider error path, where provider errors are
+safe-normalized into SAFE-OUT responses rather than executing a local fallback.
 
 Telemetry payloads should include:
 
@@ -174,7 +184,16 @@ Telemetry payloads should include:
 - retry_count
 - request_id
 
-Prompt text is excluded by default unless a future explicit redaction policy allows sanitized prompt capture. Telemetry must not contain API keys, authorization headers, raw request bodies, full provider exception strings, or other secret-bearing fields.
+`retry_count` may be surfaced safely on `ProviderResult` and `ProviderError` with
+a default of `0`, or otherwise must be available to telemetry without exposing
+raw provider internals. This does not require a broad provider contract refactor.
+
+Prompt text and raw system prompt text are excluded by default unless a future
+explicit redaction policy allows sanitized prompt capture. Telemetry must not
+contain API keys, Authorization headers, raw provider request bodies, raw
+provider response bodies, full raw provider exception strings, raw prompt text by
+default, raw system prompt text by default, secret-bearing environment values,
+secret-bearing config values, or other secret-bearing fields.
 
 ## 11. SAFE-OUT and fallback
 
