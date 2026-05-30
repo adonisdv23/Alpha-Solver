@@ -204,7 +204,7 @@ python -m pytest tests/cli/test_alpha_solver_cli.py -q
 
 Use focused commands for the PR scope first. For docs-only changes, `git diff --check` plus existence or heading checks is usually enough unless the docs add or change runnable commands.
 
-Full `python -m pytest -q` is useful when practical, but do not overstate it. If a full run fails because of a known unrelated issue, such as Python 3.14 math AST compatibility, report the exact command, environment, and failure summary instead of hiding it.
+Full `python -m pytest -q` is useful when practical, but do not overstate it. If a full run fails because of a known unrelated issue, report the exact command, environment, and failure summary instead of hiding it.
 
 ## 12. Testing and Validation Workflow
 
@@ -359,7 +359,6 @@ Evidence should point back to repo artifacts: merged PRs, commit hashes, specs, 
 
 Known gaps and future work include:
 
-- Python 3.14 math AST compatibility.
 - Provider telemetry.
 - Provider budget/cost accounting.
 - Provider SAFE-OUT and fallback hardening.
@@ -378,15 +377,14 @@ Do not claim live production readiness from placeholders, docs, fake tests, env 
 
 Ranked remaining roadmap:
 
-1. Python 3.14 math compatibility.
-2. Provider telemetry.
-3. Provider budget/cost accounting.
-4. Provider SAFE-OUT/fallback orchestration.
-5. Optional gated live OpenAI smoke test.
-6. Rate-limit/health placeholder cleanup.
-7. Metrics/Grafana/runtime hardening.
-8. Simulated adapter live-readiness decisions.
-9. SDK/auth hardening.
+1. Provider telemetry.
+2. Provider budget/cost accounting.
+3. Provider SAFE-OUT/fallback orchestration.
+4. Optional gated live OpenAI smoke test.
+5. Rate-limit/health placeholder cleanup.
+6. Metrics/Grafana/runtime hardening.
+7. Simulated adapter live-readiness decisions.
+8. SDK/auth hardening.
 
 Decision rule:
 
@@ -416,7 +414,6 @@ Do not let credit pressure create broad manual edits, untested code changes, or 
 | Broad PRs mix docs, code, specs, tests, and CI. | Review becomes hard and regressions hide. | Split into narrow PRs. |
 | Workbook treated as repo truth. | Planning rows may be stale. | Confirm with repo files, PRs, commits, tests, and CI. |
 | Claude read-only mistaken for repo write access. | Drafts may be mistaken for committed changes. | Require branch, commit, PR URL, and CI evidence. |
-| Full pytest failure from known Python 3.14 issue. | A known unrelated issue can distract from the PR. | Report exact environment and failure, then scope a separate fix. |
 | Secrets pasted into prompts/logs. | Credentials can leak outside the repo. | Use placeholders and rotate any exposed secret. |
 | Portable solver edited as if disposable. | It is a behavior contract. | Touch only with explicit scope and review SAFE-OUT/routing/envelope effects. |
 | Prompt adapters mistaken for provider clients. | Prompt rendering can be confused with live provider execution. | Keep provider execution in provider client paths. |

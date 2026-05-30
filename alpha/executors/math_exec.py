@@ -20,15 +20,22 @@ _ALLOWED_UNARY = {
     ast.USub: lambda a: -a,
 }
 
+_LEGACY_NUM = getattr(ast, "Num", None)
+
+
+def _numeric(value: Any) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError("unsupported constant")
+    return float(value)
+
+
 def _eval(node: ast.AST) -> float:
     if isinstance(node, ast.Expression):
         return _eval(node.body)
     if isinstance(node, ast.Constant):
-        if isinstance(node.value, (int, float)):
-            return float(node.value)
-        raise ValueError("unsupported constant")
-    if isinstance(node, ast.Num):  # pragma: no cover
-        return float(node.n)
+        return _numeric(node.value)
+    if _LEGACY_NUM is not None and isinstance(node, _LEGACY_NUM):  # pragma: no cover
+        return _numeric(node.n)
     if isinstance(node, ast.BinOp):
         op_type = type(node.op)
         if op_type not in _ALLOWED_BINOPS:
