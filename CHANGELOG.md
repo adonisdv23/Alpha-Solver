@@ -20,6 +20,14 @@
 - AlphaSolver v2.2.6 P3 moved to `alpha.solver.observability` and is wrapped by the single `alpha-solver-v91-python` entrypoint.
 - Diagnostics now include scorer details, config snapshot and accounting summary.
 
+### Documentation
+- Synced the Operator & Technology Manual baseline refresh from PR #182 and the final post-placeholder-cleanup refresh from PR #187.
+- Recorded PR #183's initial `LIVE-SMOKE-OPENAI-001` contract and PR #185's alignment of that spec with the implemented skipped-by-default live smoke.
+- Captured PR #186's health/readiness and rate-limit placeholder truth cleanup, keeping `NEW-HEALTH-001` and `NEW-RATE-001` as future/placeholder targets rather than implemented richer dependency checks or Redis-backed rate limiting.
+
+### Tests
+- Recorded PR #184's skipped-by-default live OpenAI smoke test for FastAPI `/v1/solve` and the registered `live` / `openai` pytest markers; default pytest/CI remains credential-free and network-free, operator verification may still be pending, and any gated pass proves only that credentialed environment at that time.
+
 ## [2025-09-09]
 ### Added
 - SAFE-OUT v1.1 state machine with structured recovery and phased JSONL logging.
