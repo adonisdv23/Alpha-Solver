@@ -65,11 +65,21 @@ Implemented:
 - No-secret, allowlist-based telemetry/accounting/SAFE-OUT response
   construction.
 
-### 2.4 Not implemented
+### 2.4 Implemented, partial, and not implemented boundaries
+
+Implemented but gated/partial:
+
+- Optional gated live OpenAI smoke test for FastAPI `/v1/solve`; it is
+  skipped by default and requires explicit live credentials and
+  `ALPHA_LIVE_OPENAI=1`.
+- Basic service metrics endpoint and provider lifecycle/accounting events.
+- Lightweight local health/readiness probes for `/health` and `/ready`, plus
+  compatibility probes for `/healthz` and `/readyz`.
+- In-process service API rate limiting and in-memory tenant token-bucket/quota
+  limiting.
 
 Not implemented:
 
-- Optional gated live OpenAI smoke test.
 - Hard or soft budget enforcement.
 - Pre-call budget blocking.
 - Persistent tenant budgets.
@@ -78,10 +88,11 @@ Not implemented:
 - `provider.fallback.local` emission.
 - CLI remote provider execution.
 - Portable solver remote provider execution.
-- Production SLO enforcement.
+- Redis-backed tenant/global rate limiting or SlowAPI-style distributed
+  limiting.
+- Redis, VectorDB, or live-provider health/readiness pings.
+- Production SLO enforcement, dashboards/tracing, or production hardening.
 - Full replay/determinism integration for provider paths.
-- Expanded Prometheus/Grafana/OpenTelemetry provider observability.
-- Production hardening.
 
 ## 3. Source-of-Truth Hierarchy
 
@@ -328,31 +339,43 @@ Follow-up:
 - Structured provider SAFE-OUT responses.
 - Provider failure normalization.
 - Fake/mocked CI coverage.
+- Skipped-by-default live OpenAI smoke test at
+  `tests/providers/test_openai_live_smoke.py`.
 
 ### 7.2 What does not exist
 
-- Live OpenAI smoke test.
 - Production-readiness guarantee.
 - Live provider reliability guarantee.
 - Budget enforcement.
+- Budget persistence.
+- Billing integration.
 - Local fallback after provider failure.
 - `provider.fallback.local`.
 - CLI remote execution.
 - Portable solver remote execution.
+- Replay/determinism provider integration.
 
 ### 7.3 Current operator rule
 
 Passing `scripts/check_env.py` means configuration shape is valid. It does not
 mean OpenAI works live.
 
+The skipped-by-default live OpenAI smoke test exists, but operator live
+verification may still be pending unless it has been manually run with real
+credentials in the target environment. Passing that gated smoke proves only
+that the explicit FastAPI `/v1/solve` OpenAI provider path worked in that
+credentialed environment at that time; it is narrow evidence, not a production
+readiness claim.
+
 OpenAI live readiness requires:
 
 - valid `OPENAI_API_KEY`;
+- explicit `ALPHA_LIVE_OPENAI=1` for the gated smoke;
+- `MODEL_PROVIDER=openai`;
 - account access;
 - model access;
 - billing/quota;
-- network availability;
-- successful gated live test, once implemented.
+- network availability.
 
 ## 8. Runtime Readiness Summary
 
@@ -366,6 +389,23 @@ readiness row. `docs/RUNTIME_READINESS.md` remains the detailed source for:
 - placeholder/future features;
 - external-service requirements;
 - non-implemented surfaces.
+
+Current health/readiness behavior is lightweight and local. `/health` and
+`/ready` use `service/health.py` probes for adapter-registry JSON and
+model-provider import availability. `/healthz` and `/readyz` remain lightweight
+compatibility probes. Redis, VectorDB, and live-provider pings are not part of
+the current health/readiness contract; `NEW-HEALTH-001` remains a
+future/placeholder richer dependency-check target.
+
+Current rate limiting is also limited in scope. Service API rate limiting is
+in-process sliding-window behavior, and tenant limiting is in-memory
+token-bucket/quota behavior. Redis-backed tenant/global rate limiting,
+SlowAPI-style distributed limiting, and production-grade distributed quotas are
+not implemented; `NEW-RATE-001` remains a future/placeholder Redis-backed
+target.
+
+Basic metrics exist, but production observability dashboards/tracing and SLO
+enforcement remain future or partial.
 
 When runtime status changes, update Runtime Readiness first or in the same PR as
 this manual. Do not use this manual to create behavior that code does not
@@ -482,11 +522,10 @@ remains future work.
 
 ### 11.1 Near-term
 
-1. Optional gated OpenAI live smoke, Codex later.
-2. Backlog spreadsheet sync.
-3. Final Operator & Technology Manual refresh.
-4. Rate-limit/health placeholder cleanup.
-5. Expanded provider observability or metrics hardening.
+1. Backlog spreadsheet sync, if the operator requests ledger updates.
+2. Operator live verification of the skipped-by-default OpenAI smoke, if needed
+   in a credentialed target environment.
+3. Expanded provider observability or metrics hardening.
 
 ### 11.2 Later
 
@@ -496,7 +535,9 @@ remains future work.
 4. Replay/determinism integration.
 5. CLI remote provider execution.
 6. Portable solver provider integration, only if explicitly approved.
-7. Production SLO/hardening.
+7. Redis-backed rate limiting, if still desired.
+8. Richer health/readiness dependency checks, if still desired.
+9. Production SLO/hardening.
 
 Roadmap items are not blockers for current local/offline operation. They are
 known future lanes that should be scoped into narrow specs and PRs before
@@ -535,8 +576,10 @@ This manual is ready when:
 
 - It matches current repo state after the provider telemetry, accounting, and
   SAFE-OUT stabilization work reflected in Runtime Readiness.
-- It does not claim a live OpenAI smoke test exists unless implemented.
-- It says optional live smoke is planned/deferred.
+- It says the skipped-by-default live OpenAI smoke test exists, while operator
+  live verification may still be pending.
+- It treats live smoke success as narrow credentialed-environment evidence, not
+  production readiness.
 - It distinguishes specs from runtime truth.
 - It explains Codex, Claude, ChatGPT, GitHub, and manual editing roles.
 - It includes Claude session hygiene.
@@ -544,5 +587,6 @@ This manual is ready when:
 - It lists remaining roadmap items without turning them into blockers.
 - It avoids production-readiness overclaims.
 - It gives the operator a clear next action: keep default work local/offline,
-  use Codex for narrow PRs, update the backlog from repo evidence, and defer
-  live-provider proof until an explicitly gated smoke-test lane is implemented.
+  use Codex for narrow PRs, update the backlog from repo evidence only when
+  requested, and treat any live-provider proof as an explicitly gated manual
+  operation.
