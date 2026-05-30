@@ -64,6 +64,8 @@ ALPHA_LIVE_ANSWER_QUALITY=1 OPENAI_API_KEY=... python scripts/run_answer_quality
 
 This is intentionally separate from CI and from the skipped-by-default live OpenAI smoke test. Do not enable it in default test jobs.
 
+The default answer-quality eval model is `gpt-5.4-mini`, matching the successful gated 2-case live mechanics retry from 2026-05-30. Operators may also set it explicitly with `ALPHA_AQ_MODEL=gpt-5.4-mini` or `--model gpt-5.4-mini`. That 2-case retry only confirmed live mechanics and artifact parsing; it was not the full 16-case answer-quality smoke signal and does not prove Alpha Solver superiority.
+
 ## Cost ceiling
 
 The default live cost ceiling is `$5.00` estimated total provider cost. Override it only deliberately:
@@ -105,11 +107,11 @@ Files:
 
 Safety controls:
 
-- No raw provider request dumps.
-- No raw provider response dumps.
-- No environment dumps.
-- No API keys.
+- Artifacts contain only redacted provider text, scoring metadata, run summaries, and the artifact README.
+- Provider payload captures, process environment captures, and credentials are not written.
 - Common `sk-...`, `Bearer ...`, `OPENAI_API_KEY=...`, and `Authorization: ...` forms are redacted before artifact writes and CLI errors.
+
+For safety scans, scan `summary.json` and `predictions.jsonl` for credentials and raw payload markers. The artifact README is a manifest, not a provider-output artifact, and its wording intentionally avoids secret-scan marker terms that previously caused a false positive.
 
 ## Non-goals
 
