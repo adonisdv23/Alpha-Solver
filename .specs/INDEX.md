@@ -31,6 +31,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 | `NEW-HEALTH-001.md` | NEW-HEALTH-001 · Health Check Endpoints |
 | `NEW-RATE-001.md` | NEW-RATE-001 · API Rate Limiting |
 | `OBS-ALERTS-001.md` | CODE SPEC — OBS-ALERTS-001 · Prometheus Alerts + CI Validation (RES_Dash) |
+| `PROVIDER-OPENAI-001.md` | PROVIDER-OPENAI-001 · Real OpenAI Provider Execution |
 | `RES-03.md` | CODE SPEC — RES-03 · Decision Rules & Scoring (RES) |
 | `RES-04.md` | CODE SPEC — RES-04 · Confidence & Budget Gates (RES) |
 | `RES-05.md` | CODE SPEC — RES-05 · Tool Adapters (Playwright, GSheets) — MVP stubs (RES) |
