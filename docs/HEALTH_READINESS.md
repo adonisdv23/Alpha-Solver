@@ -1,13 +1,17 @@
 # Health & Readiness Endpoints
 
 Alpha Solver exposes lightweight liveness and readiness probes for use by
-orchestrators and load balancers.
+orchestrators and load balancers. This page documents the current service-layer
+runtime behavior in `service/health.py` and `service/app.py`, not the future
+`NEW-HEALTH-001` placeholder target.
 
 ## `/health`
 
 * **Method:** `GET`
 * **Purpose:** Liveness check. Returns the operational status of the service and
-  critical dependencies.
+  the current lightweight local probes. These probes check adapter-registry JSON
+  loadability and model-provider import availability; they do not check Redis,
+  VectorDB, or perform live provider pings.
 * **Response:**
 
 ```json
@@ -32,4 +36,7 @@ A non-OK status triggers a `503` response.
   the application is not yet marked ready.
 * **Response:** same schema as `/health`.
 
-Both endpoints complete in under 100 ms and never expose secrets or PII.
+Both endpoints complete in under 100 ms and never expose secrets or PII. The
+compatibility `/healthz` and `/readyz` endpoints in `service/app.py` remain
+lighter service-state probes and do not use the richer `/health`/`/ready`
+dependency payload.
