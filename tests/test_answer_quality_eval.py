@@ -60,6 +60,8 @@ def test_quality_gate_config_is_referenced():
 
     assert gate["primary_metric"] == "em"
     assert gate["max_cost_per_call"] == 0.01
+    assert gate["answer_quality_eval"]["minimum_margin"] == 0.05
+    assert aq.answer_quality_success_criteria(gate)["minimum_margin"] == 0.05
 
 
 def test_default_dry_run_needs_no_key_and_makes_no_provider_calls(monkeypatch, tmp_path):
@@ -111,10 +113,51 @@ def test_live_producer_calls_baseline_and_treatment_with_controlled_settings(mon
     assert baseline.seed == treatment.seed == aq.DEFAULT_SEED
     assert baseline.prompt == treatment.prompt
     assert baseline.system != treatment.system
+    assert aq.shared_project_context() in baseline.system
+    assert aq.shared_project_context() in treatment.system
+    assert "Alpha Solver operator discipline checklist" not in baseline.system
+    assert "Alpha Solver operator discipline checklist" in treatment.system
+    for shared_rule in (
+        "Source hierarchy",
+        "not wired live Tree-of-Thought",
+        "no-key/no-network defaults",
+        "evidence, not proof",
+        "provider.fallback.local are not implemented",
+        "do not edit backlog workbooks",
+    ):
+        assert shared_rule in baseline.system
+        assert shared_rule in treatment.system
     assert baseline.metadata["eval_arm"] == "baseline"
     assert treatment.metadata["eval_arm"] == "treatment"
     assert report["arms"]["baseline"]["accuracy"] == 1.0
     assert report["arms"]["treatment"]["accuracy"] == 1.0
+
+
+def test_label_parser_requires_unambiguous_first_line_label():
+    choices = ["OVERCLAIM", "SUPPORTED"]
+
+    assert aq.extract_label("OVERCLAIM\nReason", choices) == "OVERCLAIM"
+    assert aq.extract_label("Label: SUPPORTED\nReason", choices) == "SUPPORTED"
+    assert aq.extract_label("Not OVERCLAIM; the claim is SUPPORTED.", choices) is None
+    assert aq.extract_label("SUPPORTED or OVERCLAIM depending on interpretation", choices) is None
+    assert aq.extract_label("Reason: this is OVERCLAIM", choices) is None
+
+
+def test_negated_or_ambiguous_label_text_is_not_scored_correct():
+    case = aq.EvalCase(
+        id="parse-case",
+        category="runtime_overclaim_detection",
+        input="x",
+        choices=["OVERCLAIM", "SUPPORTED"],
+        gold_label="OVERCLAIM",
+        rubric="x",
+        dataset_version=aq.DATASET_VERSION,
+    )
+
+    assert aq.score_prediction("Not OVERCLAIM; probably SUPPORTED", case) == {
+        "label": None,
+        "correct": False,
+    }
 
 
 def test_artifact_redaction_excludes_secrets_and_raw_metadata(monkeypatch, tmp_path):

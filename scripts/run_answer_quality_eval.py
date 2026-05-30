@@ -48,7 +48,7 @@ DEFAULT_TIMEOUT_MS = 45_000
 DEFAULT_SEED = 123
 DEFAULT_COST_CEILING_USD = 5.00
 DEFAULT_PRICE_HINT = {"input_per_1k": 0.0015, "output_per_1k": 0.004}
-MIN_TREATMENT_MARGIN = 0.05
+DEFAULT_MIN_TREATMENT_MARGIN = 0.05
 REQUIRED_FIELDS = {"id", "category", "input", "choices", "gold_label", "rubric"}
 ALLOWED_CATEGORIES = {
     "runtime_overclaim_detection",
@@ -185,6 +185,37 @@ def load_quality_gate(path: Path) -> dict[str, Any]:
     return data
 
 
+def shared_project_context() -> str:
+    return (
+        "Shared Alpha Solver project context for both eval arms:\n"
+        "- Source hierarchy: direct user instructions and checked-in repo/spec docs outrank "
+        "external backlog ledgers, planning spreadsheets, marketing drafts, and convenience notes.\n"
+        "- Current /v1/solve OpenAI behavior: the live OpenAI path is a single provider "
+        "execute call, not wired live Tree-of-Thought or reasoning orchestration.\n"
+        "- Default behavior: local/offline and no-key/no-network defaults must be preserved; "
+        "live provider calls require explicit gates.\n"
+        "- Evidence framing: smoke tests and small evals are evidence, not proof of production "
+        "readiness or categorical model superiority.\n"
+        "- Current constraints: budget enforcement, budget persistence, billing integration, "
+        "local fallback after provider failure, and provider.fallback.local are not implemented.\n"
+        "- Workflow constraints: do not edit backlog workbooks unless explicitly requested; "
+        "do not expose secrets; do not treat simulated baseline token or latency behavior as "
+        "live answer-quality evidence."
+    )
+
+
+def answer_quality_success_criteria(quality_gate: dict[str, Any]) -> dict[str, Any]:
+    configured = quality_gate.get("answer_quality_eval")
+    minimum_margin = DEFAULT_MIN_TREATMENT_MARGIN
+    if isinstance(configured, dict) and "minimum_margin" in configured:
+        minimum_margin = float(configured["minimum_margin"])
+    return {
+        "metric": "treatment_accuracy_minus_baseline_accuracy",
+        "minimum_margin": minimum_margin,
+        "quality_gate_reference": str(QUALITY_GATE_DEFAULT.relative_to(ROOT)),
+    }
+
+
 def case_prompt(case: EvalCase) -> str:
     choices = ", ".join(case.choices)
     return (
@@ -199,17 +230,25 @@ def case_prompt(case: EvalCase) -> str:
 
 
 def baseline_system_prompt() -> str:
-    return "You are a careful assistant. Follow the user instructions and answer with the requested label."
+    return (
+        "You are a careful assistant. Use the shared project context below when it is relevant.\n\n"
+        f"{shared_project_context()}\n\n"
+        "Task instruction: return exactly one allowed label on the first line, then one concise reason."
+    )
 
 
 def treatment_system_prompt() -> str:
     return (
-        "You are applying the Alpha Solver operator-discipline treatment. Preserve source hierarchy: "
-        "direct user instructions and checked-in repo/spec docs outrank external backlog ledgers and drafts. "
-        "Use SAFE-OUT framing: avoid unsupported claims, do not infer production readiness from smoke evidence, "
-        "and state uncertainty when evidence is insufficient. Maintain workflow constraints: no default live calls, "
-        "no secret exposure, no backlog workbook edits unless explicitly requested, and no simulated baseline evidence. "
-        "For this eval, return exactly one allowed label on the first line, then one concise reason."
+        "You are applying the Alpha Solver operator-discipline treatment. Use the same shared project "
+        "context as the baseline, then apply the structured discipline checklist below.\n\n"
+        f"{shared_project_context()}\n\n"
+        "Alpha Solver operator discipline checklist:\n"
+        "1. Identify the controlling source in the prompt and reject lower-priority conflicts.\n"
+        "2. Check whether a claim overstates current implementation, evidence, readiness, or scope.\n"
+        "3. Preserve no-live, no-secret, no-workbook-edit, and no-simulated-evidence constraints.\n"
+        "4. Choose only from the allowed labels; if evidence is insufficient, prefer the label that "
+        "avoids unsupported claims.\n\n"
+        "Task instruction: return exactly one allowed label on the first line, then one concise reason."
     )
 
 
@@ -275,13 +314,18 @@ def build_request(case: EvalCase, *, arm: str, config: EvalConfig) -> ProviderRe
 
 def extract_label(text: str, choices: list[str]) -> str | None:
     first_line = text.strip().splitlines()[0].strip() if text.strip() else ""
-    normalized = re.sub(r"[^A-Za-z0-9_\-]", "", first_line).upper()
-    for choice in choices:
-        if normalized == choice.upper():
-            return choice
-    for choice in choices:
-        if re.search(rf"\b{re.escape(choice)}\b", text, re.IGNORECASE):
-            return choice
+    if not first_line:
+        return None
+    candidates = [first_line]
+    label_match = re.fullmatch(r"(?i)label\s*[:=]\s*(.+)", first_line)
+    if label_match:
+        candidates.append(label_match.group(1).strip())
+
+    for candidate in candidates:
+        normalized = re.sub(r"[^A-Za-z0-9_\-]", "", candidate).upper()
+        matches = [choice for choice in choices if normalized == choice.upper()]
+        if len(matches) == 1:
+            return matches[0]
     return None
 
 
@@ -327,7 +371,9 @@ def execute_arm(
 
 
 def summarize_predictions(
-    predictions: list[dict[str, Any]], cases: list[EvalCase]
+    predictions: list[dict[str, Any]],
+    cases: list[EvalCase],
+    success_criteria: dict[str, Any],
 ) -> dict[str, Any]:
     by_arm: dict[str, list[dict[str, Any]]] = {"baseline": [], "treatment": []}
     for prediction in predictions:
@@ -361,13 +407,9 @@ def summarize_predictions(
         "case_count": len(cases),
         "categories": sorted({case.category for case in cases}),
         "arms": arm_summary,
-        "pre_registered_success_criteria": {
-            "metric": "treatment_accuracy_minus_baseline_accuracy",
-            "minimum_margin": MIN_TREATMENT_MARGIN,
-            "quality_gate_reference": str(QUALITY_GATE_DEFAULT.relative_to(ROOT)),
-        },
+        "pre_registered_success_criteria": success_criteria,
         "observed_margin": observed_margin,
-        "success_criteria_met": observed_margin >= MIN_TREATMENT_MARGIN,
+        "success_criteria_met": observed_margin >= success_criteria["minimum_margin"],
     }
 
 
@@ -433,6 +475,7 @@ def run_eval(config: EvalConfig, *, client: ProviderClient | None = None) -> dic
     cases = load_cases(config.dataset, limit=config.limit)
     quality_gate = load_quality_gate(config.quality_gate)
     expected_cost = estimate_expected_cost(cases, config)
+    success_criteria = answer_quality_success_criteria(quality_gate)
     ensure_live_allowed(config, cases, expected_cost)
 
     if not config.live:
@@ -445,8 +488,7 @@ def run_eval(config: EvalConfig, *, client: ProviderClient | None = None) -> dic
             "quality_gate_reference": str(config.quality_gate.relative_to(ROOT)),
             "quality_gate_primary_metric": quality_gate.get("primary_metric"),
             "pre_registered_success_criteria": {
-                "metric": "treatment_accuracy_minus_baseline_accuracy",
-                "minimum_margin": MIN_TREATMENT_MARGIN,
+                **success_criteria,
                 "quality_gate_reference": str(config.quality_gate.relative_to(ROOT)),
             },
             "live_predictions_generated": False,
@@ -487,7 +529,7 @@ def run_eval(config: EvalConfig, *, client: ProviderClient | None = None) -> dic
                 )
             predictions.append(prediction)
 
-    summary = summarize_predictions(predictions, cases)
+    summary = summarize_predictions(predictions, cases, success_criteria)
     out_dir = write_artifacts(
         config=config,
         dataset_path=config.dataset,

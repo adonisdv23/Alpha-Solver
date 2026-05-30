@@ -1,6 +1,6 @@
 # EVAL-ANSWER-QUALITY-001: Gated MVP Answer Quality Eval
 
-Status: initial gated MVP implementation. This eval is a prompt-level treatment comparison unless a future change actually wires live reasoning orchestration onto `/v1/solve`.
+Status: gated MVP implementation with context-equalized arm design. This eval is a prompt-level treatment comparison unless a future change actually wires live reasoning orchestration onto `/v1/solve`.
 
 This eval produces smoke evidence, not proof. A passing run must not be described as production readiness, budget enforcement, fallback support, or proof that Alpha Solver is categorically better than a frontier model.
 
@@ -35,12 +35,14 @@ If a gold label is disputed, mark the row with `"disputed": true` or remove the 
 
 The runner uses the same provider primitive for both arms: `OpenAIProviderClient.execute(ProviderRequest(...))`.
 
+Both arms now receive the same shared Alpha Solver project context needed to answer the repo-native cases. That shared context includes source hierarchy, current `/v1/solve` OpenAI pass-through behavior, no-live/no-key defaults, evidence-not-proof framing, absent budget enforcement/billing/fallback support, no `provider.fallback.local`, no backlog workbook edits unless explicitly requested, no secret exposure, and no simulated baseline evidence. This fixes the context-confound risk where the treatment could win mainly because it had project rules that the baseline lacked.
+
 | Arm | Definition |
 | --- | --- |
-| Baseline | Raw/direct OpenAI with a minimal careful-assistant system prompt. |
-| Treatment | The same OpenAI model/settings plus the Alpha Solver operator-discipline system prompt: source hierarchy, SAFE-OUT framing, no unsupported claims, workflow constraints, no simulated evidence, no secret exposure, and no backlog workbook edits unless explicitly requested. |
+| Baseline | Direct OpenAI provider primitive with a careful-assistant system prompt, the shared project context, and the same output-format task instruction. |
+| Treatment | The same OpenAI model/settings, the same shared project context, and an additional Alpha Solver operator-discipline checklist that structures source selection, overclaim checks, workflow-constraint checks, and label selection. |
 
-Controlled settings include model, temperature, max tokens, seed value carried in `ProviderRequest`, input case order, redaction policy, and artifact schema. The current OpenAI client keeps seed in the provider request but does not send seed to the Responses API until endpoint support is validated.
+The intended treatment variable is structured operator discipline and checking behavior, not possession of project rules. Controlled settings include model, temperature, max tokens, seed value carried in `ProviderRequest`, input case order, redaction policy, artifact schema, and the user case prompt. The current OpenAI client keeps seed in the provider request but does not send seed to the Responses API until endpoint support is validated.
 
 ## Live gating and default behavior
 
@@ -83,9 +85,13 @@ These are pre-flight controls, not billing integration or budget enforcement.
 
 Primary smoke metric: treatment accuracy minus baseline accuracy.
 
-Pre-registered margin: treatment must beat baseline by at least `0.05` absolute accuracy on this dataset to count as a positive smoke signal.
+Pre-registered margin: treatment must beat baseline by at least `0.05` absolute accuracy on this dataset to count as a positive smoke signal. The operative answer-quality eval margin is mirrored in `config/quality_gate.yaml` under `answer_quality_eval.minimum_margin` so reports can cite an auditable gate source.
 
 The runner references `config/quality_gate.yaml` for existing quality-gate context but does not repurpose simulated `compare_baseline` token or latency behavior as answer-quality evidence.
+
+## Label parsing
+
+Scoring intentionally accepts only an unambiguous first-line label. The first line may be exactly an allowed label or `Label: <allowed label>`. The scorer does not search the full response body for broad fallback matches, because negated or ambiguous text such as `not OVERCLAIM` can otherwise be counted as a false positive. Outputs without a clear first-line label are scored as missing labels.
 
 ## Artifacts and safety
 
