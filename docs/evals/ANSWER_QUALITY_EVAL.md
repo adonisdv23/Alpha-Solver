@@ -18,7 +18,7 @@ Dataset: `datasets/answer_quality_operator_cases.jsonl`
 
 Version: `answer_quality_operator_cases_v0.1`
 
-The expanded case set for `EVAL-CASESET-EXPANSION-001` contains 48 Alpha Solver-native, gold-anchored cases across the same four categories, with 12 cases per category. The original 16 cases are preserved, including `aq-lane-003` as the historical simulated-vs-live evidence anchor, and 32 harder sibling cases add plausible near-miss choices and clearer rubrics:
+The expanded case set for `EVAL-CASESET-EXPANSION-001` contains 48 Alpha Solver-native, gold-anchored cases across the same four categories, with 12 cases per category. The original 16 case IDs are preserved, including `aq-lane-003` unchanged as the historical simulated-vs-live evidence anchor. The expanded siblings have been hardened before live eval to reduce label-token leakage, replace obvious distractors with plausible near misses, disambiguate runtime-readiness source labels, and keep rubrics aligned with single-label scoring:
 
 1. Runtime overclaim detection.
 2. Source hierarchy conflict detection.
