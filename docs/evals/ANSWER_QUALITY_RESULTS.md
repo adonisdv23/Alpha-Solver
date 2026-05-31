@@ -382,3 +382,24 @@ Known gaps:
 ## 29. Expanded 48-case conclusion
 
 A gated live repeatability eval (N=3, `gpt-5.4-mini`, the fixed 48-case Alpha Solver-native set, fair shared-context baseline vs operator-discipline treatment, `minimum_margin` 0.0625) was reported with three requested and three completed runs. As operator-reported, because the run artifact directory and archive were not present in the repo workspace and `artifacts/` is gitignored, per-run treatment-minus-baseline margins were 0.0208, 0.0, and 0.0, with mean 0.0069, stdev 0.0120, min 0.0, max 0.0208, and zero of three runs meeting the pre-registered 0.0625 margin. Forty-seven of the forty-eight cases were correct for both arms in every run; the only differentiating case was `aq-lane-003`, where baseline failed all three runs and treatment succeeded once. The expanded 48-case result is therefore inconclusive, negative against the pre-registered success gate, saturated for this model, and concentrated on a fragile single-case signal. It does not support Alpha Solver superiority, MVP validation, model superiority, orchestration validation, or production readiness. `EVAL-EXPANDED-REPEATABILITY-001` is functionally satisfied by the repeat-runs=3 live run, and additional live spending on the same 48-case set is not recommended. `MVP-THESIS-GATE-001` remains blocked/deferred pending a documented interpretation and a future decision about whether to scope a higher-headroom discriminating eval and/or `PROVIDER-REASONING-ORCHESTRATION-001`.
+
+## 30. MVP-THESIS-GATE-001 decision
+
+This section records the `MVP-THESIS-GATE-001` decision that sections 26 and 29 deferred to. It is a docs-only decision note. It does not change code, tests, datasets, config, workflows, generated artifacts, provider behavior, or runtime behavior, and it does not run any live eval.
+
+Decision: `MVP-THESIS-GATE-001` is deferred pending a higher-headroom discriminating eval. It is not validated and not rejected.
+
+- Not validated: the expanded 48-case live result was operator-reported, did not meet the pre-registered `0.0625` margin, and passed zero of three runs (sections 15, 21, 29).
+- Not rejected: the set was saturated, with 47 of 48 cases correct for both arms in every run (section 22), so the eval lacked the headroom to fairly test the MVP thesis. Saturation is inconclusive evidence, not a disproof.
+
+Unblock path, in order:
+
+1. `EVAL-ARTIFACT-PRESERVE-001`, so future live-eval directories and archives are citable rather than lost behind the `artifacts/` gitignore. This is a prerequisite for any future live eval.
+2. A higher-headroom, deliberately discriminating answer-quality eval with pre-registered criteria and preserved artifacts, sized to avoid saturation for `gpt-5.4-mini` or successor models.
+3. `PROVIDER-REASONING-ORCHESTRATION-001` remains an unstarted, unvalidated candidate to be scoped only as future analysis after the higher-headroom eval. This result does not validate, justify, or require orchestration.
+
+Do not spend more live budget on the fixed 48-case set, and do not treat dataset polishing as the next value lane. `EVAL-EXPANDED-REPEATABILITY-001` remains functionally satisfied by the repeat-runs=3 run (section 23).
+
+Operational note: the Alpha Solver MVP may be used only in a narrow, non-validated sense, in local/offline deterministic mode and explicitly opt-in OpenAI provider pass-through, under operator supervision, with no production, SLO, or budget-enforcement reliance. Such use must never be described as MVP validation.
+
+The forbidden claims in sections 10 and 25 remain in force: no Alpha Solver superiority, MVP validation, model superiority, orchestration validation, or production readiness; no repeatable treatment-margin pass on the fixed 48-case set; no treatment of operator-reported numbers as repo-artifact-backed; and no claim that `aq-lane-003` proves general treatment value.
