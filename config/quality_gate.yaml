@@ -5,4 +5,4 @@ max_cost_per_call: 0.01
 primary_metric: em
 answer_quality_eval:
   metric: treatment_accuracy_minus_baseline_accuracy
-  minimum_margin: 0.05
+  minimum_margin: 0.0625

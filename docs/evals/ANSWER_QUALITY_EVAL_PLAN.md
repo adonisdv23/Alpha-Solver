@@ -140,6 +140,8 @@ Phase 1 case sets should focus on tasks where Alpha Solver's operator discipline
 
 Recommended minimum: at least 10 unambiguous cases per category for an initial smoke signal, and at least 25 per category before treating the result as a meaningful MVP value signal. Each case should include a gold label or rubric expectation that can be adjudicated without knowing which system produced the answer.
 
+`EVAL-CASESET-EXPANSION-001` expands the implemented answer-quality operator dataset to 48 cases, preserving the original 16 and targeting 12 cases in each of the four currently implemented categories: runtime overclaim detection, source hierarchy conflict detection, lane selection, and backlog impact classification. This is still a smoke-evidence dataset, not an MVP-validation dataset; `MVP-THESIS-GATE-001` remains blocked until expanded live results are run, stable, and interpreted without superiority or production-readiness overclaims.
+
 ## Minimal Phase 1 component needed
 
 Add a real prediction-producer, not a parallel eval framework. It should:
@@ -168,6 +170,7 @@ Add a real prediction-producer, not a parallel eval framework. It should:
 ### 2. Pre-registered success criteria
 
 - Define the margin that counts as better before running the live eval.
+- For the 48-case `EVAL-CASESET-EXPANSION-001` dataset, use `0.0625` absolute treatment-minus-baseline accuracy as the pre-registered margin, equivalent to at least 3 net cases out of 48.
 - Start from `config/quality_gate.yaml` where metrics map cleanly: for example, exact/gold accuracy should meet or exceed the configured `min_accuracy` if the case set is mature enough.
 - For the initial small MVP signal, pre-register both absolute and relative criteria, such as treatment accuracy >= baseline accuracy + an agreed margin on gold tasks, no regression in safety/constraint violations, and cost/latency within a declared ceiling.
 - If a task-specific metric does not map to the current quality-gate keys, document that exception in the result artifact rather than silently inventing proof.
