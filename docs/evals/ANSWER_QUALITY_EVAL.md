@@ -66,6 +66,35 @@ This is intentionally separate from CI and from the skipped-by-default live Open
 
 The default answer-quality eval model is `gpt-5.4-mini`, matching the successful gated 2-case live mechanics retry from 2026-05-30. Operators may also set it explicitly with `ALPHA_AQ_MODEL=gpt-5.4-mini` or `--model gpt-5.4-mini`. That 2-case retry only confirmed live mechanics and artifact parsing; it was not the full 16-case answer-quality smoke signal and does not prove Alpha Solver superiority.
 
+
+## Repeatability mode
+
+`EVAL-REPEATABILITY-001` adds opt-in repeatability around the same runner rather than a new eval framework. Use `--repeat-runs N` with `N > 1` to run the existing answer-quality eval repeatedly and write an aggregate summary.
+
+No-live repeatability remains the default and makes no provider calls:
+
+```bash
+env -u OPENAI_API_KEY -u ALPHA_LIVE_ANSWER_QUALITY python scripts/run_answer_quality_eval.py --artifact-root /tmp/aq_repeatability_no_live_repeat --limit 2 --repeat-runs 3
+```
+
+Live repeatability requires all live gates plus an explicit repeat count:
+
+```bash
+ALPHA_LIVE_ANSWER_QUALITY=1 OPENAI_API_KEY=... python scripts/run_answer_quality_eval.py --live --repeat-runs 5 --cost-ceiling-usd 5.00
+```
+
+Before live repeatability makes provider calls, the runner estimates the cost of one complete two-arm eval and multiplies it by the requested repeat count. It refuses live repeatability before the first provider call when the estimated total exceeds `--cost-ceiling-usd`. During live repeatability, each completed run keeps its own artifact subdirectory, and the runner also tracks returned known cost estimates so an interrupted or cost-aborted repeatability attempt records how many runs completed and why it stopped.
+
+Repeatability artifacts are written under `artifacts/eval/answer_quality/<timestamp>_repeatability/` unless `--artifact-root` is overridden. The aggregate file is `repeatability_summary.json`; each run is preserved below `run_001/`, `run_002/`, and so on. The aggregate includes requested and completed run counts, per-run baseline accuracy, treatment accuracy, observed margin, mean margin, margin standard deviation when at least two scored runs exist, min/max spread, success count by run, per-case hit rates by arm, dedicated `aq-lane-003` tracking, an evidence-not-proof disclaimer, and a concise stability field.
+
+Interpret `apparent_treatment_advantage_stability` narrowly:
+
+- `stable` means every completed scored repeatability run met the pre-registered margin. This is still evidence, not proof.
+- `unstable` means at least one completed scored run met the margin and at least one did not.
+- `inconclusive` means there were no scored runs, only one scored run, or no repeatable treatment-margin pass.
+
+Repeatability measures run-to-run variability in this small 16-case smoke eval. It must not be used to claim Alpha Solver superiority, MVP validation, production readiness, or a completed case-set expansion.
+
 ## Cost ceiling
 
 The default live cost ceiling is `$5.00` estimated total provider cost. Override it only deliberately:

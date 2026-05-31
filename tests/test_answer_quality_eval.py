@@ -223,3 +223,123 @@ def test_disputed_cases_are_rejected(tmp_path):
 
     with pytest.raises(ValueError, match="marked disputed"):
         aq.load_cases(dataset)
+
+
+def test_no_live_repeatability_writes_aggregate_without_provider_calls(monkeypatch, tmp_path):
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv("ALPHA_LIVE_ANSWER_QUALITY", raising=False)
+    client = RecordingClient(["OVERCLAIM"])
+
+    report = aq.run_repeatability(_config(tmp_path, limit=2), repeat_runs=3, client=client)
+
+    assert report["mode"] == "answer_quality_repeatability"
+    assert report["requested_runs"] == 3
+    assert report["completed_runs"] == 3
+    assert report["live"] is False
+    assert report["mean_margin"] is None
+    assert report["margin_stddev"] is None
+    assert report["apparent_treatment_advantage_stability"] == "inconclusive"
+    assert "evidence" in report["conclusion"].lower()
+    assert "proof" in report["disclaimer"].lower()
+    assert client.requests == []
+
+    artifact_dir = Path(report["artifact_dir"])
+    assert (artifact_dir / "repeatability_summary.json").exists()
+    assert (artifact_dir / "README.txt").exists()
+    assert len(list(artifact_dir.glob("run_*/**/summary.json"))) == 3
+    assert report["tracked_case"]["case_id"] == "aq-lane-003"
+    assert report["tracked_case"]["by_arm"]["baseline"]["hit_rate"] is None
+
+
+def test_live_repeatability_aggregates_per_run_case_hits_and_tracked_case(monkeypatch, tmp_path):
+    monkeypatch.setenv("ALPHA_LIVE_ANSWER_QUALITY", "1")
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-test-secret-value")
+    dataset = tmp_path / "tracked_cases.jsonl"
+    dataset.write_text(
+        "\n".join(
+            [
+                json.dumps(
+                    {
+                        "id": "aq-runtime-001",
+                        "category": "runtime_overclaim_detection",
+                        "input": "x",
+                        "choices": ["OVERCLAIM", "SUPPORTED"],
+                        "gold_label": "OVERCLAIM",
+                        "rubric": "x",
+                        "dataset_version": aq.DATASET_VERSION,
+                    }
+                ),
+                json.dumps(
+                    {
+                        "id": "aq-lane-003",
+                        "category": "lane_selection",
+                        "input": "x",
+                        "choices": [
+                            "LIVE_GATED_PROVIDER_PREDICTIONS",
+                            "SIMULATED_COMPARE_BASELINE",
+                        ],
+                        "gold_label": "LIVE_GATED_PROVIDER_PREDICTIONS",
+                        "rubric": "x",
+                        "dataset_version": aq.DATASET_VERSION,
+                    }
+                ),
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    config = aq.EvalConfig(
+        dataset=dataset,
+        quality_gate=aq.QUALITY_GATE_DEFAULT,
+        artifact_root=tmp_path / "artifacts",
+        live=True,
+    )
+    client = RecordingClient(
+        [
+            "OVERCLAIM\nReason",
+            "OVERCLAIM\nReason",
+            "LIVE_GATED_PROVIDER_PREDICTIONS\nReason",
+            "LIVE_GATED_PROVIDER_PREDICTIONS\nReason",
+            "OVERCLAIM\nReason",
+            "OVERCLAIM\nReason",
+            "LIVE_GATED_PROVIDER_PREDICTIONS\nReason",
+            "SIMULATED_COMPARE_BASELINE\nReason",
+        ]
+    )
+
+    report = aq.run_repeatability(config, repeat_runs=2, client=client)
+
+    assert report["requested_runs"] == 2
+    assert report["completed_runs"] == 2
+    assert len(client.requests) == 8
+    assert [row["baseline_accuracy"] for row in report["per_run"]] == [1.0, 1.0]
+    assert [row["treatment_accuracy"] for row in report["per_run"]] == [1.0, 0.5]
+    assert [row["observed_margin"] for row in report["per_run"]] == [0.0, -0.5]
+    assert report["mean_margin"] == -0.25
+    assert report["margin_min"] == -0.5
+    assert report["margin_max"] == 0.0
+    assert report["margin_stddev"] is not None
+    assert report["success_count_by_run"] == 0
+    first_case = report["per_case_hit_rates_by_arm"]["aq-runtime-001"]
+    assert first_case["baseline"]["hit_rate"] == 1.0
+    assert first_case["treatment"]["hit_rate"] == 1.0
+    tracked = report["tracked_case"]["by_arm"]
+    assert tracked["baseline"]["hit_rate"] == 1.0
+    assert tracked["treatment"]["hit_rate"] == 0.5
+    assert report["apparent_treatment_advantage_stability"] == "inconclusive"
+
+
+def test_live_repeatability_total_cost_ceiling_refuses_before_provider_call(monkeypatch, tmp_path):
+    monkeypatch.setenv("ALPHA_LIVE_ANSWER_QUALITY", "1")
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-test-secret-value")
+    client = RecordingClient(["OVERCLAIM"])
+
+    report = aq.run_repeatability(
+        _config(tmp_path, live=True, limit=1, ceiling=0.000001), repeat_runs=3, client=client
+    )
+
+    assert report["requested_runs"] == 3
+    assert report["completed_runs"] == 0
+    assert "estimated cost" in report["stopped_reason"]
+    assert client.requests == []
+    assert (Path(report["artifact_dir"]) / "repeatability_summary.json").exists()
