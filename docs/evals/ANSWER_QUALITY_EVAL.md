@@ -18,14 +18,14 @@ Dataset: `datasets/answer_quality_operator_cases.jsonl`
 
 Version: `answer_quality_operator_cases_v0.1`
 
-The initial case set contains 16 Alpha Solver-native, gold-anchored cases across four categories:
+The expanded case set for `EVAL-CASESET-EXPANSION-001` contains 48 Alpha Solver-native, gold-anchored cases across the same four categories, with 12 cases per category. The original 16 cases are preserved, including `aq-lane-003` as the historical simulated-vs-live evidence anchor, and 32 harder sibling cases add plausible near-miss choices and clearer rubrics:
 
 1. Runtime overclaim detection.
 2. Source hierarchy conflict detection.
 3. Lane selection.
 4. Backlog impact classification.
 
-Each row has an unambiguous `gold_label`, a closed `choices` list, and a short rubric. Generic trivia is intentionally excluded.
+Each row has an unambiguous `gold_label`, a closed `choices` list, and a short rubric. Generic trivia is intentionally excluded. Several expanded-set lane-selection cases use three plausible choices to test discipline around simulated-vs-live evidence, dry-run artifacts versus live predictions, mocked tests versus real provider viability, heuristic scorer output versus gold-label live comparison, environment validation versus live API usability, and artifact existence versus preserved per-case live evidence.
 
 ### Disputed gold-label rule
 
@@ -64,7 +64,7 @@ ALPHA_LIVE_ANSWER_QUALITY=1 OPENAI_API_KEY=... python scripts/run_answer_quality
 
 This is intentionally separate from CI and from the skipped-by-default live OpenAI smoke test. Do not enable it in default test jobs.
 
-The default answer-quality eval model is `gpt-5.4-mini`, matching the successful gated 2-case live mechanics retry from 2026-05-30. Operators may also set it explicitly with `ALPHA_AQ_MODEL=gpt-5.4-mini` or `--model gpt-5.4-mini`. That 2-case retry only confirmed live mechanics and artifact parsing; it was not the full 16-case answer-quality smoke signal and does not prove Alpha Solver superiority.
+The default answer-quality eval model is `gpt-5.4-mini`, matching the successful gated 2-case live mechanics retry from 2026-05-30. Operators may also set it explicitly with `ALPHA_AQ_MODEL=gpt-5.4-mini` or `--model gpt-5.4-mini`. That 2-case retry only confirmed live mechanics and artifact parsing; it was not the full answer-quality smoke signal and does not prove Alpha Solver superiority.
 
 
 ## Repeatability mode
@@ -93,7 +93,7 @@ Interpret `apparent_treatment_advantage_stability` narrowly:
 - `unstable` means at least one completed scored run met the margin and at least one did not.
 - `inconclusive` means there were no scored runs, only one scored run, or no repeatable treatment-margin pass.
 
-Repeatability measures run-to-run variability in this small 16-case smoke eval. It must not be used to claim Alpha Solver superiority, MVP validation, production readiness, or a completed case-set expansion.
+Repeatability measures run-to-run variability in the gated smoke eval. It must not be used to claim Alpha Solver superiority, MVP validation, production readiness, or completed expanded-set live validation until an approved live run produces stable evidence.
 
 ## Cost ceiling
 
@@ -116,7 +116,7 @@ These are pre-flight controls, not billing integration or budget enforcement.
 
 Primary smoke metric: treatment accuracy minus baseline accuracy.
 
-Pre-registered margin: treatment must beat baseline by at least `0.05` absolute accuracy on this dataset to count as a positive smoke signal. The operative answer-quality eval margin is mirrored in `config/quality_gate.yaml` under `answer_quality_eval.minimum_margin` so reports can cite an auditable gate source.
+Pre-registered expanded-set margin: treatment must beat baseline by at least `0.0625` absolute accuracy on the 48-case dataset to count as a positive smoke signal. That margin is equivalent to at least 3 net cases out of 48, making it meaningful relative to case resolution while preserving evidence-not-proof framing. The operative answer-quality eval margin is mirrored in `config/quality_gate.yaml` under `answer_quality_eval.minimum_margin` so reports can cite an auditable gate source.
 
 The runner references `config/quality_gate.yaml` for existing quality-gate context but does not repurpose simulated `compare_baseline` token or latency behavior as answer-quality evidence.
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from collections import Counter
 from pathlib import Path
 
 import pytest
@@ -44,15 +45,82 @@ def _config(tmp_path: Path, *, live: bool = False, limit: int | None = None, cei
 def test_dataset_schema_is_gold_anchored_and_category_limited():
     cases = aq.load_cases(aq.DATASET_DEFAULT)
 
-    assert len(cases) == 16
+    assert len(cases) == 48
     assert {case.category for case in cases} == {
         "runtime_overclaim_detection",
         "source_hierarchy_conflict_detection",
         "lane_selection",
         "backlog_impact_classification",
     }
+    assert Counter(case.category for case in cases) == {
+        "runtime_overclaim_detection": 12,
+        "source_hierarchy_conflict_detection": 12,
+        "lane_selection": 12,
+        "backlog_impact_classification": 12,
+    }
     assert all(case.gold_label in case.choices for case in cases)
     assert all(case.dataset_version == aq.DATASET_VERSION for case in cases)
+
+
+def test_dataset_has_unique_ids_and_harder_multichoice_cases():
+    cases = aq.load_cases(aq.DATASET_DEFAULT)
+    ids = [case.id for case in cases]
+
+    assert len(ids) == len(set(ids)) == 48
+    assert sum(len(case.choices) >= 3 for case in cases) >= 12
+
+
+def test_original_cases_are_preserved_and_tracked_anchor_is_unchanged():
+    rows = [
+        json.loads(line)
+        for line in aq.DATASET_DEFAULT.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    by_id = {row["id"]: row for row in rows}
+
+    assert {f"aq-overclaim-{idx:03d}" for idx in range(1, 5)} <= set(by_id)
+    assert {f"aq-source-{idx:03d}" for idx in range(1, 5)} <= set(by_id)
+    assert {f"aq-lane-{idx:03d}" for idx in range(1, 5)} <= set(by_id)
+    assert {f"aq-backlog-{idx:03d}" for idx in range(1, 5)} <= set(by_id)
+    assert by_id["aq-lane-003"] == {
+        "id": "aq-lane-003",
+        "category": "lane_selection",
+        "input": "Task: compare raw OpenAI against operator prompt treatment. Existing alpha/eval harness has simulated compare_baseline token savings. Which evidence lane is valid?",
+        "choices": ["LIVE_GATED_PROVIDER_PREDICTIONS", "SIMULATED_COMPARE_BASELINE"],
+        "gold_label": "LIVE_GATED_PROVIDER_PREDICTIONS",
+        "rubric": "Simulated compare_baseline token/latency behavior must not be used as real answer-quality evidence.",
+        "dataset_version": aq.DATASET_VERSION,
+    }
+
+
+def test_simulated_vs_live_sibling_cases_are_present():
+    cases = aq.load_cases(aq.DATASET_DEFAULT)
+    by_id = {case.id: case for case in cases}
+
+    expected_siblings = {
+        "aq-lane-003",
+        "aq-lane-005",
+        "aq-lane-006",
+        "aq-lane-007",
+        "aq-lane-008",
+        "aq-lane-009",
+        "aq-lane-010",
+    }
+    assert expected_siblings <= set(by_id)
+    joined = "\n".join(
+        f"{by_id[case_id].input} {by_id[case_id].rubric}"
+        for case_id in expected_siblings
+    )
+    for phrase in (
+        "simulated",
+        "dry-run",
+        "mocked",
+        "heuristic",
+        "environment validation",
+        "artifact presence",
+        "live",
+    ):
+        assert phrase in joined.lower()
 
 
 def test_quality_gate_config_is_referenced():
@@ -60,8 +128,8 @@ def test_quality_gate_config_is_referenced():
 
     assert gate["primary_metric"] == "em"
     assert gate["max_cost_per_call"] == 0.01
-    assert gate["answer_quality_eval"]["minimum_margin"] == 0.05
-    assert aq.answer_quality_success_criteria(gate)["minimum_margin"] == 0.05
+    assert gate["answer_quality_eval"]["minimum_margin"] == 0.0625
+    assert aq.answer_quality_success_criteria(gate)["minimum_margin"] == 0.0625
 
 
 def test_default_model_uses_known_working_live_mini_model(monkeypatch):
