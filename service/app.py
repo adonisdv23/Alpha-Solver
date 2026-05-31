@@ -700,7 +700,6 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
                 preview_request = replace(
                     provider_request,
                     prompt=_expert_step_one_prompt(query),
-                    system=None,
                 )
                 preview_result = _execute_provider_call(
                     request=request,
@@ -711,7 +710,6 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
                 answer_request = replace(
                     provider_request,
                     prompt=_expert_step_two_prompt(query, preview),
-                    system=None,
                 )
                 answer_result = _execute_provider_call(
                     request=request,

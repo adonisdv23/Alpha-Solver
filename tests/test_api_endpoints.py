@@ -505,6 +505,41 @@ def test_solve_openai_expert_complex_route_makes_two_calls_and_returns_envelope(
     _clear_provider_factory()
 
 
+def test_solve_openai_expert_complex_route_preserves_system_prompt(monkeypatch):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    fake = FakeProviderClient(
+        [
+            _provider_result(
+                '{"considerations":["Follow caller constraints"],'
+                '"assumptions":["System instruction remains authoritative"],'
+                '"confidence":0.8}'
+            ),
+            _provider_result("Answer constrained by system prompt."),
+        ]
+    )
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+    system_prompt = "You must answer in exactly two bullet points."
+
+    resp = client.post(
+        "/v1/solve",
+        json={
+            "query": (
+                "Review this security migration plan, compare risks and tradeoffs, "
+                "and decide whether the team should proceed this quarter."
+            ),
+            "context": {"route": "expert", "system": system_prompt},
+        },
+        headers={"X-API-Key": key, "X-Request-ID": "req-expert-system"},
+    )
+
+    assert resp.status_code == 200
+    assert len(fake.requests) == 2
+    assert fake.requests[0].system == system_prompt
+    assert fake.requests[1].system == system_prompt
+    _clear_provider_factory()
+
+
 def test_solve_openai_expert_trivial_route_makes_one_direct_call(monkeypatch):
     monkeypatch.setenv("MODEL_PROVIDER", "openai")
     fake = FakeProviderClient([_provider_result("Short direct answer.")])
