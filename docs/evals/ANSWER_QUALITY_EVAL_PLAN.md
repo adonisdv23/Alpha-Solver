@@ -151,6 +151,7 @@ Add a real prediction-producer, not a parallel eval framework. It should:
 - Save redacted outputs as JSONL rows compatible with the existing scorer/rubric conventions, then feed those rows into `alpha/eval` and/or scenario-rubric scoring.
 - Record actual token usage, latency, model, model_set, temperature, max_tokens, seed support, treatment version, dataset version, and cost estimate when available.
 - Include a result disclaimer: results are evidence, not proof, and may vary with model snapshots, prompts, case selection, and live-provider conditions.
+- For repeatability checks, rerun the same gated prediction producer multiple times with preserved per-run artifacts and an aggregate summary; this measures run-to-run variability and must not be framed as proof of superiority.
 
 ## Required Phase 1 rigor
 
