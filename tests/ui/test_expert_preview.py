@@ -246,6 +246,38 @@ def test_urlencoded_submission_extracts_prompt_and_preserves_it(client: TestClie
     assert len(fake.requests) == 2
 
 
+def test_local_provider_expert_preview_ignores_route_context(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    csrf_token = _login(client)
+    monkeypatch.setenv("MODEL_PROVIDER", "local")
+    client.app.state.provider_client_factory = lambda _model_set: (_ for _ in ()).throw(
+        AssertionError("provider should not be used in local mode")
+    )
+    calls: list[str] = []
+
+    def fake_solver(query: str) -> dict[str, str]:
+        calls.append(query)
+        label = "plain" if len(calls) == 1 else "expert"
+        return {"final_answer": f"local {label}: {query}"}
+
+    monkeypatch.setattr("service.app._tree_of_thought", fake_solver)
+    prompt = "Define alpha in one sentence."
+
+    response = client.post(
+        "/dashboard/expert-preview",
+        data={"prompt": prompt},
+        headers={auth.CSRF_HEADER_NAME: csrf_token},
+    )
+
+    assert response.status_code == 200
+    html = response.text
+    assert "local plain: Define alpha in one sentence." in html
+    assert "local expert: Define alpha in one sentence." in html
+    assert f'<textarea id="prompt" name="prompt" required>{prompt}</textarea>' in html
+    assert calls == [prompt, prompt]
+
+
 def test_json_submission_still_extracts_prompt(client: TestClient) -> None:
     csrf_token = _login(client)
     fake = _install_successful_fake(client)

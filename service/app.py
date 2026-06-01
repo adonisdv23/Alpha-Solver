@@ -452,6 +452,24 @@ _CONFIDENCE_RE = re.compile(r"(?i)confidence[^0-9%]*(\d+(?:\.\d+)?)\s*(%)?")
 _PERCENT_RE = re.compile(r"(\d+(?:\.\d+)?)\s*%")
 
 
+_LOCAL_SOLVER_CONTEXT_CONTROL_KEYS = frozenset({"route"})
+
+
+def _local_solver_params(params: Dict[str, Any]) -> Dict[str, Any]:
+    """Return context kwargs safe for the deterministic local solver.
+
+    ``context.route`` is a service/provider routing seam.  The local solver does
+    not accept it as a runtime knob, so strip it before forwarding request
+    context into the local/offline implementation.
+    """
+
+    return {
+        key: value
+        for key, value in params.items()
+        if key not in _LOCAL_SOLVER_CONTEXT_CONTROL_KEYS
+    }
+
+
 def _is_expert_route(params: Dict[str, Any]) -> bool:
     return str(params.get("route", "")).strip().lower() == "expert"
 
@@ -898,7 +916,7 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
         max_steps = params.get("max_steps", 2)
         result = run_react_lite(query, seed=seed, max_steps=max_steps)
     else:
-        result = _tree_of_thought(query, **params)
+        result = _tree_of_thought(query, **_local_solver_params(params))
     duration_ms = (time.time() - start) * 1000
     cost = duration_ms * cfg.cost_per_ms
     _record_cost(duration_ms, cost)
