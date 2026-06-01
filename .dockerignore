@@ -1,0 +1,36 @@
+# VCS and local developer state
+.git
+.gitignore
+.gitattributes
+.venv
+venv
+.env
+.env.*
+!.env.example
+
+# Python caches and test/build outputs
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Local/generated runtime artifacts that should not be baked into preview images
+artifacts/
+logs/
+telemetry/
+*.log
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
