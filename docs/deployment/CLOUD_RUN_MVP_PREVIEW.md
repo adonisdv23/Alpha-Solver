@@ -292,7 +292,8 @@ configures successful login to redirect directly to `/dashboard/expert-preview`;
 3. Confirm health, auth redirect, login, CSRF rejection, CSRF success, preview render, and safety checks.
 4. Deploy to Cloud Run with `MODEL_PROVIDER=local`.
 5. Repeat the Cloud Run smoke checklist.
-6. Record results in the PR/release notes or operator handoff notes without adding MVP validation or production-readiness claims.
+6. For behavioral comparison after smoke passes, use `docs/OPERATOR_BEHAVIORAL_DEMO_CHECKLIST.md`.
+7. Record results in the PR/release notes or operator handoff notes without adding MVP validation or production-readiness claims.
 
 ## 12. Held live OpenAI workflow
 
