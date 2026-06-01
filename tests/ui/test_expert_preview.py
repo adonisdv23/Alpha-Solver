@@ -58,6 +58,27 @@ def _login(client: TestClient) -> str:
     return csrf_token
 
 
+def _assert_successful_preview_response(html: str, prompt: str) -> None:
+    assert "plain same-provider answer" in html
+    assert "Alpha Solver expert preview" in html
+    assert f'<textarea id="prompt" name="prompt" required>{prompt}</textarea>' in html
+
+
+def _install_successful_fake(client: TestClient) -> FakeProviderClient:
+    fake = FakeProviderClient(
+        [
+            _provider_result("plain same-provider answer"),
+            _provider_result(
+                '{"considerations":["Check timeline risk"],'
+                '"assumptions":["Budget is constrained"],"confidence":0.35}'
+            ),
+            _provider_result("draft expert answer that clarify mode replaces"),
+        ]
+    )
+    client.app.state.provider_client_factory = lambda _model_set: fake
+    return fake
+
+
 def test_expert_preview_requires_authentication(client: TestClient) -> None:
     response = client.get("/dashboard/expert-preview", follow_redirects=False)
 
@@ -189,6 +210,119 @@ def test_preview_submission_handles_unstructured_expert_preview_coherently(
     assert "Bearer" not in html
     assert "raw request" not in html.lower()
     assert "raw response" not in html.lower()
+
+
+def test_browser_like_multipart_submission_extracts_prompt_and_preserves_it(
+    client: TestClient,
+) -> None:
+    csrf_token = _login(client)
+    fake = _install_successful_fake(client)
+    prompt = "Define alpha in one sentence."
+
+    response = client.post(
+        "/dashboard/expert-preview",
+        files={"prompt": (None, prompt)},
+        headers={auth.CSRF_HEADER_NAME: csrf_token},
+    )
+
+    assert response.status_code == 200
+    _assert_successful_preview_response(response.text, prompt)
+    assert len(fake.requests) == 2
+
+
+def test_urlencoded_submission_extracts_prompt_and_preserves_it(client: TestClient) -> None:
+    csrf_token = _login(client)
+    fake = _install_successful_fake(client)
+    prompt = "Summarize alpha briefly."
+
+    response = client.post(
+        "/dashboard/expert-preview",
+        data={"prompt": prompt},
+        headers={auth.CSRF_HEADER_NAME: csrf_token},
+    )
+
+    assert response.status_code == 200
+    _assert_successful_preview_response(response.text, prompt)
+    assert len(fake.requests) == 2
+
+
+def test_json_submission_still_extracts_prompt(client: TestClient) -> None:
+    csrf_token = _login(client)
+    fake = _install_successful_fake(client)
+    prompt = "Explain alpha as JSON-compatible input."
+
+    response = client.post(
+        "/dashboard/expert-preview",
+        json={"prompt": prompt},
+        headers={auth.CSRF_HEADER_NAME: csrf_token},
+    )
+
+    assert response.status_code == 200
+    _assert_successful_preview_response(response.text, prompt)
+    assert len(fake.requests) == 2
+
+
+def test_empty_prompt_returns_user_facing_error(client: TestClient) -> None:
+    csrf_token = _login(client)
+
+    response = client.post(
+        "/dashboard/expert-preview",
+        data={"prompt": "   "},
+        headers={auth.CSRF_HEADER_NAME: csrf_token},
+    )
+
+    assert response.status_code == 400
+    assert "Prompt is required." in response.text
+    assert "Plain provider output" in response.text
+    assert "Alpha Solver expert preview" in response.text
+
+
+def test_preview_failure_preserves_prompt_in_textarea(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    csrf_token = _login(client)
+    prompt = "Keep this prompt visible after a provider failure."
+
+    async def fail_preview(*args: object, **kwargs: object) -> dict[str, object]:
+        raise RuntimeError("forced preview failure")
+
+    monkeypatch.setattr(expert_preview, "_solve_preview", fail_preview)
+
+    response = client.post(
+        "/dashboard/expert-preview",
+        data={"prompt": prompt},
+        headers={auth.CSRF_HEADER_NAME: csrf_token},
+    )
+
+    assert response.status_code == 502
+    assert "Preview request failed." in response.text
+    assert f'<textarea id="prompt" name="prompt" required>{prompt}</textarea>' in response.text
+
+
+def test_second_browser_style_submit_after_error_keeps_csrf_behavior(client: TestClient) -> None:
+    csrf_token = _login(client)
+    error_response = client.post(
+        "/dashboard/expert-preview",
+        files={"prompt": (None, "")},
+        headers={auth.CSRF_HEADER_NAME: csrf_token},
+    )
+    assert error_response.status_code == 400
+    assert "Prompt is required." in error_response.text
+    assert "document.write" not in error_response.text
+    assert "initExpertPreviewForm" in error_response.text
+    assert "X-Alpha-CSRF" in error_response.text
+
+    fake = _install_successful_fake(client)
+    prompt = "Define alpha in one sentence."
+    response = client.post(
+        "/dashboard/expert-preview",
+        files={"prompt": (None, prompt)},
+        headers={auth.CSRF_HEADER_NAME: csrf_token},
+    )
+
+    assert response.status_code == 200
+    _assert_successful_preview_response(response.text, prompt)
+    assert len(fake.requests) == 2
 
 
 def test_preview_copy_keeps_claim_boundaries(client: TestClient) -> None:

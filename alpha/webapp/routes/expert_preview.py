@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import html
 import json
+from email import policy
+from email.parser import BytesParser
 from typing import Any, Dict, Iterable, Mapping
 from urllib.parse import parse_qs
 
@@ -153,7 +155,7 @@ def _render_page(
       <h1>Supervised preview only</h1>
       <p class="disclaimer">{_escape(DISCLAIMER)}</p>
       {error_html}
-      <form method="post" action="{_ROUTE}">
+      <form method="post" action="{_ROUTE}" id="expert-preview-form">
         <label for="prompt">Prompt</label>
         <textarea id="prompt" name="prompt" required>{_escape(prompt)}</textarea>
         <button type="submit">Compare same-provider outputs</button>
@@ -170,7 +172,6 @@ def _render_page(
       </section>
     </main>
     <script>
-      const form = document.querySelector("form");
       function cookieValue(name) {{
         return document.cookie
           .split(";")
@@ -178,33 +179,85 @@ def _render_page(
           .find((part) => part.startsWith(name + "="))
           ?.slice(name.length + 1) || "";
       }}
-      form.addEventListener("submit", async (event) => {{
-        event.preventDefault();
-        const response = await fetch(form.action, {{
-          method: "POST",
-          headers: {{ "X-Alpha-CSRF": cookieValue("alpha_dashboard_csrf") }},
-          body: new FormData(form),
+      function initExpertPreviewForm() {{
+        const form = document.querySelector("#expert-preview-form");
+        if (!form || form.dataset.alphaSubmitBound === "true") {{
+          return;
+        }}
+        form.dataset.alphaSubmitBound = "true";
+        form.addEventListener("submit", async (event) => {{
+          event.preventDefault();
+          const response = await fetch(form.action, {{
+            method: "POST",
+            headers: {{
+              "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+              "X-Alpha-CSRF": cookieValue("alpha_dashboard_csrf"),
+            }},
+            body: new URLSearchParams(new FormData(form)),
+          }});
+          const html = await response.text();
+          const nextDocument = new DOMParser().parseFromString(html, "text/html");
+          document.title = nextDocument.title;
+          document.body.innerHTML = nextDocument.body.innerHTML;
+          initExpertPreviewForm();
         }});
-        const html = await response.text();
-        document.open();
-        document.write(html);
-        document.close();
-      }});
+      }}
+      initExpertPreviewForm();
     </script>
   </body>
 </html>"""
 
 
+def _prompt_from_multipart_body(content_type: str, body: bytes) -> str:
+    message = BytesParser(policy=policy.default).parsebytes(
+        b"Content-Type: "
+        + content_type.encode("latin-1", errors="ignore")
+        + b"\r\nMIME-Version: 1.0\r\n\r\n"
+        + body
+    )
+    if not message.is_multipart():
+        return ""
+    for part in message.iter_parts():
+        params = dict(part.get_params(header="content-disposition", failobj=[]))
+        if params.get("name") != "prompt":
+            continue
+        payload = part.get_payload(decode=True)
+        if payload is None:
+            return str(part.get_payload()).strip()
+        charset = part.get_content_charset() or "utf-8"
+        return payload.decode(charset, errors="replace").strip()
+    return ""
+
+
+async def _prompt_from_form(request: Request) -> str:
+    form = await request.form()
+    value = form.get("prompt", "")
+    return str(value).strip()
+
+
 async def _extract_prompt(request: Request) -> str:
-    content_type = request.headers.get("content-type", "").lower()
+    content_type_header = request.headers.get("content-type", "")
+    content_type = content_type_header.lower()
     if "application/json" in content_type:
         payload = await request.json()
         if isinstance(payload, Mapping):
             return str(payload.get("prompt", "")).strip()
         return ""
+
+    if "application/x-www-form-urlencoded" in content_type or "multipart/form-data" in content_type:
+        try:
+            return await _prompt_from_form(request)
+        except AssertionError:
+            # Starlette requires the optional python-multipart package even for
+            # URL-encoded form parsing. Keep the preview route compatible with
+            # minimal no-network installs by falling back to the raw body parser.
+            pass
+
     body = await request.body()
     if not body:
         return ""
+    if "multipart/form-data" in content_type:
+        return _prompt_from_multipart_body(content_type_header, body)
     parsed = parse_qs(body.decode())
     return (parsed.get("prompt") or [""])[0].strip()
 
