@@ -34,20 +34,36 @@ must remain private because it signs session cookies.
 ```python
 from fastapi import FastAPI
 
-from alpha.webapp.routes import auth, requests, settings
+from alpha.webapp.routes import auth, expert_preview, requests, settings
 
 app = FastAPI()
 auth.install_dashboard_security(app)
 app.include_router(auth.router)
 app.include_router(requests.router)
 app.include_router(settings.router)
+app.include_router(expert_preview.router)
 ```
 
 The middleware installed by `install_dashboard_security` intercepts all
-requests whose path begins with `/requests`, `/settings`, or `/run`. Unauthenticated
-clients receive a redirect to `/login`. POST/PUT/PATCH/DELETE requests to these
-paths also require the `X-Alpha-CSRF` header to match the CSRF token stored in
+requests whose path begins with `/requests`, `/settings`, `/run`, or `/dashboard`.
+Unauthenticated clients receive a redirect to `/login`. POST/PUT/PATCH/DELETE
+requests to these paths also require the `X-Alpha-CSRF` header to match the CSRF token stored in
 the cookie.
+
+
+## Expert Preview Route
+
+The authenticated expert preview UI is available at `/dashboard/expert-preview`
+when `alpha.webapp.routes.expert_preview.router` is included. Operators can enter
+one prompt and compare two same-provider panes: `Plain provider output` uses the
+ordinary non-expert solve path, while `Alpha Solver expert preview` opts into the
+existing expert route with `context.route == "expert"`.
+
+The page is for supervised operator review only. It includes an explicit
+disclaimer that the preview does not prove Alpha Solver superiority, MVP
+validation, production readiness, broad runtime readiness, or answer-quality
+benchmark success. The behavioral demo checklist remains the review aid for
+behavior shape, and this UI does not replace eval evidence.
 
 ## Obtaining the CSRF Token
 
