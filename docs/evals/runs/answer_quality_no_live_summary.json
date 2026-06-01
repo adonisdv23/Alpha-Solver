@@ -1,0 +1,50 @@
+{
+  "artifact_kind": "answer_quality_no_live_summary",
+  "artifact_schema_version": "answer_quality_no_live_summary_v1",
+  "case_count": 48,
+  "categories": [
+    "backlog_impact_classification",
+    "lane_selection",
+    "runtime_overclaim_detection",
+    "source_hierarchy_conflict_detection"
+  ],
+  "claim_boundaries": [
+    "reviewability_only",
+    "not_mvp_validation",
+    "not_alpha_solver_superiority",
+    "not_answer_superiority",
+    "not_production_readiness",
+    "not_broad_runtime_readiness",
+    "not_answer_quality_benchmark_success",
+    "not_provider_reasoning_orchestration"
+  ],
+  "dataset_path": "datasets/answer_quality_operator_cases.jsonl",
+  "dataset_sha256": "6ce3dbaf34b51a863e8b3e38ba17dec8381e15a02e8a7cafb26fe859051e1a5a",
+  "dataset_version": "answer_quality_operator_cases_v0.1",
+  "disclaimer": "Evidence, not proof: this gated MVP eval is a small smoke signal only.",
+  "estimated_preflight_cost_usd": 0.159753,
+  "live_predictions_generated": false,
+  "max_tokens": 220,
+  "mode": "no_live",
+  "model": "gpt-5.4-mini",
+  "pre_registered_success_criteria": {
+    "metric": "treatment_accuracy_minus_baseline_accuracy",
+    "minimum_margin": 0.0625,
+    "quality_gate_reference": "config/quality_gate.yaml"
+  },
+  "quality_gate_reference": "config/quality_gate.yaml",
+  "run_id": "answer_quality_no_live_summary",
+  "safety_exclusions": [
+    "credentials",
+    "provider_payloads",
+    "provider_request_response_bodies",
+    "prompts",
+    "process_environment",
+    "exception_dumps",
+    "generated_answer_text"
+  ],
+  "seed": 123,
+  "skipped_status": "no_live_dry_run_no_provider_predictions",
+  "temperature": 0.0,
+  "treatment_version": "alpha_solver_operator_discipline_v0.1"
+}

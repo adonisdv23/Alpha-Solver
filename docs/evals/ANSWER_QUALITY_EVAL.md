@@ -95,6 +95,41 @@ Interpret `apparent_treatment_advantage_stability` narrowly:
 
 Repeatability measures run-to-run variability in the gated smoke eval. It must not be used to claim Alpha Solver superiority, MVP validation, production readiness, or completed expanded-set live validation until an approved live run produces stable evidence.
 
+
+## Persisting no-live summary artifacts
+
+`EVAL-ARTIFACT-PRESERVE-001` adds an opt-in committed evidence path for
+summary-level no-live answer-quality eval results. The default runner behavior is
+unchanged: no-live runs still avoid provider calls, and committed summary
+persistence happens only when `--save-summary` is passed.
+
+```bash
+python scripts/run_answer_quality_eval.py --no-live --save-summary
+```
+
+By default, the safe summary artifact is written to:
+
+```text
+docs/evals/runs/answer_quality_no_live_summary.json
+```
+
+Tests may inject a different destination with `--summary-output PATH`; operators
+should use the default `docs/evals/runs/` path when they want a durable,
+reviewable artifact that can be committed. The JSON artifact contains only
+summary-level fields such as schema version, mode (`no_live`), dataset path and
+hash, case count, categories, quality-gate reference, pre-registered success
+criteria, model/settings metadata, estimated pre-flight cost, skipped/no-live
+status, safety exclusions, and claim boundaries.
+
+The committed summary artifact intentionally excludes API keys, auth headers,
+raw provider payloads, raw request/response bodies, raw prompts, generated answer
+text, environment dumps, broad telemetry dumps, exception dumps, and other unsafe
+secret-bearing material. Live provider behavior is not enabled by this flag.
+
+These artifacts support evidence reviewability only. They do not prove MVP
+validation, Alpha Solver superiority, answer superiority, production readiness,
+broad runtime readiness, answer-quality benchmark success, or provider reasoning orchestration.
+
 ## Cost ceiling
 
 The default live cost ceiling is `$5.00` estimated total provider cost. Override it only deliberately:

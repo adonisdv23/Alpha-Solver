@@ -37,6 +37,8 @@ from alpha.providers.openai import OpenAIProviderClient  # noqa: E402
 DATASET_DEFAULT = ROOT / "datasets" / "answer_quality_operator_cases.jsonl"
 QUALITY_GATE_DEFAULT = ROOT / "config" / "quality_gate.yaml"
 ARTIFACT_ROOT_DEFAULT = ROOT / "artifacts" / "eval" / "answer_quality"
+SUMMARY_ARTIFACT_DEFAULT = ROOT / "docs" / "evals" / "runs" / "answer_quality_no_live_summary.json"
+SUMMARY_ARTIFACT_SCHEMA_VERSION = "answer_quality_no_live_summary_v1"
 LIVE_GATE_ENV = "ALPHA_LIVE_ANSWER_QUALITY"
 OPENAI_KEY_ENV = "OPENAI_API_KEY"
 DATASET_VERSION = "answer_quality_operator_cases_v0.1"
@@ -97,6 +99,8 @@ class EvalConfig:
     input_per_1k_usd: float = DEFAULT_PRICE_HINT["input_per_1k"]
     output_per_1k_usd: float = DEFAULT_PRICE_HINT["output_per_1k"]
     limit: int | None = None
+    save_summary: bool = False
+    summary_output: Path = SUMMARY_ARTIFACT_DEFAULT
 
 
 def relative_path_for_artifact(path: Path) -> str:
@@ -426,6 +430,99 @@ def summarize_predictions(
     }
 
 
+def build_no_live_summary_artifact(
+    *,
+    config: EvalConfig,
+    dataset_path: Path,
+    cases: list[EvalCase],
+    summary: dict[str, Any],
+    expected_cost: float,
+) -> dict[str, Any]:
+    """Build a safe committed-docs no-live summary artifact.
+
+    This artifact intentionally keeps only summary-level metadata. It does not
+    include prompts, provider request/response bodies, provider payloads,
+    credentials, process environment dumps, exception dumps, or generated answer
+    text.
+    """
+    success_criteria = summary.get("pre_registered_success_criteria", {})
+    return redact_for_artifact(
+        {
+            "artifact_schema_version": SUMMARY_ARTIFACT_SCHEMA_VERSION,
+            "artifact_kind": "answer_quality_no_live_summary",
+            "run_id": "answer_quality_no_live_summary",
+            "disclaimer": EVIDENCE_DISCLAIMER,
+            "mode": "no_live",
+            "live_predictions_generated": False,
+            "dataset_version": DATASET_VERSION,
+            "dataset_path": relative_path_for_artifact(dataset_path),
+            "dataset_sha256": dataset_sha(dataset_path),
+            "case_count": len(cases),
+            "categories": sorted({case.category for case in cases}),
+            "treatment_version": TREATMENT_VERSION,
+            "quality_gate_reference": summary.get(
+                "quality_gate_reference", relative_path_for_artifact(config.quality_gate)
+            ),
+            "pre_registered_success_criteria": {
+                "metric": success_criteria.get("metric"),
+                "minimum_margin": success_criteria.get("minimum_margin"),
+                "quality_gate_reference": success_criteria.get(
+                    "quality_gate_reference", relative_path_for_artifact(config.quality_gate)
+                ),
+            },
+            "estimated_preflight_cost_usd": expected_cost,
+            "model": config.model,
+            "temperature": config.temperature,
+            "max_tokens": config.max_tokens,
+            "seed": config.seed,
+            "skipped_status": "no_live_dry_run_no_provider_predictions",
+            "safety_exclusions": [
+                "credentials",
+                "provider_payloads",
+                "provider_request_response_bodies",
+                "prompts",
+                "process_environment",
+                "exception_dumps",
+                "generated_answer_text",
+            ],
+            "claim_boundaries": [
+                "reviewability_only",
+                "not_mvp_validation",
+                "not_alpha_solver_superiority",
+                "not_answer_superiority",
+                "not_production_readiness",
+                "not_broad_runtime_readiness",
+                "not_answer_quality_benchmark_success",
+                "not_provider_reasoning_orchestration",
+            ],
+        }
+    )
+
+
+def write_no_live_summary_artifact(
+    *,
+    config: EvalConfig,
+    dataset_path: Path,
+    cases: list[EvalCase],
+    summary: dict[str, Any],
+    expected_cost: float,
+) -> Path:
+    """Write the safe no-live summary artifact under a docs/evals/runs path."""
+    output_path = config.summary_output
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    artifact = build_no_live_summary_artifact(
+        config=config,
+        dataset_path=dataset_path,
+        cases=cases,
+        summary=summary,
+        expected_cost=expected_cost,
+    )
+    output_path.write_text(
+        json.dumps(artifact, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    return output_path
+
+
 def write_artifacts(
     *,
     config: EvalConfig,
@@ -512,11 +609,21 @@ def run_eval(config: EvalConfig, *, client: ProviderClient | None = None) -> dic
             dry_run=True,
             expected_cost=expected_cost,
         )
-        return {
+        report = {
             **summary,
             "artifact_dir": str(out_dir),
             "estimated_preflight_cost_usd": expected_cost,
         }
+        if config.save_summary:
+            summary_path = write_no_live_summary_artifact(
+                config=config,
+                dataset_path=config.dataset,
+                cases=cases,
+                summary=summary,
+                expected_cost=expected_cost,
+            )
+            report["summary_artifact_path"] = relative_path_for_artifact(summary_path)
+        return report
 
     provider = client or OpenAIProviderClient(
         max_retries=0,
@@ -822,6 +929,8 @@ def run_repeatability(
             input_per_1k_usd=config.input_per_1k_usd,
             output_per_1k_usd=config.output_per_1k_usd,
             limit=config.limit,
+            save_summary=config.save_summary,
+            summary_output=config.summary_output,
         )
         try:
             report = run_eval(run_config, client=client)
@@ -872,6 +981,8 @@ def config_from_args(args: argparse.Namespace) -> EvalConfig:
         input_per_1k_usd=args.input_per_1k_usd,
         output_per_1k_usd=args.output_per_1k_usd,
         limit=args.limit,
+        save_summary=args.save_summary,
+        summary_output=Path(args.summary_output),
     )
 
 
@@ -880,6 +991,25 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--dataset", default=str(DATASET_DEFAULT))
     parser.add_argument("--quality-gate", default=str(QUALITY_GATE_DEFAULT))
     parser.add_argument("--artifact-root", default=str(ARTIFACT_ROOT_DEFAULT))
+    parser.add_argument(
+        "--save-summary",
+        action="store_true",
+        help=(
+            "Also write a safe no-live summary artifact to docs/evals/runs/. "
+            "This does not enable live provider calls."
+        ),
+    )
+    parser.add_argument(
+        "--summary-output",
+        default=str(SUMMARY_ARTIFACT_DEFAULT),
+        help="Path for --save-summary no-live artifact output.",
+    )
+    parser.add_argument(
+        "--no-live",
+        dest="live",
+        action="store_false",
+        help="Explicitly keep the default no-live dry-run mode.",
+    )
     parser.add_argument("--model", default=os.getenv("ALPHA_AQ_MODEL", DEFAULT_MODEL))
     parser.add_argument("--temperature", type=float, default=DEFAULT_TEMPERATURE)
     parser.add_argument("--max-tokens", type=int, default=DEFAULT_MAX_TOKENS)
@@ -915,6 +1045,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "preserve each run under its own artifact subdirectory, and write an aggregate summary."
         ),
     )
+    parser.set_defaults(live=False)
     return parser.parse_args(argv)
 
 
