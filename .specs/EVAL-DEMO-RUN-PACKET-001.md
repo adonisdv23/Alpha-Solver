@@ -58,10 +58,15 @@ The operator run packet must include:
    follow-up tickets only for real defects or clear routing/prompt weaknesses.
 4. Optional controlled live-provider sequence requiring explicit approval,
    `MODEL_PROVIDER=openai`, `ALPHA_LIVE_PREVIEW_ENABLED=true`, a low
-   `ALPHA_LIVE_PREVIEW_MAX_REQUESTS` such as `1` or `2`, `max-instances=1` for
-   the test window when using the current per-process cap, approved prompt count
-   only, cap confirmation when in scope, immediate return to
-   `MODEL_PROVIDER=local`, and rollback confirmation.
+   `ALPHA_LIVE_PREVIEW_MAX_REQUESTS` such as `1` or `2`, and a safe-key
+   prerequisite that `OPENAI_API_KEY` is configured through the approved secret
+   mechanism, preferably Secret Manager. The sequence must warn operators not to
+   paste the API key into the run packet, evidence template, screenshots, logs,
+   Google Sheets, PR comments, or chat, and not to proceed if the live key is
+   missing or cannot be confirmed as mounted safely. It must also include
+   `max-instances=1` for the test window when using the current per-process cap,
+   approved prompt count only, cap confirmation when in scope, immediate return
+   to `MODEL_PROVIDER=local`, and rollback confirmation.
 5. Recommended first-run prompt subset covering overclaim prevention, hidden
    constraints, execution planning, corrective next actions, and project-context
    preservation.

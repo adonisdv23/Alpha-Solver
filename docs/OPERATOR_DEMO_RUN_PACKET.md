@@ -59,14 +59,19 @@ Use this only with explicit approval for a live-provider test window.
 2. Set `MODEL_PROVIDER=openai` only for the approved window.
 3. Set `ALPHA_LIVE_PREVIEW_ENABLED=true`.
 4. Set `ALPHA_LIVE_PREVIEW_MAX_REQUESTS` to a low value, usually `1` or `2`.
-5. Keep Cloud Run `max-instances=1` for the test window if using the current
+5. Confirm `OPENAI_API_KEY` is configured through the approved secret mechanism,
+   preferably Secret Manager. Do not paste the API key into this run packet, the
+   evidence template, screenshots, logs, Google Sheets, PR comments, or chat. Do
+   not proceed if the live key is missing or the operator cannot confirm it is
+   mounted safely.
+6. Keep Cloud Run `max-instances=1` for the test window if using the current
    per-process cap.
-6. Run only the approved prompt count.
-7. If cap behavior is part of the test, confirm the cap blocks additional live
+7. Run only the approved prompt count.
+8. If cap behavior is part of the test, confirm the cap blocks additional live
    preview submissions as expected.
-8. Immediately return the service to `MODEL_PROVIDER=local` when the approved
+9. Immediately return the service to `MODEL_PROVIDER=local` when the approved
    prompts or window are complete.
-9. Record rollback confirmation in the evidence block.
+10. Record rollback confirmation in the evidence block.
 
 ## Evidence packet
 
