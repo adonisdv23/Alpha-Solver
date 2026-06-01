@@ -136,6 +136,61 @@ def test_preview_submission_renders_plain_and_expert_outputs(client: TestClient)
     assert "raw response" not in html.lower()
 
 
+def test_preview_submission_handles_unstructured_expert_preview_coherently(
+    client: TestClient,
+) -> None:
+    csrf_token = _login(client)
+    raw_secret = "sk-preview-should-not-render"
+    raw_answer = "This long expert answer should be hidden when confidence is unavailable."
+    fake = FakeProviderClient(
+        [
+            _provider_result("plain same-provider answer", raw_secret=raw_secret),
+            _provider_result(
+                "Here is a prose review with risks and assumptions, but no compact JSON, "
+                "no section headings, and no numeric confidence value.",
+                raw_secret=raw_secret,
+            ),
+            _provider_result(raw_answer, raw_secret=raw_secret),
+        ]
+    )
+    client.app.state.provider_client_factory = lambda _model_set: fake
+
+    response = client.post(
+        "/dashboard/expert-preview",
+        data={
+            "prompt": (
+                "Plan a security review and architecture migration where goals, timeline, "
+                "owners, risk tolerance, and compliance constraints are uncertain."
+            )
+        },
+        headers={auth.CSRF_HEADER_NAME: csrf_token},
+    )
+
+    assert response.status_code == 200
+    html = response.text
+    assert "plain same-provider answer" in html
+    assert "I need a few details before I can answer this well." in html
+    assert "clarify" in html
+    assert "unavailable" in html
+    assert "What is the main outcome you want from this request?" in html
+    assert "preview_parse_status" in html
+    assert "unstructured" in html
+    assert raw_answer not in html
+
+    assert len(fake.requests) == 3
+    assert fake.requests[0].metadata["route"] == "tot"
+    assert fake.requests[1].metadata["route"] == "expert"
+    assert fake.requests[2].metadata["route"] == "expert"
+
+    assert raw_secret not in html
+    assert "provider-hidden" not in html
+    assert "raw_metadata" not in html
+    assert "Authorization" not in html
+    assert "Bearer" not in html
+    assert "raw request" not in html.lower()
+    assert "raw response" not in html.lower()
+
+
 def test_preview_copy_keeps_claim_boundaries(client: TestClient) -> None:
     _login(client)
 

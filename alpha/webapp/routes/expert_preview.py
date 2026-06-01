@@ -40,7 +40,16 @@ def _public_meta(payload: Mapping[str, Any]) -> Dict[str, Any]:
     meta = payload.get("meta")
     if not isinstance(meta, Mapping):
         return {}
-    allowed = ("route", "complexity", "provider", "model", "model_set", "call_count")
+    allowed = (
+        "route",
+        "complexity",
+        "provider",
+        "model",
+        "model_set",
+        "call_count",
+        "preview_parse_status",
+        "confidence_available",
+    )
     return {key: meta[key] for key in allowed if key in meta}
 
 
@@ -69,9 +78,14 @@ def _render_expert_payload(payload: Mapping[str, Any] | None) -> str:
     if payload is None:
         return '<p class="empty">Submit a prompt to render the Alpha Solver expert preview.</p>'
     meta = _public_meta(payload)
+    confidence = (
+        "unavailable"
+        if meta.get("confidence_available") is False
+        else payload.get("confidence", "—")
+    )
     rows = [
         ("Mode", payload.get("mode", "—")),
-        ("Confidence", payload.get("confidence", "—")),
+        ("Confidence", confidence),
         ("Complexity", meta.get("complexity", "—")),
         ("Call count", meta.get("call_count", "—")),
     ]

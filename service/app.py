@@ -441,6 +441,7 @@ _MULTI_PART_MARKERS = (
 
 
 _CONFIDENCE_RE = re.compile(r"(?i)confidence[^0-9%]*(\d+(?:\.\d+)?)\s*(%)?")
+_PERCENT_RE = re.compile(r"(\d+(?:\.\d+)?)\s*%")
 
 
 def _is_expert_route(params: Dict[str, Any]) -> bool:
@@ -473,12 +474,12 @@ def _as_string_list(value: Any) -> list[str]:
     return []
 
 
-def _confidence_value(value: Any) -> float:
+def _parse_confidence_value(value: Any) -> float | None:
     raw: float | None = None
     if isinstance(value, (int, float)) and not isinstance(value, bool):
         raw = float(value)
     elif isinstance(value, str):
-        match = _CONFIDENCE_RE.search(value) or re.search(r"(\d+(?:\.\d+)?)\s*%", value)
+        match = _CONFIDENCE_RE.search(value) or _PERCENT_RE.search(value)
         if match:
             raw = float(match.group(1))
             if match.lastindex and match.group(match.lastindex) == "%":
@@ -489,31 +490,51 @@ def _confidence_value(value: Any) -> float:
             except ValueError:
                 raw = None
     if raw is None:
-        return 0.0
+        return None
     if raw > 1.0:
         raw /= 100.0
     return max(0.0, min(1.0, raw))
 
 
+def _confidence_value(value: Any) -> float:
+    parsed = _parse_confidence_value(value)
+    return 0.0 if parsed is None else parsed
+
+
 def _parse_expert_preview(text: str) -> dict[str, Any]:
     data: dict[str, Any] = {}
+    parse_status = "unstructured"
     try:
         parsed = json.loads(text)
     except json.JSONDecodeError:
         parsed = None
     if isinstance(parsed, dict):
         data = parsed
-    confidence_source = data.get("confidence", text)
+        parse_status = "json"
+
+    confidence_source = data.get("confidence") if "confidence" in data else text
+    parsed_confidence = _parse_confidence_value(confidence_source)
+    confidence_available = parsed_confidence is not None
+
     considerations = _as_string_list(data.get("considerations"))
     assumptions = _as_string_list(data.get("assumptions"))
     if not considerations:
         considerations = _extract_section_list(text, "considerations")
+        if considerations and parse_status == "unstructured":
+            parse_status = "sections"
     if not assumptions:
         assumptions = _extract_section_list(text, "assumptions")
+        if assumptions and parse_status == "unstructured":
+            parse_status = "sections"
+    if confidence_available and parse_status == "unstructured":
+        parse_status = "sections"
+
     return {
         "considerations": considerations,
         "assumptions": assumptions,
-        "confidence": _confidence_value(confidence_source),
+        "confidence": 0.0 if parsed_confidence is None else parsed_confidence,
+        "confidence_available": confidence_available,
+        "preview_parse_status": parse_status,
     }
 
 
@@ -564,6 +585,9 @@ def _expert_step_two_prompt(query: str, preview: dict[str, Any]) -> str:
 
 
 _CLARIFY_MESSAGE = "I need a few details before I can answer this well."
+_BLOCK_MESSAGE = (
+    "I cannot safely provide a final answer for this request in the supervised preview."
+)
 
 
 def _clarifying_questions_for_expert_request(
@@ -606,7 +630,21 @@ def _expert_response(
     model: str,
     call_count: int,
     clarifying_questions: list[str] | None = None,
+    preview_parse_status: str | None = None,
+    confidence_available: bool | None = None,
 ) -> Dict[str, Any]:
+    meta = {
+        "route": "expert",
+        "complexity": complexity,
+        "provider": provider,
+        "model": model,
+        "call_count": call_count,
+    }
+    if preview_parse_status is not None:
+        meta["preview_parse_status"] = preview_parse_status
+    if confidence_available is not None:
+        meta["confidence_available"] = confidence_available
+
     response = {
         "final_answer": answer,
         "answer": answer,
@@ -614,13 +652,7 @@ def _expert_response(
         "assumptions": assumptions,
         "confidence": confidence,
         "mode": mode,
-        "meta": {
-            "route": "expert",
-            "complexity": complexity,
-            "provider": provider,
-            "model": model,
-            "call_count": call_count,
-        },
+        "meta": meta,
     }
     if mode == "clarify" and clarifying_questions is not None:
         response["clarifying_questions"] = clarifying_questions
@@ -786,9 +818,12 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
                     provider_client=provider_client,
                     provider_request=answer_request,
                 )
-                mode = _mode_from_confidence(
-                    preview["confidence"], preview["assumptions"], model_set
-                )
+                if preview.get("confidence_available") is False:
+                    mode = "clarify"
+                else:
+                    mode = _mode_from_confidence(
+                        preview["confidence"], preview["assumptions"], model_set
+                    )
                 expert_answer = answer_result.text
                 clarifying_questions = None
                 if mode == "clarify":
@@ -796,6 +831,8 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
                     clarifying_questions = _clarifying_questions_for_expert_request(
                         query, preview["considerations"], preview["assumptions"]
                     )
+                elif mode == "block":
+                    expert_answer = _BLOCK_MESSAGE
                 return JSONResponse(
                     _expert_response(
                         answer=expert_answer,
@@ -808,6 +845,14 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
                         model=answer_result.model,
                         call_count=2,
                         clarifying_questions=clarifying_questions,
+                        preview_parse_status=(
+                            preview["preview_parse_status"]
+                            if preview.get("confidence_available") is False
+                            else None
+                        ),
+                        confidence_available=(
+                            False if preview.get("confidence_available") is False else None
+                        ),
                     )
                 )
 
