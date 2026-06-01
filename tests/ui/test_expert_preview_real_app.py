@@ -61,9 +61,38 @@ def client(monkeypatch: pytest.MonkeyPatch) -> TestClient:
 def _login(client: TestClient) -> str:
     response = client.post("/login", data={"password": "testing-secret"}, follow_redirects=False)
     assert response.status_code == 303
+    assert response.headers["location"] == ROUTE
     csrf_token = client.cookies.get(auth.CSRF_COOKIE_NAME)
     assert csrf_token
     return csrf_token
+
+
+def test_successful_login_redirects_to_expert_preview_and_sets_cookies(
+    client: TestClient,
+) -> None:
+    response = client.post("/login", data={"password": "testing-secret"}, follow_redirects=False)
+
+    assert response.status_code == 303
+    assert response.headers["location"] == ROUTE
+    assert client.cookies.get(auth.SESSION_COOKIE_NAME)
+    assert client.cookies.get(auth.CSRF_COOKIE_NAME)
+
+
+def test_incorrect_password_returns_login_page(client: TestClient) -> None:
+    response = client.post("/login", data={"password": "wrong"}, follow_redirects=False)
+
+    assert response.status_code == 401
+    assert "Invalid credentials" in response.text
+    assert not client.cookies.get(auth.SESSION_COOKIE_NAME)
+
+
+def test_requests_route_remains_unmounted_in_bundled_app(client: TestClient) -> None:
+    _login(client)
+
+    response = client.get("/requests")
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Not Found"}
 
 
 def test_route_registered_in_real_app() -> None:

@@ -24,6 +24,8 @@ __all__ = [
     "CSRF_HEADER_NAME",
     "PASSWORD_ENV_VAR",
     "DEFAULT_DASHBOARD_PASSWORD",
+    "DEFAULT_LOGIN_REDIRECT",
+    "configure_login_redirect",
 ]
 
 
@@ -38,6 +40,12 @@ SECRET_ENV_VAR = "ALPHA_DASHBOARD_SECRET_KEY"
 # Fallback password used only when PASSWORD_ENV_VAR is unset. Callers that mount
 # the dashboard on a public app should treat this value as "not configured".
 DEFAULT_DASHBOARD_PASSWORD = "alpha-dashboard"
+
+# Default dashboard landing page after a successful login. Bundled or custom
+# applications can override this on their FastAPI app state without changing the
+# shared router's default behavior.
+DEFAULT_LOGIN_REDIRECT = "/requests"
+_LOGIN_REDIRECT_STATE_ATTR = "alpha_dashboard_login_redirect"
 
 SESSION_TTL_SECONDS = 60 * 60  # one hour
 LOCKOUT_THRESHOLD = 5
@@ -235,6 +243,28 @@ def _build_lockout_response() -> HTMLResponse:
     return HTMLResponse(content=html, status_code=status.HTTP_429_TOO_MANY_REQUESTS)
 
 
+def _validate_login_redirect(target: str) -> str:
+    if not target.startswith("/") or target.startswith("//"):
+        raise ValueError("dashboard login redirect must be a root-relative path")
+    return target
+
+
+def configure_login_redirect(app: FastAPI, target: str) -> None:
+    """Configure the app-local dashboard landing path after successful login."""
+
+    setattr(app.state, _LOGIN_REDIRECT_STATE_ATTR, _validate_login_redirect(target))
+
+
+def _login_redirect_for(request: Request) -> str:
+    target = getattr(request.app.state, _LOGIN_REDIRECT_STATE_ATTR, DEFAULT_LOGIN_REDIRECT)
+    if not isinstance(target, str):
+        return DEFAULT_LOGIN_REDIRECT
+    try:
+        return _validate_login_redirect(target)
+    except ValueError:
+        return DEFAULT_LOGIN_REDIRECT
+
+
 @router.get("/login", response_class=HTMLResponse)
 async def login_form() -> HTMLResponse:
     return HTMLResponse(content=_render_login_template())
@@ -251,7 +281,9 @@ async def login(request: Request) -> Response:
     if secrets.compare_digest(supplied_password, _expected_password()):
         _record_success(identifier)
         session = _create_session()
-        response = RedirectResponse("/requests", status_code=status.HTTP_303_SEE_OTHER)
+        response = RedirectResponse(
+            _login_redirect_for(request), status_code=status.HTTP_303_SEE_OTHER
+        )
         response.set_cookie(
             CSRF_COOKIE_NAME,
             session.csrf_token,

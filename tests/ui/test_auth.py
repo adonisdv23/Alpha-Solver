@@ -53,6 +53,7 @@ def test_login_sets_secure_cookie_and_allows_access(client: TestClient) -> None:
 
     response = client.post("/login", data={"password": "testing-secret"}, follow_redirects=False)
     assert response.status_code == 303
+    assert response.headers["location"] == auth.DEFAULT_LOGIN_REDIRECT
 
     session_cookie = client.cookies.get(auth.SESSION_COOKIE_NAME)
     csrf_cookie = client.cookies.get(auth.CSRF_COOKIE_NAME)
@@ -68,6 +69,37 @@ def test_login_sets_secure_cookie_and_allows_access(client: TestClient) -> None:
     page = client.get("/requests")
     assert page.status_code == 200
     assert "<form" in page.text
+
+
+def test_configured_login_redirect_preserves_session_cookies(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("ALPHA_DASHBOARD_PASSWORD", "testing-secret")
+    monkeypatch.setenv("ALPHA_DASHBOARD_SECRET_KEY", "unit-test-secret")
+    monkeypatch.setenv("ALPHA_DASHBOARD_SECRETS_PATH", str(tmp_path / "secrets.json"))
+    monkeypatch.setenv("ALPHA_DASHBOARD_AUDIT_LOG", str(tmp_path / "audit.log"))
+
+    auth.reset_state()
+    request_routes.reset_state()
+
+    app = FastAPI()
+    auth.install_dashboard_security(app)
+    auth.configure_login_redirect(app, "/dashboard/expert-preview")
+    app.include_router(auth.router)
+    app.include_router(request_routes.router)
+
+    configured_client = TestClient(app, base_url="https://testserver")
+    try:
+        response = configured_client.post(
+            "/login", data={"password": "testing-secret"}, follow_redirects=False
+        )
+        assert response.status_code == 303
+        assert response.headers["location"] == "/dashboard/expert-preview"
+        assert configured_client.cookies.get(auth.SESSION_COOKIE_NAME)
+        assert configured_client.cookies.get(auth.CSRF_COOKIE_NAME)
+    finally:
+        configured_client.close()
+        auth.reset_state()
 
 
 def test_failed_logins_trigger_lockout(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:

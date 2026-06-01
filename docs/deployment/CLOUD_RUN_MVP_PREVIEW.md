@@ -214,8 +214,8 @@ curl -i "${SERVICE_URL}/readyz"
 
 - [ ] Logged-out `GET /dashboard/expert-preview` redirects or blocks according to dashboard auth convention.
 - [ ] Login works with the configured dashboard password.
-- [ ] The known `/requests` post-login redirect limitation is understood and is not treated as a blocker.
-- [ ] After login, direct navigation to `/dashboard/expert-preview` works.
+- [ ] Login redirects to `/dashboard/expert-preview`, not `/requests`.
+- [ ] `/requests` remains unmounted in the bundled preview app.
 - [ ] Authenticated `GET /dashboard/expert-preview` returns 200.
 
 Example cookie-jar flow:
@@ -263,13 +263,14 @@ continues serving. Preserve this behavior for Cloud Run. The auth module's
 standalone random-secret fallback is intentionally unchanged for custom app
 integrations, but the bundled Cloud Run preview mount guard must not rely on it.
 
-## 10. Known `/requests` post-login redirect limitation
+## 10. Bundled preview login landing
 
-Successful dashboard login currently redirects to `/requests`. The Cloud Run
-preview service mounts `/login` and `/dashboard/expert-preview`, but not the full
-legacy dashboard request page. A post-login `/requests` 404 is a known deferred
-limitation and is not a deployment blocker. After login, open
-`/dashboard/expert-preview` directly.
+The shared dashboard auth router defaults successful login to `/requests` for
+custom/full-dashboard consumers. The Cloud Run preview service intentionally
+mounts `/login` and `/dashboard/expert-preview`, but not the full legacy
+dashboard request page. The bundled `service.app:app` integration therefore
+configures successful login to redirect directly to `/dashboard/expert-preview`;
+`/requests` remains unmounted in this preview app.
 
 ## 11. Local-provider first workflow
 
@@ -323,7 +324,7 @@ It only prepares the repo for a controlled Cloud Run MVP preview deployment.
 | --- | --- | --- |
 | Cloud Run revision never becomes ready | Container is not listening on Cloud Run `PORT` or dependencies failed to install | Use the root `Dockerfile`; confirm the command starts Uvicorn with `--host 0.0.0.0 --port "${PORT:-8080}"` |
 | `/dashboard/expert-preview` returns 404 | Dashboard password is unset/default or dashboard secret key is missing/empty | Configure a strong non-default `ALPHA_DASHBOARD_PASSWORD` and non-empty `ALPHA_DASHBOARD_SECRET_KEY`, then redeploy a new revision |
-| Login succeeds then `/requests` returns 404 | Known login redirect limitation | Navigate directly to `/dashboard/expert-preview` after login |
+| Login redirects somewhere other than `/dashboard/expert-preview` | Bundled dashboard login redirect was not configured or regressed | Check `service.app:app` dashboard mounting and rerun the no-network UI tests |
 | POST to preview returns 403 | Missing or invalid CSRF header | Send `X-Alpha-CSRF` with the value from the `alpha_dashboard_csrf` cookie |
 | Preview attempts live provider calls | `MODEL_PROVIDER` is set to `openai` | Revert to `MODEL_PROVIDER=local`; remove `OPENAI_API_KEY` from the first preview revision |
 | Secrets appear in output | Regression or unsafe manual logging | Stop testing, capture minimal evidence without secrets, rotate affected secrets, and fix before continuing |

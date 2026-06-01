@@ -177,11 +177,9 @@ app.add_middleware(
 # deployment that forgot to set one, so we skip mounting (routes 404), log a
 # warning, and leave the JSON API fully working.
 #
-# Known limitation (tracked, deferred): a successful login redirects to /requests
-# (alpha.webapp.routes.auth.login), which this app does not mount, so the post-login
-# landing 404s. Operators should open /dashboard/expert-preview directly. A follow-up
-# should make the post-login destination configurable; we do not change the shared
-# auth redirect here.
+# The bundled preview app intentionally does not mount the full dashboard request,
+# settings, run, or jobs routes. Successful login therefore lands on the mounted
+# expert-preview page instead of the shared dashboard default.
 def _dashboard_enabled() -> bool:
     password = os.getenv(dashboard_auth.PASSWORD_ENV_VAR)
     secret_key = os.getenv(dashboard_auth.SECRET_ENV_VAR)
@@ -194,6 +192,7 @@ def _dashboard_enabled() -> bool:
 
 def _mount_dashboard(target: FastAPI) -> None:
     dashboard_auth.install_dashboard_security(target)
+    dashboard_auth.configure_login_redirect(target, expert_preview.ROUTE)
     target.include_router(dashboard_auth.router)
     target.include_router(expert_preview.router)
 
