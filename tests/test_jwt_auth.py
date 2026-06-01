@@ -202,6 +202,32 @@ def test_rotation(tmp_path):
     assert r.json()["sub"] == "u2"
 
 
+def test_rotation_reload_survives_unchanged_mtime(tmp_path):
+    auth_path = tmp_path / "auth_keys.yaml"
+    data = yaml.safe_load(Path("service/config/auth_keys.yaml").read_text())
+    auth_path.write_text(yaml.safe_dump(data))
+    store = AuthKeyStore(auth_path)
+    original_stat = auth_path.stat()
+
+    assert store.get_key("kid1") == data["kid1"]
+
+    data["kid2"] = PUB_KEY2
+    auth_path.write_text(yaml.safe_dump(data))
+    os.utime(auth_path, ns=(original_stat.st_atime_ns, original_stat.st_mtime_ns))
+
+    assert auth_path.stat().st_mtime_ns == original_stat.st_mtime_ns
+    assert store.get_key("kid2") == PUB_KEY2
+
+
+def test_unknown_kid_stays_unknown_after_forced_reload(tmp_path):
+    auth_path = tmp_path / "auth_keys.yaml"
+    data = yaml.safe_load(Path("service/config/auth_keys.yaml").read_text())
+    auth_path.write_text(yaml.safe_dump(data))
+    store = AuthKeyStore(auth_path)
+
+    assert store.get_key("missing-kid") is None
+
+
 def test_rejection_rate(tmp_path):
     app, _store, _path = build_app(tmp_path)
     client = TestClient(app)

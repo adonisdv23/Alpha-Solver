@@ -29,17 +29,18 @@ class AuthKeyStore:
     def __init__(self, path: Path | str) -> None:
         self.path = Path(path)
         self._keys: Dict[str, str] = {}
-        self._mtime: float = 0.0
+        self._signature: tuple[int, int] | None = None
         self.reload(force=True)
 
     def reload(self, force: bool = False) -> None:
         try:
-            mtime = self.path.stat().st_mtime
+            stat = self.path.stat()
+            signature = (stat.st_mtime_ns, stat.st_size)
         except FileNotFoundError:
             self._keys = {}
-            self._mtime = 0.0
+            self._signature = None
             return
-        if force or mtime != self._mtime:
+        if force or signature != self._signature:
             with self.path.open() as f:
                 data = yaml.safe_load(f) or {}
             keys: Dict[str, str] = {}
@@ -50,11 +51,15 @@ class AuthKeyStore:
                     pem = value or ""
                 keys[kid] = pem
             self._keys = keys
-            self._mtime = mtime
+            self._signature = signature
 
     def get_key(self, kid: str) -> Optional[str]:
         self.reload()
-        return self._keys.get(kid)
+        key = self._keys.get(kid)
+        if key is None:
+            self.reload(force=True)
+            key = self._keys.get(kid)
+        return key
 
 
 def _b64url_decode(data: str) -> bytes:
