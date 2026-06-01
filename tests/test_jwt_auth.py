@@ -202,6 +202,56 @@ def test_rotation(tmp_path):
     assert r.json()["sub"] == "u2"
 
 
+def test_rotation_reload_survives_unchanged_mtime(tmp_path):
+    auth_path = tmp_path / "auth_keys.yaml"
+    data = yaml.safe_load(Path("service/config/auth_keys.yaml").read_text())
+    auth_path.write_text(yaml.safe_dump(data))
+    store = AuthKeyStore(auth_path)
+    original_stat = auth_path.stat()
+
+    assert store.get_key("kid1") == data["kid1"]
+
+    data["kid2"] = PUB_KEY2
+    auth_path.write_text(yaml.safe_dump(data))
+    os.utime(auth_path, ns=(original_stat.st_atime_ns, original_stat.st_mtime_ns))
+
+    assert auth_path.stat().st_mtime_ns == original_stat.st_mtime_ns
+    assert store.get_key("kid2") == PUB_KEY2
+
+
+def test_unknown_kids_force_reload_once_per_unchanged_signature(tmp_path, monkeypatch):
+    auth_path = tmp_path / "auth_keys.yaml"
+    data = yaml.safe_load(Path("service/config/auth_keys.yaml").read_text())
+    auth_path.write_text(yaml.safe_dump(data))
+    store = AuthKeyStore(auth_path)
+    monkeypatch.setattr("service.auth.jwt_utils.time.monotonic", lambda: 100.0)
+
+    forced_reloads = 0
+    original_reload = store.reload
+
+    def counting_reload(force=False):
+        nonlocal forced_reloads
+        if force:
+            forced_reloads += 1
+        return original_reload(force=force)
+
+    monkeypatch.setattr(store, "reload", counting_reload)
+
+    for index in range(5):
+        assert store.get_key(f"missing-kid-{index}") is None
+
+    assert forced_reloads == 1
+
+
+def test_unknown_kid_stays_unknown_after_forced_reload(tmp_path):
+    auth_path = tmp_path / "auth_keys.yaml"
+    data = yaml.safe_load(Path("service/config/auth_keys.yaml").read_text())
+    auth_path.write_text(yaml.safe_dump(data))
+    store = AuthKeyStore(auth_path)
+
+    assert store.get_key("missing-kid") is None
+
+
 def test_rejection_rate(tmp_path):
     app, _store, _path = build_app(tmp_path)
     client = TestClient(app)
