@@ -37,7 +37,7 @@ SESSION_TTL_SECONDS = 60 * 60  # one hour
 LOCKOUT_THRESHOLD = 5
 LOCKOUT_DURATION_SECONDS = 5 * 60  # five minutes
 
-_PROTECTED_PREFIXES: Tuple[str, ...] = ("/requests", "/settings", "/run")
+_PROTECTED_PREFIXES: Tuple[str, ...] = ("/requests", "/settings", "/run", "/dashboard")
 _CSRF_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
 
 _TEMPLATE_DIR = Path(__file__).resolve().parent.parent / "templates"
