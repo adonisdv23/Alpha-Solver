@@ -12,6 +12,7 @@ import yaml
 
 ALLOWED_ALGS = {"RS256"}
 LEWAY_SECONDS = 60
+FORCED_MISS_RELOAD_COOLDOWN_SECONDS = 1.0
 
 
 class JWTError(Exception):
@@ -30,6 +31,8 @@ class AuthKeyStore:
         self.path = Path(path)
         self._keys: Dict[str, str] = {}
         self._signature: tuple[int, int] | None = None
+        self._last_forced_miss_signature: tuple[int, int] | None = None
+        self._last_forced_miss_at: float = 0.0
         self.reload(force=True)
 
     def reload(self, force: bool = False) -> None:
@@ -39,6 +42,7 @@ class AuthKeyStore:
         except FileNotFoundError:
             self._keys = {}
             self._signature = None
+            self._last_forced_miss_signature = None
             return
         if force or signature != self._signature:
             with self.path.open() as f:
@@ -56,10 +60,20 @@ class AuthKeyStore:
     def get_key(self, kid: str) -> Optional[str]:
         self.reload()
         key = self._keys.get(kid)
-        if key is None:
+        if key is None and self._should_force_reload_for_miss():
             self.reload(force=True)
+            self._last_forced_miss_signature = self._signature
+            self._last_forced_miss_at = time.monotonic()
             key = self._keys.get(kid)
         return key
+
+    def _should_force_reload_for_miss(self) -> bool:
+        if self._signature != self._last_forced_miss_signature:
+            return True
+        return (
+            time.monotonic() - self._last_forced_miss_at
+            >= FORCED_MISS_RELOAD_COOLDOWN_SECONDS
+        )
 
 
 def _b64url_decode(data: str) -> bytes:
