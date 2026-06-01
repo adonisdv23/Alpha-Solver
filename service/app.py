@@ -70,6 +70,7 @@ from .security import validate_api_key, sanitize_query
 from .otel import init_tracer
 from .health import healthcheck
 from .gating.gates import evaluate_gates
+from alpha.webapp.routes import auth as dashboard_auth, expert_preview
 
 
 class JsonFormatter(logging.Formatter):
@@ -164,6 +165,40 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Dashboard UI: login/session plus the supervised expert-preview page. This
+# reuses the shared dashboard auth/CSRF middleware (see alpha/webapp/routes/auth.py)
+# so /dashboard/* is protected; we intentionally mount only auth + expert-preview.
+#
+# Fail closed: mount the dashboard only when a non-default ALPHA_DASHBOARD_PASSWORD
+# is configured. Otherwise /login and the provider-backed preview would sit behind
+# the well-known default password on any deployment that forgot to set one, so we
+# skip mounting (routes 404), log a warning, and leave the JSON API fully working.
+#
+# Known limitation (tracked, deferred): a successful login redirects to /requests
+# (alpha.webapp.routes.auth.login), which this app does not mount, so the post-login
+# landing 404s. Operators should open /dashboard/expert-preview directly. A follow-up
+# should make the post-login destination configurable; we do not change the shared
+# auth redirect here.
+def _dashboard_enabled() -> bool:
+    password = os.getenv(dashboard_auth.PASSWORD_ENV_VAR)
+    return bool(password) and password != dashboard_auth.DEFAULT_DASHBOARD_PASSWORD
+
+
+def _mount_dashboard(target: FastAPI) -> None:
+    dashboard_auth.install_dashboard_security(target)
+    target.include_router(dashboard_auth.router)
+    target.include_router(expert_preview.router)
+
+
+if _dashboard_enabled():
+    _mount_dashboard(app)
+else:
+    logger.warning(
+        "Dashboard UI disabled: set a non-default %s to enable /dashboard/* "
+        "(login + supervised expert-preview).",
+        dashboard_auth.PASSWORD_ENV_VAR,
+    )
 
 
 def _is_openai_provider_enabled() -> bool:

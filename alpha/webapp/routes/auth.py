@@ -22,6 +22,8 @@ __all__ = [
     "SESSION_COOKIE_NAME",
     "CSRF_COOKIE_NAME",
     "CSRF_HEADER_NAME",
+    "PASSWORD_ENV_VAR",
+    "DEFAULT_DASHBOARD_PASSWORD",
 ]
 
 
@@ -32,6 +34,10 @@ CSRF_HEADER_NAME = "x-alpha-csrf"
 
 PASSWORD_ENV_VAR = "ALPHA_DASHBOARD_PASSWORD"
 SECRET_ENV_VAR = "ALPHA_DASHBOARD_SECRET_KEY"
+
+# Fallback password used only when PASSWORD_ENV_VAR is unset. Callers that mount
+# the dashboard on a public app should treat this value as "not configured".
+DEFAULT_DASHBOARD_PASSWORD = "alpha-dashboard"
 
 SESSION_TTL_SECONDS = 60 * 60  # one hour
 LOCKOUT_THRESHOLD = 5
@@ -220,7 +226,7 @@ async def _extract_login_payload(request: Request) -> Dict[str, str]:
 def _expected_password() -> str:
     password = os.getenv(PASSWORD_ENV_VAR)
     if password is None:
-        return "alpha-dashboard"
+        return DEFAULT_DASHBOARD_PASSWORD
     return password
 
 

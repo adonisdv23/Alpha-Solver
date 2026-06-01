@@ -65,6 +65,21 @@ validation, production readiness, broad runtime readiness, or answer-quality
 benchmark success. The behavioral demo checklist remains the review aid for
 behavior shape, and this UI does not replace eval evidence.
 
+### Mounting in the bundled API app
+
+In the bundled API application (`service.app:app`), the dashboard — the login
+routes plus `/dashboard/expert-preview` — is mounted **only when a non-default
+`ALPHA_DASHBOARD_PASSWORD` is configured**. If the password is unset or left at
+the documented default, the dashboard is not mounted (its routes return 404), a
+warning is logged, and the JSON API keeps serving normally. This fails closed so
+a misconfigured deployment never exposes the provider-backed preview behind the
+well-known default password.
+
+**Known limitation (deferred):** a successful login redirects to `/requests`,
+which the bundled API app does not mount, so the post-login landing returns 404.
+After logging in, open `/dashboard/expert-preview` directly. A follow-up will
+make the post-login destination configurable.
+
 ## Obtaining the CSRF Token
 
 The CSRF token for the current session is exposed via the
