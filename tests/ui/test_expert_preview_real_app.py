@@ -13,6 +13,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -21,7 +22,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from alpha.providers import FakeProviderClient, ProviderCost, ProviderResult, ProviderUsage  # noqa: E402
 from alpha.webapp.routes import auth, expert_preview  # noqa: E402
-from service.app import app  # noqa: E402
+from service.app import app, _dashboard_enabled, _mount_dashboard  # noqa: E402
 
 ROUTE = "/dashboard/expert-preview"
 
@@ -136,3 +137,35 @@ def test_preview_post_without_csrf_is_rejected(client: TestClient) -> None:
     response = client.post(ROUTE, data={"prompt": "hello"}, follow_redirects=False)
 
     assert response.status_code == 403
+
+
+def test_dashboard_disabled_when_password_unset(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("ALPHA_DASHBOARD_PASSWORD", raising=False)
+    assert _dashboard_enabled() is False
+
+
+def test_dashboard_disabled_when_password_is_default(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("ALPHA_DASHBOARD_PASSWORD", auth.DEFAULT_DASHBOARD_PASSWORD)
+    assert _dashboard_enabled() is False
+
+
+def test_dashboard_enabled_when_password_non_default(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("ALPHA_DASHBOARD_PASSWORD", "a-strong-operator-secret")
+    assert _dashboard_enabled() is True
+
+
+def test_mount_dashboard_adds_protected_routes() -> None:
+    fresh = FastAPI()
+    _mount_dashboard(fresh)
+
+    paths = {getattr(route, "path", None) for route in fresh.routes}
+    assert ROUTE in paths
+    assert "/login" in paths
+
+    fresh_client = TestClient(fresh, base_url="https://testserver")
+    try:
+        response = fresh_client.get(ROUTE, follow_redirects=False)
+    finally:
+        fresh_client.close()
+    assert response.status_code == 303
+    assert response.headers["location"] == "/login"

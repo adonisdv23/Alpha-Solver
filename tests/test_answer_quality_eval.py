@@ -305,7 +305,7 @@ def test_expert_pass_behavioral_demo_checklist_documents_scope_and_boundaries():
 
     assert "docs/evals/runs/answer_quality_no_live_summary.json" in text
     assert "must not require live OpenAI calls" in text
-    assert "UI-PREVIEW-001 remains held and not implemented" in text
+    assert "UI-PREVIEW-001 is implemented and operator-accessible" in text
 
 
 def test_live_requires_explicit_env_gate_even_with_client_and_key(monkeypatch, tmp_path):
