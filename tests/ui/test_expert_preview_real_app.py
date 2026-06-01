@@ -46,6 +46,9 @@ def client(monkeypatch: pytest.MonkeyPatch) -> TestClient:
     monkeypatch.setenv("ALPHA_DASHBOARD_PASSWORD", "testing-secret")
     monkeypatch.setenv("ALPHA_DASHBOARD_SECRET_KEY", "unit-test-secret")
     monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    monkeypatch.setenv("ALPHA_LIVE_PREVIEW_ENABLED", "true")
+    monkeypatch.setenv("ALPHA_LIVE_PREVIEW_MAX_REQUESTS", "20")
+    app.state.live_preview_request_count = 0
     auth.reset_state()
 
     # ``base_url`` must be https: login sets Secure cookies, which the test client

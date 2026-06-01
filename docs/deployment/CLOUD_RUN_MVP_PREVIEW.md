@@ -91,9 +91,22 @@ succeeds and live-provider spend is explicitly approved:
 ```text
 MODEL_PROVIDER=openai
 OPENAI_API_KEY=<test-project-key>
+ALPHA_LIVE_PREVIEW_ENABLED=true
+ALPHA_LIVE_PREVIEW_MAX_REQUESTS=<low integer cap, for example 1 or 2>
 ```
 
-Do not configure `OPENAI_API_KEY` for the first local-provider preview.
+Do not configure `OPENAI_API_KEY` for the first local-provider preview. Do not
+switch `MODEL_PROVIDER` from `local` to `openai` until the operator explicitly
+approves live-provider testing after the live-preview spend guard is merged and
+deployed.
+
+`ALPHA_LIVE_PREVIEW_ENABLED` defaults to fail-closed behavior. When
+`MODEL_PROVIDER=openai` but `ALPHA_LIVE_PREVIEW_ENABLED` is unset or false,
+`/dashboard/expert-preview` blocks preview submissions before constructing or
+calling the provider client. `ALPHA_LIVE_PREVIEW_MAX_REQUESTS` is a per-process
+request cap for the preview form; when unset, the app uses a very low default of
+`1` allowed preview submission per service instance. Set it explicitly to the
+lowest number needed for the approved operator test window.
 
 ## 5. Secret handling
 
@@ -326,7 +339,9 @@ It only prepares the repo for a controlled Cloud Run MVP preview deployment.
 | `/dashboard/expert-preview` returns 404 | Dashboard password is unset/default or dashboard secret key is missing/empty | Configure a strong non-default `ALPHA_DASHBOARD_PASSWORD` and non-empty `ALPHA_DASHBOARD_SECRET_KEY`, then redeploy a new revision |
 | Login redirects somewhere other than `/dashboard/expert-preview` | Bundled dashboard login redirect was not configured or regressed | Check `service.app:app` dashboard mounting and rerun the no-network UI tests |
 | POST to preview returns 403 | Missing or invalid CSRF header | Send `X-Alpha-CSRF` with the value from the `alpha_dashboard_csrf` cookie |
-| Preview attempts live provider calls | `MODEL_PROVIDER` is set to `openai` | Revert to `MODEL_PROVIDER=local`; remove `OPENAI_API_KEY` from the first preview revision |
+| Preview attempts live provider calls | `MODEL_PROVIDER` is set to `openai` and live-preview opt-in/cap allowed the request | Revert to `MODEL_PROVIDER=local`; remove `OPENAI_API_KEY` from the first preview revision |
+| Preview submit returns 403 with live preview disabled | `MODEL_PROVIDER=openai` without `ALPHA_LIVE_PREVIEW_ENABLED=true` | This is expected fail-closed behavior; keep held unless live-provider testing is explicitly approved |
+| Preview submit returns 403 after one or a few live tests | `ALPHA_LIVE_PREVIEW_MAX_REQUESTS` cap reached for the Cloud Run instance | Stop testing or deploy a new approved revision with a low explicit cap |
 | Secrets appear in output | Regression or unsafe manual logging | Stop testing, capture minimal evidence without secrets, rotate affected secrets, and fix before continuing |
 | Cold starts are slow | `min-instances=0` | Accept for first testing or temporarily set `min-instances=1` for scheduled operator sessions |
 

@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
-import html
-import json
 from email import policy
 from email.parser import BytesParser
+import html
+import json
+import logging
+import os
+from threading import Lock
 from typing import Any, Dict, Iterable, Mapping
 from urllib.parse import parse_qs
 
@@ -13,6 +16,7 @@ from fastapi import APIRouter, Request, status
 from fastapi.responses import HTMLResponse
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 DISCLAIMER = (
     "This preview is for supervised operator review. It does not prove Alpha Solver "
@@ -22,6 +26,88 @@ DISCLAIMER = (
 
 ROUTE = "/dashboard/expert-preview"
 _ROUTE = ROUTE
+LIVE_PREVIEW_ENABLED_ENV = "ALPHA_LIVE_PREVIEW_ENABLED"
+LIVE_PREVIEW_MAX_REQUESTS_ENV = "ALPHA_LIVE_PREVIEW_MAX_REQUESTS"
+_DEFAULT_LIVE_PREVIEW_MAX_REQUESTS = 1
+_LIVE_PREVIEW_DISABLED_MESSAGE = (
+    "Live OpenAI preview testing is disabled. Set "
+    f"{LIVE_PREVIEW_ENABLED_ENV}=true and configure a low "
+    f"{LIVE_PREVIEW_MAX_REQUESTS_ENV} only for explicitly approved operator testing."
+)
+_LIVE_PREVIEW_CAP_MESSAGE = (
+    "Live OpenAI preview request cap reached for this service instance. "
+    f"Raise {LIVE_PREVIEW_MAX_REQUESTS_ENV} only with explicit operator approval."
+)
+
+
+def _truthy_env(name: str) -> bool:
+    return os.getenv(name, "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _model_provider() -> str:
+    return os.getenv("MODEL_PROVIDER", "local").strip().lower()
+
+
+def _live_preview_max_requests() -> int:
+    raw = os.getenv(LIVE_PREVIEW_MAX_REQUESTS_ENV, "").strip()
+    if not raw:
+        return _DEFAULT_LIVE_PREVIEW_MAX_REQUESTS
+    try:
+        return int(raw)
+    except ValueError:
+        logger.warning(
+            "live_preview_guard blocked reason=invalid_cap provider=openai env=%s",
+            LIVE_PREVIEW_MAX_REQUESTS_ENV,
+        )
+        return 0
+
+
+def _live_preview_lock(request: Request) -> Lock:
+    lock = getattr(request.app.state, "live_preview_guard_lock", None)
+    if lock is None:
+        lock = Lock()
+        request.app.state.live_preview_guard_lock = lock
+    return lock
+
+
+def _check_live_preview_guard(request: Request) -> str | None:
+    """Return a safe user-facing error when the live preview must fail closed."""
+
+    provider = _model_provider()
+    if provider != "openai":
+        return None
+
+    if not _truthy_env(LIVE_PREVIEW_ENABLED_ENV):
+        logger.warning(
+            "live_preview_guard blocked reason=disabled provider=openai env=%s",
+            LIVE_PREVIEW_ENABLED_ENV,
+        )
+        return _LIVE_PREVIEW_DISABLED_MESSAGE
+
+    max_requests = _live_preview_max_requests()
+    if max_requests <= 0:
+        logger.warning(
+            "live_preview_guard blocked reason=cap_not_positive provider=openai max_requests=%s",
+            max_requests,
+        )
+        return _LIVE_PREVIEW_CAP_MESSAGE
+
+    with _live_preview_lock(request):
+        count = int(getattr(request.app.state, "live_preview_request_count", 0))
+        if count >= max_requests:
+            logger.warning(
+                "live_preview_guard blocked reason=cap_reached provider=openai count=%s max_requests=%s",
+                count,
+                max_requests,
+            )
+            return _LIVE_PREVIEW_CAP_MESSAGE
+        request.app.state.live_preview_request_count = count + 1
+        logger.warning(
+            "live_preview_guard allowed provider=openai count=%s max_requests=%s",
+            count + 1,
+            max_requests,
+        )
+    return None
 
 
 def _escape(value: Any) -> str:
@@ -293,6 +379,12 @@ async def expert_preview_submit(request: Request) -> HTMLResponse:
         return HTMLResponse(
             content=_render_page(error="Prompt is required."),
             status_code=status.HTTP_400_BAD_REQUEST,
+        )
+    guard_error = _check_live_preview_guard(request)
+    if guard_error:
+        return HTMLResponse(
+            content=_render_page(prompt=prompt, error=guard_error),
+            status_code=status.HTTP_403_FORBIDDEN,
         )
     try:
         plain = await _solve_preview(request, prompt, expert=False)
