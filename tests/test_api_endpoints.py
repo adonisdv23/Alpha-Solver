@@ -626,6 +626,53 @@ def test_solve_openai_expert_clarify_mode_surfaces_questions_without_extra_call(
     _clear_provider_factory()
 
 
+def test_solve_openai_expert_unstructured_preview_confidence_falls_back_to_clarify(monkeypatch):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    raw_answer = (
+        "This long provider answer should not be visible when preview confidence is unavailable."
+    )
+    fake = FakeProviderClient(
+        [
+            _provider_result(
+                "Here is a prose review with some risks and assumptions, but no compact "
+                "JSON object, no section headings, and no numeric confidence value."
+            ),
+            _provider_result(raw_answer),
+        ]
+    )
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={
+            "query": (
+                "Plan a security review and architecture migration where goals, timeline, "
+                "owners, risk tolerance, and compliance constraints are uncertain."
+            ),
+            "context": {"route": "expert"},
+        },
+        headers={"X-API-Key": key},
+    )
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["mode"] == "clarify"
+    assert body["confidence"] == 0.0
+    assert body["answer"] == "I need a few details before I can answer this well."
+    assert body["final_answer"] == body["answer"]
+    assert body["considerations"] == []
+    assert body["assumptions"] == []
+    assert 2 <= len(body["clarifying_questions"]) <= 4
+    assert body["clarifying_questions"][0] == "What is the main outcome you want from this request?"
+    assert body["meta"]["preview_parse_status"] == "unstructured"
+    assert body["meta"]["confidence_available"] is False
+    assert body["meta"]["call_count"] == 2
+    assert raw_answer not in resp.text
+    assert len(fake.requests) == 2
+    _clear_provider_factory()
+
+
 def test_solve_openai_expert_trivial_route_does_not_add_clarifying_questions(monkeypatch):
     monkeypatch.setenv("MODEL_PROVIDER", "openai")
     fake = FakeProviderClient([_provider_result("Short direct answer.")])
@@ -649,13 +696,14 @@ def test_solve_openai_expert_trivial_route_does_not_add_clarifying_questions(mon
 
 def test_solve_openai_expert_block_mode_remains_distinct_from_clarify(monkeypatch):
     monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    raw_answer = "This long provider answer should not be visible for true block mode."
     fake = FakeProviderClient(
         [
             _provider_result(
                 '{"considerations":["The request may be unsafe"],'
                 '"assumptions":[],"confidence":0.05}'
             ),
-            _provider_result("Cannot safely answer as requested."),
+            _provider_result(raw_answer),
         ]
     )
     app.state.provider_client_factory = lambda _model_set: fake
@@ -676,9 +724,16 @@ def test_solve_openai_expert_block_mode_remains_distinct_from_clarify(monkeypatc
     assert resp.status_code == 200
     body = resp.json()
     assert body["mode"] == "block"
-    assert body["answer"] == "Cannot safely answer as requested."
+    assert body["confidence"] == 0.05
+    assert body["answer"] == (
+        "I cannot safely provide a final answer for this request in the supervised preview."
+    )
+    assert body["final_answer"] == body["answer"]
+    assert body["considerations"] == ["The request may be unsafe"]
     assert "clarifying_questions" not in body
     assert body["meta"]["call_count"] == 2
+    assert "confidence_available" not in body["meta"]
+    assert raw_answer not in resp.text
     assert len(fake.requests) == 2
     _clear_provider_factory()
 
