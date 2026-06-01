@@ -20,7 +20,10 @@ DISCLAIMER = (
     "answer-quality benchmark success."
 )
 
-_ROUTE = "/dashboard/expert-preview"
+ROUTE = "/dashboard/expert-preview"
+_ROUTE = ROUTE
+
+
 def _escape(value: Any) -> str:
     return html.escape("" if value is None else str(value), quote=True)
 

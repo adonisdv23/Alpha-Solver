@@ -79,10 +79,10 @@ secret. The auth module's fallback random secret remains available for custom
 router integrations; the bundled app's Cloud Run/operator mount guard requires
 explicit configuration.
 
-**Known limitation (deferred):** a successful login redirects to `/requests`,
-which the bundled API app does not mount, so the post-login landing returns 404.
-After logging in, open `/dashboard/expert-preview` directly. A follow-up will
-make the post-login destination configurable.
+The shared auth router still defaults successful login to `/requests` for
+custom/full-dashboard consumers. The bundled API app configures its app-local
+post-login redirect to `/dashboard/expert-preview` because it intentionally
+mounts only auth plus the supervised expert-preview route.
 
 ## Obtaining the CSRF Token
 

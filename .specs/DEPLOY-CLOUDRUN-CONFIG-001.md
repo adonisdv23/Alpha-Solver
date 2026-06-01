@@ -17,7 +17,7 @@ for a controlled Alpha Solver MVP preview deployment of `/dashboard/expert-previ
 
 - The root `Dockerfile` uses Python 3.12, installs `requirements.txt`, copies the repo, and starts `service.app:app` with Uvicorn on `0.0.0.0` using Cloud Run `PORT` with an `8080` fallback.
 - `.dockerignore` excludes local caches, artifacts, logs, virtualenvs, VCS state, and local env files without excluding required app files.
-- The Cloud Run MVP preview doc covers purpose, scope boundaries, required settings, required env vars, local build/run, deploy examples, smoke tests, fail-closed dashboard behavior, the `/requests` redirect limitation, local-provider first workflow, held live OpenAI workflow, security notes, claim boundaries, troubleshooting, and backlog impact.
+- The Cloud Run MVP preview doc covers purpose, scope boundaries, required settings, required env vars, local build/run, deploy examples, smoke tests, fail-closed dashboard behavior, the bundled preview login redirect behavior, local-provider first workflow, held live OpenAI workflow, security notes, claim boundaries, troubleshooting, and backlog impact.
 - No runtime behavior changes are made.
 - No secrets are committed.
 - No Cloud Run deployment is performed from Codex.

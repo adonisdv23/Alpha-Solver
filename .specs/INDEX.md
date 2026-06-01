@@ -8,6 +8,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 | `AS-148.md` | CODE SPEC — AS-148 · Policy & PII Gateway (DR_TRACK_A) |
 | `AUTH-SESSION-001.md` | AUTH-SESSION-001 · Dashboard Login + Session |
 | `CLARIFY-SURFACE-001.md` | CLARIFY-SURFACE-001 · Expert Route Clarify Surface |
+| `DASHBOARD-LOGIN-REDIRECT-001.md` | DASHBOARD-LOGIN-REDIRECT-001 · Configurable Dashboard Login Redirect |
 | `DEPLOY-CLOUDRUN-CONFIG-001.md` | DEPLOY-CLOUDRUN-CONFIG-001 · Cloud Run MVP Preview Deployment Config |
 | `DEPLOY-CLOUDRUN-DASHBOARD-SECRET-GUARD-001.md` | DEPLOY-CLOUDRUN-DASHBOARD-SECRET-GUARD-001 · Require Dashboard Secret for Bundled Cloud Run Preview Mount |
 | `EPIC_RAG_001.md` | EPIC_RAG_001 · RAG & Semantic Cache Pack |
