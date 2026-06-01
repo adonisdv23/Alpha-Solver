@@ -15,7 +15,9 @@ for more testing. This checklist does not validate the MVP, prove Alpha Solver
 superiority, prove production readiness, prove answer-quality benchmark success,
 or prove provider reasoning orchestration.
 
-Use the [Operator Behavioral Demo Evidence Template](OPERATOR_BEHAVIORAL_DEMO_EVIDENCE_TEMPLATE.md)
+For a one-session step-by-step procedure, start with the
+[Operator Demo Run Packet](OPERATOR_DEMO_RUN_PACKET.md). Use the
+[Operator Behavioral Demo Evidence Template](OPERATOR_BEHAVIORAL_DEMO_EVIDENCE_TEMPLATE.md)
 to record summarized findings for each run without storing raw provider
 payloads, secrets, headers, cookies, session values, CSRF tokens, or API keys.
 
