@@ -439,3 +439,251 @@ def test_solve_openai_unknown_provider_exception_emits_no_accounting(monkeypatch
     _clear_provider_factory()
     _clear_provider_telemetry_sink()
     _clear_provider_accounting_sink()
+
+
+def _provider_result(text, *, request_id="req-expert", model="gpt-test"):
+    return ProviderResult(
+        provider="openai",
+        model=model,
+        text=text,
+        finish_reason="stop",
+        usage=ProviderUsage(input_tokens=1, output_tokens=1, total_tokens=2),
+        cost=ProviderCost(estimated_usd=0.0, source="price_hint"),
+        latency_ms=1,
+        request_id=request_id,
+        raw_metadata={"provider_request_id": f"provider-{request_id}"},
+    )
+
+
+def test_solve_openai_expert_complex_route_makes_two_calls_and_returns_envelope(monkeypatch):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    fake = FakeProviderClient(
+        [
+            _provider_result(
+                '{"considerations":["Check migration risk"],'
+                '"assumptions":["Traffic can be shifted gradually"],'
+                '"confidence":0.72}'
+            ),
+            _provider_result("Use a staged migration with rollback checkpoints."),
+        ]
+    )
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={
+            "query": (
+                "Review this database migration plan, compare risks and tradeoffs, "
+                "and decide whether the team should proceed this quarter."
+            ),
+            "context": {"route": "expert"},
+        },
+        headers={"X-API-Key": key, "X-Request-ID": "req-expert"},
+    )
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["answer"] == "Use a staged migration with rollback checkpoints."
+    assert body["final_answer"] == body["answer"]
+    assert body["considerations"] == ["Check migration risk"]
+    assert body["assumptions"] == ["Traffic can be shifted gradually"]
+    assert body["confidence"] == 0.72
+    assert body["mode"] == "answer_with_assumptions"
+    assert body["meta"] == {
+        "route": "expert",
+        "complexity": "complex",
+        "provider": "openai",
+        "model": "gpt-test",
+        "call_count": 2,
+    }
+    assert len(fake.requests) == 2
+    assert fake.requests[0].metadata["route"] == "expert"
+    assert fake.requests[1].metadata["route"] == "expert"
+    blocked = "orches" + "tration"
+    assert blocked not in resp.text.lower()
+    _clear_provider_factory()
+
+
+def test_solve_openai_expert_complex_route_preserves_system_prompt(monkeypatch):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    fake = FakeProviderClient(
+        [
+            _provider_result(
+                '{"considerations":["Follow caller constraints"],'
+                '"assumptions":["System instruction remains authoritative"],'
+                '"confidence":0.8}'
+            ),
+            _provider_result("Answer constrained by system prompt."),
+        ]
+    )
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+    system_prompt = "You must answer in exactly two bullet points."
+
+    resp = client.post(
+        "/v1/solve",
+        json={
+            "query": (
+                "Review this security migration plan, compare risks and tradeoffs, "
+                "and decide whether the team should proceed this quarter."
+            ),
+            "context": {"route": "expert", "system": system_prompt},
+        },
+        headers={"X-API-Key": key, "X-Request-ID": "req-expert-system"},
+    )
+
+    assert resp.status_code == 200
+    assert len(fake.requests) == 2
+    assert fake.requests[0].system == system_prompt
+    assert fake.requests[1].system == system_prompt
+    _clear_provider_factory()
+
+
+def test_solve_openai_expert_trivial_route_makes_one_direct_call(monkeypatch):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    fake = FakeProviderClient([_provider_result("Short direct answer.")])
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={"query": "Define alpha.", "context": {"route": "expert"}},
+        headers={"X-API-Key": key},
+    )
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["answer"] == "Short direct answer."
+    assert body["final_answer"] == "Short direct answer."
+    assert body["considerations"] == []
+    assert body["assumptions"] == []
+    assert body["confidence"] == 0.0
+    assert body["mode"] == "direct"
+    assert body["meta"]["complexity"] == "trivial"
+    assert body["meta"]["call_count"] == 1
+    assert len(fake.requests) == 1
+    _clear_provider_factory()
+
+
+def test_solve_openai_expert_clarify_mode_includes_assumptions(monkeypatch):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    fake = FakeProviderClient(
+        [
+            _provider_result(
+                '{"considerations":["Several requirements are missing"],'
+                '"assumptions":["Budget is flexible"],'
+                '"confidence":0.50}'
+            ),
+            _provider_result("Proceed only after confirming the missing requirements."),
+        ]
+    )
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={
+            "query": (
+                "Plan a security review and architecture migration where the goals, "
+                "timeline, owners, and risk tolerance are uncertain."
+            ),
+            "context": {"route": "expert"},
+        },
+        headers={"X-API-Key": key},
+    )
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["mode"] == "clarify"
+    assert body["assumptions"] == ["Budget is flexible"]
+    assert body["considerations"]
+    assert len(fake.requests) == 2
+    _clear_provider_factory()
+
+
+def test_solve_openai_non_expert_route_preserves_pass_through_shape(monkeypatch):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    fake = FakeProviderClient([_provider_result("provider answer")])
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={"query": "hello provider", "context": {"route": "tot"}},
+        headers={"X-API-Key": key, "X-Request-ID": "req-pass"},
+    )
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert set(body) == {"final_answer", "meta"}
+    assert body["final_answer"] == "provider answer"
+    assert "answer" not in body
+    assert len(fake.requests) == 1
+    assert fake.requests[0].metadata["route"] == "tot"
+    _clear_provider_factory()
+
+
+def test_solve_expert_route_local_mode_preserves_local_response(monkeypatch):
+    monkeypatch.setenv("MODEL_PROVIDER", "local")
+    app.state.provider_client_factory = lambda _model_set: (_ for _ in ()).throw(
+        AssertionError("provider should not be used in local mode")
+    )
+
+    def fake_solver(query: str, **kwargs):
+        return {"final_answer": f"local:{query}"}
+
+    monkeypatch.setattr("service.app._tree_of_thought", fake_solver)
+    client, key = _client()
+    resp = client.post(
+        "/v1/solve",
+        json={"query": "hi", "context": {"route": "expert"}},
+        headers={"X-API-Key": key},
+    )
+
+    assert resp.status_code == 200
+    assert resp.json() == {"final_answer": "local:hi"}
+    _clear_provider_factory()
+
+
+def test_solve_openai_expert_envelope_does_not_leak_secrets_or_raw_metadata(monkeypatch):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    secret = "sk-test-expert-secret"
+    fake = FakeProviderClient(
+        [
+            ProviderResult(
+                provider="openai",
+                model="gpt-test",
+                text='{"considerations":["Use safe metadata"],"assumptions":[],"confidence":0.9}',
+                finish_reason="stop",
+                usage=ProviderUsage(input_tokens=1, output_tokens=1, total_tokens=2),
+                cost=ProviderCost(estimated_usd=0.0, source="price_hint"),
+                latency_ms=1,
+                request_id="req-leak",
+                raw_metadata={"raw": secret, "provider_request_id": "provider-req-leak"},
+            ),
+            _provider_result("Safe final answer.", request_id="req-leak"),
+        ]
+    )
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={
+            "query": "Review a security architecture migration with uncertain risks.",
+            "context": {"route": "expert"},
+        },
+        headers={"X-API-Key": key, "X-Request-ID": "req-leak"},
+    )
+
+    assert resp.status_code == 200
+    serialized = resp.text
+    assert secret not in serialized
+    assert "raw_metadata" not in serialized
+    assert "provider_request_id" not in serialized
+    assert "Authorization" not in serialized
+    assert "Bearer" not in serialized
+    blocked = "orches" + "tration"
+    assert blocked not in serialized.lower()
+    _clear_provider_factory()

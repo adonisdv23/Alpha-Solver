@@ -7,8 +7,10 @@ import json
 import logging
 import os
 import time
+import re
 import uuid
 from collections import defaultdict, deque
+from dataclasses import replace
 from pathlib import Path
 from typing import Any, Deque, DefaultDict, Dict, Optional
 from enum import Enum
@@ -67,6 +69,7 @@ from alpha.core.telemetry import record_rate_limit, record_request, record_safe_
 from .security import validate_api_key, sanitize_query
 from .otel import init_tracer
 from .health import healthcheck
+from .gating.gates import evaluate_gates
 
 
 class JsonFormatter(logging.Formatter):
@@ -372,6 +375,203 @@ def _provider_error_response(error: ProviderError) -> JSONResponse:
     )
 
 
+_MULTI_PART_MARKERS = (
+    "first",
+    "second",
+    "third",
+    "compare",
+    "tradeoff",
+    "trade-off",
+    "pros and cons",
+    "step-by-step",
+    "plan",
+    "review",
+    "decide",
+    "decision",
+    "risk",
+    "risks",
+    "assumption",
+    "assumptions",
+    "ambiguous",
+    "uncertain",
+    "unknown",
+    "legal",
+    "medical",
+    "financial",
+    "architecture",
+    "migration",
+    "security",
+    "expert",
+)
+
+
+_CONFIDENCE_RE = re.compile(r"(?i)confidence[^0-9%]*(\d+(?:\.\d+)?)\s*(%)?")
+
+
+def _is_expert_route(params: Dict[str, Any]) -> bool:
+    return str(params.get("route", "")).strip().lower() == "expert"
+
+
+def _expert_complexity(query: str) -> str:
+    text = query.strip().lower()
+    score = 0
+    word_count = len(text.split())
+    if word_count >= 45 or len(text) >= 280:
+        score += 2
+    elif word_count >= 25 or len(text) >= 160:
+        score += 1
+    if any(marker in text for marker in _MULTI_PART_MARKERS):
+        score += 1
+    if text.count("?") >= 2 or "\n" in text or ";" in text:
+        score += 1
+    if any(token in text for token in (" and ", " or ", " vs ", " versus ")) and word_count >= 12:
+        score += 1
+    return "complex" if score >= 2 else "trivial"
+
+
+def _as_string_list(value: Any) -> list[str]:
+    if isinstance(value, list):
+        return [str(item).strip() for item in value if str(item).strip()]
+    if isinstance(value, str):
+        parts = [part.strip(" -•\t") for part in re.split(r"[\n;]+", value)]
+        return [part for part in parts if part]
+    return []
+
+
+def _confidence_value(value: Any) -> float:
+    raw: float | None = None
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        raw = float(value)
+    elif isinstance(value, str):
+        match = _CONFIDENCE_RE.search(value) or re.search(r"(\d+(?:\.\d+)?)\s*%", value)
+        if match:
+            raw = float(match.group(1))
+            if match.lastindex and match.group(match.lastindex) == "%":
+                raw /= 100.0
+        else:
+            try:
+                raw = float(value.strip())
+            except ValueError:
+                raw = None
+    if raw is None:
+        return 0.0
+    if raw > 1.0:
+        raw /= 100.0
+    return max(0.0, min(1.0, raw))
+
+
+def _parse_expert_preview(text: str) -> dict[str, Any]:
+    data: dict[str, Any] = {}
+    try:
+        parsed = json.loads(text)
+    except json.JSONDecodeError:
+        parsed = None
+    if isinstance(parsed, dict):
+        data = parsed
+    confidence_source = data.get("confidence", text)
+    considerations = _as_string_list(data.get("considerations"))
+    assumptions = _as_string_list(data.get("assumptions"))
+    if not considerations:
+        considerations = _extract_section_list(text, "considerations")
+    if not assumptions:
+        assumptions = _extract_section_list(text, "assumptions")
+    return {
+        "considerations": considerations,
+        "assumptions": assumptions,
+        "confidence": _confidence_value(confidence_source),
+    }
+
+
+def _extract_section_list(text: str, section: str) -> list[str]:
+    pattern = re.compile(
+        rf"(?ims)^\s*{re.escape(section)}\s*:?\s*(.*?)(?=^\s*(?:considerations|assumptions|confidence)\s*:?|\Z)"
+    )
+    match = pattern.search(text)
+    if not match:
+        return []
+    return _as_string_list(match.group(1))
+
+
+def _mode_from_confidence(confidence: float, assumptions: list[str], model_set: ModelSet) -> str:
+    if confidence <= 0.10:
+        return "block"
+    decision, _info = evaluate_gates(
+        confidence=confidence,
+        budget_tokens=model_set.max_tokens,
+        policy_flags={},
+    )
+    if decision == "block":
+        return "block"
+    if decision == "clarify":
+        return "clarify"
+    if assumptions and confidence < 0.75:
+        return "answer_with_assumptions"
+    return "direct"
+
+
+def _expert_step_one_prompt(query: str) -> str:
+    return (
+        "For the request below, identify expert-style considerations, assumptions, "
+        "and a self-rated confidence from 0 to 1. Return compact JSON with keys "
+        "considerations, assumptions, and confidence.\n\nRequest:\n"
+        f"{query}"
+    )
+
+
+def _expert_step_two_prompt(query: str, preview: dict[str, Any]) -> str:
+    return (
+        "Answer the request below using the provided considerations and assumptions. "
+        "Do not include raw provider metadata.\n\n"
+        f"Considerations: {json.dumps(preview['considerations'], ensure_ascii=False)}\n"
+        f"Assumptions: {json.dumps(preview['assumptions'], ensure_ascii=False)}\n"
+        f"Self-rated confidence: {preview['confidence']}\n\nRequest:\n{query}"
+    )
+
+
+def _expert_response(
+    *,
+    answer: str,
+    considerations: list[str],
+    assumptions: list[str],
+    confidence: float,
+    mode: str,
+    complexity: str,
+    provider: str,
+    model: str,
+    call_count: int,
+) -> Dict[str, Any]:
+    return {
+        "final_answer": answer,
+        "answer": answer,
+        "considerations": considerations,
+        "assumptions": assumptions,
+        "confidence": confidence,
+        "mode": mode,
+        "meta": {
+            "route": "expert",
+            "complexity": complexity,
+            "provider": provider,
+            "model": model,
+            "call_count": call_count,
+        },
+    }
+
+
+def _execute_provider_call(
+    *,
+    request: Request,
+    provider_client: Any,
+    provider_request: ProviderRequest,
+) -> ProviderResult:
+    _emit_provider_telemetry(request, _provider_request_started_event(provider_request))
+    result = provider_client.execute(provider_request)
+    _emit_provider_telemetry(
+        request, _provider_request_completed_event(provider_request, result)
+    )
+    _emit_provider_accounting(request, _provider_accounting_record(provider_request, result))
+    return result
+
+
 class StrategyEnum(str, Enum):
     cot = "cot"
     react = "react"
@@ -475,10 +675,69 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
         )
         try:
             provider_client = _get_provider_client(request, model_set)
-            _emit_provider_telemetry(
-                request, _provider_request_started_event(provider_request)
+            if _is_expert_route(params):
+                complexity = _expert_complexity(query)
+                if complexity == "trivial":
+                    provider_result = _execute_provider_call(
+                        request=request,
+                        provider_client=provider_client,
+                        provider_request=provider_request,
+                    )
+                    return JSONResponse(
+                        _expert_response(
+                            answer=provider_result.text,
+                            considerations=[],
+                            assumptions=[],
+                            confidence=0.0,
+                            mode="direct",
+                            complexity=complexity,
+                            provider=provider_result.provider,
+                            model=provider_result.model,
+                            call_count=1,
+                        )
+                    )
+
+                preview_request = replace(
+                    provider_request,
+                    prompt=_expert_step_one_prompt(query),
+                )
+                preview_result = _execute_provider_call(
+                    request=request,
+                    provider_client=provider_client,
+                    provider_request=preview_request,
+                )
+                preview = _parse_expert_preview(preview_result.text)
+                answer_request = replace(
+                    provider_request,
+                    prompt=_expert_step_two_prompt(query, preview),
+                )
+                answer_result = _execute_provider_call(
+                    request=request,
+                    provider_client=provider_client,
+                    provider_request=answer_request,
+                )
+                mode = _mode_from_confidence(
+                    preview["confidence"], preview["assumptions"], model_set
+                )
+                return JSONResponse(
+                    _expert_response(
+                        answer=answer_result.text,
+                        considerations=preview["considerations"],
+                        assumptions=preview["assumptions"],
+                        confidence=preview["confidence"],
+                        mode=mode,
+                        complexity=complexity,
+                        provider=answer_result.provider,
+                        model=answer_result.model,
+                        call_count=2,
+                    )
+                )
+
+            provider_result = _execute_provider_call(
+                request=request,
+                provider_client=provider_client,
+                provider_request=provider_request,
             )
-            provider_result = provider_client.execute(provider_request)
         except ProviderError as exc:
             _emit_provider_telemetry(
                 request, _provider_request_error_event(provider_request, exc)
@@ -498,12 +757,6 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
                 request, _provider_request_error_event(provider_request, safe_error)
             )
             return _provider_error_response(safe_error)
-        _emit_provider_telemetry(
-            request, _provider_request_completed_event(provider_request, provider_result)
-        )
-        _emit_provider_accounting(
-            request, _provider_accounting_record(provider_request, provider_result)
-        )
         return JSONResponse(_provider_success_response(provider_result, model_set))
 
     start = time.time()
