@@ -84,7 +84,7 @@ This checklist explicitly states:
 - `PROVIDER-EXPERT-PASS-001` remains Done from PR #199.
 - `CLARIFY-SURFACE-001` remains separate and should only be marked Done if PR #200 was merged.
 - `EVAL-ARTIFACT-PRESERVE-001` remains separate and should only be marked Done if PR #201 was merged.
-- UI-PREVIEW-001 remains held and not implemented.
+- UI-PREVIEW-001 is implemented and operator-accessible at `/dashboard/expert-preview` (behind dashboard authentication).
 - Do not edit the Google Sheet from Codex.
 - Do not update uncertain legacy concept rows.
 - Do not touch Review Queue concept rows unless the human operator specifically requests it.

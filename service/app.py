@@ -70,6 +70,7 @@ from .security import validate_api_key, sanitize_query
 from .otel import init_tracer
 from .health import healthcheck
 from .gating.gates import evaluate_gates
+from alpha.webapp.routes import auth as dashboard_auth, expert_preview
 
 
 class JsonFormatter(logging.Formatter):
@@ -164,6 +165,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Dashboard UI: login/session plus the supervised expert-preview page. This
+# reuses the shared dashboard auth/CSRF middleware (see alpha/webapp/routes/auth.py)
+# so /dashboard/* is protected; we intentionally mount only auth + expert-preview.
+dashboard_auth.install_dashboard_security(app)
+app.include_router(dashboard_auth.router)
+app.include_router(expert_preview.router)
 
 
 def _is_openai_provider_enabled() -> bool:
