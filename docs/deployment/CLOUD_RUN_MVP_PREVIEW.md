@@ -11,7 +11,8 @@ operator-test deployment of the Alpha Solver MVP preview route:
 
 The first deployment is intended to make the already-implemented supervised
 preview reachable behind the existing dashboard password gate. It is a deployment
-configuration and operator-smoke lane only.
+configuration and operator-smoke lane only. For one manual preview session, use
+the [Operator Demo Run Packet](../OPERATOR_DEMO_RUN_PACKET.md).
 
 ## 2. Scope boundaries
 

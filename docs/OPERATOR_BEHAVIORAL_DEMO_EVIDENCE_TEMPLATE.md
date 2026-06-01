@@ -3,8 +3,9 @@
 ## Purpose
 
 Use this copyable template to record summarized evidence from the
-[Operator Behavioral Demo Checklist](OPERATOR_BEHAVIORAL_DEMO_CHECKLIST.md) for
-Alpha Solver MVP preview runs. The template is for manual operator notes only.
+[Operator Behavioral Demo Checklist](OPERATOR_BEHAVIORAL_DEMO_CHECKLIST.md) and
+the [Operator Demo Run Packet](OPERATOR_DEMO_RUN_PACKET.md) for Alpha Solver MVP
+preview runs. The template is for manual operator notes only.
 It does not create storage, run automated evaluations, validate the MVP, prove
 Alpha Solver superiority, prove production readiness, prove answer-quality
 benchmark success, or prove provider reasoning orchestration.
