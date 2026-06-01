@@ -170,10 +170,12 @@ app.add_middleware(
 # reuses the shared dashboard auth/CSRF middleware (see alpha/webapp/routes/auth.py)
 # so /dashboard/* is protected; we intentionally mount only auth + expert-preview.
 #
-# Fail closed: mount the dashboard only when a non-default ALPHA_DASHBOARD_PASSWORD
-# is configured. Otherwise /login and the provider-backed preview would sit behind
-# the well-known default password on any deployment that forgot to set one, so we
-# skip mounting (routes 404), log a warning, and leave the JSON API fully working.
+# Fail closed: mount the dashboard only when both a non-default
+# ALPHA_DASHBOARD_PASSWORD and an explicit ALPHA_DASHBOARD_SECRET_KEY are
+# configured. Otherwise /login and the provider-backed preview could sit behind
+# the well-known default password or use an ephemeral runtime signing secret on a
+# deployment that forgot to set one, so we skip mounting (routes 404), log a
+# warning, and leave the JSON API fully working.
 #
 # Known limitation (tracked, deferred): a successful login redirects to /requests
 # (alpha.webapp.routes.auth.login), which this app does not mount, so the post-login
@@ -182,7 +184,12 @@ app.add_middleware(
 # auth redirect here.
 def _dashboard_enabled() -> bool:
     password = os.getenv(dashboard_auth.PASSWORD_ENV_VAR)
-    return bool(password) and password != dashboard_auth.DEFAULT_DASHBOARD_PASSWORD
+    secret_key = os.getenv(dashboard_auth.SECRET_ENV_VAR)
+    return (
+        bool(password)
+        and password != dashboard_auth.DEFAULT_DASHBOARD_PASSWORD
+        and bool(secret_key)
+    )
 
 
 def _mount_dashboard(target: FastAPI) -> None:
@@ -195,9 +202,10 @@ if _dashboard_enabled():
     _mount_dashboard(app)
 else:
     logger.warning(
-        "Dashboard UI disabled: set a non-default %s to enable /dashboard/* "
-        "(login + supervised expert-preview).",
+        "Dashboard UI disabled: set a non-default %s and explicit %s "
+        "to enable /dashboard/* (login + supervised expert-preview).",
         dashboard_auth.PASSWORD_ENV_VAR,
+        dashboard_auth.SECRET_ENV_VAR,
     )
 
 
