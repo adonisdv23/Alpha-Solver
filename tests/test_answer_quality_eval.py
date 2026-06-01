@@ -139,6 +139,7 @@ def test_default_model_uses_known_working_live_mini_model(monkeypatch):
 
     assert aq.DEFAULT_MODEL == "gpt-5.4-mini"
     assert args.model == "gpt-5.4-mini"
+    assert args.live is False
 
 
 def test_default_dry_run_needs_no_key_and_makes_no_provider_calls(monkeypatch, tmp_path):
@@ -154,6 +155,102 @@ def test_default_dry_run_needs_no_key_and_makes_no_provider_calls(monkeypatch, t
     artifact_dir = Path(report["artifact_dir"])
     assert (artifact_dir / "summary.json").exists()
     assert (artifact_dir / "predictions.jsonl").read_text(encoding="utf-8") == ""
+
+
+def test_no_live_save_summary_writes_safe_docs_artifact(monkeypatch, tmp_path):
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv("ALPHA_LIVE_ANSWER_QUALITY", raising=False)
+    summary_path = tmp_path / "docs" / "evals" / "runs" / "answer_quality_no_live_summary.json"
+    client = RecordingClient(["OVERCLAIM"])
+    config = aq.EvalConfig(
+        dataset=aq.DATASET_DEFAULT,
+        quality_gate=aq.QUALITY_GATE_DEFAULT,
+        artifact_root=tmp_path / "ephemeral",
+        limit=1,
+        save_summary=True,
+        summary_output=summary_path,
+    )
+
+    report = aq.run_eval(config, client=client)
+
+    assert client.requests == []
+    assert report["live_predictions_generated"] is False
+    assert report["summary_artifact_path"] == str(summary_path)
+    assert summary_path.exists()
+    artifact = json.loads(summary_path.read_text(encoding="utf-8"))
+    assert artifact["artifact_schema_version"] == aq.SUMMARY_ARTIFACT_SCHEMA_VERSION
+    assert artifact["artifact_kind"] == "answer_quality_no_live_summary"
+    assert artifact["mode"] == "no_live"
+    assert artifact["live_predictions_generated"] is False
+    assert artifact["case_count"] == 1
+    assert artifact["dataset_path"] == "datasets/answer_quality_operator_cases.jsonl"
+    assert artifact["skipped_status"] == "no_live_dry_run_no_provider_predictions"
+
+    combined = json.dumps(artifact, sort_keys=True).lower()
+    for forbidden in (
+        "api key",
+        "authorization",
+        "bearer",
+        "raw request",
+        "raw response",
+        "raw provider payload",
+        "environment dump",
+        "sk-test-secret",
+    ):
+        assert forbidden not in combined
+    assert "provider_payloads" in combined
+    assert "process_environment" in combined
+
+
+def test_default_no_live_does_not_write_summary_artifact(monkeypatch, tmp_path):
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv("ALPHA_LIVE_ANSWER_QUALITY", raising=False)
+    summary_path = tmp_path / "docs" / "evals" / "runs" / "answer_quality_no_live_summary.json"
+    config = aq.EvalConfig(
+        dataset=aq.DATASET_DEFAULT,
+        quality_gate=aq.QUALITY_GATE_DEFAULT,
+        artifact_root=tmp_path / "ephemeral",
+        limit=1,
+        summary_output=summary_path,
+    )
+
+    report = aq.run_eval(config, client=RecordingClient(["OVERCLAIM"]))
+
+    assert "summary_artifact_path" not in report
+    assert not summary_path.exists()
+
+
+def test_save_summary_cli_no_live_alias_and_output_path(tmp_path):
+    summary_path = tmp_path / "summary.json"
+
+    args = aq.parse_args(["--no-live", "--save-summary", "--summary-output", str(summary_path)])
+    config = aq.config_from_args(args)
+
+    assert args.live is False
+    assert config.live is False
+    assert config.save_summary is True
+    assert config.summary_output == summary_path
+
+
+def test_answer_quality_docs_describe_summary_artifact_path_and_safety_exclusions():
+    text = Path("docs/evals/ANSWER_QUALITY_EVAL.md").read_text(encoding="utf-8")
+
+    assert "docs/evals/runs/answer_quality_no_live_summary.json" in text
+    assert "--save-summary" in text
+    for phrase in (
+        "API keys",
+        "auth headers",
+        "raw provider payloads",
+        "raw request/response bodies",
+        "environment dumps",
+        "MVP validation",
+        "Alpha Solver superiority",
+        "production readiness",
+        "broad runtime readiness",
+        "answer-quality benchmark success",
+        "provider reasoning orchestration",
+    ):
+        assert phrase in text
 
 
 def test_live_requires_explicit_env_gate_even_with_client_and_key(monkeypatch, tmp_path):
