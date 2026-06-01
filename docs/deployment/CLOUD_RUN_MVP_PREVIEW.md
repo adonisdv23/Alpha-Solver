@@ -65,9 +65,10 @@ ALPHA_DASHBOARD_PASSWORD=<strong non-default password>
 ALPHA_DASHBOARD_SECRET_KEY=<long random secret>
 ```
 
-`ALPHA_DASHBOARD_PASSWORD` must not be `alpha-dashboard`. If the password is
-missing or left at the default, the bundled app fails closed and does not mount
-`/dashboard/*` routes.
+`ALPHA_DASHBOARD_PASSWORD` must not be `alpha-dashboard`, and
+`ALPHA_DASHBOARD_SECRET_KEY` must be explicitly set to a non-empty value. If the
+password is missing/default or the secret key is missing/empty, the bundled app
+fails closed and does not mount `/dashboard/*` routes.
 
 If the Cloud Run service is reachable without Cloud Run IAM, also set a strong
 API key for the JSON API surface instead of relying on development defaults:
@@ -137,8 +138,8 @@ curl -i http://127.0.0.1:8080/healthz
 curl -i http://127.0.0.1:8080/dashboard/expert-preview
 ```
 
-The second command should redirect unauthenticated users to `/login` when a
-non-default dashboard password is configured.
+The second command should redirect unauthenticated users to `/login` when both a
+non-default dashboard password and dashboard secret key are configured.
 
 ## 7. Cloud Run deploy command examples
 
@@ -175,14 +176,17 @@ Cloud Run console or through an operator-controlled secret process.
 ### Temporary fail-closed mount verification
 
 To verify fail-closed behavior, deploy or revise a temporary test revision with
-`ALPHA_DASHBOARD_PASSWORD` unset or set to `alpha-dashboard`, then request:
+`ALPHA_DASHBOARD_PASSWORD` unset, `ALPHA_DASHBOARD_PASSWORD=alpha-dashboard`, or
+a non-default password but missing/empty `ALPHA_DASHBOARD_SECRET_KEY`, then
+request:
 
 ```bash
 curl -i "${SERVICE_URL}/dashboard/expert-preview"
 ```
 
 Expected result: dashboard routes should not mount, so the route should return
-404 rather than exposing the preview behind a default password.
+404 rather than exposing the preview behind a default password or an ephemeral
+runtime signing secret.
 
 ## 8. Post-deploy smoke-test checklist
 
@@ -203,7 +207,8 @@ curl -i "${SERVICE_URL}/readyz"
 
 - [ ] With `ALPHA_DASHBOARD_PASSWORD` unset, `/dashboard/expert-preview` does not mount.
 - [ ] With `ALPHA_DASHBOARD_PASSWORD=alpha-dashboard`, `/dashboard/expert-preview` does not mount.
-- [ ] With a non-default password and `ALPHA_DASHBOARD_SECRET_KEY`, `/dashboard/expert-preview` mounts and is protected by auth.
+- [ ] With a non-default password but missing/empty `ALPHA_DASHBOARD_SECRET_KEY`, `/dashboard/expert-preview` does not mount.
+- [ ] With a non-default password and non-empty `ALPHA_DASHBOARD_SECRET_KEY`, `/dashboard/expert-preview` mounts and is protected by auth.
 
 ### Route and auth checks
 
@@ -251,9 +256,12 @@ curl -i -b /tmp/alpha-cookies.txt \
 ## 9. Fail-closed dashboard behavior
 
 The bundled FastAPI app mounts dashboard auth plus `/dashboard/expert-preview`
-only when `ALPHA_DASHBOARD_PASSWORD` is configured and is not the documented
-default `alpha-dashboard`. Otherwise dashboard routes return 404 and the JSON API
-continues serving. Preserve this behavior for Cloud Run.
+only when `ALPHA_DASHBOARD_PASSWORD` is configured, is not the documented
+default `alpha-dashboard`, and `ALPHA_DASHBOARD_SECRET_KEY` is explicitly set to
+a non-empty value. Otherwise dashboard routes return 404 and the JSON API
+continues serving. Preserve this behavior for Cloud Run. The auth module's
+standalone random-secret fallback is intentionally unchanged for custom app
+integrations, but the bundled Cloud Run preview mount guard must not rely on it.
 
 ## 10. Known `/requests` post-login redirect limitation
 
@@ -314,7 +322,7 @@ It only prepares the repo for a controlled Cloud Run MVP preview deployment.
 | Symptom | Likely cause | Mitigation |
 | --- | --- | --- |
 | Cloud Run revision never becomes ready | Container is not listening on Cloud Run `PORT` or dependencies failed to install | Use the root `Dockerfile`; confirm the command starts Uvicorn with `--host 0.0.0.0 --port "${PORT:-8080}"` |
-| `/dashboard/expert-preview` returns 404 | Dashboard password is unset or set to `alpha-dashboard` | Configure a strong non-default `ALPHA_DASHBOARD_PASSWORD` and redeploy a new revision |
+| `/dashboard/expert-preview` returns 404 | Dashboard password is unset/default or dashboard secret key is missing/empty | Configure a strong non-default `ALPHA_DASHBOARD_PASSWORD` and non-empty `ALPHA_DASHBOARD_SECRET_KEY`, then redeploy a new revision |
 | Login succeeds then `/requests` returns 404 | Known login redirect limitation | Navigate directly to `/dashboard/expert-preview` after login |
 | POST to preview returns 403 | Missing or invalid CSRF header | Send `X-Alpha-CSRF` with the value from the `alpha_dashboard_csrf` cookie |
 | Preview attempts live provider calls | `MODEL_PROVIDER` is set to `openai` | Revert to `MODEL_PROVIDER=local`; remove `OPENAI_API_KEY` from the first preview revision |

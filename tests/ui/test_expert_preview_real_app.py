@@ -140,17 +140,34 @@ def test_preview_post_without_csrf_is_rejected(client: TestClient) -> None:
 
 
 def test_dashboard_disabled_when_password_unset(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.delenv("ALPHA_DASHBOARD_PASSWORD", raising=False)
+    monkeypatch.delenv(auth.PASSWORD_ENV_VAR, raising=False)
+    monkeypatch.setenv(auth.SECRET_ENV_VAR, "unit-test-secret")
     assert _dashboard_enabled() is False
 
 
 def test_dashboard_disabled_when_password_is_default(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("ALPHA_DASHBOARD_PASSWORD", auth.DEFAULT_DASHBOARD_PASSWORD)
+    monkeypatch.setenv(auth.PASSWORD_ENV_VAR, auth.DEFAULT_DASHBOARD_PASSWORD)
+    monkeypatch.setenv(auth.SECRET_ENV_VAR, "unit-test-secret")
     assert _dashboard_enabled() is False
 
 
-def test_dashboard_enabled_when_password_non_default(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("ALPHA_DASHBOARD_PASSWORD", "a-strong-operator-secret")
+def test_dashboard_disabled_when_secret_unset(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv(auth.PASSWORD_ENV_VAR, "a-strong-operator-secret")
+    monkeypatch.delenv(auth.SECRET_ENV_VAR, raising=False)
+    assert _dashboard_enabled() is False
+
+
+def test_dashboard_disabled_when_secret_empty(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv(auth.PASSWORD_ENV_VAR, "a-strong-operator-secret")
+    monkeypatch.setenv(auth.SECRET_ENV_VAR, "")
+    assert _dashboard_enabled() is False
+
+
+def test_dashboard_enabled_when_password_non_default_and_secret_set(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv(auth.PASSWORD_ENV_VAR, "a-strong-operator-secret")
+    monkeypatch.setenv(auth.SECRET_ENV_VAR, "unit-test-secret")
     assert _dashboard_enabled() is True
 
 

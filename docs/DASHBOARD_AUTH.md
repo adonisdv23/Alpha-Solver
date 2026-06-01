@@ -69,11 +69,15 @@ behavior shape, and this UI does not replace eval evidence.
 
 In the bundled API application (`service.app:app`), the dashboard — the login
 routes plus `/dashboard/expert-preview` — is mounted **only when a non-default
-`ALPHA_DASHBOARD_PASSWORD` is configured**. If the password is unset or left at
-the documented default, the dashboard is not mounted (its routes return 404), a
-warning is logged, and the JSON API keeps serving normally. This fails closed so
-a misconfigured deployment never exposes the provider-backed preview behind the
-well-known default password.
+`ALPHA_DASHBOARD_PASSWORD` and an explicit non-empty
+`ALPHA_DASHBOARD_SECRET_KEY` are configured**. If the password is unset/default
+or the secret key is missing/empty, the dashboard is not mounted (its routes
+return 404), a warning is logged, and the JSON API keeps serving normally. This
+fails closed so a misconfigured deployment never exposes the provider-backed
+preview behind the well-known default password or an ephemeral runtime signing
+secret. The auth module's fallback random secret remains available for custom
+router integrations; the bundled app's Cloud Run/operator mount guard requires
+explicit configuration.
 
 **Known limitation (deferred):** a successful login redirects to `/requests`,
 which the bundled API app does not mount, so the post-login landing returns 404.
