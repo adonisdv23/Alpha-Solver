@@ -253,6 +253,61 @@ def test_answer_quality_docs_describe_summary_artifact_path_and_safety_exclusion
         assert phrase in text
 
 
+def test_expert_pass_behavioral_demo_checklist_documents_scope_and_boundaries():
+    checklist = Path("docs/evals/EXPERT_PASS_BEHAVIORAL_DEMO.md")
+    text = checklist.read_text(encoding="utf-8")
+
+    for section in (
+        "## Purpose",
+        "## Scope",
+        "## Prompt set",
+        "## Expected judgment behavior",
+        "## Pass/fail checklist",
+        "## How to run or manually inspect behavior",
+        "## Evidence artifacts",
+        "## Claim boundaries",
+        "## Backlog impact",
+    ):
+        assert section in text
+
+    for prompt_case in (
+        "Trivial",
+        "Complex planning",
+        "Messy or vague",
+        "Clarify-needed",
+        "Assumption-heavy",
+        "Block-sensitive",
+        "Provider pass-through preservation",
+    ):
+        assert prompt_case in text
+
+    for behavior_phrase in (
+        "expert path",
+        "Direct/simple behavior",
+        "mode is `clarify`",
+        "surfaces assumptions",
+        "block remains distinct from clarify",
+    ):
+        assert behavior_phrase in text
+
+    for guardrail in (
+        "not an answer-superiority benchmark",
+        "does not prove MVP validation",
+        "does not prove Alpha Solver superiority",
+        "does not prove answer-quality superiority",
+        "does not prove production readiness",
+        "does not prove broad runtime readiness",
+        "does not prove answer-quality benchmark success",
+        "does not implement provider reasoning orchestration",
+        "small behavioral review/demo aid only",
+    ):
+        assert guardrail in text
+
+    assert "docs/evals/runs/answer_quality_no_live_summary.json" in text
+    assert "must not require live OpenAI calls" in text
+    assert "UI-PREVIEW-001 remains held and not implemented" in text
+
+
 def test_live_requires_explicit_env_gate_even_with_client_and_key(monkeypatch, tmp_path):
     monkeypatch.setenv("OPENAI_API_KEY", "sk-test-secret-value")
     monkeypatch.delenv("ALPHA_LIVE_ANSWER_QUALITY", raising=False)
