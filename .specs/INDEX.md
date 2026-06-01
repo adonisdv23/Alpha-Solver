@@ -7,6 +7,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 | `AS-145.md` | CODE SPEC — AS-145 · Tool Adapters: Playwright + GSheets (MVP hardening) (RES_05) |
 | `AS-148.md` | CODE SPEC — AS-148 · Policy & PII Gateway (DR_TRACK_A) |
 | `AUTH-SESSION-001.md` | AUTH-SESSION-001 · Dashboard Login + Session |
+| `CLARIFY-SURFACE-001.md` | CLARIFY-SURFACE-001 · Expert Route Clarify Surface |
 | `EPIC_RAG_001.md` | EPIC_RAG_001 · RAG & Semantic Cache Pack |
 | `FINOPS-BUDGET-001.md` | FINOPS-BUDGET-001 · Budget Guardrails |
 | `MCP-001.md` | CODE SPEC — MCP-001 · MCP Registry Loader & Wiring (MCP) |

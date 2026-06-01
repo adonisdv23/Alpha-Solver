@@ -566,16 +566,18 @@ def test_solve_openai_expert_trivial_route_makes_one_direct_call(monkeypatch):
     _clear_provider_factory()
 
 
-def test_solve_openai_expert_clarify_mode_includes_assumptions(monkeypatch):
+def test_solve_openai_expert_clarify_mode_surfaces_questions_without_extra_call(monkeypatch):
     monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    raw_answer = "Proceed only after confirming the missing requirements."
     fake = FakeProviderClient(
         [
             _provider_result(
                 '{"considerations":["Several requirements are missing"],'
-                '"assumptions":["Budget is flexible"],'
+                '"assumptions":["Budget is flexible",'
+                '"The user has not specified the desired output format."],'
                 '"confidence":0.50}'
             ),
-            _provider_result("Proceed only after confirming the missing requirements."),
+            _provider_result(raw_answer),
         ]
     )
     app.state.provider_client_factory = lambda _model_set: fake
@@ -596,8 +598,87 @@ def test_solve_openai_expert_clarify_mode_includes_assumptions(monkeypatch):
     assert resp.status_code == 200
     body = resp.json()
     assert body["mode"] == "clarify"
-    assert body["assumptions"] == ["Budget is flexible"]
-    assert body["considerations"]
+    assert body["answer"] == "I need a few details before I can answer this well."
+    assert body["final_answer"] == body["answer"]
+    assert body["answer"] != raw_answer
+    assert body["assumptions"] == [
+        "Budget is flexible",
+        "The user has not specified the desired output format.",
+    ]
+    assert body["considerations"] == ["Several requirements are missing"]
+    assert 2 <= len(body["clarifying_questions"]) <= 4
+    assert body["clarifying_questions"] == [
+        "What is the main outcome you want from this request?",
+        "What output format or deliverable should I produce?",
+        "What timeline or deadline constraints should I preserve?",
+        "What budget or resource constraints should I account for?",
+    ]
+    assert "Can you clarify?" not in body["clarifying_questions"]
+    assert body["meta"]["call_count"] == 2
+    assert len(fake.requests) == 2
+    serialized = resp.text
+    assert "raw_metadata" not in serialized
+    assert "provider_request_id" not in serialized
+    assert "Authorization" not in serialized
+    assert "Bearer" not in serialized
+    blocked = "orches" + "tration"
+    assert blocked not in serialized.lower()
+    _clear_provider_factory()
+
+
+def test_solve_openai_expert_trivial_route_does_not_add_clarifying_questions(monkeypatch):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    fake = FakeProviderClient([_provider_result("Short direct answer.")])
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={"query": "Define alpha.", "context": {"route": "expert"}},
+        headers={"X-API-Key": key},
+    )
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["mode"] == "direct"
+    assert "clarifying_questions" not in body
+    assert body["meta"]["call_count"] == 1
+    assert len(fake.requests) == 1
+    _clear_provider_factory()
+
+
+def test_solve_openai_expert_block_mode_remains_distinct_from_clarify(monkeypatch):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    fake = FakeProviderClient(
+        [
+            _provider_result(
+                '{"considerations":["The request may be unsafe"],'
+                '"assumptions":[],"confidence":0.05}'
+            ),
+            _provider_result("Cannot safely answer as requested."),
+        ]
+    )
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={
+            "query": (
+                "Review this uncertain security migration risk decision and decide "
+                "whether the proposed ambiguous access-control plan should proceed."
+            ),
+            "context": {"route": "expert"},
+        },
+        headers={"X-API-Key": key},
+    )
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["mode"] == "block"
+    assert body["answer"] == "Cannot safely answer as requested."
+    assert "clarifying_questions" not in body
+    assert body["meta"]["call_count"] == 2
     assert len(fake.requests) == 2
     _clear_provider_factory()
 
