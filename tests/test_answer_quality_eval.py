@@ -563,3 +563,57 @@ def test_live_repeatability_total_cost_ceiling_refuses_before_provider_call(monk
     assert "estimated cost" in report["stopped_reason"]
     assert client.requests == []
     assert (Path(report["artifact_dir"]) / "repeatability_summary.json").exists()
+
+
+def test_mvp_tester_handoff_doc_covers_closeout_boundaries():
+    doc_path = Path("docs/MVP_TESTER_HANDOFF.md")
+
+    assert doc_path.exists()
+    text = doc_path.read_text(encoding="utf-8")
+    lower = text.lower()
+
+    for lane in (
+        "PROVIDER-EXPERT-PASS-001",
+        "CLARIFY-SURFACE-001",
+        "EVAL-ARTIFACT-PRESERVE-001",
+        "EVAL-BEHAVIORAL-DEMO-001",
+        "UI-PREVIEW-001",
+    ):
+        assert lane in text
+
+    for required_reference in (
+        "/dashboard/expert-preview",
+        "docs/evals/EXPERT_PASS_BEHAVIORAL_DEMO.md",
+        "docs/evals/runs/answer_quality_no_live_summary.json",
+    ):
+        assert required_reference in text
+
+    for required_boundary in (
+        "This is a tester/operator handoff.",
+        "It does not prove MVP validation.",
+        "It does not prove Alpha Solver superiority.",
+        "It does not prove answer-quality superiority.",
+        "It does not prove production readiness.",
+        "It does not prove broad runtime readiness.",
+        "It does not prove answer-quality benchmark success.",
+        "It does not implement or claim provider reasoning orchestration.",
+        "It does not replace live evaluation or real user testing.",
+    ):
+        assert required_boundary in text
+
+    assert "production-ready" not in lower
+    assert "validated superiority" not in lower
+    for positive_claim in (
+        "proves mvp validation",
+        "proves alpha solver superiority",
+        "proves answer-quality superiority",
+        "proves production readiness",
+        "proves broad runtime readiness",
+        "proves answer-quality benchmark success",
+        "claims provider reasoning orchestration",
+    ):
+        assert positive_claim not in lower
+
+    for line in text.splitlines():
+        if "benchmark success" in line.lower() or "provider reasoning orchestration" in line.lower():
+            assert "does not" in line.lower() or "do not" in line.lower()
