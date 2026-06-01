@@ -20,7 +20,12 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from alpha.providers import FakeProviderClient, ProviderCost, ProviderResult, ProviderUsage  # noqa: E402
+from alpha.providers import (
+    FakeProviderClient,
+    ProviderCost,
+    ProviderResult,
+    ProviderUsage,
+)  # noqa: E402
 from alpha.webapp.routes import auth, expert_preview  # noqa: E402
 from service.app import app, _dashboard_enabled, _mount_dashboard  # noqa: E402
 
@@ -59,6 +64,15 @@ def client(monkeypatch: pytest.MonkeyPatch) -> TestClient:
     finally:
         test_client.close()
         auth.reset_state()
+
+
+def _assert_loading_state_script(html: str) -> None:
+    assert "let previewInFlight = false;" in html
+    assert "submitButton.disabled = true;" in html
+    assert "Running preview..." in html
+    assert '"X-Alpha-CSRF": cookieValue("alpha_dashboard_csrf")' in html
+    assert "document.body.innerHTML = nextDocument.body.innerHTML;" in html
+    assert "initExpertPreviewForm();" in html
 
 
 def _login(client: TestClient) -> str:
@@ -119,6 +133,7 @@ def test_authenticated_request_renders_page(client: TestClient) -> None:
 
     assert response.status_code == 200
     assert expert_preview.DISCLAIMER in response.text
+    _assert_loading_state_script(response.text)
 
 
 def test_preview_post_uses_fake_provider_without_network(
@@ -134,12 +149,16 @@ def test_preview_post_uses_fake_provider_without_network(
                 '"assumptions":["Budget is constrained"],"confidence":0.35}',
                 raw_secret=raw_secret,
             ),
-            _provider_result("draft expert answer that clarify mode replaces", raw_secret=raw_secret),
+            _provider_result(
+                "draft expert answer that clarify mode replaces", raw_secret=raw_secret
+            ),
         ]
     )
     # Inject the fake on the shared app singleton via monkeypatch so it is restored
     # afterwards and never leaks into other tests that import the real app.
-    monkeypatch.setattr(app.state, "provider_client_factory", lambda _model_set: fake, raising=False)
+    monkeypatch.setattr(
+        app.state, "provider_client_factory", lambda _model_set: fake, raising=False
+    )
 
     response = client.post(
         ROUTE,

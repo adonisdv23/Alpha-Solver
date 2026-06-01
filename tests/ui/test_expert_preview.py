@@ -11,7 +11,12 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from alpha.providers import FakeProviderClient, ProviderCost, ProviderResult, ProviderUsage  # noqa: E402
+from alpha.providers import (
+    FakeProviderClient,
+    ProviderCost,
+    ProviderResult,
+    ProviderUsage,
+)  # noqa: E402
 from alpha.webapp.routes import auth, expert_preview  # noqa: E402
 
 
@@ -64,6 +69,17 @@ def _assert_successful_preview_response(html: str, prompt: str) -> None:
     assert f'<textarea id="prompt" name="prompt" required>{prompt}</textarea>' in html
 
 
+def _assert_loading_state_script(html: str) -> None:
+    assert "let previewInFlight = false;" in html
+    assert "if (previewInFlight)" in html
+    assert "submitButton.disabled = true;" in html
+    assert "Running preview..." in html
+    assert 'form.setAttribute("aria-busy", "true");' in html
+    assert '"X-Alpha-CSRF": cookieValue("alpha_dashboard_csrf")' in html
+    assert "document.body.innerHTML = nextDocument.body.innerHTML;" in html
+    assert "initExpertPreviewForm();" in html
+
+
 def _assert_no_sensitive_preview_leak(html: str, *secrets: str) -> None:
     for secret in secrets:
         assert secret not in html
@@ -110,6 +126,7 @@ def test_authenticated_user_can_access_preview_page(client: TestClient) -> None:
     assert expert_preview.DISCLAIMER in response.text
     assert "Plain provider output" in response.text
     assert "Alpha Solver expert preview" in response.text
+    _assert_loading_state_script(response.text)
 
 
 def test_preview_submission_renders_plain_and_expert_outputs(client: TestClient) -> None:
@@ -123,7 +140,9 @@ def test_preview_submission_renders_plain_and_expert_outputs(client: TestClient)
                 '"assumptions":["Budget is constrained"],"confidence":0.35}',
                 raw_secret=raw_secret,
             ),
-            _provider_result("draft expert answer that clarify mode replaces", raw_secret=raw_secret),
+            _provider_result(
+                "draft expert answer that clarify mode replaces", raw_secret=raw_secret
+            ),
         ]
     )
     client.app.state.provider_client_factory = lambda _model_set: fake
@@ -446,8 +465,7 @@ def test_second_browser_style_submit_after_error_keeps_csrf_behavior(client: Tes
     assert error_response.status_code == 400
     assert "Prompt is required." in error_response.text
     assert "document.write" not in error_response.text
-    assert "initExpertPreviewForm" in error_response.text
-    assert "X-Alpha-CSRF" in error_response.text
+    _assert_loading_state_script(error_response.text)
 
     fake = _install_successful_fake(client)
     prompt = "Define alpha in one sentence."

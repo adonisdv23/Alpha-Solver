@@ -224,6 +224,7 @@ def _render_page(
       label {{ font-weight: 700; }}
       textarea {{ min-height: 130px; resize: vertical; border: 1px solid #cdd5ef; border-radius: 12px; padding: 0.85rem 1rem; font: inherit; color: inherit; background: rgba(255,255,255,0.78); }}
       button {{ justify-self: start; border: 0; border-radius: 999px; padding: 0.7rem 1.25rem; font: inherit; font-weight: 700; color: white; background: linear-gradient(135deg, #5661f6, #7b5ff4); cursor: pointer; }}
+      button:disabled {{ cursor: wait; opacity: 0.72; }}
       .panes {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }}
       .pane h2 {{ margin-top: 0; }}
       .answer, pre {{ white-space: pre-wrap; overflow-wrap: anywhere; }}
@@ -274,21 +275,44 @@ def _render_page(
           return;
         }}
         form.dataset.alphaSubmitBound = "true";
+        let previewInFlight = false;
         form.addEventListener("submit", async (event) => {{
           event.preventDefault();
-          const response = await fetch(form.action, {{
-            method: "POST",
-            headers: {{
-              "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-              "X-Alpha-CSRF": cookieValue("alpha_dashboard_csrf"),
-            }},
-            body: new URLSearchParams(new FormData(form)),
-          }});
-          const html = await response.text();
-          const nextDocument = new DOMParser().parseFromString(html, "text/html");
-          document.title = nextDocument.title;
-          document.body.innerHTML = nextDocument.body.innerHTML;
-          initExpertPreviewForm();
+          if (previewInFlight) {{
+            return;
+          }}
+          previewInFlight = true;
+          const submitButton = form.querySelector('button[type="submit"]');
+          const originalButtonText = submitButton?.textContent || "Compare same-provider outputs";
+          if (submitButton) {{
+            submitButton.disabled = true;
+            submitButton.textContent = "Running preview...";
+          }}
+          form.setAttribute("aria-busy", "true");
+          try {{
+            const response = await fetch(form.action, {{
+              method: "POST",
+              headers: {{
+                "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+                "X-Alpha-CSRF": cookieValue("alpha_dashboard_csrf"),
+              }},
+              body: new URLSearchParams(new FormData(form)),
+            }});
+            const html = await response.text();
+            const nextDocument = new DOMParser().parseFromString(html, "text/html");
+            document.title = nextDocument.title;
+            document.body.innerHTML = nextDocument.body.innerHTML;
+            initExpertPreviewForm();
+          }} finally {{
+            previewInFlight = false;
+            if (document.body.contains(form)) {{
+              form.removeAttribute("aria-busy");
+              if (submitButton) {{
+                submitButton.disabled = false;
+                submitButton.textContent = originalButtonText;
+              }}
+            }}
+          }}
         }});
       }}
       initExpertPreviewForm();
