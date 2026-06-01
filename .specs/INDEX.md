@@ -20,6 +20,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 | `MCP-006.md` | CODE SPEC — MCP-006 · Retry & Backoff (MCP) |
 | `MCP-007.md` | CODE SPEC — MCP-007 · MCP Observability hooks (MCP) |
 | `MCP-008.md` | MCP-008 · Domainless MCP Tool Allowlist Enforcement |
+| `MVP-CLOSEOUT-001.md` | MVP-CLOSEOUT-001 · MVP Tester Handoff and Readiness Packet |
 | `NEW-009.md` | CODE SPEC — NEW-009 · Clarify Templates Pack (RES_02) |
 | `NEW-010.md` | CODE SPEC — NEW-010 · Section-Specific Prompt Decks (RES_01) |
 | `NEW-011.md` | CODE SPEC — NEW-011 · Weight-Tuning Harness (RES-03 scoring) (RES_03) |
