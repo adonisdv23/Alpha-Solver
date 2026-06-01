@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import sys
 from pathlib import Path
 
@@ -35,6 +34,8 @@ def client(monkeypatch: pytest.MonkeyPatch) -> TestClient:
     monkeypatch.setenv("ALPHA_DASHBOARD_PASSWORD", "testing-secret")
     monkeypatch.setenv("ALPHA_DASHBOARD_SECRET_KEY", "unit-test-secret")
     monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    monkeypatch.setenv("ALPHA_LIVE_PREVIEW_ENABLED", "true")
+    monkeypatch.setenv("ALPHA_LIVE_PREVIEW_MAX_REQUESTS", "20")
     auth.reset_state()
 
     app = FastAPI()
@@ -47,7 +48,6 @@ def client(monkeypatch: pytest.MonkeyPatch) -> TestClient:
         yield test_client
     finally:
         test_client.close()
-        os.environ.pop("MODEL_PROVIDER", None)
 
 
 def _login(client: TestClient) -> str:
@@ -62,6 +62,20 @@ def _assert_successful_preview_response(html: str, prompt: str) -> None:
     assert "plain same-provider answer" in html
     assert "Alpha Solver expert preview" in html
     assert f'<textarea id="prompt" name="prompt" required>{prompt}</textarea>' in html
+
+
+def _assert_no_sensitive_preview_leak(html: str, *secrets: str) -> None:
+    for secret in secrets:
+        assert secret not in html
+    assert "provider-hidden" not in html
+    assert "raw_metadata" not in html
+    assert "Authorization" not in html
+    assert "Bearer" not in html
+    assert "OPENAI_API_KEY" not in html
+    assert "sk-" not in html
+    assert "raw request" not in html.lower()
+    assert "raw response" not in html.lower()
+    assert "raw provider" not in html.lower()
 
 
 def _install_successful_fake(client: TestClient) -> FakeProviderClient:
@@ -155,6 +169,97 @@ def test_preview_submission_renders_plain_and_expert_outputs(client: TestClient)
     assert "Bearer" not in html
     assert "raw request" not in html.lower()
     assert "raw response" not in html.lower()
+
+
+def test_openai_preview_submit_blocks_when_live_preview_flag_absent(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    csrf_token = _login(client)
+    prompt = "Keep this blocked prompt visible."
+    monkeypatch.delenv("ALPHA_LIVE_PREVIEW_ENABLED", raising=False)
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-guard-test-should-not-render")
+
+    def fail_factory(_model_set: object) -> FakeProviderClient:
+        raise AssertionError("provider factory must not be invoked when guard blocks")
+
+    client.app.state.provider_client_factory = fail_factory
+
+    response = client.post(
+        "/dashboard/expert-preview",
+        data={"prompt": prompt},
+        headers={
+            auth.CSRF_HEADER_NAME: csrf_token,
+            "Authorization": "Bearer should-not-render",
+        },
+    )
+
+    assert response.status_code == 403
+    html = response.text
+    assert "Live OpenAI preview testing is disabled." in html
+    assert f'<textarea id="prompt" name="prompt" required>{prompt}</textarea>' in html
+    _assert_no_sensitive_preview_leak(
+        html,
+        "sk-guard-test-should-not-render",
+        "should-not-render",
+    )
+
+
+def test_openai_preview_submit_blocks_when_live_preview_flag_false(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    csrf_token = _login(client)
+    prompt = "Keep this false-flag prompt visible."
+    monkeypatch.setenv("ALPHA_LIVE_PREVIEW_ENABLED", "false")
+
+    def fail_factory(_model_set: object) -> FakeProviderClient:
+        raise AssertionError("provider factory must not be invoked when guard blocks")
+
+    client.app.state.provider_client_factory = fail_factory
+
+    response = client.post(
+        "/dashboard/expert-preview",
+        data={"prompt": prompt},
+        headers={auth.CSRF_HEADER_NAME: csrf_token},
+    )
+
+    assert response.status_code == 403
+    html = response.text
+    assert "Live OpenAI preview testing is disabled." in html
+    assert f'<textarea id="prompt" name="prompt" required>{prompt}</textarea>' in html
+    assert "Plain provider output" in html
+    assert "Alpha Solver expert preview" in html
+
+
+def test_openai_preview_cap_blocks_after_configured_limit(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    csrf_token = _login(client)
+    monkeypatch.setenv("ALPHA_LIVE_PREVIEW_ENABLED", "true")
+    monkeypatch.setenv("ALPHA_LIVE_PREVIEW_MAX_REQUESTS", "1")
+    fake = _install_successful_fake(client)
+    first_prompt = "Define alpha in one sentence."
+    second_prompt = "This second live preview should be blocked."
+
+    first = client.post(
+        "/dashboard/expert-preview",
+        data={"prompt": first_prompt},
+        headers={auth.CSRF_HEADER_NAME: csrf_token},
+    )
+    second = client.post(
+        "/dashboard/expert-preview",
+        data={"prompt": second_prompt},
+        headers={auth.CSRF_HEADER_NAME: csrf_token},
+    )
+
+    assert first.status_code == 200
+    _assert_successful_preview_response(first.text, first_prompt)
+    assert len(fake.requests) == 2
+    assert second.status_code == 403
+    html = second.text
+    assert "Live OpenAI preview request cap reached" in html
+    assert f'<textarea id="prompt" name="prompt" required>{second_prompt}</textarea>' in html
+    assert len(fake.requests) == 2
+    _assert_no_sensitive_preview_leak(html)
 
 
 def test_preview_submission_handles_unstructured_expert_preview_coherently(
