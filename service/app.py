@@ -528,6 +528,37 @@ def _expert_step_two_prompt(query: str, preview: dict[str, Any]) -> str:
     )
 
 
+_CLARIFY_MESSAGE = "I need a few details before I can answer this well."
+
+
+def _clarifying_questions_for_expert_request(
+    query: str, considerations: list[str], assumptions: list[str]
+) -> list[str]:
+    """Return deterministic, local clarify questions for expert-route clarify mode."""
+    source_text = " ".join([query, *considerations, *assumptions]).lower()
+    questions: list[str] = []
+
+    def add(question: str) -> None:
+        if question not in questions and len(questions) < 4:
+            questions.append(question)
+
+    add("What is the main outcome you want from this request?")
+
+    if any(term in source_text for term in ("format", "deliverable", "output")):
+        add("What output format or deliverable should I produce?")
+    if any(term in source_text for term in ("timeline", "deadline", "milestone", "schedule")):
+        add("What timeline or deadline constraints should I preserve?")
+    if any(term in source_text for term in ("budget", "cost", "resource")):
+        add("What budget or resource constraints should I account for?")
+    if any(term in source_text for term in ("risk", "security", "legal", "medical", "financial")):
+        add("What risk tolerance or compliance constraints should guide the answer?")
+
+    add("What constraints or context should I preserve?")
+    add("What tradeoffs or priorities matter most?")
+    add("What would make the answer successful for you?")
+    return questions[:4]
+
+
 def _expert_response(
     *,
     answer: str,
@@ -539,8 +570,9 @@ def _expert_response(
     provider: str,
     model: str,
     call_count: int,
+    clarifying_questions: list[str] | None = None,
 ) -> Dict[str, Any]:
-    return {
+    response = {
         "final_answer": answer,
         "answer": answer,
         "considerations": considerations,
@@ -555,6 +587,9 @@ def _expert_response(
             "call_count": call_count,
         },
     }
+    if mode == "clarify" and clarifying_questions is not None:
+        response["clarifying_questions"] = clarifying_questions
+    return response
 
 
 def _execute_provider_call(
@@ -719,9 +754,16 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
                 mode = _mode_from_confidence(
                     preview["confidence"], preview["assumptions"], model_set
                 )
+                expert_answer = answer_result.text
+                clarifying_questions = None
+                if mode == "clarify":
+                    expert_answer = _CLARIFY_MESSAGE
+                    clarifying_questions = _clarifying_questions_for_expert_request(
+                        query, preview["considerations"], preview["assumptions"]
+                    )
                 return JSONResponse(
                     _expert_response(
-                        answer=answer_result.text,
+                        answer=expert_answer,
                         considerations=preview["considerations"],
                         assumptions=preview["assumptions"],
                         confidence=preview["confidence"],
@@ -730,6 +772,7 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
                         provider=answer_result.provider,
                         model=answer_result.model,
                         call_count=2,
+                        clarifying_questions=clarifying_questions,
                     )
                 )
 
