@@ -766,7 +766,7 @@ def test_solve_expert_route_local_mode_preserves_local_response(monkeypatch):
         AssertionError("provider should not be used in local mode")
     )
 
-    def fake_solver(query: str, **kwargs):
+    def fake_solver(query: str):
         return {"final_answer": f"local:{query}"}
 
     monkeypatch.setattr("service.app._tree_of_thought", fake_solver)

@@ -50,6 +50,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 | `REVIEW-P0P1.md` | CODE SPEC — REVIEW-P0P1 · P0 + P1 Bulk Review (MVP Readiness) (RES_06) |
 | `UI-JOBS-001.md` | UI-JOBS-001 · Dashboard Job History & Metrics (RES_Dash) |
 | `UI-PREVIEW-001.md` | UI-PREVIEW-001 · Authenticated Expert Preview UI |
+| `UI-PREVIEW-LOCAL-SMOKE-001.md` | UI-PREVIEW-LOCAL-SMOKE-001 · Local-provider Expert Preview Smoke Fix |
 | `UI-KEYS-001.md` | UI-KEYS-001 · Dashboard: API Keys Management |
 | `UI-REQ-001.md` | UI-REQ-001 · Dashboard Request Submission UI |
 | `UI-RUN-001.md` | UI-RUN-001 · Dashboard One-click Demo Run |
