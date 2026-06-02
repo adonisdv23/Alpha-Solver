@@ -573,8 +573,46 @@ def _extract_section_list(text: str, section: str) -> list[str]:
     return _as_string_list(match.group(1))
 
 
-def _mode_from_confidence(confidence: float, assumptions: list[str], model_set: ModelSet) -> str:
-    if confidence <= 0.10:
+_EXECUTION_PLANNING_DELIVERABLE_RE = re.compile(
+    r"(?i)\b(?:test\s+plan|operator\s+test\s+plan|runbook|checklist|plan)\b"
+)
+_EXECUTION_PLANNING_ACTION_RE = re.compile(
+    r"(?i)\b(?:create|draft|write|produce|build|outline|prepare)\b"
+)
+_CONCRETE_TARGET_RE = re.compile(
+    r"(?:/[A-Za-z0-9_.~:/?#\[\]@!$&'()*+,;=%-]+|\bfor\s+[^.?!]+)"
+)
+_UNDERSPECIFIED_OR_HIGH_RISK_RE = re.compile(
+    r"(?i)\b(?:ambiguous|uncertain|unknown|unspecified|not\s+specified|missing|"
+    r"unsafe|impossible|legal|medical|financial|compliance|security)\b"
+)
+_LOW_CONFIDENCE_BLOCK_THRESHOLD = 0.10
+
+
+def _is_actionable_execution_planning_prompt(query: str) -> bool:
+    """Return True when a planning request is actionable enough to answer.
+
+    This deliberately stays narrow: it only recognizes explicit execution-style
+    deliverable requests that include a target/context signal and avoids prompts
+    that state they are underspecified or belong to high-risk domains.
+    """
+
+    text = query.strip()
+    if not text:
+        return False
+    if _UNDERSPECIFIED_OR_HIGH_RISK_RE.search(text):
+        return False
+    return (
+        _EXECUTION_PLANNING_ACTION_RE.search(text) is not None
+        and _EXECUTION_PLANNING_DELIVERABLE_RE.search(text) is not None
+        and _CONCRETE_TARGET_RE.search(text) is not None
+    )
+
+
+def _mode_from_confidence(
+    confidence: float, assumptions: list[str], model_set: ModelSet, *, query: str = ""
+) -> str:
+    if confidence <= _LOW_CONFIDENCE_BLOCK_THRESHOLD:
         return "block"
     decision, _info = evaluate_gates(
         confidence=confidence,
@@ -584,6 +622,8 @@ def _mode_from_confidence(confidence: float, assumptions: list[str], model_set: 
     if decision == "block":
         return "block"
     if decision == "clarify":
+        if _is_actionable_execution_planning_prompt(query):
+            return "answer_with_assumptions"
         return "clarify"
     if assumptions and confidence < 0.75:
         return "answer_with_assumptions"
@@ -856,7 +896,10 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
                     mode = "clarify"
                 else:
                     mode = _mode_from_confidence(
-                        preview["confidence"], preview["assumptions"], model_set
+                        preview["confidence"],
+                        preview["assumptions"],
+                        model_set,
+                        query=query,
                     )
                 expert_answer = answer_result.text
                 clarifying_questions = None
