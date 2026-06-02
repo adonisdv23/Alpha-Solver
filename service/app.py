@@ -587,6 +587,15 @@ _UNDERSPECIFIED_OR_HIGH_RISK_RE = re.compile(
     r"unsafe|impossible|legal|medical|financial|compliance|security)\b"
 )
 _LOW_CONFIDENCE_BLOCK_THRESHOLD = 0.10
+_ACTIONABLE_EXECUTION_PLAN_DEFAULT_ASSUMPTIONS = [
+    "Supervised operator preview only.",
+    "Local rollback is available after the controlled run.",
+    (
+        "No MVP validation, production-readiness, Alpha Solver superiority, "
+        "broad benchmark success, or exact billing accuracy claim is made from this run."
+    ),
+    "Evidence must be sanitized before capture or sharing.",
+]
 
 
 def _is_actionable_execution_planning_prompt(query: str) -> bool:
@@ -607,6 +616,28 @@ def _is_actionable_execution_planning_prompt(query: str) -> bool:
         and _EXECUTION_PLANNING_DELIVERABLE_RE.search(text) is not None
         and _CONCRETE_TARGET_RE.search(text) is not None
     )
+
+
+def _default_actionable_execution_plan_assumptions(
+    query: str, assumptions: list[str], *, confidence_available: bool
+) -> list[str]:
+    """Add narrow defaults when unavailable Step 1 metadata gave no assumptions."""
+
+    if (
+        confidence_available
+        or assumptions
+        or not _is_actionable_execution_planning_prompt(query)
+    ):
+        return assumptions
+    return list(_ACTIONABLE_EXECUTION_PLAN_DEFAULT_ASSUMPTIONS)
+
+
+def _mode_for_unavailable_expert_confidence(query: str) -> str:
+    """Choose a safe mode when Step 1 confidence metadata is missing/unparseable."""
+
+    if _is_actionable_execution_planning_prompt(query):
+        return "answer_with_assumptions"
+    return "clarify"
 
 
 def _mode_from_confidence(
@@ -940,6 +971,11 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
                     provider_request=preview_request,
                 )
                 preview = _parse_expert_preview(preview_result.text)
+                preview["assumptions"] = _default_actionable_execution_plan_assumptions(
+                    query,
+                    preview["assumptions"],
+                    confidence_available=bool(preview.get("confidence_available")),
+                )
                 answer_request = replace(
                     provider_request,
                     prompt=_expert_step_two_prompt(query, preview),
@@ -950,7 +986,7 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
                     provider_request=answer_request,
                 )
                 if preview.get("confidence_available") is False:
-                    mode = "clarify"
+                    mode = _mode_for_unavailable_expert_confidence(query)
                 else:
                     mode = _mode_from_confidence(
                         preview["confidence"],

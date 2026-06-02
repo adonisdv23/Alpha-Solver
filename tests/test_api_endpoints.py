@@ -619,6 +619,63 @@ def test_solve_openai_expert_answerable_operator_plan_uses_assumptions_not_clari
     _clear_provider_factory()
 
 
+@pytest.mark.parametrize(
+    "step_one_text",
+    [
+        "",
+        "not json and no confidence metadata",
+        "{malformed json",
+        '{"considerations":[],"assumptions":[]}',
+    ],
+)
+def test_solve_openai_expert_actionable_plan_missing_step_one_metadata_answers_with_defaults(
+    monkeypatch, step_one_text
+):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    prompt = (
+        "Create a two-hour operator test plan for /dashboard/expert-preview "
+        "that separates setup, prompt runs, evidence capture, and rollback."
+    )
+    fake = FakeProviderClient(
+        [
+            _provider_result(step_one_text),
+            _provider_result("   "),
+        ]
+    )
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={"query": prompt, "context": {"route": "expert"}},
+        headers={"X-API-Key": key, "X-Request-ID": "req-live-step1-fallback"},
+    )
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["mode"] == "answer_with_assumptions"
+    assert body["answer"].strip()
+    assert body["final_answer"] == body["answer"]
+    assert body["answer"] != "I need a few details before I can answer this well."
+    assert "Two-hour operator test plan" in body["answer"]
+    for section in ("Setup", "Prompt runs", "Evidence capture", "Rollback"):
+        assert section in body["answer"]
+    assert body["assumptions"] == [
+        "Supervised operator preview only.",
+        "Local rollback is available after the controlled run.",
+        (
+            "No MVP validation, production-readiness, Alpha Solver superiority, "
+            "broad benchmark success, or exact billing accuracy claim is made from this run."
+        ),
+        "Evidence must be sanitized before capture or sharing.",
+    ]
+    assert "clarifying_questions" not in body
+    assert body["meta"]["confidence_available"] is False
+    assert body["meta"]["preview_parse_status"] in {"unstructured", "json"}
+    assert len(fake.requests) == 2
+    _clear_provider_factory()
+
+
 def test_solve_openai_expert_answer_with_assumptions_empty_step_two_uses_plan_fallback(monkeypatch):
     monkeypatch.setenv("MODEL_PROVIDER", "openai")
     prompt = (
