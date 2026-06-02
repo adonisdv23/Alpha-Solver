@@ -23,6 +23,10 @@ identifiers, or full raw model outputs.
 
 This first run is a signal source for follow-up tickets, not a benchmark.
 
+After the follow-up fixes are merged and latest `main` is redeployed, use the
+[Operator Post-Fix Retest Packet](../OPERATOR_POST_FIX_RETEST_PACKET.md) for a
+short verification pass focused on layout, metrics, and format preservation.
+
 It does not establish any of the following claims:
 
 - This does not validate the MVP.

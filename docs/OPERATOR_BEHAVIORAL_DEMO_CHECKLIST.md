@@ -16,7 +16,10 @@ superiority, prove production readiness, prove answer-quality benchmark success,
 or prove provider reasoning orchestration.
 
 For a one-session step-by-step procedure, start with the
-[Operator Demo Run Packet](OPERATOR_DEMO_RUN_PACKET.md). Use the
+[Operator Demo Run Packet](OPERATOR_DEMO_RUN_PACKET.md). After the first demo
+follow-up fixes are merged and redeployed, use the
+[Operator Post-Fix Retest Packet](OPERATOR_POST_FIX_RETEST_PACKET.md) for the
+short focused verification pass. Use the
 [Operator Behavioral Demo Evidence Template](OPERATOR_BEHAVIORAL_DEMO_EVIDENCE_TEMPLATE.md)
 to record summarized findings for each run without storing raw provider
 payloads, secrets, headers, cookies, session values, CSRF tokens, or API keys.

@@ -18,6 +18,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 | `EVAL-BEHAVIORAL-DEMO-001.md` | EVAL-BEHAVIORAL-DEMO-001 · Operator Behavioral Demo Checklist for MVP Preview |
 | `EVAL-DEMO-EVIDENCE-001.md` | EVAL-DEMO-EVIDENCE-001 · Operator Demo Evidence Template |
 | `EVAL-DEMO-FINDINGS-001.md` | EVAL-DEMO-FINDINGS-001 · First Operator Demo Findings |
+| `EVAL-DEMO-POST-FIX-RETEST-001.md` | EVAL-DEMO-POST-FIX-RETEST-001 · Post-Fix Operator Retest Packet |
 | `EVAL-DEMO-RUN-PACKET-001.md` | EVAL-DEMO-RUN-PACKET-001 · One-Page Operator Demo Run Packet |
 | `FINOPS-BUDGET-001.md` | FINOPS-BUDGET-001 · Budget Guardrails |
 | `MCP-001.md` | CODE SPEC — MCP-001 · MCP Registry Loader & Wiring (MCP) |
