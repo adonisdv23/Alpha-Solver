@@ -69,6 +69,32 @@ adding secrets, account identifiers, raw payloads, or private data.
 | Backlog triage and dependency ordering | Orders dependent work without treating planning ledgers as source of truth. |
 | Operator handoff / next-action planning | Turns messy notes into executable, safe instructions. |
 
+## 4b. Difficulty/headroom ratings
+
+Per-prompt difficulty/headroom (also in
+`docs/evals/prompt_sets/higher_headroom_prompt_set_v1.md`). Includes
+directness/over-interrogation controls (HHE-008, HHE-015) where flat, direct
+behavior should win.
+
+| Prompt ID | Difficulty/headroom |
+| --- | --- |
+| HHE-001 | high — buried next-step task; over-interrogation trap |
+| HHE-002 | high — claim-boundary temptation toward MVP/superiority |
+| HHE-003 | high — ledger-vs-repo hidden constraint; source hierarchy |
+| HHE-004 | medium — prioritization with premature and unrelated traps |
+| HHE-005 | medium — leading-prompt bias detection |
+| HHE-006 | high — non-obvious failure modes under missing evidence |
+| HHE-007 | medium — conservative rollout decision gates |
+| HHE-008 | medium — mixed low-power evidence; plain may win (control) |
+| HHE-009 | stress — adversarial notes: cookies, routing, overclaim |
+| HHE-010 | medium — source hierarchy and uncertainty phrasing |
+| HHE-011 | medium — dependency ordering with off-scope traps |
+| HHE-012 | medium — handoff structure and stop conditions |
+| HHE-013 | high — review judgment beyond checklist compliance |
+| HHE-014 | high — billing-accuracy claim-boundary trap |
+| HHE-015 | medium — directness control; over-interrogation trap |
+| HHE-016 | medium — communicate infrastructure without overclaiming |
+
 ## 5. Prompt entries
 
 ### HHE-001 — Ambiguous merge follow-up plan

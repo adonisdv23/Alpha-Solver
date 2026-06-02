@@ -15,9 +15,12 @@
 
 ## Regression comparison table
 
-| Prompt ID | Prompt family | Prior Alpha score | Current Alpha score | Delta | Regression status | Expected change rationale | Notes |
-| --- | --- | ---: | ---: | ---: | --- | --- | --- |
-|  |  |  |  |  | Regression flagged/No regression/Expected change/Inconclusive |  |  |
+| Prompt ID | Prompt family | Prior Alpha total | Current Alpha total | Delta | Prior lift_delta | Current lift_delta | Prior lift_qualified | Current lift_qualified | Regression status | Expected change rationale | Notes |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | --- | --- | --- | --- | --- |
+|  |  |  |  |  |  |  |  |  | Regression flagged/No regression/Expected change/Inconclusive |  |  |
+
+Track regressions on lift (`lift_delta`, `lift_qualified`), not only on polish or
+total score, so that a structure-only change is not recorded as an improvement.
 
 ## Dimensions reviewed
 

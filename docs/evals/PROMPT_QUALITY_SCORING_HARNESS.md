@@ -134,6 +134,22 @@ Use one primary family and optional secondary families per prompt.
 10. **Record conservative interpretation.** State only the narrowest conclusion
     supported by the preserved artifacts.
 
+## Blinding and lift qualification
+
+`OUTPUT-DIFF-MEASUREMENT-HARDENING-001` adds blinded scoring and a lift decision
+aid to this workflow:
+
+- Score outputs as `Output A` / `Output B` using
+  `docs/evals/templates/blinded_score_sheet_template.csv`; keep the plain/alpha
+  mapping in `docs/evals/templates/blinding_map_template.csv` and unblind only
+  after scores are recorded. See `docs/evals/BLIND_SCORING_PROCEDURE.md`.
+- Capture all 14 dimensions plus length in
+  `docs/evals/templates/comparison_score_table_template.csv` and the Alpha
+  expert envelope in `docs/evals/templates/paired_output_capture_template.md`.
+- Compute `lift_delta`, `polish_delta`, `lift_qualified`, and `polish_only_flag`
+  with `docs/evals/LIFT_DECISION_RULE.md`. Treat `lift_qualified` as an internal
+  review decision aid only.
+
 ## Regression workflow
 
 Use a stable prompt set as a regression suite after behavior, answer-structure,
@@ -196,7 +212,10 @@ Recommended templates:
 - `docs/evals/templates/prompt_set_manifest_template.md`;
 - `docs/evals/templates/comparison_score_table_template.csv`;
 - `docs/evals/templates/regression_run_summary_template.md`;
-- `docs/evals/templates/run_report_template.md`.
+- `docs/evals/templates/run_report_template.md`;
+- `docs/evals/templates/blinded_score_sheet_template.csv`;
+- `docs/evals/templates/blinding_map_template.csv`;
+- `docs/evals/templates/paired_output_capture_template.md`.
 
 ## Redaction and safety
 

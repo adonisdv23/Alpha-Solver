@@ -1,0 +1,2 @@
+comparison_id,prompt_id,output_a_identity,output_b_identity,assignment_method_or_seed,assigned_by,assigned_at,unblinded_by,unblinded_at
+cmp-001,HHE-001,plain,alpha,random-or-seed,assigner-id,2026-01-01T00:00:00Z,reviewer-id,2026-01-01T00:00:00Z
