@@ -99,6 +99,9 @@ separately.
 - Assign plain and Alpha to `Output A` and `Output B` using a recorded random
   method or seed.
 - Record the mapping in `blinding-map.csv`.
+- Assign `Output A` / `Output B` and record the map before writing any
+  judge-facing paired-output capture, so captures and scoring share the same
+  neutral labels (see `artifact-population-guide.md`).
 - Complete blinded scoring before consulting the map.
 - Keep Alpha and plain identity out of all judge-facing fields.
 - Treat blinding as procedural, not cryptographic. The committed map is visible;

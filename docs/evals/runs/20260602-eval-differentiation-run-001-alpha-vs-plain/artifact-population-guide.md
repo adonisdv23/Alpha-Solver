@@ -21,18 +21,31 @@ captures, and no populated evidence packets.
 
 ## Population order for A3-1
 
-Follow this order so blinding is preserved:
+Follow this order so blinding is preserved and the captures stay aligned to the
+`Output A` / `Output B` framing that scoring uses:
 
 1. Confirm every Section A pre-run item in `operator-checklist.md` is recorded.
 2. Generate the two outputs per prompt under the approved cap.
-3. Write one sanitized paired-output capture per prompt.
-4. Assign Output A / Output B and record `blinding-map.csv`.
-5. Score the blinded sheet (`blinded-score-sheet.csv`) on all 14 dimensions.
-6. Unblind via the map, then fill `score-table.csv`.
-7. Compute the decision fields and apply the polish-only guard.
-8. Record any defects in `defects.md`.
-9. Write evidence packets only if operator-approved.
-10. Update `run-summary.md` with a conservative interpretation.
+3. Assign plain and Alpha to `Output A` / `Output B` using a recorded random
+   method or seed.
+4. Record the mapping in `blinding-map.csv`, kept separate from judge-facing
+   scoring.
+5. Write one sanitized paired-output capture per prompt using the `Output A` /
+   `Output B` labels, not judge-facing plain/Alpha labels.
+6. Score `blinded-score-sheet.csv` on all 14 dimensions using `Output A` and
+   `Output B` only.
+7. Unblind via `blinding-map.csv` only after blinded scoring is complete.
+8. Fill `score-table.csv` from the unblinded scores.
+9. Compute the decision fields and apply the polish-only guard from
+   `docs/evals/LIFT_DECISION_RULE.md`.
+10. Record any defects in `defects.md`.
+11. Write evidence packets only if operator-approved.
+12. Update `run-summary.md` with a conservative interpretation.
+
+This order matches `docs/evals/BLIND_SCORING_PROCEDURE.md`: outputs are assigned
+to `Output A` / `Output B` and recorded in the blinding map before any capture or
+scoring, so the captures and the blinded score sheet share the same neutral
+labels and no rewrite is needed after unblinding.
 
 ## Paired-output captures
 
@@ -48,26 +61,32 @@ paired-output-captures/cmp-HHE-009-paired-output-capture.md
 Each capture must reuse
 `docs/evals/templates/paired_output_capture_template.md` and should record:
 
-- prompt ID and run ID;
-- sanitized plain answer text or summary;
-- sanitized Alpha answer text or summary;
-- word counts for each side;
-- sanitized Alpha expert-envelope fields only if available and allowed;
+- comparison ID, prompt ID, and run ID;
+- sanitized `Output A` answer text or summary, with word count;
+- sanitized `Output B` answer text or summary, with word count;
+- sanitized Alpha expert-envelope fields, only if available and allowed, in the
+  template's unblinded-analysis section;
 - allowed summary-level metadata only;
 - redactions performed;
 - non-claims.
 
-Do not place Alpha/plain identity in any judge-facing field. Save sanitized
-answer text only. Never paste raw provider payloads, response IDs, headers,
-account identifiers, cookies, CSRF or session values, environment dumps, or
-private user data into a capture.
+Write captures only after `Output A` / `Output B` are assigned and recorded in
+`blinding-map.csv` (steps 3 and 4 above). Use the `Output A` / `Output B` labels
+in all judge-facing sections and keep plain/Alpha identity out of them. A capture
+may carry the plain/Alpha mapping only if it is not used as a judge-facing scoring
+artifact; otherwise it must preserve the `Output A` / `Output B` framing. The
+Alpha expert-envelope fields are for unblinded material-lift analysis only and
+must not be used to bias blinded scoring. Save sanitized answer text only. Never
+paste raw provider payloads, response IDs, headers, account identifiers, cookies,
+CSRF or session values, environment dumps, or private user data into a capture.
 
 ## Blinding map
 
 `blinding-map.csv` records the de-anonymizing mapping and stays separate from the
-judge-facing score sheet. Populate it only at step 4 above, using a recorded
-random method or seed. The scorer must not consult it until blinded scoring is
-complete. Blinding is procedural, not cryptographic.
+judge-facing score sheet. Populate it at steps 3 and 4 above — immediately after
+assigning `Output A` / `Output B` and before writing any capture or scoring —
+using a recorded random method or seed. The scorer must not consult it until
+blinded scoring is complete. Blinding is procedural, not cryptographic.
 
 ## Blinded score sheet
 
