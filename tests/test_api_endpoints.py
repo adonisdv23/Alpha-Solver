@@ -505,6 +505,114 @@ def test_solve_openai_expert_complex_route_makes_two_calls_and_returns_envelope(
     _clear_provider_factory()
 
 
+def test_solve_openai_expert_complex_route_preserves_requested_plan_shape(monkeypatch):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    prompt = (
+        "Create a two-hour operator test plan for /dashboard/expert-preview "
+        "that separates setup, prompt runs, evidence capture, and rollback."
+    )
+    structured_answer = (
+        "# Two-hour operator test plan for /dashboard/expert-preview\n\n"
+        "| Time box | Section | Tasks | Evidence |\n"
+        "| --- | --- | --- | --- |\n"
+        "| 0:00-0:20 | Setup | Confirm local-provider config and login. | Smoke notes. |\n"
+        "| 0:20-1:15 | Prompt runs | Run the controlled prompts. | Prompt/result summaries. |\n"
+        "| 1:15-1:45 | Evidence capture | Save sanitized observations. | Evidence packet. |\n"
+        "| 1:45-2:00 | Rollback | Return MODEL_PROVIDER=local and record status. | Rollback note. |\n\n"
+        "Assumptions: supervised operator demo only; no production-readiness claim."
+    )
+    fake = FakeProviderClient(
+        [
+            _provider_result(
+                '{"considerations":["Keep the requested two-hour test-plan deliverable first",'
+                '"Preserve section separation for setup, prompt runs, evidence capture, and rollback"],'
+                '"assumptions":["The run is a supervised operator preview, not MVP validation"],'
+                '"confidence":0.82}'
+            ),
+            _provider_result(structured_answer),
+        ]
+    )
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={"query": prompt, "context": {"route": "expert"}},
+        headers={"X-API-Key": key, "X-Request-ID": "req-format"},
+    )
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["final_answer"] == structured_answer
+    assert body["answer"] == structured_answer
+    assert "Two-hour operator test plan" in body["final_answer"]
+    for section in ("Setup", "Prompt runs", "Evidence capture", "Rollback"):
+        assert section in body["final_answer"]
+    for time_box in ("0:00-0:20", "0:20-1:15", "1:15-1:45", "1:45-2:00"):
+        assert time_box in body["final_answer"]
+    assert body["considerations"] == [
+        "Keep the requested two-hour test-plan deliverable first",
+        "Preserve section separation for setup, prompt runs, evidence capture, and rollback",
+    ]
+    assert body["assumptions"] == [
+        "The run is a supervised operator preview, not MVP validation"
+    ]
+    assert body["mode"] == "direct"
+    assert len(fake.requests) == 2
+    answer_prompt = fake.requests[1].prompt
+    assert "Preserve the user's requested output format first" in answer_prompt
+    assert "plan, checklist, table, release note, email, rubric, runbook" in answer_prompt
+    assert "headings, section names, order, time boxes, bullets, tables" in answer_prompt
+    assert "do not let them replace the requested deliverable" in answer_prompt
+    assert prompt in answer_prompt
+    _clear_provider_factory()
+
+
+def test_solve_openai_expert_prompt_preserves_claim_boundaries(monkeypatch):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    fake = FakeProviderClient(
+        [
+            _provider_result(
+                '{"considerations":["Avoid broad conclusions from one demo"],'
+                '"assumptions":["Evidence is limited"],"confidence":0.9}'
+            ),
+            _provider_result(
+                "Release note: this supports follow-up testing but does not validate the MVP."
+            ),
+        ]
+    )
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={
+            "query": (
+                "Write a release note for one operator demo, include scope boundaries and "
+                "next-step caveats, and avoid claiming MVP validation, Alpha Solver "
+                "superiority, production readiness, broad runtime readiness, answer-quality "
+                "benchmark success, or provider reasoning orchestration."
+            ),
+            "context": {"route": "expert"},
+        },
+        headers={"X-API-Key": key, "X-Request-ID": "req-claims"},
+    )
+
+    assert resp.status_code == 200
+    assert len(fake.requests) == 2
+    answer_prompt = fake.requests[1].prompt
+    assert "Do not overclaim certainty" in answer_prompt
+    assert "validation" in answer_prompt
+    assert "production readiness" in answer_prompt
+    assert "superiority" in answer_prompt
+    assert "provider reasoning orchestration" in answer_prompt
+    body = resp.json()
+    assert "does not validate the MVP" in body["final_answer"]
+    assert body["considerations"] == ["Avoid broad conclusions from one demo"]
+    assert body["assumptions"] == ["Evidence is limited"]
+    _clear_provider_factory()
+
+
 def test_solve_openai_expert_complex_route_preserves_system_prompt(monkeypatch):
     monkeypatch.setenv("MODEL_PROVIDER", "openai")
     fake = FakeProviderClient(
