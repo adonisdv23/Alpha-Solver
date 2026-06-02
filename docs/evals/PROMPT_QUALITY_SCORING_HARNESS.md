@@ -215,7 +215,10 @@ Recommended templates:
 - `docs/evals/templates/run_report_template.md`;
 - `docs/evals/templates/blinded_score_sheet_template.csv`;
 - `docs/evals/templates/blinding_map_template.csv`;
-- `docs/evals/templates/paired_output_capture_template.md`.
+- `docs/evals/templates/paired_output_capture_template.md`;
+- `docs/evals/templates/side_by_side_evidence_packet_template.md` for future
+  per-comparison review/index/interpretation packets that cite the hardened
+  artifacts and preserve conservative non-claims.
 
 ## Redaction and safety
 

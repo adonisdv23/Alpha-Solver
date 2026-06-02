@@ -245,3 +245,12 @@ This preservation guide supports:
 - Future `EVAL-DIFFERENTIATION-RUN-001` by defining the run report, score table,
   defects, redactions, evidence strength, and conservative interpretation needed
   for decision-making.
+
+## Side-by-side evidence packets
+
+Future Alpha-vs-plain comparison runs may add blank-template-derived
+side-by-side evidence packets under `docs/evals/runs/` using
+`docs/evals/templates/side_by_side_evidence_packet_template.md`. These packets
+are review/index/interpretation artifacts only and must reference, not replace,
+the score table, paired-output capture, blinded score sheet, blinding map, and
+run report.
