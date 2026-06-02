@@ -182,6 +182,11 @@ def test_preview_post_uses_fake_provider_without_network(
     assert response.status_code == 200
     html = response.text
     assert "plain same-provider answer" in html
+    assert "Request metrics" in html
+    assert "Total preview latency" in html
+    assert "Estimated API cost" in html
+    assert "gpt-test" in html
+    assert "price_hint" in html
     # Three deterministic fake calls (plain tot pass + two expert passes) prove the
     # preview ran end-to-end with no live provider/network dependency.
     assert len(fake.requests) == 3

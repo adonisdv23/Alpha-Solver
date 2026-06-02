@@ -8,8 +8,9 @@ import html
 import json
 import logging
 import os
+import time
 from threading import Lock
-from typing import Any, Dict, Iterable, Mapping
+from typing import Any, Dict, Iterable, Mapping, Sequence
 from urllib.parse import parse_qs
 
 from fastapi import APIRouter, Request, status
@@ -151,6 +152,127 @@ def _render_list(items: Iterable[str]) -> str:
     return "<ul>" + "".join(f"<li>{_escape(item)}</li>" for item in values) + "</ul>"
 
 
+def _unknown_if_missing(value: Any, *, missing: str = "unknown") -> str:
+    if value is None or value == "":
+        return missing
+    return str(value)
+
+
+def _format_duration_ms(value: Any) -> str:
+    if value is None:
+        return "unknown"
+    try:
+        ms = float(value)
+    except (TypeError, ValueError):
+        return "unknown"
+    if ms < 1000:
+        return f"{ms:.0f} ms"
+    return f"{ms / 1000:.2f} s"
+
+
+def _format_cost_usd(value: Any) -> str:
+    if value is None or value == "":
+        return "not estimated"
+    try:
+        cost = float(value)
+    except (TypeError, ValueError):
+        return "not estimated"
+    return f"${cost:.6f} estimated"
+
+
+def _usage_from_meta(meta: Mapping[str, Any]) -> Mapping[str, Any]:
+    usage = meta.get("usage")
+    return usage if isinstance(usage, Mapping) else {}
+
+
+def _cost_from_meta(meta: Mapping[str, Any]) -> Mapping[str, Any]:
+    cost = meta.get("cost")
+    return cost if isinstance(cost, Mapping) else {}
+
+
+def _public_metric_row(label: str, payload: Mapping[str, Any] | None) -> Dict[str, str]:
+    meta = payload.get("meta") if isinstance(payload, Mapping) else None
+    safe_meta = meta if isinstance(meta, Mapping) else {}
+    usage = _usage_from_meta(safe_meta)
+    cost = _cost_from_meta(safe_meta)
+    mode = payload.get("mode") if isinstance(payload, Mapping) else None
+    if mode is None:
+        mode = safe_meta.get("route")
+    return {
+        "label": label,
+        "provider": _unknown_if_missing(safe_meta.get("provider") or _model_provider()),
+        "model": _unknown_if_missing(safe_meta.get("model")),
+        "mode": _unknown_if_missing(mode),
+        "call_count": _unknown_if_missing(safe_meta.get("call_count")),
+        "input_tokens": _unknown_if_missing(usage.get("input_tokens")),
+        "output_tokens": _unknown_if_missing(usage.get("output_tokens")),
+        "total_tokens": _unknown_if_missing(usage.get("total_tokens")),
+        "estimated_cost": _format_cost_usd(cost.get("estimated_usd")),
+        "cost_source": _unknown_if_missing(cost.get("source")),
+        "latency": _format_duration_ms(safe_meta.get("latency_ms")),
+    }
+
+
+def _render_metrics_panel(
+    *,
+    metrics: Mapping[str, Any] | None,
+    plain: Mapping[str, Any] | None,
+    expert: Mapping[str, Any] | None,
+) -> str:
+    if metrics is None:
+        return ""
+    rows: Sequence[Dict[str, str]] = (
+        _public_metric_row("Plain provider output", plain),
+        _public_metric_row("Alpha Solver expert preview", expert),
+    )
+    body = "".join(
+        "<tr>"
+        f'<th scope="row">{_escape(row["label"])}</th>'
+        f"<td>{_escape(row['provider'])}</td>"
+        f"<td>{_escape(row['model'])}</td>"
+        f"<td>{_escape(row['mode'])}</td>"
+        f"<td>{_escape(row['call_count'])}</td>"
+        f"<td>{_escape(row['input_tokens'])}</td>"
+        f"<td>{_escape(row['output_tokens'])}</td>"
+        f"<td>{_escape(row['total_tokens'])}</td>"
+        f"<td>{_escape(row['estimated_cost'])}</td>"
+        f"<td>{_escape(row['cost_source'])}</td>"
+        f"<td>{_escape(row['latency'])}</td>"
+        "</tr>"
+        for row in rows
+    )
+    total_duration = _format_duration_ms(metrics.get("duration_ms"))
+    return f"""
+      <section class="metrics-panel" aria-label="Request metrics">
+        <div class="metrics-heading">
+          <h2>Request metrics</h2>
+          <p>Total preview latency: <strong>{_escape(total_duration)}</strong></p>
+        </div>
+        <div class="metrics-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Output</th>
+                <th scope="col">Provider</th>
+                <th scope="col">Model</th>
+                <th scope="col">Mode</th>
+                <th scope="col">Calls</th>
+                <th scope="col">Input tokens</th>
+                <th scope="col">Output tokens</th>
+                <th scope="col">Total tokens</th>
+                <th scope="col">Estimated API cost</th>
+                <th scope="col">Cost source</th>
+                <th scope="col">Provider latency</th>
+              </tr>
+            </thead>
+            <tbody>{body}</tbody>
+          </table>
+        </div>
+        <p class="metrics-note">Costs are estimates when provider or price-hint metadata is available; otherwise they are not estimated. Provider payload contents, headers, cookies, session values, CSRF tokens, account identifiers, and secrets are not shown.</p>
+      </section>
+    """
+
+
 def _render_plain_payload(payload: Mapping[str, Any] | None) -> str:
     if payload is None:
         return '<p class="empty">Submit a prompt to render the plain same-provider output.</p>'
@@ -206,6 +328,7 @@ def _render_page(
     plain: Mapping[str, Any] | None = None,
     expert: Mapping[str, Any] | None = None,
     error: str = "",
+    metrics: Mapping[str, Any] | None = None,
 ) -> str:
     error_html = f'<p class="error" role="alert">{_escape(error)}</p>' if error else ""
     return f"""<!DOCTYPE html>
@@ -219,12 +342,20 @@ def _render_page(
       .container {{ max-width: 1080px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }}
       h1 {{ margin-bottom: 0.5rem; }}
       .disclaimer {{ border: 1px solid #c7d2fe; background: rgba(238, 242, 255, 0.9); border-radius: 14px; padding: 1rem; color: #30365f; }}
-      form, .pane {{ background: rgba(255, 255, 255, 0.92); border-radius: 16px; padding: 1.25rem; box-shadow: 0 18px 55px rgba(31, 35, 71, 0.08); }}
+      form, .pane, .metrics-panel {{ background: rgba(255, 255, 255, 0.92); border-radius: 16px; padding: 1.25rem; box-shadow: 0 18px 55px rgba(31, 35, 71, 0.08); }}
       form {{ display: grid; gap: 0.85rem; margin: 1.5rem 0; }}
       label {{ font-weight: 700; }}
       textarea {{ min-height: 130px; resize: vertical; border: 1px solid #cdd5ef; border-radius: 12px; padding: 0.85rem 1rem; font: inherit; color: inherit; background: rgba(255,255,255,0.78); }}
       button {{ justify-self: start; border: 0; border-radius: 999px; padding: 0.7rem 1.25rem; font: inherit; font-weight: 700; color: white; background: linear-gradient(135deg, #5661f6, #7b5ff4); cursor: pointer; }}
       button:disabled {{ cursor: wait; opacity: 0.72; }}
+      .metrics-panel {{ margin: 0 0 1rem; border-radius: 16px; padding: 1.25rem; box-shadow: 0 18px 55px rgba(31, 35, 71, 0.08); }}
+      .metrics-heading {{ display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }}
+      .metrics-heading h2 {{ margin: 0; }}
+      .metrics-table-wrap {{ overflow-x: auto; }}
+      table {{ width: 100%; border-collapse: collapse; font-size: 0.92rem; }}
+      th, td {{ border-bottom: 1px solid rgba(86, 97, 246, 0.15); padding: 0.55rem; text-align: left; vertical-align: top; }}
+      th {{ color: #565b8f; font-weight: 800; }}
+      .metrics-note {{ color: #5f668f; font-size: 0.88rem; margin-bottom: 0; }}
       .panes {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 1rem; }}
       .pane {{ min-width: 0; }}
       .pane h2 {{ margin-top: 0; }}
@@ -251,6 +382,7 @@ def _render_page(
         <textarea id="prompt" name="prompt" required>{_escape(prompt)}</textarea>
         <button type="submit">Compare same-provider outputs</button>
       </form>
+      {_render_metrics_panel(metrics=metrics, plain=plain, expert=expert)}
       <section class="panes" aria-label="same-provider comparison">
         <article class="pane" id="plain-pane">
           <h2>Plain provider output</h2>
@@ -376,6 +508,57 @@ async def _extract_prompt(request: Request) -> str:
     return (parsed.get("prompt") or [""])[0].strip()
 
 
+def _sum_record_field(records: Sequence[Mapping[str, Any]], field: str) -> int | None:
+    values = [record.get(field) for record in records]
+    if not values or not all(isinstance(value, int) for value in values):
+        return None
+    return sum(values)
+
+
+def _sum_record_cost(records: Sequence[Mapping[str, Any]]) -> float | None:
+    values = [record.get("estimated_cost_usd") for record in records]
+    if not values or not all(isinstance(value, (int, float)) for value in values):
+        return None
+    return float(sum(values))
+
+
+def _record_cost_source(records: Sequence[Mapping[str, Any]]) -> str | None:
+    sources = {str(record.get("cost_source")) for record in records if record.get("cost_source")}
+    return sources.pop() if len(sources) == 1 else None
+
+
+def _metrics_meta_from_accounting_records(
+    records: Sequence[Mapping[str, Any]], *, latency_ms: float
+) -> Dict[str, Any]:
+    meta: Dict[str, Any] = {"latency_ms": latency_ms}
+    if records:
+        first = records[-1]
+        for field in ("provider", "model", "model_set", "route"):
+            if first.get(field) is not None:
+                meta[field] = first[field]
+        meta["call_count"] = len(records)
+        meta["usage"] = {
+            "input_tokens": _sum_record_field(records, "input_tokens"),
+            "output_tokens": _sum_record_field(records, "output_tokens"),
+            "total_tokens": _sum_record_field(records, "total_tokens"),
+        }
+        meta["cost"] = {
+            "estimated_usd": _sum_record_cost(records),
+            "source": _record_cost_source(records) or "unknown",
+        }
+    return meta
+
+
+def _merge_metrics_meta(payload: Dict[str, Any], metrics_meta: Mapping[str, Any]) -> Dict[str, Any]:
+    existing = payload.get("meta")
+    meta = dict(existing) if isinstance(existing, Mapping) else {}
+    for key, value in metrics_meta.items():
+        if key not in meta or key in {"usage", "cost", "latency_ms", "call_count"}:
+            meta[key] = value
+    payload["meta"] = meta
+    return payload
+
+
 async def _solve_preview(request: Request, prompt: str, *, expert: bool) -> Dict[str, Any]:
     # Import lazily so tests can monkeypatch service.app without importing the
     # API application when they only render the page.
@@ -384,12 +567,34 @@ async def _solve_preview(request: Request, prompt: str, *, expert: bool) -> Dict
     context: Dict[str, Any] = {}
     if expert:
         context["route"] = "expert"
-    response = await solve(SolveRequest(query=prompt, context=context), request)
+
+    records: list[Mapping[str, Any]] = []
+    previous_sink = getattr(request.app.state, "provider_accounting_sink", None)
+
+    def capture_accounting(record: dict[str, Any]) -> None:
+        records.append(dict(record))
+        if callable(previous_sink):
+            previous_sink(record)
+
+    request.app.state.provider_accounting_sink = capture_accounting
+    start = time.perf_counter()
+    try:
+        response = await solve(SolveRequest(query=prompt, context=context), request)
+    finally:
+        if previous_sink is None:
+            try:
+                delattr(request.app.state, "provider_accounting_sink")
+            except AttributeError:
+                pass
+        else:
+            request.app.state.provider_accounting_sink = previous_sink
+    latency_ms = (time.perf_counter() - start) * 1000
     body = response.body.decode("utf-8")
     payload = json.loads(body) if body else {}
+    metrics_meta = _metrics_meta_from_accounting_records(records, latency_ms=latency_ms)
     if not isinstance(payload, dict):
-        return {"final_answer": str(payload)}
-    return payload
+        return {"final_answer": str(payload), "meta": metrics_meta}
+    return _merge_metrics_meta(payload, metrics_meta)
 
 
 @router.get(_ROUTE, response_class=HTMLResponse)
@@ -412,14 +617,23 @@ async def expert_preview_submit(request: Request) -> HTMLResponse:
             status_code=status.HTTP_403_FORBIDDEN,
         )
     try:
+        start = time.perf_counter()
         plain = await _solve_preview(request, prompt, expert=False)
         expert = await _solve_preview(request, prompt, expert=True)
+        duration_ms = (time.perf_counter() - start) * 1000
     except Exception:
         return HTMLResponse(
             content=_render_page(prompt=prompt, error="Preview request failed."),
             status_code=status.HTTP_502_BAD_GATEWAY,
         )
-    return HTMLResponse(content=_render_page(prompt=prompt, plain=plain, expert=expert))
+    return HTMLResponse(
+        content=_render_page(
+            prompt=prompt,
+            plain=plain,
+            expert=expert,
+            metrics={"duration_ms": duration_ms},
+        )
+    )
 
 
 __all__ = ["router", "DISCLAIMER"]
