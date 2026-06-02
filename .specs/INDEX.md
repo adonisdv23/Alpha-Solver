@@ -17,7 +17,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 | `DEPLOY-CLOUDRUN-DASHBOARD-SECRET-GUARD-001.md` | DEPLOY-CLOUDRUN-DASHBOARD-SECRET-GUARD-001 · Require Dashboard Secret for Bundled Cloud Run Preview Mount |
 | `DEPLOY-LIVE-SPEND-GUARD-001.md` | DEPLOY-LIVE-SPEND-GUARD-001 · Live Provider Spend Guard for Expert Preview |
 | `EPIC_RAG_001.md` | EPIC_RAG_001 · RAG & Semantic Cache Pack |
-| `EVAL-ARTIFACT-PRESERVE-001.md` | EVAL-ARTIFACT-PRESERVE-001 · Preserve Eval Summary Artifacts |
+| `EVAL-ARTIFACT-PRESERVE-001.md` | EVAL-ARTIFACT-PRESERVE-001 · Preserve Evaluation Artifacts for Comparison Runs |
 | `EVAL-BEHAVIORAL-DEMO-001.md` | EVAL-BEHAVIORAL-DEMO-001 · Operator Behavioral Demo Checklist for MVP Preview |
 | `EVAL-DEMO-EVIDENCE-001.md` | EVAL-DEMO-EVIDENCE-001 · Operator Demo Evidence Template |
 | `EVAL-DEMO-FINDINGS-001.md` | EVAL-DEMO-FINDINGS-001 · First Operator Demo Findings |
