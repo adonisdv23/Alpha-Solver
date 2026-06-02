@@ -5,6 +5,8 @@ For the full prompt list and rubric, use the
 [Operator Behavioral Demo Checklist](OPERATOR_BEHAVIORAL_DEMO_CHECKLIST.md). For
 notes, use the
 [Operator Behavioral Demo Evidence Template](OPERATOR_BEHAVIORAL_DEMO_EVIDENCE_TEMPLATE.md).
+For the first controlled 3-prompt run's summarized findings, use
+[First Operator Demo Findings](evals/FIRST_OPERATOR_DEMO_FINDINGS.md).
 
 ## Purpose
 
