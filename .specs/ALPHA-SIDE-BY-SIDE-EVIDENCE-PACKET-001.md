@@ -4,20 +4,23 @@
 
 Documentation/spec-first lane for `OUTPUT-DIFFERENTIATION-PHASE-001`.
 
-`ALPHA-SIDE-BY-SIDE-EVIDENCE-PACKET-001` creates the reusable side-by-side evidence
-packet contract and blank packet template that future Alpha-vs-plain
-`EVAL-DIFFERENTIATION-RUN-001` artifacts can populate. This lane is
-**docs/templates/tests only**. It does not execute a run, score outputs, create
-live provider calls, or add populated evidence packets.
+`ALPHA-SIDE-BY-SIDE-EVIDENCE-PACKET-001` creates the reusable side-by-side
+evidence packet contract and blank packet template that future Alpha-vs-plain
+`EVAL-DIFFERENTIATION-RUN-001` artifacts can populate.
+
+This lane is docs/templates/tests only. It does not execute a run, score
+outputs, create live provider calls, or add populated evidence packets.
 
 ## Purpose
 
-The output-differentiation measurement layer now has hardened capture and scoring
-artifacts for all 14 rubric dimensions, blinded Output A / Output B scoring,
-separate unblinding maps, paired-output capture, lift/polish/length decision aids,
-Alpha expert-envelope evidence, and strict non-claims. This spec adds a thin
-review/index/interpretation packet on top of those artifacts so future reviewers
-can summarize one comparison without replacing the underlying source artifacts.
+The output-differentiation measurement layer already has hardened capture and
+scoring artifacts for all 14 rubric dimensions, blinded Output A / Output B
+scoring, separate unblinding maps, paired-output capture, lift/polish/length
+decision aids, Alpha expert-envelope evidence, and strict non-claims.
+
+This spec adds a thin review/index/interpretation packet on top of those
+artifacts so future reviewers can summarize one comparison without replacing the
+underlying source artifacts.
 
 ## Scope
 
@@ -25,40 +28,52 @@ In scope:
 
 - Add `docs/evals/templates/side_by_side_evidence_packet_template.md` as a
   blank, placeholder-only packet template.
-- Require packet references to the existing hardened artifacts:
-  - `docs/evals/templates/paired_output_capture_template.md`;
-  - `docs/evals/templates/blinded_score_sheet_template.csv`;
-  - `docs/evals/templates/blinding_map_template.csv`;
-  - `docs/evals/templates/comparison_score_table_template.csv`;
-  - `docs/evals/templates/run_report_template.md`;
-  - `docs/evals/RESPONSE_QUALITY_RUBRIC.md`;
-  - `docs/evals/LIFT_DECISION_RULE.md`;
-  - `docs/evals/BLIND_SCORING_PROCEDURE.md`;
-  - `docs/evals/ARTIFACT_PRESERVATION.md`.
-- Add docs-integrity tests that verify the packet contract, section coverage,
-  field coverage, artifact references, redaction boundaries, and non-claims.
-- Update eval docs to identify the packet as an optional future per-comparison
-  review/index/interpretation artifact stored beside sanitized run artifacts.
+- Require packet references to existing hardened artifacts.
+- Add docs-integrity tests for packet contract coverage.
+- Update eval docs to identify the packet as an optional future
+  per-comparison review/index/interpretation artifact.
 
 Out of scope:
 
-- The first scored differentiation run or any populated evidence packet.
-- Live provider calls, scoring actual Alpha-vs-plain outputs, or changing scoring
-  behavior.
-- Provider expert-pass behavior, clarify behavior, `/v1/solve`, preview UI
-  rendering, dashboard auth, tool routing, effort toggle, persistent quota, or
-  provider reasoning orchestration.
-- `scripts/run_answer_quality_eval.py` or the multiple-choice answer-quality eval.
-- Google Sheets, backlog workbooks, or external planning ledgers.
+- The first scored differentiation run.
+- Any populated evidence packet.
+- Live provider calls.
+- Scoring actual Alpha-vs-plain outputs.
+- Provider expert-pass behavior.
+- Clarify behavior.
+- `/v1/solve` behavior.
+- Preview UI rendering.
+- Dashboard auth.
+- Tool routing.
+- Effort toggle.
+- Persistent quota.
+- Provider reasoning orchestration.
+- `scripts/run_answer_quality_eval.py`.
+- Google Sheets or backlog workbook updates.
+
+## Source artifacts
+
+A packet must reference these source artifacts instead of replacing them:
+
+- `docs/evals/templates/paired_output_capture_template.md`
+- `docs/evals/templates/blinded_score_sheet_template.csv`
+- `docs/evals/templates/blinding_map_template.csv`
+- `docs/evals/templates/comparison_score_table_template.csv`
+- `docs/evals/templates/run_report_template.md`
+- `docs/evals/RESPONSE_QUALITY_RUBRIC.md`
+- `docs/evals/LIFT_DECISION_RULE.md`
+- `docs/evals/BLIND_SCORING_PROCEDURE.md`
+- `docs/evals/ARTIFACT_PRESERVATION.md`
 
 ## Packet contract
 
-The side-by-side evidence packet is a **review/index/interpretation artifact**.
-It must link to source artifacts and preserve conservative interpretation, but it
-must not replace the comparison score table, paired-output capture, blinded score
-sheet, blinding map, or run report.
+The side-by-side evidence packet is a review/index/interpretation artifact.
 
-A future populated packet must include the following sections:
+It must link to source artifacts and preserve conservative interpretation, but
+it must not replace the comparison score table, paired-output capture, blinded
+score sheet, blinding map, or run report.
+
+A future populated packet must include these sections:
 
 1. Packet identity
 2. Source artifact references
@@ -77,8 +92,8 @@ A future populated packet must include the following sections:
 15. Follow-up tickets
 16. Non-claims
 
-The template must remain blank/placeholder-only and must not include actual scored
-examples or populated evidence.
+The template must remain blank/placeholder-only and must not include actual
+scored examples or populated evidence.
 
 ## Required packet fields
 
@@ -141,16 +156,38 @@ The packet must list all 14 dimension keys from
 ## Redaction and storage boundaries
 
 Packets may include sanitized summaries and references to committed source
-artifacts. They must not commit secrets, credentials, raw provider payloads,
-provider account identifiers, private user data, full unredacted request/response
-traces, environment dumps, dashboard credentials, cookies, CSRF tokens, session
-values, or authorization tokens. If a safe summary cannot be produced, omit the
-unsafe material and record the omission in `redactions performed`.
+artifacts.
+
+Packets must not commit:
+
+- secrets;
+- credentials;
+- raw provider payloads;
+- provider account identifiers;
+- private user data;
+- full unredacted request/response traces;
+- environment dumps;
+- dashboard credentials;
+- cookies;
+- CSRF tokens;
+- session values;
+- authorization tokens.
+
+If a safe summary cannot be produced, omit the unsafe material and record the
+omission in `redactions performed`.
 
 ## Non-claims
 
-This packet contract does not claim MVP validation, Alpha Solver superiority,
-answer-quality superiority, production readiness, broad runtime readiness,
-benchmark success, exact billing accuracy, or provider reasoning orchestration.
+This packet contract does not claim:
+
+- MVP validation;
+- Alpha Solver superiority;
+- answer-quality superiority;
+- production readiness;
+- broad runtime readiness;
+- benchmark success;
+- exact billing accuracy;
+- provider reasoning orchestration.
+
 Each future packet must carry these non-claims and should interpret only the
 narrow evidence preserved in its referenced artifacts.

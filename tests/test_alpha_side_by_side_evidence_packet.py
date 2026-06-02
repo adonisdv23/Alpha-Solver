@@ -76,6 +76,7 @@ SPEC_REQUIRED_HEADINGS = (
     "## Status",
     "## Purpose",
     "## Scope",
+    "## Source artifacts",
     "## Packet contract",
     "## Required packet fields",
     "## Fourteen-dimension coverage",
@@ -190,10 +191,10 @@ def test_new_test_file_parses_as_normal_python():
     expected_prefix = (
         '"""'
         + chr(10)
-        + 'from __future__ import annotations'
+        + "from __future__ import annotations"
         + chr(10)
         + chr(10)
-        + 'import ast'
+        + "import ast"
         + chr(10)
     )
     assert expected_prefix in source
@@ -225,7 +226,10 @@ def test_new_and_edited_files_have_reviewable_text_formatting():
 def test_target_files_have_many_physical_lines_and_bounded_line_lengths():
     for path in TARGET_FORMAT_FILES:
         lines = _read(path).splitlines()
-        assert len(lines) > 20, f"{path} is still line-collapsed"
+        if path.suffix == ".py":
+            assert len(lines) > 100, f"{path} is still line-collapsed"
+        else:
+            assert len(lines) > 50, f"{path} is still line-collapsed"
         assert max(len(line) for line in lines) < 500, (
             f"{path} still has collapsed long lines"
         )

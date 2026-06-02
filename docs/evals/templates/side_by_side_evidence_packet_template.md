@@ -1,9 +1,11 @@
 # Side-by-Side Evidence Packet Template
 
-This packet is a blank, placeholder-only **review/index/interpretation artifact**
-for a single future Alpha-vs-plain comparison. It references and interprets the
-source artifacts listed below; it does not replace the score table,
-paired-output capture, blinded score sheet, blinding map, or run report.
+This packet is a blank, placeholder-only review/index/interpretation artifact
+for a single future Alpha-vs-plain comparison.
+
+It references and interprets the source artifacts listed below. It does not replace
+the score table, paired-output capture, blinded score sheet, blinding map, or
+run report.
 
 Use with:
 
@@ -92,7 +94,7 @@ Storage boundary: this packet indexes sanitized artifacts already preserved unde
 
 ## 7. Fourteen-dimension scores
 
-Copy score values from `comparison_score_table path`; do not rescore in this
+Copy score values from `comparison_score_table path`. Do not rescore in this
 packet.
 
 | Dimension key | Plain score | Alpha score | Delta | Evidence note |
@@ -114,7 +116,7 @@ packet.
 
 ## 8. Lift / polish / total decision aid
 
-Use `docs/evals/LIFT_DECISION_RULE.md`; treat these fields as internal review
+Use `docs/evals/LIFT_DECISION_RULE.md`. Treat these fields as internal review
 decision aids, not broad claims.
 
 | Field | Placeholder |
@@ -157,8 +159,13 @@ unblinding.
 - Alpha defects: `TBD`
 - Regression status: `TBD`
 - Over-interrogation observed: `TBD yes/no`
-- `over-interrogation defect category`:
-  `TBD none / unnecessary clarification / excessive caveats / delayed answer / other`
+- `over-interrogation defect category`: `TBD`
+- Allowed over-interrogation categories:
+  - `none`
+  - `unnecessary clarification`
+  - `excessive caveats`
+  - `delayed answer`
+  - `other`
 - Defect evidence references: `TBD`
 
 ## 12. Evidence-limited explanation
