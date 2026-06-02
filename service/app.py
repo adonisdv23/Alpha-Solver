@@ -602,7 +602,16 @@ def _expert_step_one_prompt(query: str) -> str:
 def _expert_step_two_prompt(query: str, preview: dict[str, Any]) -> str:
     return (
         "Answer the request below using the provided considerations and assumptions. "
-        "Do not include raw provider metadata.\n\n"
+        "Preserve the user's requested output format first: if they ask for a "
+        "plan, checklist, table, release note, email, rubric, runbook, or other "
+        "specific deliverable, make the final answer that deliverable. Preserve "
+        "requested headings, section names, order, time boxes, bullets, tables, "
+        "and named parts unless unsafe or impossible. Keep useful assumptions, "
+        "considerations, caveats, and claim boundaries, but do not let them replace "
+        "the requested deliverable; place them after the deliverable or weave them "
+        "into it briefly. Do not overclaim certainty, validation, production "
+        "readiness, benchmark success, superiority, or provider reasoning "
+        "orchestration. Do not include raw provider metadata.\n\n"
         f"Considerations: {json.dumps(preview['considerations'], ensure_ascii=False)}\n"
         f"Assumptions: {json.dumps(preview['assumptions'], ensure_ascii=False)}\n"
         f"Self-rated confidence: {preview['confidence']}\n\nRequest:\n{query}"

@@ -198,6 +198,59 @@ def test_preview_submission_renders_plain_and_expert_outputs(client: TestClient)
     assert "raw response" not in html.lower()
 
 
+def test_preview_submission_preserves_requested_operator_plan_structure(
+    client: TestClient,
+) -> None:
+    csrf_token = _login(client)
+    prompt = (
+        "Create a two-hour operator test plan for /dashboard/expert-preview "
+        "that separates setup, prompt runs, evidence capture, and rollback."
+    )
+    expert_answer = (
+        "# Two-hour operator test plan\n\n"
+        "## Setup (0:00-0:20)\n"
+        "- Confirm local-provider baseline and dashboard login.\n\n"
+        "## Prompt runs (0:20-1:15)\n"
+        "- Run the controlled prompts and compare panes.\n\n"
+        "## Evidence capture (1:15-1:45)\n"
+        "- Record sanitized summaries only.\n\n"
+        "## Rollback (1:45-2:00)\n"
+        "- Return MODEL_PROVIDER=local and document status.\n\n"
+        "Assumptions: supervised operator test only; no MVP validation claim."
+    )
+    fake = FakeProviderClient(
+        [
+            _provider_result("plain same-provider answer"),
+            _provider_result(
+                '{"considerations":["Preserve the requested plan first"],'
+                '"assumptions":["Operator preview only"],"confidence":0.82}'
+            ),
+            _provider_result(expert_answer),
+        ]
+    )
+    client.app.state.provider_client_factory = lambda _model_set: fake
+
+    response = client.post(
+        "/dashboard/expert-preview",
+        data={"prompt": prompt},
+        headers={auth.CSRF_HEADER_NAME: csrf_token},
+    )
+
+    assert response.status_code == 200
+    html = response.text
+    assert "Two-hour operator test plan" in html
+    for section in ("Setup", "Prompt runs", "Evidence capture", "Rollback"):
+        assert section in html
+    for time_box in ("0:00-0:20", "0:20-1:15", "1:15-1:45", "1:45-2:00"):
+        assert time_box in html
+    assert "Preserve the requested plan first" in html
+    assert "Operator preview only" in html
+    assert len(fake.requests) == 3
+    answer_prompt = fake.requests[2].prompt
+    assert "Preserve the user's requested output format first" in answer_prompt
+    assert "do not let them replace the requested deliverable" in answer_prompt
+
+
 def test_openai_preview_submit_blocks_when_live_preview_flag_absent(
     client: TestClient, monkeypatch: pytest.MonkeyPatch
 ) -> None:
