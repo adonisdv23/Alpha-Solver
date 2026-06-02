@@ -11,12 +11,20 @@
 - Lift decision reference: `docs/evals/LIFT_DECISION_RULE.md`
 - Blind scoring reference: `docs/evals/BLIND_SCORING_PROCEDURE.md`
 - Artifact preservation reference: `docs/evals/ARTIFACT_PRESERVATION.md`
+- Operator checklist reference: `operator-checklist.md`
+- Artifact population guide reference: `artifact-population-guide.md`
 
 ## Explicit execution boundary
 
 This PR does not execute the run. It does not capture outputs, score outputs,
 call live providers, unblind results, populate paired-output captures, populate
 evidence packets, or record an Alpha-vs-plain result.
+
+Before the first scored run, follow `operator-checklist.md`
+(`OUTPUT-DIFF-A3-OPERATOR-CHECKLIST-DRY-RUN-001`, the A3-0 readiness step) for
+pre-run setup, output-generation, blinding, scoring, defect, redaction, stop, and
+non-claim rules. That checklist also is documentation only and does not execute
+the run.
 
 ## Selected prompt subset
 

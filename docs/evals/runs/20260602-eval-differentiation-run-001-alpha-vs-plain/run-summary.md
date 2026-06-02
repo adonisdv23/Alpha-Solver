@@ -21,6 +21,15 @@ This run is not executed. No outputs are captured, no scores are recorded, no
 blinded judging has occurred, no unblinding has occurred, and there is no
 Alpha-vs-plain result yet.
 
+### A3-0 checklist and dry-run readiness
+
+The `OUTPUT-DIFF-A3-OPERATOR-CHECKLIST-DRY-RUN-001` step (A3-0) has prepared the
+operator checklist (`operator-checklist.md`) and the dry-run validation rules
+(`artifact-population-guide.md`). This is readiness only: the run is still not
+executed, no outputs are captured, no scores are recorded, there is no
+Alpha-vs-plain result yet, and no validation or superiority claim is made. A3-0
+made no provider calls and changed no runtime behavior.
+
 ## Plain output summary
 
 Not executed. No plain output has been captured.
