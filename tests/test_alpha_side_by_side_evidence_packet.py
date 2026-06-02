@@ -342,3 +342,4 @@ def test_template_has_no_obvious_secret_like_strings():
     for pattern in SECRET_LIKE_PATTERNS:
         haystack = lowered if pattern == pattern.lower() else text
         assert pattern not in haystack, f"template contains secret-like pattern: {pattern}"
+        
