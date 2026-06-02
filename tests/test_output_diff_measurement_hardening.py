@@ -9,6 +9,7 @@ the existing docs-boundary tests in ``tests/test_answer_quality_eval.py``.
 """
 from __future__ import annotations
 
+import csv
 from pathlib import Path
 
 EVALS = Path("docs/evals")
@@ -47,40 +48,85 @@ def _read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def _header(path: Path) -> str:
-    return _read(path).splitlines()[0]
+def _csv_rows(path: Path) -> list[list[str]]:
+    assert path.exists(), f"missing required file: {path}"
+    with path.open(newline="", encoding="utf-8") as handle:
+        return list(csv.reader(handle))
+
+
+def _csv_header(path: Path) -> list[str]:
+    rows = _csv_rows(path)
+    assert rows, f"{path} must include a header row"
+    return rows[0]
+
+
+def _assert_template_has_example_row(path: Path) -> list[list[str]]:
+    rows = _csv_rows(path)
+    assert len(rows) >= 2, f"{path} must include a header row and example row"
+    assert len(rows[0]) == len(rows[1]), (
+        f"{path} header has {len(rows[0])} columns but example row has "
+        f"{len(rows[1])}"
+    )
+    return rows
+
+
+def _assert_required_columns(path: Path, required: tuple[str, ...]) -> list[str]:
+    header = _csv_header(path)
+    header_fields = set(header)
+    for field in required:
+        assert field in header_fields, f"{path} missing field: {field}"
+    return header
+
+
+def test_csv_templates_have_header_example_rows_and_matching_column_counts():
+    for path in (
+        TEMPLATES / "comparison_score_table_template.csv",
+        TEMPLATES / "blinded_score_sheet_template.csv",
+        TEMPLATES / "blinding_map_template.csv",
+    ):
+        _assert_template_has_example_row(path)
 
 
 def test_comparison_score_table_covers_all_14_dimensions():
-    header = _header(TEMPLATES / "comparison_score_table_template.csv")
-    for key in DIMENSION_KEYS:
-        assert f"{key}_plain" in header, f"missing {key}_plain"
-        assert f"{key}_alpha" in header, f"missing {key}_alpha"
+    path = TEMPLATES / "comparison_score_table_template.csv"
+    required = tuple(
+        field
+        for key in DIMENSION_KEYS
+        for field in (f"{key}_plain", f"{key}_alpha")
+    )
+    _assert_required_columns(path, required)
 
 
 def test_comparison_score_table_has_lift_polish_length_and_flags():
-    header = _header(TEMPLATES / "comparison_score_table_template.csv")
-    for field in (
-        "total_delta",
-        "lift_delta",
-        "polish_delta",
-        "winning_surface",
-        "lift_qualified",
-        "material_constraint_verified",
-        "polish_only_flag",
-        "output_a_len_words",
-        "output_b_len_words",
-        "length_ratio",
-    ):
-        assert field in header, f"missing field: {field}"
+    path = TEMPLATES / "comparison_score_table_template.csv"
+    _assert_required_columns(
+        path,
+        (
+            "total_delta",
+            "lift_delta",
+            "polish_delta",
+            "winning_surface",
+            "lift_qualified",
+            "material_constraint_verified",
+            "polish_only_flag",
+            "output_a_len_words",
+            "output_b_len_words",
+            "length_ratio",
+        ),
+    )
 
 
 def test_blinded_score_sheet_uses_output_a_b_and_has_no_brand_tokens():
-    header = _header(TEMPLATES / "blinded_score_sheet_template.csv")
-    for key in DIMENSION_KEYS:
-        assert f"output_a_{key}" in header, f"missing output_a_{key}"
-        assert f"output_b_{key}" in header, f"missing output_b_{key}"
-    lowered = header.lower()
+    path = TEMPLATES / "blinded_score_sheet_template.csv"
+    header = _assert_required_columns(
+        path,
+        tuple(
+            field
+            for key in DIMENSION_KEYS
+            for field in (f"output_a_{key}", f"output_b_{key}")
+        ),
+    )
+    lowered = ",".join(header).lower()
     assert "alpha" not in lowered, "blinded sheet header must not reveal Alpha"
     assert "plain" not in lowered, "blinded sheet header must not reveal Plain"
 
@@ -91,15 +137,16 @@ def test_blinding_map_exists_and_is_distinct_from_blinded_sheet():
     assert map_path.exists()
     assert sheet_path.exists()
     assert map_path.resolve() != sheet_path.resolve()
-    header = _header(map_path)
-    for field in (
-        "output_a_identity",
-        "output_b_identity",
-        "assignment_method_or_seed",
-        "assigned_by",
-        "unblinded_by",
-    ):
-        assert field in header, f"missing mapping field: {field}"
+    _assert_required_columns(
+        map_path,
+        (
+            "output_a_identity",
+            "output_b_identity",
+            "assignment_method_or_seed",
+            "assigned_by",
+            "unblinded_by",
+        ),
+    )
 
 
 def test_paired_output_capture_has_envelope_and_redaction():
