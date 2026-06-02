@@ -175,6 +175,10 @@ The preview is not operator-test-ready if any of these occur:
 - This checkpoint does not prove exact billing accuracy.
 - This checkpoint does not prove provider reasoning orchestration.
 
+## Output differentiation rubric
+
+Future Alpha-vs-plain comparison work should use the universal response-quality rubric in `docs/evals/RESPONSE_QUALITY_RUBRIC.md` to score visible output quality, preserve reviewer calibration, and avoid unsupported superiority, validation, production-readiness, benchmark, billing-accuracy, or provider-reasoning-orchestration claims.
+
 ## Next stage
 
 Recommended next-stage work, only after operator approval where applicable:
