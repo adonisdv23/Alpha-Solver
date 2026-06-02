@@ -207,6 +207,7 @@ def test_new_and_edited_files_have_reviewable_text_formatting():
         assert literal_newline_escape not in text, (
             f"{path} contains literal newline escape sequences"
         )
+        assert "\r" not in text, f"{path} contains carriage returns"
         lines = text.splitlines()
         assert len(lines) > 1, f"{path} appears collapsed onto one line"
         assert max(len(line) for line in lines) < 500, (
