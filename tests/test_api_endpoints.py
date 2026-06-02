@@ -618,6 +618,46 @@ def test_solve_openai_expert_answerable_operator_plan_uses_assumptions_not_clari
     assert len(fake.requests) == 2
     _clear_provider_factory()
 
+
+def test_solve_openai_expert_answer_with_assumptions_empty_step_two_uses_plan_fallback(monkeypatch):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    prompt = (
+        "Create a two-hour operator test plan for /dashboard/expert-preview "
+        "that separates setup, prompt runs, evidence capture, and rollback."
+    )
+    fake = FakeProviderClient(
+        [
+            _provider_result(
+                '{"considerations":["Keep the requested deliverable primary"],'
+                '"assumptions":["Run is a supervised operator preview"],"confidence":0.50}'
+            ),
+            _provider_result("   "),
+        ]
+    )
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={"query": prompt, "context": {"route": "expert"}},
+        headers={"X-API-Key": key, "X-Request-ID": "req-empty-primary"},
+    )
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["mode"] == "answer_with_assumptions"
+    assert body["answer"].strip()
+    assert body["final_answer"] == body["answer"]
+    assert "Two-hour operator test plan" in body["answer"]
+    for section in ("Setup", "Prompt runs", "Evidence capture", "Rollback"):
+        assert section in body["answer"]
+    assert "I need a few details before I can answer this well." not in body["answer"]
+    assert "clarifying_questions" not in body
+    assert body["considerations"] == ["Keep the requested deliverable primary"]
+    assert body["assumptions"] == ["Run is a supervised operator preview"]
+    assert len(fake.requests) == 2
+    _clear_provider_factory()
+
 def test_solve_openai_expert_prompt_preserves_claim_boundaries(monkeypatch):
     monkeypatch.setenv("MODEL_PROVIDER", "openai")
     fake = FakeProviderClient(

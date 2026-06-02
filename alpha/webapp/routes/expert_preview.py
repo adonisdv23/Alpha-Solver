@@ -124,7 +124,9 @@ def _as_list(value: Any) -> list[str]:
 
 
 def _answer(payload: Mapping[str, Any]) -> str:
-    value = payload.get("answer", payload.get("final_answer", ""))
+    value = payload.get("answer")
+    if value is None or not str(value).strip():
+        value = payload.get("final_answer", "")
     return str(value) if value is not None else ""
 
 
