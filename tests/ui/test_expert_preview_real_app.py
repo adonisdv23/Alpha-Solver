@@ -75,6 +75,13 @@ def _assert_loading_state_script(html: str) -> None:
     assert "initExpertPreviewForm();" in html
 
 
+def _assert_long_response_layout(html: str) -> None:
+    assert '.panes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start;' in html
+    assert '.pane { min-width: 0; }' in html
+    assert '.answer, pre { white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }' in html
+    assert '.answer { display: block; margin: 0 0 1rem; max-height: none; overflow: visible;' in html
+
+
 def _login(client: TestClient) -> str:
     response = client.post("/login", data={"password": "testing-secret"}, follow_redirects=False)
     assert response.status_code == 303
@@ -134,6 +141,7 @@ def test_authenticated_request_renders_page(client: TestClient) -> None:
     assert response.status_code == 200
     assert expert_preview.DISCLAIMER in response.text
     _assert_loading_state_script(response.text)
+    _assert_long_response_layout(response.text)
 
 
 def test_preview_post_uses_fake_provider_without_network(
