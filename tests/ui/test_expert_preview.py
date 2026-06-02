@@ -80,6 +80,14 @@ def _assert_loading_state_script(html: str) -> None:
     assert "initExpertPreviewForm();" in html
 
 
+def _assert_long_response_layout(html: str) -> None:
+    assert '.panes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start;' in html
+    assert '.pane { min-width: 0; }' in html
+    assert '.answer, pre { white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }' in html
+    assert '.answer { display: block; margin: 0 0 1rem; max-height: none; overflow: visible;' in html
+    assert 'class="answer response-text" aria-label="Primary response"' in html
+
+
 def _assert_no_sensitive_preview_leak(html: str, *secrets: str) -> None:
     for secret in secrets:
         assert secret not in html
@@ -334,6 +342,39 @@ def test_preview_submission_handles_unstructured_expert_preview_coherently(
     assert "Bearer" not in html
     assert "raw request" not in html.lower()
     assert "raw response" not in html.lower()
+
+
+def test_long_plain_and_expert_responses_use_expanding_wrapping_answer_boxes(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    csrf_token = _login(client)
+    long_plain = "Plain provider output " + ("wraps cleanly with a very long segment " * 80)
+    long_expert = "Alpha Solver expert preview output " + ("expands vertically for operator review " * 80)
+
+    async def fake_solve_preview(*args: object, expert: bool) -> dict[str, object]:
+        if expert:
+            return {
+                "final_answer": long_expert,
+                "confidence": 0.62,
+                "considerations": ["Review long output layout"],
+                "meta": {"route": "expert", "call_count": 1},
+            }
+        return {"final_answer": long_plain, "meta": {"route": "tot", "call_count": 1}}
+
+    monkeypatch.setattr(expert_preview, "_solve_preview", fake_solve_preview)
+
+    response = client.post(
+        "/dashboard/expert-preview",
+        data={"prompt": "Render long responses without clipping."},
+        headers={auth.CSRF_HEADER_NAME: csrf_token},
+    )
+
+    assert response.status_code == 200
+    html = response.text
+    assert long_plain in html
+    assert long_expert in html
+    assert html.count('class="answer response-text" aria-label="Primary response"') == 2
+    _assert_long_response_layout(html)
 
 
 def test_browser_like_multipart_submission_extracts_prompt_and_preserves_it(

@@ -157,7 +157,7 @@ def _render_plain_payload(payload: Mapping[str, Any] | None) -> str:
     meta = _public_meta(payload)
     details = json.dumps(meta, indent=2, sort_keys=True) if meta else "{}"
     return f"""
-      <p class="answer">{_escape(_answer(payload))}</p>
+      <div class="answer response-text" aria-label="Primary response">{_escape(_answer(payload))}</div>
       <details>
         <summary>Details</summary>
         <pre>{_escape(details)}</pre>
@@ -185,7 +185,7 @@ def _render_expert_payload(payload: Mapping[str, Any] | None) -> str:
         f"<div><dt>{_escape(label)}</dt><dd>{_escape(value)}</dd></div>" for label, value in rows
     )
     return f"""
-      <p class="answer">{_escape(_answer(payload))}</p>
+      <div class="answer response-text" aria-label="Primary response">{_escape(_answer(payload))}</div>
       <dl class="metadata">{rows_html}</dl>
       <h3>Considerations</h3>
       {_render_list(_as_list(payload.get('considerations')))}
@@ -225,10 +225,11 @@ def _render_page(
       textarea {{ min-height: 130px; resize: vertical; border: 1px solid #cdd5ef; border-radius: 12px; padding: 0.85rem 1rem; font: inherit; color: inherit; background: rgba(255,255,255,0.78); }}
       button {{ justify-self: start; border: 0; border-radius: 999px; padding: 0.7rem 1.25rem; font: inherit; font-weight: 700; color: white; background: linear-gradient(135deg, #5661f6, #7b5ff4); cursor: pointer; }}
       button:disabled {{ cursor: wait; opacity: 0.72; }}
-      .panes {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }}
+      .panes {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 1rem; }}
+      .pane {{ min-width: 0; }}
       .pane h2 {{ margin-top: 0; }}
-      .answer, pre {{ white-space: pre-wrap; overflow-wrap: anywhere; }}
-      .answer {{ border: 1px solid rgba(86, 97, 246, 0.16); background: rgba(237, 240, 255, 0.65); border-radius: 12px; padding: 1rem; }}
+      .answer, pre {{ white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }}
+      .answer {{ display: block; margin: 0 0 1rem; max-height: none; overflow: visible; border: 1px solid rgba(86, 97, 246, 0.16); background: rgba(237, 240, 255, 0.65); border-radius: 12px; padding: 1rem; }}
       .metadata {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }}
       dt {{ color: #565b8f; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }}
       dd {{ margin: 0; font-weight: 600; }}
