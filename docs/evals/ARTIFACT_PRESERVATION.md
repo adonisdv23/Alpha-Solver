@@ -140,6 +140,24 @@ Every side-by-side Alpha-vs-plain artifact must include:
 Summaries may cite sanitized excerpts only when safe and necessary. They must not
 store raw provider payloads or full unredacted request/response traces.
 
+## Measurement hardening: blinding, lift qualification, and length
+
+`OUTPUT-DIFF-MEASUREMENT-HARDENING-001` extends the side-by-side artifact with:
+
+- per-dimension plain and alpha scores for all 14 rubric dimensions, plus
+  `total_delta`, `lift_delta`, `polish_delta`, `lift_qualified`,
+  `material_constraint_verified`, and `polish_only_flag`
+  (`docs/evals/templates/comparison_score_table_template.csv`);
+- a structured Alpha expert-envelope capture and sanitized paired-output text
+  (`docs/evals/templates/paired_output_capture_template.md`);
+- label-stripped Output A / Output B scoring
+  (`docs/evals/templates/blinded_score_sheet_template.csv`) with a separate
+  mapping file (`docs/evals/templates/blinding_map_template.csv`);
+- length metrics (`output_a_len_words`, `output_b_len_words`, `length_ratio`).
+
+See `docs/evals/LIFT_DECISION_RULE.md` and `docs/evals/BLIND_SCORING_PROCEDURE.md`.
+These are internal review aids and do not change the claim boundaries below.
+
 ## Redaction rules
 
 Before committing artifacts:

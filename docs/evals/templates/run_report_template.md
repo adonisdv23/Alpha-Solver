@@ -12,6 +12,8 @@
 - Live mode used: yes/no
 - Request cap used:
 - Rollback confirmed: yes/no/not applicable
+- Blinding performed: yes/no (see docs/evals/BLIND_SCORING_PROCEDURE.md)
+- Output A/B mapping file: docs/evals/templates/blinding_map_template.csv
 
 ## Plain output summary
 
@@ -31,9 +33,15 @@ request/response traces.
 
 ## Score table
 
-| Prompt ID | Category | Plain score | Alpha score | Winner/tie/no decision | Notes |
-| --- | --- | ---: | ---: | --- | --- |
-|  |  |  |  |  |  |
+Use `docs/evals/templates/comparison_score_table_template.csv` for the full
+14-dimension per-output scores. Summarize per prompt here:
+
+| Prompt ID | Plain total | Alpha total | total_delta | lift_delta | polish_delta | winning_surface | lift_qualified | polish_only_flag | length_ratio |
+| --- | ---: | ---: | ---: | ---: | ---: | --- | --- | --- | ---: |
+|  |  |  |  |  |  |  |  |  |  |
+
+Lift/polish subscores and the `lift_qualified` decision aid are defined in
+`docs/evals/LIFT_DECISION_RULE.md` (internal review aid only).
 
 ## Alpha advantages observed
 

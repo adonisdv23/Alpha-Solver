@@ -380,6 +380,15 @@ Use the score delta as an input, not as an automatic verdict.
 - Use `Inconclusive` when artifacts are incomplete, reviewer context is missing,
   or the prompt cannot be fairly scored.
 
+### Aggregation, blinding, and lift qualification (additive)
+
+These dimension definitions are unchanged. For how per-dimension scores are
+aggregated without rewarding output polish — the lift/polish subscores, the
+`lift_qualified` decision aid, and the polish-only-win guard — see
+`docs/evals/LIFT_DECISION_RULE.md`. For label-stripped Output A / Output B
+scoring, see `docs/evals/BLIND_SCORING_PROCEDURE.md`. These aids are internal
+review tooling only and do not strengthen any claim boundary below.
+
 ## Strict non-claims
 
 This rubric does not validate the MVP.
