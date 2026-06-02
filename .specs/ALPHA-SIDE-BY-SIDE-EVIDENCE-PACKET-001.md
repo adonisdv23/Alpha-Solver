@@ -1,4 +1,4 @@
-# ALPHA-SIDE-BY-SIDE-EVIDENCE-PACKET-001 · Side-by-Side Evidence Packet Contract
+# ALPHA-SIDE-BY-SIDE-EVIDENCE-PACKET-001 - Side-by-Side Evidence Packet Contract
 
 ## Status
 

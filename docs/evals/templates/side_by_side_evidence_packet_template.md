@@ -171,8 +171,14 @@ readiness from this packet.
 
 ## 13. Conservative interpretation
 
-- Outcome label:
-  `TBD Alpha local advantage / Plain local advantage / Tie / Inconclusive / Regression flagged / Expected change`
+- Outcome label: `TBD`
+- Allowed outcome labels:
+  - `Alpha local advantage`
+  - `Plain local advantage`
+  - `Tie`
+  - `Inconclusive`
+  - `Regression flagged`
+  - `Expected change`
 - Conservative interpretation: `TBD`
 - Reasons the evidence may be incomplete: `TBD`
 
