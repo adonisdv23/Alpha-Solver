@@ -6,7 +6,10 @@ For the full prompt list and rubric, use the
 notes, use the
 [Operator Behavioral Demo Evidence Template](OPERATOR_BEHAVIORAL_DEMO_EVIDENCE_TEMPLATE.md).
 For the first controlled 3-prompt run's summarized findings, use
-[First Operator Demo Findings](evals/FIRST_OPERATOR_DEMO_FINDINGS.md).
+[First Operator Demo Findings](evals/FIRST_OPERATOR_DEMO_FINDINGS.md). After the
+first demo follow-up fixes are merged and redeployed, use the
+[Operator Post-Fix Retest Packet](OPERATOR_POST_FIX_RETEST_PACKET.md) instead of
+rerunning this full packet.
 
 ## Purpose
 
