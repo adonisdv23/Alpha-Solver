@@ -568,26 +568,16 @@ async def _solve_preview(request: Request, prompt: str, *, expert: bool) -> Dict
     if expert:
         context["route"] = "expert"
 
+    from alpha.providers import capture_provider_accounting
+
     records: list[Mapping[str, Any]] = []
-    previous_sink = getattr(request.app.state, "provider_accounting_sink", None)
 
     def capture_accounting(record: dict[str, Any]) -> None:
         records.append(dict(record))
-        if callable(previous_sink):
-            previous_sink(record)
 
-    request.app.state.provider_accounting_sink = capture_accounting
     start = time.perf_counter()
-    try:
+    with capture_provider_accounting(capture_accounting):
         response = await solve(SolveRequest(query=prompt, context=context), request)
-    finally:
-        if previous_sink is None:
-            try:
-                delattr(request.app.state, "provider_accounting_sink")
-            except AttributeError:
-                pass
-        else:
-            request.app.state.provider_accounting_sink = previous_sink
     latency_ms = (time.perf_counter() - start) * 1000
     body = response.body.decode("utf-8")
     payload = json.loads(body) if body else {}
