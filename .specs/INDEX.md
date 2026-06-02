@@ -59,6 +59,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 | `UI-PREVIEW-LOADING-STATE-001.md` | UI-PREVIEW-LOADING-STATE-001 · Expert Preview Loading State |
 | `UI-PREVIEW-LOCAL-SMOKE-001.md` | UI-PREVIEW-LOCAL-SMOKE-001 · Local-provider Expert Preview Smoke Fix |
 | `UI-PREVIEW-RESPONSE-LAYOUT-001.md` | UI-PREVIEW-RESPONSE-LAYOUT-001 · Expert Preview Long Response Layout |
+| `UI-PREVIEW-REQUEST-METRICS-001.md` | UI-PREVIEW-REQUEST-METRICS-001 · Expert Preview Request Metrics Panel |
 | `UI-KEYS-001.md` | UI-KEYS-001 · Dashboard: API Keys Management |
 | `UI-REQ-001.md` | UI-REQ-001 · Dashboard Request Submission UI |
 | `UI-RUN-001.md` | UI-RUN-001 · Dashboard One-click Demo Run |

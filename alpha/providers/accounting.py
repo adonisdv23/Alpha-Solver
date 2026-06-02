@@ -10,7 +10,9 @@ from __future__ import annotations
 
 import json
 import logging
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
+from contextvars import ContextVar
 from typing import Any
 
 from .base import ProviderResult
@@ -20,6 +22,9 @@ PROVIDER_COST_RECORDED = "provider.cost.recorded"
 _ACCOUNTING_SOURCE = "service:/v1/solve"
 _BUDGET_STATUS_RECORDED = "recorded"
 _PROVIDER_ACCOUNTING_LOGGER = logging.getLogger("alpha.providers.accounting")
+_PROVIDER_ACCOUNTING_CONTEXT_SINK: ContextVar[Callable[[dict[str, Any]], None] | None] = (
+    ContextVar("provider_accounting_context_sink", default=None)
+)
 
 _ALLOWED_FIELDS = {
     "event",
@@ -39,6 +44,19 @@ _ALLOWED_FIELDS = {
     "accounting_source",
     "provider_request_id",
 }
+
+
+@contextmanager
+def capture_provider_accounting(
+    sink: Callable[[dict[str, Any]], None],
+) -> Iterator[None]:
+    """Capture provider accounting records for the current async context only."""
+
+    token = _PROVIDER_ACCOUNTING_CONTEXT_SINK.set(sink)
+    try:
+        yield
+    finally:
+        _PROVIDER_ACCOUNTING_CONTEXT_SINK.reset(token)
 
 
 def build_provider_accounting_record(
@@ -91,6 +109,9 @@ def emit_provider_accounting(
         for key in _ALLOWED_FIELDS
         if key in record and record[key] is not None
     }
+    context_sink = _PROVIDER_ACCOUNTING_CONTEXT_SINK.get()
+    if context_sink is not None:
+        context_sink(dict(safe_record))
     if sink is not None:
         sink(dict(safe_record))
         return
@@ -101,6 +122,7 @@ def emit_provider_accounting(
 
 __all__ = [
     "PROVIDER_COST_RECORDED",
+    "capture_provider_accounting",
     "build_provider_accounting_record",
     "emit_provider_accounting",
 ]
