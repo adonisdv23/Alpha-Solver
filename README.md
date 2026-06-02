@@ -22,9 +22,17 @@ See [docs/RUNTIME_READINESS.md](docs/RUNTIME_READINESS.md) for the current
 runtime status matrix: what works locally, what is env-validation only, what is
 mocked/simulated, and what remains future work.
 
+See [docs/MVP_READINESS_CHECKPOINT.md](docs/MVP_READINESS_CHECKPOINT.md) for the
+supervised-preview checkpoint. It marks the preview as ready for disciplined
+operator testing only and does not claim MVP validation or production readiness.
+
 ## Status
 
-MVP ready; P0 & P1 merged:
+Core MVP/P0/P1 capabilities are merged. The supervised preview checkpoint is
+operator-test-ready only; it is not an MVP validation or production-readiness
+claim.
+
+Merged areas include:
 
 - Scoring & routing
 - Gates & policy
