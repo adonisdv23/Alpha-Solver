@@ -338,6 +338,61 @@ def test_preview_submission_answerable_operator_plan_is_not_clarify_only(
     assert "answer_with_assumptions" in html
     assert len(fake.requests) == 3
 
+
+def test_preview_submission_renders_operator_plan_when_expert_step_two_is_empty(
+    client: TestClient,
+) -> None:
+    csrf_token = _login(client)
+    prompt = (
+        "Create a two-hour operator test plan for /dashboard/expert-preview "
+        "that separates setup, prompt runs, evidence capture, and rollback."
+    )
+    fake = FakeProviderClient(
+        [
+            _provider_result("plain same-provider answer"),
+            _provider_result(
+                '{"considerations":["Keep the requested deliverable primary"],'
+                '"assumptions":["Run is a supervised operator preview"],"confidence":0.50}'
+            ),
+            _provider_result(""),
+        ]
+    )
+    client.app.state.provider_client_factory = lambda _model_set: fake
+
+    response = client.post(
+        "/dashboard/expert-preview",
+        data={"prompt": prompt},
+        headers={auth.CSRF_HEADER_NAME: csrf_token},
+    )
+
+    assert response.status_code == 200
+    html = response.text
+    assert "answer_with_assumptions" in html
+    assert "Two-hour operator test plan" in html
+    for section in ("Setup", "Prompt runs", "Evidence capture", "Rollback"):
+        assert section in html
+    assert "Keep the requested deliverable primary" in html
+    assert "Run is a supervised operator preview" in html
+    assert "I need a few details before I can answer this well." not in html
+    assert len(fake.requests) == 3
+
+
+def test_expert_preview_answer_uses_final_answer_when_answer_alias_is_blank() -> None:
+    html = expert_preview._render_expert_payload(
+        {
+            "answer": "",
+            "final_answer": "Two-hour operator test plan fallback",
+            "mode": "answer_with_assumptions",
+            "considerations": ["Keep deliverable primary"],
+            "assumptions": ["Supervised preview only"],
+            "meta": {"route": "expert", "complexity": "complex", "call_count": 2},
+        }
+    )
+
+    assert "Two-hour operator test plan fallback" in html
+    assert "Keep deliverable primary" in html
+    assert "Supervised preview only" in html
+
 def test_openai_preview_submit_blocks_when_live_preview_flag_absent(
     client: TestClient, monkeypatch: pytest.MonkeyPatch
 ) -> None:
