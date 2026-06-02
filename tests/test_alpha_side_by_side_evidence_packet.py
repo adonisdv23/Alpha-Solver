@@ -7,11 +7,23 @@ evidence packets.
 """
 from __future__ import annotations
 
+import ast
+import unicodedata
 from pathlib import Path
 
 SPEC = Path(".specs/ALPHA-SIDE-BY-SIDE-EVIDENCE-PACKET-001.md")
 INDEX = Path(".specs/INDEX.md")
 TEMPLATE = Path("docs/evals/templates/side_by_side_evidence_packet_template.md")
+TEST_FILE = Path("tests/test_alpha_side_by_side_evidence_packet.py")
+
+REVIEWABILITY_FILES = (
+    SPEC,
+    TEMPLATE,
+    TEST_FILE,
+    Path("docs/evals/ARTIFACT_PRESERVATION.md"),
+    Path("docs/evals/PROMPT_QUALITY_SCORING_HARNESS.md"),
+    Path("docs/evals/runs/README.md"),
+)
 
 REQUIRED_ARTIFACTS = (
     "docs/evals/templates/paired_output_capture_template.md",
@@ -42,6 +54,18 @@ REQUIRED_SECTIONS = (
     "## 14. Redactions performed",
     "## 15. Follow-up tickets",
     "## 16. Non-claims",
+)
+
+SPEC_REQUIRED_HEADINGS = (
+    "# ALPHA-SIDE-BY-SIDE-EVIDENCE-PACKET-001 · Side-by-Side Evidence Packet Contract",
+    "## Status",
+    "## Purpose",
+    "## Scope",
+    "## Packet contract",
+    "## Required packet fields",
+    "## Fourteen-dimension coverage",
+    "## Redaction and storage boundaries",
+    "## Non-claims",
 )
 
 DIMENSION_KEYS = (
@@ -113,6 +137,17 @@ STRICT_NON_CLAIMS = (
 )
 
 SECRET_LIKE_PATTERNS = ("sk-", "xoxb-", "-----BEGIN", "bearer ")
+BIDI_CONTROL_CATEGORIES = {
+    "RLO",
+    "LRO",
+    "RLE",
+    "LRE",
+    "PDF",
+    "RLI",
+    "LRI",
+    "FSI",
+    "PDI",
+}
 
 
 def _read(path: Path) -> str:
@@ -120,10 +155,51 @@ def _read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def _standalone_lines(path: Path) -> set[str]:
+    return {line.strip() for line in _read(path).splitlines()}
+
+
 def test_spec_exists_and_is_indexed():
     assert SPEC.exists()
     index = _read(INDEX)
     assert "ALPHA-SIDE-BY-SIDE-EVIDENCE-PACKET-001.md" in index
+
+
+def test_new_test_file_parses_as_normal_python():
+    source = _read(TEST_FILE)
+    ast.parse(source, filename=str(TEST_FILE))
+    assert source.startswith('"""Docs-integrity tests')
+    expected_prefix = (
+        '"""'
+        + chr(10)
+        + 'from __future__ import annotations'
+        + chr(10)
+        + chr(10)
+        + 'import ast'
+        + chr(10)
+    )
+    assert expected_prefix in source
+
+
+def test_new_and_edited_files_have_reviewable_text_formatting():
+    for path in REVIEWABILITY_FILES:
+        text = _read(path)
+        literal_newline_escape = "\\" + "n"
+        assert literal_newline_escape not in text, (
+            f"{path} contains literal newline escape sequences"
+        )
+        assert len(text.splitlines()) > 1, f"{path} appears collapsed onto one line"
+        for character in text:
+            bidi = unicodedata.bidirectional(character)
+            assert bidi not in BIDI_CONTROL_CATEGORIES, (
+                f"{path} contains hidden/bidirectional control character {bidi}"
+            )
+
+
+def test_spec_contains_required_headings_as_standalone_lines():
+    lines = _standalone_lines(SPEC)
+    for heading in SPEC_REQUIRED_HEADINGS:
+        assert heading in lines, f"spec missing standalone heading: {heading}"
 
 
 def test_template_exists_and_references_hardened_artifacts():
@@ -143,10 +219,11 @@ def test_template_exists_and_references_hardened_artifacts():
         assert source_name in lowered
 
 
-def test_template_includes_required_sections_and_identity_fields():
+def test_template_includes_required_sections_as_standalone_lines_and_fields():
     text = _read(TEMPLATE)
+    lines = _standalone_lines(TEMPLATE)
     for section in REQUIRED_SECTIONS:
-        assert section in text, f"template missing section: {section}"
+        assert section in lines, f"template missing standalone section: {section}"
     for field in IDENTITY_AND_SOURCE_FIELDS:
         assert field in text, f"template missing field: {field}"
 
@@ -186,7 +263,8 @@ def test_template_enforces_redaction_and_storage_boundaries():
         "redactions performed",
         "storage boundary",
         "sanitized",
-        "do not paste raw provider payloads",
+        "do not paste any of the following here",
+        "raw provider payloads",
         "provider account identifiers",
         "private user data",
         "full unredacted request/response traces",
@@ -202,7 +280,7 @@ def test_template_enforces_redaction_and_storage_boundaries():
 
 def test_template_carries_strict_non_claims():
     text = _read(TEMPLATE)
-    assert "## 16. Non-claims" in text
+    assert "## 16. Non-claims" in _standalone_lines(TEMPLATE)
     for claim in STRICT_NON_CLAIMS:
         assert claim in text, f"template missing non-claim: {claim}"
 

@@ -82,16 +82,41 @@ examples or populated evidence.
 
 ## Required packet fields
 
-A future packet must carry placeholders for: `packet_id`, `comparison_id`,
-`parent_run_id`, `run_directory`, `prompt_id`, `prompt_family`,
-`difficulty_headroom`, `evidence_strength`, `non_claims_confirmed`,
-`blinded_score_sheet path`, `blinding_map path`, `paired_output_capture path`,
-`comparison_score_table path`, `run_report path`, `plain_total`, `alpha_total`,
-`total_delta`, `lift_delta`, `polish_delta`, `winning_surface`, `lift_qualified`,
-`material_constraint_verified`, `polish_only_flag`, `length_ratio`,
-`considerations`, `assumptions`, `material/correct tags`, `confidence`, `mode`,
-`clarifying questions`, `sanitized metadata`, `over-interrogation defect category`,
-and `redactions performed`.
+A future packet must carry placeholders for:
+
+- `packet_id`
+- `comparison_id`
+- `parent_run_id`
+- `run_directory`
+- `prompt_id`
+- `prompt_family`
+- `difficulty_headroom`
+- `evidence_strength`
+- `non_claims_confirmed`
+- `blinded_score_sheet path`
+- `blinding_map path`
+- `paired_output_capture path`
+- `comparison_score_table path`
+- `run_report path`
+- `plain_total`
+- `alpha_total`
+- `total_delta`
+- `lift_delta`
+- `polish_delta`
+- `winning_surface`
+- `lift_qualified`
+- `material_constraint_verified`
+- `polish_only_flag`
+- `length_ratio`
+- `considerations`
+- `assumptions`
+- `material/correct tags`
+- `confidence`
+- `mode`
+- `clarifying questions`
+- `sanitized metadata`
+- `over-interrogation defect category`
+- `redactions performed`
 
 ## Fourteen-dimension coverage
 

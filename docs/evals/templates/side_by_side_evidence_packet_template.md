@@ -42,9 +42,19 @@ Use with:
 | `run_report path` | `TBD` |
 
 Storage boundary: this packet indexes sanitized artifacts already preserved under
-`docs/evals/runs/`; do not paste raw provider payloads, provider account identifiers, private user data, full unredacted request/response traces,
-environment dumps, dashboard credentials, cookies, CSRF tokens, session values,
-credential strings, or authorization-token material here.
+`docs/evals/runs/`. Do not paste any of the following here:
+
+- raw provider payloads;
+- provider account identifiers;
+- private user data;
+- full unredacted request/response traces;
+- environment dumps;
+- dashboard credentials;
+- cookies;
+- CSRF tokens;
+- session values;
+- credential strings;
+- authorization-token material.
 
 ## 3. Prompt under review
 
@@ -147,7 +157,8 @@ unblinding.
 - Alpha defects: `TBD`
 - Regression status: `TBD`
 - Over-interrogation observed: `TBD yes/no`
-- `over-interrogation defect category`: `TBD none / unnecessary clarification / excessive caveats / delayed answer / other`
+- `over-interrogation defect category`:
+  `TBD none / unnecessary clarification / excessive caveats / delayed answer / other`
 - Defect evidence references: `TBD`
 
 ## 12. Evidence-limited explanation
@@ -160,7 +171,8 @@ readiness from this packet.
 
 ## 13. Conservative interpretation
 
-- Outcome label: `TBD Alpha local advantage / Plain local advantage / Tie / Inconclusive / Regression flagged / Expected change`
+- Outcome label:
+  `TBD Alpha local advantage / Plain local advantage / Tie / Inconclusive / Regression flagged / Expected change`
 - Conservative interpretation: `TBD`
 - Reasons the evidence may be incomplete: `TBD`
 
