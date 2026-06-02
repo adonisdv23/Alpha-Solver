@@ -4,7 +4,10 @@ Use this short packet after redeploying latest `main` to verify the fixes that
 followed the first controlled operator demo. This packet is intentionally smaller
 than the original [Operator Demo Run Packet](OPERATOR_DEMO_RUN_PACKET.md) and
 should be read alongside the summarized
-[First Operator Demo Findings](evals/FIRST_OPERATOR_DEMO_FINDINGS.md).
+[First Operator Demo Findings](evals/FIRST_OPERATOR_DEMO_FINDINGS.md). After the
+post-fix retest is complete, record summarized outcomes in the
+[Post-Fix Operator Retest Findings](evals/POST_FIX_OPERATOR_RETEST_FINDINGS.md)
+artifact.
 
 ## Purpose
 
