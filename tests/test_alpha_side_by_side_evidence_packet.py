@@ -16,10 +16,14 @@ INDEX = Path(".specs/INDEX.md")
 TEMPLATE = Path("docs/evals/templates/side_by_side_evidence_packet_template.md")
 TEST_FILE = Path("tests/test_alpha_side_by_side_evidence_packet.py")
 
-REVIEWABILITY_FILES = (
-    SPEC,
-    TEMPLATE,
+TARGET_FORMAT_FILES = (
     TEST_FILE,
+    TEMPLATE,
+    SPEC,
+)
+
+REVIEWABILITY_FILES = (
+    *TARGET_FORMAT_FILES,
     INDEX,
     Path("docs/evals/ARTIFACT_PRESERVATION.md"),
     Path("docs/evals/PROMPT_QUALITY_SCORING_HARNESS.md"),
@@ -159,6 +163,7 @@ BIDI_CONTROL_CATEGORIES = {
     "FSI",
     "PDI",
 }
+HIDDEN_CONTROL_CATEGORIES = {"Cf"}
 
 
 def _read(path: Path) -> str:
@@ -208,9 +213,22 @@ def test_new_and_edited_files_have_reviewable_text_formatting():
         )
         for character in text:
             bidi = unicodedata.bidirectional(character)
+            category = unicodedata.category(character)
             assert bidi not in BIDI_CONTROL_CATEGORIES, (
-                f"{path} contains hidden/bidirectional control character {bidi}"
+                f"{path} contains bidirectional control character {bidi}"
             )
+            assert category not in HIDDEN_CONTROL_CATEGORIES, (
+                f"{path} contains hidden Unicode control category {category}"
+            )
+
+
+def test_target_files_have_many_physical_lines_and_bounded_line_lengths():
+    for path in TARGET_FORMAT_FILES:
+        lines = _read(path).splitlines()
+        assert len(lines) > 20, f"{path} is still line-collapsed"
+        assert max(len(line) for line in lines) < 500, (
+            f"{path} still has collapsed long lines"
+        )
 
 
 def test_spec_contains_required_headings_as_standalone_lines():
