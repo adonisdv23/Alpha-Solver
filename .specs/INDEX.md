@@ -27,6 +27,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 | `EVAL-DEMO-POST-FIX-FINDINGS-001.md` | EVAL-DEMO-POST-FIX-FINDINGS-001 · Post-Fix Operator Retest Findings |
 | `EVAL-DEMO-POST-FIX-RETEST-001.md` | EVAL-DEMO-POST-FIX-RETEST-001 · Post-Fix Operator Retest Packet |
 | `EVAL-DEMO-RUN-PACKET-001.md` | EVAL-DEMO-RUN-PACKET-001 · One-Page Operator Demo Run Packet |
+| `EVAL-DIFFERENTIATION-RUN-001.md` | EVAL-DIFFERENTIATION-RUN-001 · Controlled Alpha-vs-Plain Run Scaffold |
 | `HIGHER-HEADROOM-EVAL-001.md` | HIGHER-HEADROOM-EVAL-001 · Higher-Headroom Alpha-vs-Plain Prompt Set |
 | `FINOPS-BUDGET-001.md` | FINOPS-BUDGET-001 · Budget Guardrails |
 | `MCP-001.md` | CODE SPEC — MCP-001 · MCP Registry Loader & Wiring (MCP) |

@@ -15,3 +15,9 @@ packets derived from `docs/evals/templates/side_by_side_evidence_packet_template
 those packets are review/index/interpretation artifacts only and must reference,
 not replace, the score table, paired-output capture, blinded score sheet,
 blinding map, and run report.
+
+## Prepared run scaffolds
+
+- `20260602-eval-differentiation-run-001-alpha-vs-plain/` prepares the
+  `EVAL-DIFFERENTIATION-RUN-001` controlled Alpha-vs-plain pilot scaffold. It is
+  not executed and contains no populated outputs, scores, or evidence packets.
