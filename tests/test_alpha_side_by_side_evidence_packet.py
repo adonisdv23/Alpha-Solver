@@ -20,6 +20,7 @@ REVIEWABILITY_FILES = (
     SPEC,
     TEMPLATE,
     TEST_FILE,
+    INDEX,
     Path("docs/evals/ARTIFACT_PRESERVATION.md"),
     Path("docs/evals/PROMPT_QUALITY_SCORING_HARNESS.md"),
     Path("docs/evals/runs/README.md"),
@@ -54,6 +55,16 @@ REQUIRED_SECTIONS = (
     "## 14. Redactions performed",
     "## 15. Follow-up tickets",
     "## 16. Non-claims",
+)
+
+TEMPLATE_TABLES = (
+    ("| Field | Placeholder |", "| --- | --- |"),
+    ("| Source artifact | Path |", "| --- | --- |"),
+    (
+        "| Dimension key | Plain score | Alpha score | Delta | Evidence note |",
+        "| --- | --- | --- | --- | --- |",
+    ),
+    ("| Ticket/spec | Reason | Owner/status |", "| --- | --- | --- |"),
 )
 
 SPEC_REQUIRED_HEADINGS = (
@@ -167,7 +178,9 @@ def test_spec_exists_and_is_indexed():
 
 def test_new_test_file_parses_as_normal_python():
     source = _read(TEST_FILE)
+    lines = source.splitlines()
     ast.parse(source, filename=str(TEST_FILE))
+    assert len(lines) > 100, f"{TEST_FILE} appears collapsed onto too few lines"
     assert source.startswith('"""Docs-integrity tests')
     expected_prefix = (
         '"""'
@@ -188,7 +201,11 @@ def test_new_and_edited_files_have_reviewable_text_formatting():
         assert literal_newline_escape not in text, (
             f"{path} contains literal newline escape sequences"
         )
-        assert len(text.splitlines()) > 1, f"{path} appears collapsed onto one line"
+        lines = text.splitlines()
+        assert len(lines) > 1, f"{path} appears collapsed onto one line"
+        assert max(len(line) for line in lines) < 500, (
+            f"{path} has an overly long line that may indicate collapsed text"
+        )
         for character in text:
             bidi = unicodedata.bidirectional(character)
             assert bidi not in BIDI_CONTROL_CATEGORIES, (
@@ -226,6 +243,17 @@ def test_template_includes_required_sections_as_standalone_lines_and_fields():
         assert section in lines, f"template missing standalone section: {section}"
     for field in IDENTITY_AND_SOURCE_FIELDS:
         assert field in text, f"template missing field: {field}"
+
+
+def test_template_tables_have_standalone_header_and_separator_rows():
+    lines = _read(TEMPLATE).splitlines()
+    for header, separator in TEMPLATE_TABLES:
+        assert header in lines, f"template missing standalone table header: {header}"
+        header_index = lines.index(header)
+        assert header_index + 1 < len(lines), f"template table has no separator: {header}"
+        assert lines[header_index + 1] == separator, (
+            f"template table separator must follow header {header!r} on its own line"
+        )
 
 
 def test_template_includes_all_14_rubric_dimension_keys():
