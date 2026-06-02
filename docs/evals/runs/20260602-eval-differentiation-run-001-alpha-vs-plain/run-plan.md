@@ -13,6 +13,7 @@
 - Artifact preservation reference: `docs/evals/ARTIFACT_PRESERVATION.md`
 - Operator checklist reference: `operator-checklist.md`
 - Artifact population guide reference: `artifact-population-guide.md`
+- A3-1 capture packet reference: `a3-1-capture-packet.md` (capture guidance only; does not execute the run)
 
 ## Explicit execution boundary
 
