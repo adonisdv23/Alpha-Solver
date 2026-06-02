@@ -377,6 +377,47 @@ def test_preview_submission_renders_operator_plan_when_expert_step_two_is_empty(
     assert len(fake.requests) == 3
 
 
+def test_preview_submission_actionable_operator_plan_recovers_when_step_one_metadata_missing(
+    client: TestClient,
+) -> None:
+    csrf_token = _login(client)
+    prompt = (
+        "Create a two-hour operator test plan for /dashboard/expert-preview "
+        "that separates setup, prompt runs, evidence capture, and rollback."
+    )
+    fake = FakeProviderClient(
+        [
+            _provider_result("plain same-provider answer"),
+            _provider_result("not json and no confidence metadata"),
+            _provider_result(""),
+        ]
+    )
+    client.app.state.provider_client_factory = lambda _model_set: fake
+
+    response = client.post(
+        "/dashboard/expert-preview",
+        data={"prompt": prompt},
+        headers={auth.CSRF_HEADER_NAME: csrf_token},
+    )
+
+    assert response.status_code == 200
+    html = response.text
+    assert "plain same-provider answer" in html
+    assert "answer_with_assumptions" in html
+    assert "Two-hour operator test plan" in html
+    for section in ("Setup", "Prompt runs", "Evidence capture", "Rollback"):
+        assert section in html
+    assert "Supervised operator preview only." in html
+    assert "Local rollback is available after the controlled run." in html
+    assert "Evidence must be sanitized before capture or sharing." in html
+    assert "I need a few details before I can answer this well." not in html
+    assert "Clarifying questions" in html
+    assert "None surfaced." in html
+    assert "unavailable" in html
+    assert "preview_parse_status" in html
+    assert len(fake.requests) == 3
+
+
 def test_expert_preview_answer_uses_final_answer_when_answer_alias_is_blank() -> None:
     html = expert_preview._render_expert_payload(
         {
