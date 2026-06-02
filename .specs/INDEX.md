@@ -4,6 +4,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 
 | File | Title |
 | --- | --- |
+| `ALPHA-CLARIFY-THRESHOLD-001.md` | ALPHA-CLARIFY-THRESHOLD-001 · Answer Execution Prompts with Assumptions When Sufficient |
 | `ALPHA-FORMAT-PRESERVATION-001.md` | ALPHA-FORMAT-PRESERVATION-001 · Expert Answer Format Preservation |
 | `AS-145.md` | CODE SPEC — AS-145 · Tool Adapters: Playwright + GSheets (MVP hardening) (RES_05) |
 | `AS-148.md` | CODE SPEC — AS-148 · Policy & PII Gateway (DR_TRACK_A) |

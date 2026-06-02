@@ -568,6 +568,56 @@ def test_solve_openai_expert_complex_route_preserves_requested_plan_shape(monkey
     _clear_provider_factory()
 
 
+def test_solve_openai_expert_answerable_operator_plan_uses_assumptions_not_clarify(monkeypatch):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    prompt = (
+        "Create a two-hour operator test plan for /dashboard/expert-preview "
+        "that separates setup, prompt runs, evidence capture, and rollback."
+    )
+    structured_answer = (
+        "# Two-hour operator test plan for /dashboard/expert-preview\n\n"
+        "Assumptions: supervised operator test; local rollback is available.\n\n"
+        "## Setup\n"
+        "- 0:00-0:20: Confirm dashboard auth, local-provider defaults, and evidence template.\n\n"
+        "## Prompt runs\n"
+        "- 0:20-1:10: Run the controlled prompts and record plain vs Alpha summaries.\n\n"
+        "## Evidence capture\n"
+        "- 1:10-1:45: Capture sanitized screenshots, request IDs, and observed modes.\n\n"
+        "## Rollback\n"
+        "- 1:45-2:00: Restore MODEL_PROVIDER=local and document unresolved issues."
+    )
+    fake = FakeProviderClient(
+        [
+            _provider_result(
+                '{"considerations":["The request includes a concrete route and named sections"],'
+                '"assumptions":["Run is a supervised operator preview"],"confidence":0.50}'
+            ),
+            _provider_result(structured_answer),
+        ]
+    )
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={"query": prompt, "context": {"route": "expert"}},
+        headers={"X-API-Key": key, "X-Request-ID": "req-clarify-threshold"},
+    )
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["mode"] == "answer_with_assumptions"
+    assert body["final_answer"] == structured_answer
+    assert body["answer"] == structured_answer
+    assert body["answer"] != "I need a few details before I can answer this well."
+    assert "clarifying_questions" not in body
+    for section in ("Setup", "Prompt runs", "Evidence capture", "Rollback"):
+        assert section in body["final_answer"]
+    assert "Assumptions" in body["final_answer"]
+    assert body["assumptions"] == ["Run is a supervised operator preview"]
+    assert len(fake.requests) == 2
+    _clear_provider_factory()
+
 def test_solve_openai_expert_prompt_preserves_claim_boundaries(monkeypatch):
     monkeypatch.setenv("MODEL_PROVIDER", "openai")
     fake = FakeProviderClient(

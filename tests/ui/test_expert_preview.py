@@ -287,6 +287,57 @@ def test_preview_submission_preserves_requested_operator_plan_structure(
     assert "do not let them replace the requested deliverable" in answer_prompt
 
 
+def test_preview_submission_answerable_operator_plan_is_not_clarify_only(
+    client: TestClient,
+) -> None:
+    csrf_token = _login(client)
+    prompt = (
+        "Create a two-hour operator test plan for /dashboard/expert-preview "
+        "that separates setup, prompt runs, evidence capture, and rollback."
+    )
+    expert_answer = (
+        "# Two-hour operator test plan\n\n"
+        "Assumptions: supervised preview only; no MVP validation claim.\n\n"
+        "## Setup\n"
+        "- Confirm dashboard auth and local-provider rollback path.\n\n"
+        "## Prompt runs\n"
+        "- Execute controlled prompts and compare primary answers.\n\n"
+        "## Evidence capture\n"
+        "- Save sanitized observations, screenshots, and request IDs.\n\n"
+        "## Rollback\n"
+        "- Restore local mode and record status."
+    )
+    fake = FakeProviderClient(
+        [
+            _provider_result("plain same-provider answer"),
+            _provider_result(
+                '{"considerations":["The prompt already names the deliverable and route"],'
+                '"assumptions":["Operator has approved preview access"],"confidence":0.50}'
+            ),
+            _provider_result(expert_answer),
+        ]
+    )
+    client.app.state.provider_client_factory = lambda _model_set: fake
+
+    response = client.post(
+        "/dashboard/expert-preview",
+        data={"prompt": prompt},
+        headers={auth.CSRF_HEADER_NAME: csrf_token},
+    )
+
+    assert response.status_code == 200
+    html = response.text
+    assert "I need a few details before I can answer this well." not in html
+    assert "Two-hour operator test plan" in html
+    for section in ("Setup", "Prompt runs", "Evidence capture", "Rollback"):
+        assert section in html
+    assert "Assumptions" in html
+    assert "The prompt already names the deliverable and route" in html
+    assert "Operator has approved preview access" in html
+    assert "Mode" in html
+    assert "answer_with_assumptions" in html
+    assert len(fake.requests) == 3
+
 def test_openai_preview_submit_blocks_when_live_preview_flag_absent(
     client: TestClient, monkeypatch: pytest.MonkeyPatch
 ) -> None:
