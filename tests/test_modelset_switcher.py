@@ -65,3 +65,21 @@ def test_resolver_priority_and_fallback():
     assert reason.startswith("unknown-tenant-default")
     assert explain["model_set_reason"].startswith("unknown-tenant-default")
 
+
+def test_a3_live_capture_resolves_when_requested():
+    reg = ModelSetRegistry()
+    resolver = ModelSetResolver(registry=reg)
+
+    explain = {}
+    ms, reason = resolver.resolve(requested="a3_live_capture", route_explain=explain)
+
+    assert ms.name == "a3_live_capture"
+    assert ms.provider == "openai"
+    assert ms.model == "gpt-5-mini"
+    assert ms.max_tokens == 4096
+    assert ms.timeout_ms == 60000
+    assert reason == "requested"
+    assert explain == {
+        "model_set": "a3_live_capture",
+        "model_set_reason": "requested",
+    }
