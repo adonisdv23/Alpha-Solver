@@ -3,8 +3,13 @@
 from __future__ import annotations
 
 import re
+
 from fastapi import HTTPException, Request
 from alpha.core.config import APISettings
+
+_IMPORT_SYNTAX_RE = re.compile(
+    r"(?i)(?:\bimport\b(?:\s+[A-Za-z_][\w.]*)?|\bfrom\s+[A-Za-z_][\w.]*\s+import\b)"
+)
 
 # Regex to match control characters (except newlines and tabs which are generally safe)
 _CONTROL_CHARS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f]")
@@ -33,7 +38,11 @@ def sanitize_query(text: str, max_length: int = 1000) -> str:
     if _CONTROL_CHARS.search(text):
         raise HTTPException(status_code=400, detail="query contains invalid characters")
     # Very conservative disallow list for obvious code-injection patterns.
-    if "__" in text or "import" in text.lower():
+    # Keep double-underscore rejection for Python dunder escape hatches such as
+    # ``__import__(...)``. Match import syntax as tokens instead of the substring
+    # "import" so ordinary words like "IMPORTANT" and "importance" remain valid
+    # natural-language input.
+    if "__" in text or _IMPORT_SYNTAX_RE.search(text):
         raise HTTPException(status_code=400, detail="query contains disallowed patterns")
     return text
 
