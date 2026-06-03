@@ -505,6 +505,115 @@ def test_solve_openai_expert_complex_route_makes_two_calls_and_returns_envelope(
     _clear_provider_factory()
 
 
+def test_solve_openai_expert_direct_mode_empty_step_two_returns_safe_out(monkeypatch):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    fake = FakeProviderClient(
+        [
+            _provider_result(
+                '{"considerations":["Check the requested decision"],'
+                '"assumptions":[],"confidence":0.95}'
+            ),
+            _provider_result("   ", request_id="req-empty-step-two"),
+        ]
+    )
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={
+            "query": (
+                "Review this database migration plan, compare reliability risks "
+                "and tradeoffs, and decide whether the team should proceed this "
+                "quarter with rollback checkpoints."
+            ),
+            "context": {"route": "expert"},
+        },
+        headers={"X-API-Key": key, "X-Request-ID": "req-empty-step-two"},
+    )
+
+    assert resp.status_code == 502
+    body = resp.json()
+    _assert_provider_safe_out_schema(
+        body,
+        category="unknown",
+        retryable=False,
+        request_id="req-empty-step-two",
+    )
+    assert body["final_answer"] == "SAFE-OUT: Provider returned an empty expert answer."
+    assert "answer" not in body
+    assert body["final_answer"].strip()
+    assert len(fake.requests) == 2
+    _clear_provider_factory()
+
+
+def test_solve_openai_expert_empty_step_two_safe_out_does_not_leak_raw_data(
+    monkeypatch,
+):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    secret = "sk-test-empty-expert-secret"
+    raw_payload = "raw-provider-payload-secret"
+    prompt_sentinel = "MUST_NOT_LEAK_RAW_PROMPT_SENTINEL"
+    fake = FakeProviderClient(
+        [
+            _provider_result(
+                '{"considerations":["Use safe response assembly"],'
+                '"assumptions":[],"confidence":0.95}',
+                request_id="req-empty-redact-preview",
+            ),
+            ProviderResult(
+                provider="openai",
+                model="gpt-test",
+                text=" \n\t ",
+                finish_reason="stop",
+                usage=ProviderUsage(input_tokens=1, output_tokens=0, total_tokens=1),
+                cost=ProviderCost(estimated_usd=0.0, source="price_hint"),
+                latency_ms=1,
+                request_id="req-empty-redact",
+                raw_metadata={
+                    "raw": raw_payload,
+                    "api_key": secret,
+                    "Authorization": f"Bearer {secret}",
+                    "prompt": prompt_sentinel,
+                    "provider_request_id": "provider-req-empty-redact",
+                },
+            ),
+        ]
+    )
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={
+            "query": (
+                f"Review {prompt_sentinel} migration reliability risks, compare "
+                "tradeoffs, and decide whether this complex plan should proceed."
+            ),
+            "context": {"route": "expert"},
+        },
+        headers={"X-API-Key": key, "X-Request-ID": "req-empty-redact"},
+    )
+
+    assert resp.status_code == 502
+    body = resp.json()
+    _assert_provider_safe_out_schema(
+        body, category="unknown", retryable=False, request_id="req-empty-redact"
+    )
+    serialized = resp.text
+    assert secret not in serialized
+    assert key not in serialized
+    assert raw_payload not in serialized
+    assert prompt_sentinel not in serialized
+    assert "raw_metadata" not in serialized
+    assert "provider_request_id" not in serialized
+    assert "Authorization" not in serialized
+    assert "Bearer" not in serialized
+    assert "metadata" not in serialized
+    assert "prompt" not in serialized.lower()
+    _clear_provider_factory()
+
+
 def test_solve_openai_expert_complex_route_preserves_requested_plan_shape(monkeypatch):
     monkeypatch.setenv("MODEL_PROVIDER", "openai")
     prompt = (

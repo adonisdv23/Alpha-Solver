@@ -1008,6 +1008,18 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
                     )
                 elif mode == "block":
                     expert_answer = _BLOCK_MESSAGE
+                if not expert_answer.strip():
+                    record_safe_out(request.url.path)
+                    return _provider_error_response(
+                        ProviderError(
+                            provider=answer_result.provider,
+                            category="unknown",
+                            retryable=False,
+                            safe_message="Provider returned an empty expert answer.",
+                            request_id=answer_result.request_id,
+                            retry_count=answer_result.retry_count,
+                        )
+                    )
                 return JSONResponse(
                     _expert_response(
                         answer=expert_answer,
