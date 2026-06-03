@@ -441,12 +441,12 @@ def test_solve_openai_unknown_provider_exception_emits_no_accounting(monkeypatch
     _clear_provider_accounting_sink()
 
 
-def _provider_result(text, *, request_id="req-expert", model="gpt-test"):
+def _provider_result(text, *, request_id="req-expert", model="gpt-test", finish_reason="stop"):
     return ProviderResult(
         provider="openai",
         model=model,
         text=text,
-        finish_reason="stop",
+        finish_reason=finish_reason,
         usage=ProviderUsage(input_tokens=1, output_tokens=1, total_tokens=2),
         cost=ProviderCost(estimated_usd=0.0, source="price_hint"),
         latency_ms=1,
@@ -1121,6 +1121,140 @@ def test_solve_openai_non_expert_route_preserves_pass_through_shape(monkeypatch)
     assert "answer" not in body
     assert len(fake.requests) == 1
     assert fake.requests[0].metadata["route"] == "tot"
+    _clear_provider_factory()
+
+
+@pytest.mark.parametrize(
+    ("provider_text", "finish_reason"),
+    [
+        ("", "incomplete"),
+        (" \n\t ", "stop"),
+    ],
+)
+def test_solve_openai_plain_empty_final_answer_returns_safe_out(
+    monkeypatch, provider_text, finish_reason
+):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    fake = FakeProviderClient(
+        [
+            _provider_result(
+                provider_text,
+                request_id="req-empty-provider-final",
+                finish_reason=finish_reason,
+            )
+        ]
+    )
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={"query": "hello provider", "context": {"route": "tot"}},
+        headers={"X-API-Key": key, "X-Request-ID": "req-empty-provider-final"},
+    )
+
+    assert resp.status_code == 502
+    body = resp.json()
+    _assert_provider_safe_out_schema(
+        body,
+        category="unknown",
+        retryable=False,
+        request_id="req-empty-provider-final",
+    )
+    assert body["final_answer"] == "SAFE-OUT: Provider returned an empty answer."
+    assert body["final_answer"].strip()
+    assert "answer" not in body
+    assert len(fake.requests) == 1
+    assert fake.requests[0].metadata["route"] == "tot"
+    _clear_provider_factory()
+
+
+def test_solve_openai_plain_empty_final_answer_safe_out_does_not_leak_raw_data(
+    monkeypatch,
+):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    secret = "sk-test-plain-empty-secret"
+    raw_payload = "plain-empty-raw-provider-payload"
+    prompt_sentinel = "PLAIN_EMPTY_PROMPT_MUST_NOT_LEAK"
+    fake = FakeProviderClient(
+        [
+            ProviderResult(
+                provider="openai",
+                model="gpt-test",
+                text="",
+                finish_reason="incomplete",
+                usage=ProviderUsage(input_tokens=1, output_tokens=0, total_tokens=1),
+                cost=ProviderCost(estimated_usd=0.0, source="price_hint"),
+                latency_ms=1,
+                request_id="req-empty-plain-redact",
+                raw_metadata={
+                    "raw": raw_payload,
+                    "api_key": secret,
+                    "Authorization": f"Bearer {secret}",
+                    "prompt": prompt_sentinel,
+                    "provider_request_id": "provider-req-empty-plain-redact",
+                },
+            )
+        ]
+    )
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={"query": f"Review {prompt_sentinel} and return a short answer."},
+        headers={"X-API-Key": key, "X-Request-ID": "req-empty-plain-redact"},
+    )
+
+    assert resp.status_code == 502
+    body = resp.json()
+    _assert_provider_safe_out_schema(
+        body,
+        category="unknown",
+        retryable=False,
+        request_id="req-empty-plain-redact",
+    )
+    serialized = resp.text
+    assert secret not in serialized
+    assert key not in serialized
+    assert raw_payload not in serialized
+    assert prompt_sentinel not in serialized
+    assert "raw_metadata" not in serialized
+    assert "provider_request_id" not in serialized
+    assert "Authorization" not in serialized
+    assert "Bearer" not in serialized
+    assert "metadata" not in serialized
+    assert "traceback" not in serialized.lower()
+    assert "prompt" not in serialized.lower()
+    assert "answer" not in body
+    _clear_provider_factory()
+
+
+def test_solve_openai_expert_trivial_empty_final_answer_returns_safe_out(monkeypatch):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    fake = FakeProviderClient(
+        [_provider_result("", request_id="req-empty-trivial", finish_reason="incomplete")]
+    )
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={"query": "Define alpha.", "context": {"route": "expert"}},
+        headers={"X-API-Key": key, "X-Request-ID": "req-empty-trivial"},
+    )
+
+    assert resp.status_code == 502
+    body = resp.json()
+    _assert_provider_safe_out_schema(
+        body,
+        category="unknown",
+        retryable=False,
+        request_id="req-empty-trivial",
+    )
+    assert body["final_answer"].strip()
+    assert "answer" not in body
+    assert len(fake.requests) == 1
     _clear_provider_factory()
 
 

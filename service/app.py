@@ -387,6 +387,25 @@ def _provider_request_error_event(
     )
 
 
+_PROVIDER_EMPTY_FINAL_ANSWER_MESSAGE = "Provider returned an empty answer."
+
+
+def _provider_empty_final_answer_error(result: ProviderResult) -> ProviderError:
+    return ProviderError(
+        provider=result.provider,
+        category="unknown",
+        retryable=False,
+        safe_message=_PROVIDER_EMPTY_FINAL_ANSWER_MESSAGE,
+        request_id=result.request_id,
+        retry_count=result.retry_count,
+    )
+
+
+def _provider_empty_final_answer_response(request: Request, result: ProviderResult) -> JSONResponse:
+    record_safe_out(request.url.path)
+    return _provider_error_response(_provider_empty_final_answer_error(result))
+
+
 def _provider_success_response(result: ProviderResult, model_set: ModelSet) -> Dict[str, Any]:
     return {
         "final_answer": result.text,
@@ -947,6 +966,8 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
                         provider_client=provider_client,
                         provider_request=provider_request,
                     )
+                    if not provider_result.text.strip():
+                        return _provider_empty_final_answer_response(request, provider_result)
                     return JSONResponse(
                         _expert_response(
                             answer=provider_result.text,
@@ -1067,6 +1088,8 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
                 request, _provider_request_error_event(provider_request, safe_error)
             )
             return _provider_error_response(safe_error)
+        if not provider_result.text.strip():
+            return _provider_empty_final_answer_response(request, provider_result)
         return JSONResponse(_provider_success_response(provider_result, model_set))
 
     start = time.time()

@@ -67,6 +67,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 | `RES-08.md` | CODE SPEC — RES-08 · Budget Simulator + Evidence Pack (RES) |
 | `REVIEW-P0P1.md` | CODE SPEC — REVIEW-P0P1 · P0 + P1 Bulk Review (MVP Readiness) (RES_06) |
 | `SOLVE-EXPERT-EMPTY-ANSWER-GUARD-001.md` | SOLVE-EXPERT-EMPTY-ANSWER-GUARD-001 · Expert Route Empty Primary Answer Guard |
+| `SOLVE-PROVIDER-FINAL-ANSWER-EMPTY-GUARD-001.md` | SOLVE-PROVIDER-FINAL-ANSWER-EMPTY-GUARD-001 · Provider Final Answer Empty Output Guard |
 | `SOLVE-SANITIZER-FALSE-POSITIVE-001.md` | SOLVE-SANITIZER-FALSE-POSITIVE-001 · Narrow Import-Substring Sanitizer Fix |
 | `UI-JOBS-001.md` | UI-JOBS-001 · Dashboard Job History & Metrics (RES_Dash) |
 | `UI-PREVIEW-001.md` | UI-PREVIEW-001 · Authenticated Expert Preview UI |
