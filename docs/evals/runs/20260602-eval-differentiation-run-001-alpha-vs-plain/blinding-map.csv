@@ -1,1 +1,5 @@
 comparison_id,prompt_id,output_a_identity,output_b_identity,assignment_method_or_seed,assigned_by,assigned_at,unblinded_by,unblinded_at
+cmp-HHE-002,HHE-002,plain,alpha,operator-approved unblinding map from completed blinded scoring packet,operator-approved-source-packet,2026-06-03T00:00:00Z,operator-approved-unblinding-map,2026-06-03T00:00:00Z
+cmp-HHE-003,HHE-003,alpha,plain,operator-approved unblinding map from completed blinded scoring packet,operator-approved-source-packet,2026-06-03T00:00:00Z,operator-approved-unblinding-map,2026-06-03T00:00:00Z
+cmp-HHE-007,HHE-007,plain,alpha,operator-approved unblinding map from completed blinded scoring packet,operator-approved-source-packet,2026-06-03T00:00:00Z,operator-approved-unblinding-map,2026-06-03T00:00:00Z
+cmp-HHE-009,HHE-009,alpha,plain,operator-approved unblinding map from completed blinded scoring packet,operator-approved-source-packet,2026-06-03T00:00:00Z,operator-approved-unblinding-map,2026-06-03T00:00:00Z
