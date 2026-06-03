@@ -32,6 +32,7 @@ RUN_DIR_REFERENCE = (
 
 CHECKLIST = RUN_DIR / "operator-checklist.md"
 POPULATION_GUIDE = RUN_DIR / "artifact-population-guide.md"
+CAPTURE_PACKET = RUN_DIR / "a3-1-capture-packet.md"
 
 PILOT_PROMPTS = ("HHE-002", "HHE-003", "HHE-007", "HHE-009")
 
@@ -428,3 +429,43 @@ def test_population_guide_capture_uses_blinded_labels_and_envelope_caveat():
     assert "output a` / `output b` labels" in normalized
     assert "for unblinded material-lift analysis only" in normalized
     assert "must not be used to bias blinded scoring" in normalized
+
+
+CAPTURE_PACKET_REQUIRED_HEADINGS = (
+    "# A3-1 Operator-Supervised Capture Packet",
+    "## Status and boundaries",
+    "## 1. Readiness judgment",
+    "## 2. Surfaces",
+    "## 3. A3-1 order (must be preserved)",
+    "## 4. Where to find each prompt",
+    "## 5. Capture steps in detail (steps 1 to 5)",
+    "## 6. Fill-in template (one per prompt)",
+    "## 7. Stop conditions",
+    "## 8. What to send back to Claude Code after capture",
+    "## Non-claims",
+)
+
+
+def test_capture_packet_uses_lf_byte_newlines_and_no_hidden_unicode():
+    """Guard the A3-1 capture packet against collapsed serialization.
+
+    Reads raw bytes (not only ``text.splitlines()``) so that nonstandard Unicode
+    line or paragraph separators and hidden format characters cannot masquerade as
+    physical LF newlines or survive review. This regression guard exists because a
+    SHA-pinned raw view must render the packet as many LF-delimited physical lines.
+    """
+    raw = CAPTURE_PACKET.read_bytes()
+    assert raw.count(b"\n") > 250, "capture packet must use many LF byte newlines"
+    assert b"\r" not in raw, "capture packet must not contain carriage returns"
+    text = raw.decode("utf-8")
+    assert "\u2028" not in text, "capture packet must not contain U+2028 line separator"
+    assert "\u2029" not in text, "capture packet must not contain U+2029 paragraph separator"
+    for character in text:
+        assert unicodedata.category(character) != "Cf", "hidden format character present"
+        assert (
+            unicodedata.bidirectional(character) not in BIDI_CONTROL_CATEGORIES
+        ), "bidirectional control character present"
+    lines = text.split("\n")
+    assert max(len(line) for line in lines) < 500, "overly long physical line"
+    for heading in CAPTURE_PACKET_REQUIRED_HEADINGS:
+        assert heading in lines, f"missing standalone LF-delimited heading {heading!r}"

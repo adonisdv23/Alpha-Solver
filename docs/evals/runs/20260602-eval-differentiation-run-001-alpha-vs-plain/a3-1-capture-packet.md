@@ -4,6 +4,7 @@
 - Step: A3-1 capture guidance (capture instructions only)
 - Phase: `OUTPUT-DIFFERENTIATION-PHASE-001`
 - Run directory: `docs/evals/runs/20260602-eval-differentiation-run-001-alpha-vs-plain/`
+- Serialization: plain UTF-8 text, LF byte newlines, ASCII punctuation only
 
 Companion documents:
 
@@ -32,9 +33,9 @@ anything. Specifically, this packet and the act of reading it:
 - do not modify runtime or provider behavior.
 
 A3-1 stays gated behind explicit operator approval. Provider calls remain
-unauthorized unless separately approved in a later instruction. Default
-`MODEL_PROVIDER=local` makes no provider API calls; the live OpenAI path is gated
-and out of scope here.
+unauthorized unless separately approved in a later instruction. Default capture is
+local/offline unless explicitly changed: `MODEL_PROVIDER=local` makes no provider
+API calls, and the live OpenAI path is gated and out of scope here.
 
 ## 1. Readiness judgment
 

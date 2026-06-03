@@ -1,4 +1,4 @@
-# EVAL-DIFFERENTIATION-RUN-001 · Run Plan
+# EVAL-DIFFERENTIATION-RUN-001 - Run Plan
 
 ## Run identity
 
@@ -38,7 +38,7 @@ The first pilot uses these four higher-headroom prompts:
 | `HHE-007` | Go/no-go memo from incomplete evidence; tests conservative rollout judgment. |
 | `HHE-009` | Noisy operator notes cleanup; tests adversarial/noisy instruction handling and scope control. |
 
-## Stage A — scaffold validation only
+## Stage A - scaffold validation only
 
 Stage A is the only stage performed by this PR.
 
@@ -52,7 +52,7 @@ Stage A is the only stage performed by this PR.
 Stage A records no outputs, no scores, no unblinding decisions, and no live
 provider artifacts.
 
-## Stage B — later operator-supervised output capture
+## Stage B - later operator-supervised output capture
 
 Stage B may happen only after explicit operator approval in a later lane or run
 instruction.
@@ -160,7 +160,7 @@ This scaffold makes no claim of:
 - Exact billing accuracy.
 - Provider reasoning orchestration.
 
-## Stage C — later blinded scoring, unblinding, defects, and summary
+## Stage C - later blinded scoring, unblinding, defects, and summary
 
 Stage C may happen only after explicit operator approval after Stage B artifacts
 exist.
