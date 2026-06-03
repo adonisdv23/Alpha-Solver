@@ -155,6 +155,20 @@ store raw provider payloads or full unredacted request/response traces.
   mapping file (`docs/evals/templates/blinding_map_template.csv`);
 - length metrics (`output_a_len_words`, `output_b_len_words`, `length_ratio`).
 
+`OUTPUT-DIFF-B1-LIFT-REPORTING-HARDENING-001` further hardens future-run
+reporting. Future score tables should preserve the lift and polish subscores
+(`lift_subscore_plain`, `lift_subscore_alpha`, `polish_subscore_plain`,
+`polish_subscore_alpha`) alongside the existing deltas, and should preserve
+length context (`length_confound_flag`, optional `output_a_tokens`, optional
+`output_b_tokens`) without requiring token counts when they were not captured.
+Future runs should also record the resolved decision surface
+(`winning_surface_resolved`), capture provenance (`form_capture_level`,
+`capture_commit_sha`, `capture_started_at`, `capture_completed_at`,
+`capture_model_set`, `capture_surface_count`, and summary-level
+`capture_provider_execution_count` when safe), and blinding-integrity fields
+(`scores_locked_before_unblinding`, `blinded_scoring_completed_at`,
+`unblinding_approved_by`, and `unblinding_applied_at`).
+
 See `docs/evals/LIFT_DECISION_RULE.md` and `docs/evals/BLIND_SCORING_PROCEDURE.md`.
 These are internal review aids and do not change the claim boundaries below.
 

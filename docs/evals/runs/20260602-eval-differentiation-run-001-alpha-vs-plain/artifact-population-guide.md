@@ -98,16 +98,37 @@ unblinding.
 ## Score table
 
 After unblinding, transfer scores into `score-table.csv` using the hardened
-comparison schema. Compute the decision fields:
+comparison schema. For future runs, preserve enough machine-readable fields to
+make the score arithmetic, capture provenance, and blinding sequence auditable.
+Compute the decision fields:
 
 - `plain_total` and `alpha_total`;
 - `total_delta`, `lift_delta`, and `polish_delta`;
+- `lift_subscore_plain`, `lift_subscore_alpha`, `polish_subscore_plain`, and
+  `polish_subscore_alpha`;
 - `lift_qualified` and `material_constraint_verified`;
-- `polish_only_flag`.
+- `polish_only_flag`;
+- `winning_surface` and `winning_surface_resolved`;
+- `length_ratio`, `length_confound_flag`, and optional `output_a_tokens` /
+  `output_b_tokens` values (`not-captured` or blank is acceptable when token
+  counts were unavailable).
+
+Recompute `plain_total` and `alpha_total` from the 14 rubric dimension fields
+rather than trusting a copied scorer total. If a scorer-provided total and the
+recomputed total differ, preserve the recomputed total in the table and record
+the scorer-total mismatch in `defects.md` or a run-summary caveat. Lock the
+blinded scores before unblinding and record `scores_locked_before_unblinding`,
+`blinded_scoring_completed_at`, `unblinding_approved_by`, and
+`unblinding_applied_at`. Preserve capture provenance when available, including
+`form_capture_level`, `capture_commit_sha`, `capture_started_at`,
+`capture_completed_at`, `capture_model_set`, `capture_surface_count`, and safe
+summary-level `capture_provider_execution_count`.
 
 Apply the polish-only guard from `docs/evals/LIFT_DECISION_RULE.md`. Do not count
 polish-only wins as expert-interrogation lift. Record plain wins and ties
-honestly.
+honestly. If the guard prevents an Alpha win from being treated as material lift,
+cap `winning_surface_resolved` at `Tie` or `Inconclusive` and explain the reason
+in the run summary.
 
 ## Defects
 
