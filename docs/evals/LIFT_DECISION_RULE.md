@@ -22,8 +22,12 @@ Scores are 0–3 per `docs/evals/RESPONSE_QUALITY_RUBRIC.md` (unchanged here).
 
 ## Subscores
 
-- `lift_delta` = Σ(alpha − plain) over the lift cluster.
-- `polish_delta` = Σ(alpha − plain) over the polish cluster.
+- `lift_subscore_plain` = Σ(plain) over the lift cluster.
+- `lift_subscore_alpha` = Σ(alpha) over the lift cluster.
+- `lift_delta` = `lift_subscore_alpha - lift_subscore_plain`.
+- `polish_subscore_plain` = Σ(plain) over the polish cluster.
+- `polish_subscore_alpha` = Σ(alpha) over the polish cluster.
+- `polish_delta` = `polish_subscore_alpha - polish_subscore_plain`.
 - `total_delta` = Σ(alpha − plain) over all 14 dimensions.
 
 ## Rule: when does Alpha earn `lift_qualified = yes`?
@@ -43,9 +47,10 @@ Otherwise `lift_qualified = no`.
 ## Polish-only-win guard
 
 If `total_delta > 0` but `lift_delta <= 0` and `polish_delta > 0`, set
-`polish_only_flag = yes` and cap `winning_surface` at `Tie` or
-`Inconclusive`. A more organized, better-formatted, or longer answer must not be
-recorded as an Alpha win when no expert constraint was surfaced.
+`polish_only_flag = yes`. Preserve the raw rubric outcome in `winning_surface` if
+needed, but cap `winning_surface_resolved` at `Tie` or `Inconclusive`. A more
+organized, better-formatted, or longer answer must not be recorded as an Alpha
+win when no expert constraint was surfaced.
 
 ## Worked examples
 
@@ -54,7 +59,8 @@ recorded as an Alpha win when no expert constraint was surfaced.
   no defect → `lift_qualified = yes`, `polish_only_flag = no`.
 - **Polish only.** Alpha is better structured with tidier next actions but adds no
   real constraint; `lift_delta = 0`, `polish_delta = +2`, `total_delta = +2` →
-  `lift_qualified = no`, `polish_only_flag = yes`, `winning_surface = Tie`.
+  `lift_qualified = no`, `polish_only_flag = yes`,
+  `winning_surface_resolved = Tie`.
 
 ## Interpretation limits
 

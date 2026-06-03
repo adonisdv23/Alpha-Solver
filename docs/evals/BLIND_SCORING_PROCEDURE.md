@@ -38,10 +38,15 @@ rather than on the presence of an envelope or on output volume.
 5. Score all 14 rubric dimensions for `Output A` and `Output B` using
    `docs/evals/templates/blinded_score_sheet_template.csv`. The judge-facing sheet
    must not contain Alpha or Plain labels.
-6. Only after scores are recorded, unblind via the mapping file and transfer scores
-   into `docs/evals/templates/comparison_score_table_template.csv`.
-7. Apply `docs/evals/LIFT_DECISION_RULE.md` to compute `lift_delta`, `polish_delta`,
-   `lift_qualified`, and `polish_only_flag`.
+6. Lock the blinded scores before unblinding. Future comparison score tables
+   should record `scores_locked_before_unblinding=yes` plus
+   `blinded_scoring_completed_at` before the mapping is consulted.
+7. Only after scores are locked, unblind via the mapping file, record
+   `unblinding_approved_by` and `unblinding_applied_at`, and transfer scores into
+   `docs/evals/templates/comparison_score_table_template.csv`.
+8. Apply `docs/evals/LIFT_DECISION_RULE.md` to compute `lift_delta`,
+   `polish_delta`, lift/polish subscores, `lift_qualified`, `polish_only_flag`,
+   and `winning_surface_resolved`.
 
 ## Non-claims
 

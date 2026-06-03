@@ -105,13 +105,32 @@ def test_comparison_score_table_has_lift_polish_length_and_flags():
             "total_delta",
             "lift_delta",
             "polish_delta",
+            "lift_subscore_plain",
+            "lift_subscore_alpha",
+            "polish_subscore_plain",
+            "polish_subscore_alpha",
             "winning_surface",
+            "winning_surface_resolved",
             "lift_qualified",
             "material_constraint_verified",
             "polish_only_flag",
             "output_a_len_words",
             "output_b_len_words",
             "length_ratio",
+            "length_confound_flag",
+            "output_a_tokens",
+            "output_b_tokens",
+            "form_capture_level",
+            "capture_commit_sha",
+            "capture_started_at",
+            "capture_completed_at",
+            "capture_model_set",
+            "capture_surface_count",
+            "capture_provider_execution_count",
+            "scores_locked_before_unblinding",
+            "blinded_scoring_completed_at",
+            "unblinding_approved_by",
+            "unblinding_applied_at",
         ),
     )
 
@@ -178,6 +197,7 @@ def test_paired_output_capture_has_envelope_and_redaction():
 def test_new_docs_and_spec_carry_strict_non_claims():
     targets = (
         Path(".specs/OUTPUT-DIFF-MEASUREMENT-HARDENING-001.md"),
+        Path(".specs/OUTPUT-DIFF-B1-LIFT-REPORTING-HARDENING-001.md"),
         EVALS / "LIFT_DECISION_RULE.md",
         EVALS / "BLIND_SCORING_PROCEDURE.md",
         TEMPLATES / "paired_output_capture_template.md",
@@ -247,10 +267,52 @@ def test_response_rubric_unchanged_14_dims_and_points_to_new_aids():
     assert "BLIND_SCORING_PROCEDURE.md" in text
 
 
+def test_reporting_hardening_artifact_guide_preserves_audit_requirements():
+    text = _read(
+        EVALS
+        / "runs"
+        / "20260602-eval-differentiation-run-001-alpha-vs-plain"
+        / "artifact-population-guide.md"
+    )
+    lowered = text.lower()
+    for required in (
+        "recompute",
+        "scorer-total mismatch",
+        "scores_locked_before_unblinding",
+        "capture_commit_sha",
+        "capture_started_at",
+        "capture_completed_at",
+        "raw provider payloads",
+        "secret",
+    ):
+        assert required in lowered, f"artifact guide missing: {required}"
+
+
+def test_no_stale_eval_artifact_preserve_pr201_references_remain():
+    paths = (
+        Path(".specs/MVP-CLOSEOUT-001.md"),
+        Path("docs/MVP_TESTER_HANDOFF.md"),
+        EVALS / "EXPERT_PASS_BEHAVIORAL_DEMO.md",
+    )
+    for path in paths:
+        text = _read(path)
+        stale_pr = "PR #" + "201"
+        assert f"EVAL-ARTIFACT-PRESERVE-001`: {stale_pr}" not in text
+        stale_done = (
+            "EVAL-ARTIFACT-PRESERVE-001` remains separate and should only be "
+            f"marked Done if {stale_pr} was merged"
+        )
+        assert stale_done not in text
+
+
 def test_new_spec_is_indexed():
     index = _read(Path(".specs/INDEX.md"))
-    assert "OUTPUT-DIFF-MEASUREMENT-HARDENING-001.md" in index
-    assert Path(".specs/OUTPUT-DIFF-MEASUREMENT-HARDENING-001.md").exists()
+    for spec in (
+        "OUTPUT-DIFF-MEASUREMENT-HARDENING-001.md",
+        "OUTPUT-DIFF-B1-LIFT-REPORTING-HARDENING-001.md",
+    ):
+        assert spec in index
+        assert (Path(".specs") / spec).exists()
 
 
 def test_no_secret_patterns_in_new_csv_templates():

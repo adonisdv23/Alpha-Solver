@@ -15,16 +15,25 @@ be preserved in full sanitized form to keep scoring re-scorable.
 - Prompt ID / family / difficulty-headroom:
 - Sanitized prompt reference:
 - Blinding performed: yes/no (Output A / Output B assigned in `blinding_map_template.csv`)
+- Form capture level: full-sanitized / summary-only / not-captured
+- Capture commit SHA: git-sha / not-captured
+- Capture started at: ISO-8601 / not-captured
+- Capture completed at: ISO-8601 / not-captured
+- Capture model set: model-set-label / not-captured
+- Capture surface count: count
+- Capture provider execution count: count / not-captured (summary-level only)
 
 ## Output A (blinded)
 
 - Sanitized answer text:
 - Length (words):
+- Tokens: token count / not-captured
 
 ## Output B (blinded)
 
 - Sanitized answer text:
 - Length (words):
+- Tokens: token count / not-captured
 
 ## Alpha expert-envelope capture (unblinded analysis)
 

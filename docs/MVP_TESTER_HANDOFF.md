@@ -165,7 +165,7 @@ This closeout lane does not include:
 - Existing lane rows should remain tied to their own implementation PRs:
   - `PROVIDER-EXPERT-PASS-001`: PR #199
   - `CLARIFY-SURFACE-001`: PR #200
-  - `EVAL-ARTIFACT-PRESERVE-001`: PR #201
+  - `EVAL-ARTIFACT-PRESERVE-001`: PR #229
   - `EVAL-BEHAVIORAL-DEMO-001`: PR #202
   - `UI-PREVIEW-001`: PR #203
 - Do not mutate uncertain legacy concept rows.

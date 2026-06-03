@@ -83,7 +83,7 @@ This checklist explicitly states:
 - Add the merged PR as implementation evidence for `EVAL-BEHAVIORAL-DEMO-001`.
 - `PROVIDER-EXPERT-PASS-001` remains Done from PR #199.
 - `CLARIFY-SURFACE-001` remains separate and should only be marked Done if PR #200 was merged.
-- `EVAL-ARTIFACT-PRESERVE-001` remains separate and should only be marked Done if PR #201 was merged.
+- `EVAL-ARTIFACT-PRESERVE-001` remains separate and should only be marked Done if PR #229 was merged.
 - UI-PREVIEW-001 is implemented and operator-accessible at `/dashboard/expert-preview` (behind dashboard authentication).
 - Do not edit the Google Sheet from Codex.
 - Do not update uncertain legacy concept rows.
