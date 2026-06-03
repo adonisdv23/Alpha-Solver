@@ -120,7 +120,8 @@ NON_CLAIMS = (
     "provider reasoning orchestration",
 )
 
-SECRET_MARKERS = ("sk-", "xoxb-", "-----BEGIN", "bearer ")
+SECRET_MARKERS = ("sk-", "xoxb-", "-----BEGIN")
+SECRET_VALUE_PATTERNS = (re.compile(r"bearer\s+[A-Za-z0-9._~+/=-]{8,}", re.IGNORECASE),)
 BIDI_CONTROL_CATEGORIES = {
     "RLO",
     "LRO",
@@ -294,40 +295,49 @@ def test_population_guide_exists_and_is_consistent():
         assert name in text
 
 
-def test_run_plan_and_summary_reference_checklist_and_stay_unexecuted():
+def test_run_plan_and_summary_reference_checklist_and_record_scored_state():
     plan = _read(RUN_DIR / "run-plan.md")
     summary = _read(RUN_DIR / "run-summary.md")
     assert "operator-checklist.md" in plan
-    assert "operator-checklist.md" in summary
-    for normalized in (
-        _normalized(RUN_DIR / "run-plan.md"),
-        _normalized(RUN_DIR / "run-summary.md"),
-    ):
-        assert "not executed" in normalized
-        assert "no outputs" in normalized
-        assert "no scores" in normalized
+    assert "clean A3-1 capture had already completed" in summary
+
+    plan_normalized = _normalized(RUN_DIR / "run-plan.md")
+    assert "not executed" in plan_normalized
+    assert "no outputs" in plan_normalized
+    assert "no scores" in plan_normalized
+
+    summary_normalized = _normalized(RUN_DIR / "run-summary.md")
+    assert "blind scoring preceded unblinding" in summary_normalized
+    assert "did not rerun capture" in summary_normalized
+    assert "did not call live providers" in summary_normalized
+    assert "did not change runtime/provider/model behavior" in summary_normalized
+    assert "did not update google sheets" in summary_normalized
+    assert "did not start batch b" in summary_normalized
 
 
-def test_scaffold_files_remain_header_only_and_placeholders():
+def test_scored_files_are_populated_after_a3_1_artifact_population():
     for csv_name in (
         "blinded-score-sheet.csv",
         "blinding-map.csv",
         "score-table.csv",
     ):
         rows = _csv_rows(RUN_DIR / csv_name)
-        assert len(rows) == 1, f"{csv_name} must remain header-only in A3-0"
+        assert len(rows) == 5, f"{csv_name} must contain 4 populated A3-1 rows"
 
     paired_files = sorted(p.name for p in (RUN_DIR / "paired-output-captures").iterdir())
     packet_files = sorted(p.name for p in (RUN_DIR / "evidence-packets").iterdir())
-    assert paired_files == [".gitkeep"], paired_files
-    assert packet_files == [".gitkeep"], packet_files
+    assert paired_files == [".gitkeep", *(f"cmp-{prompt}-paired-output-capture.md" for prompt in PILOT_PROMPTS)]
+    assert packet_files == [".gitkeep", *(f"cmp-{prompt}-evidence-packet.md" for prompt in PILOT_PROMPTS)]
 
 
 def test_no_secret_like_strings_in_a3_docs():
-    for path in (CHECKLIST, POPULATION_GUIDE):
-        lowered = _read(path).lower()
+    for path in (CHECKLIST, POPULATION_GUIDE, RUN_DIR / "run-summary.md"):
+        text = _read(path)
+        lowered = text.lower()
         for marker in SECRET_MARKERS:
             assert marker.lower() not in lowered, f"{path} contains {marker}"
+        for pattern in SECRET_VALUE_PATTERNS:
+            assert not pattern.search(text), f"{path} contains secret-like value"
 
 
 # Minimum physical line counts guard against line-collapsed files: a file that

@@ -2,38 +2,24 @@
 
 ## Status
 
-Blank scaffold only. No outputs have been captured, no scores have been
-recorded, and no defects have been observed in this run directory.
+Populated from Source Packet B, the official blind scorer result with 14-dimension scores. Defects and caveats are scorer-observed answer-quality issues only. They do not imply runtime, provider, routing, deployment, or broad product readiness conclusions.
 
-## Defect fields
+## Defect table
 
-Future defects should use these fields:
+| Defect ID | Prompt ID | Side | Rubric dimension | Category | Severity | Evidence pointer | Follow-up ticket | Affects `lift_qualified` | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EDR001-DEF-001 | HHE-002 | Output A and Output B | d07_claim_boundary / d12_brevity | official scorer caveat | medium | blinded-score-sheet.csv row cmp-HHE-002 | None | no | Unsupported or over-broad claim language. |
+| EDR001-DEF-002 | HHE-003 | Output A and Output B | d12_brevity | official scorer caveat | low | blinded-score-sheet.csv row cmp-HHE-003 | None | no | Output A broader than requested; Output B less explanatory. |
+| EDR001-DEF-003 | HHE-007 | Output A and Output B | d04_assumptions / d12_brevity | official scorer caveat | medium | blinded-score-sheet.csv row cmp-HHE-007 | None | no | Some requirements or sample-size framing were not fully grounded. |
+| EDR001-DEF-004 | HHE-009 | Output A and Output B | d07_claim_boundary / d13_safety | official scorer caveat | medium | blinded-score-sheet.csv row cmp-HHE-009 | None | no | Invalid superiority and validation framing remained. |
 
-| Field | Description |
-| --- | --- |
-| Defect ID | Stable defect identifier, such as `EDR001-DEF-001`. |
-| Prompt ID | One of the selected pilot prompts. |
-| Side | `Output A`, `Output B`, `Plain`, or `Alpha`, depending on scoring stage. |
-| Rubric dimension | Related `d01` through `d14` dimension, if applicable. |
-| Category | Defect category from the list below or a narrowly named new category. |
-| Severity | `low`, `medium`, `high`, or `critical`. |
-| Evidence pointer | Path or section reference to sanitized supporting evidence. |
-| Follow-up ticket | Follow-up spec, issue, or lane identifier if needed. |
-| Affects `lift_qualified` | `yes`, `no`, or `unknown`. |
+## Scorer caveat summary
 
-## Defect categories
+- `cmp-HHE-002`: both outputs risk unsupported claim language; Output B is more overlong and more likely to overclaim.
+- `cmp-HHE-003`: both outputs handle evidence discipline well; Output A is broader than requested, while Output B gives less explanatory background.
+- `cmp-HHE-007`: Output A fits the limited exploratory authorization better; Output B is comprehensive but assumes a required 12+ prompt set and adds requirements not grounded in the prompt.
+- `cmp-HHE-009`: both outputs correctly reject use of a browser cookie, but both retain or soften invalid “prove Alpha better” / “MVP validated” framing that should have been removed or neutralized.
 
-- Missed requested deliverable.
-- Unsupported claim.
-- Treating backlog as repo proof.
-- Unsafe secret/cookie/session handling.
-- Raw payload preservation suggestion.
-- Over-interrogation.
-- Excessive caveats.
-- Invented constraints.
-- Plain output more direct/useful.
+## Non-claims
 
-## Blank defect table
-
-| Defect ID | Prompt ID | Side | Rubric dimension | Category | Severity | Evidence pointer | Follow-up ticket | Affects `lift_qualified` |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+This defect log does not claim MVP validation, Alpha Solver superiority, answer-quality superiority, production readiness, broad runtime readiness, benchmark success, exact billing accuracy, or provider reasoning orchestration.
