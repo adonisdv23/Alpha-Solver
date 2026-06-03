@@ -122,6 +122,18 @@ def test_check_env_success_with_provider_keys(provider, key_var):
     assert "Environment looks good" in result.stdout
 
 
+def test_check_env_accepts_a3_live_capture_model_set_with_openai_key():
+    result = _run_check_env(
+        {
+            "MODEL_PROVIDER": "openai",
+            "MODEL_SET": "a3_live_capture",
+            "OPENAI_API_KEY": "secret",
+        }
+    )
+    assert result.returncode == 0
+    assert "Environment looks good" in result.stdout
+
+
 @pytest.mark.parametrize(
     ("provider", "key_var"),
     [

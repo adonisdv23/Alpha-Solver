@@ -54,6 +54,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 | `NEW-HEALTH-001.md` | NEW-HEALTH-001 · Health Check Endpoints |
 | `NEW-RATE-001.md` | NEW-RATE-001 · API Rate Limiting |
 | `OBS-ALERTS-001.md` | CODE SPEC — OBS-ALERTS-001 · Prometheus Alerts + CI Validation (RES_Dash) |
+| `OUTPUT-DIFF-A3-LIVE-CAPTURE-MODELSET-001.md` | OUTPUT-DIFF-A3-LIVE-CAPTURE-MODELSET-001 · A3 Live Capture Model Set |
 | `OUTPUT-DIFF-MEASUREMENT-HARDENING-001.md` | OUTPUT-DIFF-MEASUREMENT-HARDENING-001 · Output Differentiation Measurement Hardening |
 | `PROVIDER-BUDGET-001.md` | PROVIDER-BUDGET-001 · Post-call Provider Cost Accounting |
 | `PROVIDER-EXPERT-PASS-001.md` | PROVIDER-EXPERT-PASS-001 · Opt-in Expert Provider Pass |

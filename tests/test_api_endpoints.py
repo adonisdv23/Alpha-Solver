@@ -290,6 +290,85 @@ def test_solve_openai_mode_uses_fake_provider_and_returns_normalized_text(monkey
     _clear_provider_accounting_sink()
 
 
+def test_solve_openai_mode_can_use_a3_live_capture_model_set(monkeypatch):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    monkeypatch.setenv("MODEL_SET", "a3_live_capture")
+    fake = FakeProviderClient(
+        [
+            ProviderResult(
+                provider="openai",
+                model="gpt-test",
+                text="provider answer",
+                finish_reason="stop",
+                usage=ProviderUsage(input_tokens=3, output_tokens=5, total_tokens=8),
+                cost=ProviderCost(estimated_usd=0.001, source="price_hint"),
+                latency_ms=12,
+                request_id="req-a3-model-set",
+            )
+        ]
+    )
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={"query": "hello provider"},
+        headers={"X-API-Key": key, "X-Request-ID": "req-a3-model-set"},
+    )
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["final_answer"] == "provider answer"
+    assert body["meta"]["model_set"] == "a3_live_capture"
+    assert len(fake.requests) == 1
+    provider_request = fake.requests[0]
+    assert provider_request.model == "gpt-5-mini"
+    assert provider_request.max_tokens == 4096
+    assert provider_request.timeout_ms == 60000
+    assert provider_request.metadata["model_set"] == "a3_live_capture"
+    _clear_provider_factory()
+
+
+def test_solve_openai_mode_can_request_a3_live_capture_model_set(monkeypatch):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    fake = FakeProviderClient(
+        [
+            ProviderResult(
+                provider="openai",
+                model="gpt-test",
+                text="provider answer",
+                finish_reason="stop",
+                usage=ProviderUsage(input_tokens=3, output_tokens=5, total_tokens=8),
+                cost=ProviderCost(estimated_usd=0.001, source="price_hint"),
+                latency_ms=12,
+                request_id="req-a3-requested-model-set",
+            )
+        ]
+    )
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={
+            "query": "hello provider",
+            "context": {"model_set": "a3_live_capture"},
+        },
+        headers={"X-API-Key": key, "X-Request-ID": "req-a3-requested-model-set"},
+    )
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["meta"]["model_set"] == "a3_live_capture"
+    assert len(fake.requests) == 1
+    provider_request = fake.requests[0]
+    assert provider_request.model == "gpt-5-mini"
+    assert provider_request.max_tokens == 4096
+    assert provider_request.timeout_ms == 60000
+    assert provider_request.metadata["model_set"] == "a3_live_capture"
+    _clear_provider_factory()
+
+
 def test_solve_openai_missing_credentials_returns_safe_response(monkeypatch):
     secret = "sk-test-should-not-appear"
     monkeypatch.setenv("MODEL_PROVIDER", "openai")

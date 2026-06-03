@@ -1,4 +1,10 @@
 model_sets:
+  a3_live_capture:
+    provider: openai
+    model: gpt-5-mini
+    max_tokens: 4096
+    timeout_ms: 60000
+    price_hint: { input_per_1k: 0.0015, output_per_1k: 0.004 }
   default:
     provider: openai
     model: gpt-5
