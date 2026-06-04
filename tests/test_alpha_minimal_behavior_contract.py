@@ -249,7 +249,10 @@ def test_portable_minimal_behavior_summary_is_offline_and_bounded():
     for phrase in (
         "direct answer first",
         "mode discipline",
+        "low headroom restraint",
         "no invented scaffolding",
+        "compact caveats",
+        "task relevant risk",
         "safe claim wording",
         "evidence boundary",
         "artifact stop conditions",
@@ -257,6 +260,14 @@ def test_portable_minimal_behavior_summary_is_offline_and_bounded():
         "planning evidence, not validation",
         "repo evidence overrides planning ledger",
         "start with 'stop:'",
+        "direct extractions",
+        "short confirmations",
+        "requested deliverable",
+        "do not open with process labels",
+        "keep the answer short",
+        "do not force heavy solver framing",
+        "do not turn every uncertainty into a long risk block",
+        "suppress generic risk boilerplate",
     ):
         assert phrase in normalized
     for forbidden in (
@@ -268,6 +279,62 @@ def test_portable_minimal_behavior_summary_is_offline_and_bounded():
         "sheets were updated",
     ):
         assert forbidden not in normalized
+
+
+def test_portable_summary_preserves_boundary_and_no_runtime_implication():
+    from alpha_solver_portable import minimal_behavior_contract_summary
+
+    summary = minimal_behavior_contract_summary()
+    normalized = _normalize(summary)
+
+    assert "minimal alpha behavior contract" in normalized
+    assert "does not alter provider, model, routing, safe-out, or /v1/solve behavior" in normalized
+    for phrase in (
+        "provider orchestration is implemented",
+        "routing behavior changed",
+        "model routing behavior changed",
+        "runtime api behavior changed",
+        "provider behavior changed",
+        "production readiness is confirmed",
+    ):
+        assert phrase not in normalized
+
+
+def test_portable_summary_requires_answer_first_low_headroom_and_compact_caveats():
+    from alpha_solver_portable import minimal_behavior_contract_summary
+
+    normalized = _normalize(minimal_behavior_contract_summary())
+
+    for phrase in (
+        "begin yes/no decisions",
+        "requested deliverable",
+        "put necessary rationale or caveats after the direct answer",
+        "do not open with process labels unless they materially help the user",
+        "for simple rewrites, formatting, direct extraction",
+        "one-step admin tasks",
+        "keep the answer short",
+        "do not force heavy solver framing",
+        "shortest wording that remains truthful",
+        "do not turn every uncertainty into a long risk block",
+    ):
+        assert phrase in normalized
+
+
+def test_portable_summary_preserves_broad_non_claims():
+    from alpha_solver_portable import minimal_behavior_contract_summary
+
+    normalized = _normalize(minimal_behavior_contract_summary())
+
+    for phrase in (
+        "do not claim mvp validation",
+        "broad superiority",
+        "production readiness",
+        "benchmark success",
+        "exact billing accuracy",
+        "broad runtime readiness",
+        "provider orchestration",
+    ):
+        assert phrase in normalized
 
 def test_test_plan_contains_required_sections_and_boundaries():
     text = _read(TEST_PLAN)
@@ -301,8 +368,10 @@ def test_portable_contract_contains_minimal_behavior_protocol_wording():
         "MINIMAL ALPHA BEHAVIOR CONTRACT",
         "Direct answer first",
         "Mode discipline",
+        "Low-headroom restraint",
         "No invented scaffolding",
         "Compact caveats",
+        "Task-relevant risk",
         "Safe claim wording",
         "Evidence boundary",
         "Artifact stop conditions",
