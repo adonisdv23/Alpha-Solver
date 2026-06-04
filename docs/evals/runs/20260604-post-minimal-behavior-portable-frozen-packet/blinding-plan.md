@@ -12,6 +12,14 @@ Randomization must be recorded in the operator-only map. The assignment may vary
 
 This packet does not create actual A/B assignments.
 
+## Scorer-facing sanitization
+
+Before blind scoring, build the scorer-facing packet from a sanitized render, not directly from the raw output files. Raw output files remain exact preservation artifacts; the sanitized render is a separate blind-scoring artifact.
+
+Sanitization must follow `docs/evals/BLIND_SCORING_PROCEDURE.md`. It may neutralize direct brand, provider, route, condition, heading, footer, and envelope tells while preserving the substance of the answer. It must not remove caveats, reasoning, risks, assumptions, recommendations, omissions, verbosity, contradictions, or other answer-quality defects.
+
+Apply sanitization symmetrically to both outputs. If direct tells cannot be removed without substantive rewriting, stop before scoring and regenerate the scorer-facing packet from a clean sanitized render.
+
 ## Scorer-facing packet contents
 
 The scorer-facing packet must contain only:
@@ -27,16 +35,20 @@ The scorer-facing packet must contain only:
 
 The scorer-facing packet must not contain:
 
+- Alpha Solver names;
 - Alpha/plain labels;
-- provider identity;
-- model metadata;
+- portable-contract labels;
+- provider/model labels;
+- route identity;
 - run timestamps;
 - runtime notes;
 - repo paths;
 - assignment patterns;
-- raw output file paths;
+- raw output paths;
+- pipeline confirmation branding;
+- condition-identifying headings or footers;
 - operator notes;
-- unblinding maps;
+- unblinding maps or unblinding-map details;
 - prior eval outcomes;
 - rubric changes or new rubric semantics.
 
@@ -50,4 +62,4 @@ The scorer must be instructed not to infer condition identity from tone, structu
 
 ## Unblinding rule
 
-Unblinding happens only after blind scoring is complete, preserved, validated for completeness, and separately authorized. If the scorer-facing packet leaks identity or assignment information, stop and regenerate a clean blinded packet before scoring.
+Unblinding happens only after blind scoring is complete, preserved, validated for completeness, and separately authorized. If the scorer-facing packet contains direct condition labels, Alpha Solver branding, provider/model branding, route identity, runtime metadata, repo paths, raw output paths, pipeline confirmation branding, or unblinding-map details, stop before scoring and regenerate the sanitized scorer-facing packet.

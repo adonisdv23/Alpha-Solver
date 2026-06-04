@@ -33,6 +33,16 @@ If parity cannot be confirmed, stop capture and document the mismatch.
 - Preserve technical failure records separately from successful raw outputs.
 - Do not commit raw provider payloads, secrets, request headers, cookies, account identifiers, or private runtime traces unless a later task explicitly defines a sanitized artifact path.
 
+## Sanitized scorer-facing render
+
+Raw output preservation and scorer-facing sanitization are separate artifacts. Raw outputs must remain exact and must never be edited. A later scoring-prep task may create a separate sanitized scorer-facing render only for blind scoring.
+
+The sanitized render must follow `docs/evals/BLIND_SCORING_PROCEDURE.md`: strip brand and provider names, neutralize section headings, and preserve substantive content as plain prose. Sanitization may strip or neutralize direct brand, provider, route, condition, and obvious envelope or heading tells, including pipeline-confirmation branding.
+
+Sanitization must not remove substantive content, caveats, reasoning, risks, assumptions, recommendations, or answer-quality defects. It must be applied symmetrically to both outputs. If direct tells cannot be removed without substantive rewriting, the scorer packet is invalid and the future task must stop before scoring.
+
+The future capture or scoring-prep task must preserve a sanitization log or checklist outside the scorer-facing packet. That log is operator-only material and must not be sent to the blind scorer.
+
 ## During-capture prohibitions
 
 - Do not score during capture.
@@ -95,4 +105,6 @@ Stop the future capture task if any of these occur:
 - The task would start Batch C.
 - The task would depend on `/v1/solve` without approved proof that it consumes `alpha_solver_portable.py`.
 - Raw output preservation is unavailable.
+- A sanitized scorer-facing render cannot be produced without substantive rewriting.
+- The scorer-facing packet contains direct condition labels, Alpha Solver branding, provider/model branding, route identity, runtime metadata, repo paths, raw output paths, pipeline confirmation branding, or unblinding-map details.
 - Assignment or operator-only metadata leaks into scorer-facing material.

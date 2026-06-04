@@ -49,12 +49,13 @@ This packet adds only frozen planning artifacts:
 - future capture instructions;
 - blinding plan;
 - scorer-facing packet template;
+- scorer-facing sanitization checklist;
 - operator-only unblinding map template;
 - artifact preservation checklist;
 - packet readiness checklist;
 - future task sequence.
 
-It does not include captured outputs, A/B assignments, score sheets from a completed run, unblinded scored results, provider metadata, raw provider payloads, or Sheet updates.
+It does not include captured outputs, sanitized output renders, A/B assignments, score sheets from a completed run, unblinded scored results, provider metadata, raw provider payloads, or Sheet updates.
 
 ## Non-claims
 

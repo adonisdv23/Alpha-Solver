@@ -1,14 +1,14 @@
 # Scorer-Facing Packet Template
 
-Packet title: `Post-Minimal Behavior Portable Surface Blinded Scorer Packet`
+Packet title: `Blinded Output Comparison Scorer Packet`
 
 Status: template only. Do not populate with captured outputs in this packet PR.
 
 ## Scorer instructions
 
-You are the blind scorer for a portable-surface output comparison. Score only the paired responses in this packet. Treat Output A and Output B as blinded labels only.
+You are the blind scorer for a paired output comparison. Score only the paired responses in this packet. Treat Output A and Output B as blinded labels only.
 
-Use only the prompt text, Output A, and Output B for each comparison. Do not use outside context. Do not ask for or infer system identity, provider identity, route identity, runtime metadata, model metadata, assignment patterns, operator notes, repo paths, timestamps, request counts, or unblinding material.
+Use only the prompt text, Output A, and Output B for each comparison. Do not use outside context. Do not ask for or infer source identity, condition identity, provider identity, route identity, runtime metadata, model metadata, assignment patterns, operator notes, file paths, timestamps, request counts, or unblinding material.
 
 Do not start Batch C. Do not request runtime changes. Do not make broad validation, superiority, production-readiness, benchmark-completion, billing-precision, runtime-readiness, or provider-coordination claims.
 
@@ -55,11 +55,11 @@ Prompt text:
 
 ### Output A
 
-<blinded output A text>
+<sanitized blinded output A text>
 
 ### Output B
 
-<blinded output B text>
+<sanitized blinded output B text>
 ```
 
 ## Scoring table template
@@ -110,12 +110,11 @@ defects_caveats:
 
 After all comparisons, include these confirmations:
 
-- I did not infer which output used the portable contract.
-- I did not infer which output was plain.
+- I did not infer source identity or condition identity.
 - I used only Output A / Output B labels.
 - I did not use route identity.
 - I did not use provider metadata.
 - I did not use model metadata.
-- I did not use runtime notes, assignment patterns, request counts, operator notes, repo paths, timestamps, or unblinding material.
+- I did not use runtime notes, assignment patterns, request counts, operator notes, file paths, timestamps, or unblinding material.
 - I did not start Batch C or request runtime changes.
 - I did not make broad validation, superiority, production-readiness, benchmark-completion, billing-precision, runtime-readiness, or provider-coordination claims.

@@ -9,6 +9,10 @@ Status: packet-only readiness checklist.
 - [x] Alpha condition explicitly loads `alpha_solver_portable.py`.
 - [x] Plain condition excludes Alpha context and the portable contract.
 - [x] Prompt text is frozen in `frozen-prompt-packet.md`.
+- [x] Scorer-facing sanitization rules are defined.
+- [x] Raw outputs remain exact and separate from sanitized scorer-facing renders.
+- [x] The scorer-facing template contains no direct condition, brand, provider, route, runtime, repo-path, or portable-contract identity cues.
+- [x] No actual sanitization was performed in this PR because no outputs exist yet.
 - [x] No capture was run.
 - [x] No scoring was run.
 - [x] No unblinding was performed.
