@@ -17,9 +17,11 @@ Status: docs-only preservation checklist.
 - [x] No raw outputs were inspected or changed.
 - [x] No operator-only maps were inspected or changed.
 - [x] No broad claims were made.
+- [x] The existing PR #273 operator-test packet scope remains portable-contract/manual simulation only.
+- [x] The packet was not converted into a product/runtime operator-test lane.
 
 ## Additional preservation notes
 
 - The prior local preview attempt is treated only as a blocked-surface diagnostic, not as Alpha pass/fail evidence.
-- ChatGPT-thread testing, if pursued in a later lane, must be labeled prompt-contract/manual simulation evidence only.
-- Product-level operator testing remains blocked until an approved surface is fixed, selected, or proven to consume the intended Alpha contract.
+- ChatGPT/manual prompt-contract testing, if pursued in the next lane, must be labeled portable-contract manual simulation evidence only.
+- Product/runtime operator testing remains a separate future track requiring `ALPHA-LIMITED-OPERATOR-TEST-SURFACE-FIX-001` or another separately approved surface lane.

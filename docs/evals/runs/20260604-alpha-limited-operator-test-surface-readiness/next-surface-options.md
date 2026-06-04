@@ -4,26 +4,30 @@ Lane ID: `ALPHA-LIMITED-OPERATOR-TEST-SURFACE-READINESS-001`
 
 ## Considered options
 
-- `ALPHA-LIMITED-OPERATOR-TEST-SURFACE-FIX-001`
 - `ALPHA-LIMITED-OPERATOR-TEST-PROMPT-CONTRACT-SIMULATION-001`
+- `ALPHA-LIMITED-OPERATOR-TEST-SURFACE-FIX-001`
 - `ALPHA-LIVE-PREVIEW-READINESS-REVIEW-001`
 - `ALPHA-RUNTIME-WIRING-READINESS-REVIEW-001`
 
 ## Recommended next lane
 
-Recommended next lane: `ALPHA-LIMITED-OPERATOR-TEST-SURFACE-FIX-001`.
+Recommended next lane: `ALPHA-LIMITED-OPERATOR-TEST-PROMPT-CONTRACT-SIMULATION-001`.
 
 ## Why this lane
 
-Choose this lane because the current local supervised preview is valid only for UI/local smoke and is blocked for behavior testing if it echoes prompts. A ChatGPT project-thread run would be only prompt-contract/manual simulation evidence, not product/runtime evidence. Live provider preview and runtime `/v1/solve` measurement both require separate authorization and proof before they can be used as product-level operator-test surfaces.
+Choose this lane because it preserves the existing PR #273 limited operator-test packet scope: manual testing of the portable Alpha behavior contract. The output from that lane must be explicitly labeled as portable-contract manual simulation evidence only.
 
-The next lane should narrowly fix or establish the approved limited-operator execution surface before any operator-test results are collected or imported.
+That evidence is valid for the packet's manual portable-contract purpose, but it is not product/runtime evidence, `/v1/solve` evidence, provider evidence, benchmark validation, MVP validation, production-readiness evidence, or broad Alpha-superiority evidence.
 
-## Scope recommendation for the next lane
+The local supervised preview remains blocked/invalid as behavior evidence if it echoes prompts or produces placeholder-like output. That blocker does not require converting the current operator packet into a product/runtime test; it only prevents using the local preview as answer-behavior evidence.
 
-The next lane should:
+## Optional future product/runtime lane
 
-- identify the exact product or portable surface that the operator may use;
+Optional future product/runtime lane: `ALPHA-LIMITED-OPERATOR-TEST-SURFACE-FIX-001`.
+
+Use this only if Adonis explicitly wants product/runtime operator evidence. A future product/runtime lane should:
+
+- identify the exact product or runtime surface that the operator may use;
 - prove whether that surface consumes the intended Alpha behavior contract;
 - prevent prompt-echo or placeholder-only output from being accepted as behavior evidence;
 - preserve the no-results-import boundary until the surface is approved;
@@ -32,6 +36,6 @@ The next lane should:
 
 ## Non-recommended options for this immediate next step
 
-- `ALPHA-LIMITED-OPERATOR-TEST-PROMPT-CONTRACT-SIMULATION-001`: useful if the team intentionally wants non-product prompt-contract evidence, but it would not solve product/runtime surface readiness.
+- `ALPHA-LIMITED-OPERATOR-TEST-SURFACE-FIX-001`: appropriate only as an optional future product/runtime surface lane, not as the immediate next lane for preserving the already-approved manual portable-contract packet.
 - `ALPHA-LIVE-PREVIEW-READINESS-REVIEW-001`: premature unless the operator explicitly approves a provider-readiness lane and live access remains disabled until approved.
-- `ALPHA-RUNTIME-WIRING-READINESS-REVIEW-001`: useful for `/v1/solve` analysis, but the immediate blocker is the limited operator-test surface itself, including the local preview echo/placeholder risk.
+- `ALPHA-RUNTIME-WIRING-READINESS-REVIEW-001`: useful for `/v1/solve` analysis if explicitly requested, but not required to run the current manual portable-contract simulation packet.

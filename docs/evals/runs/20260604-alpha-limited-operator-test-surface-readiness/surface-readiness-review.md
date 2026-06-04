@@ -6,7 +6,12 @@ Status: docs-only review; no operator-test execution.
 
 ## Review boundary
 
-This review determines surface readiness only. It does not run the limited operator test, import screenshot observations as results, call providers, measure `/v1/solve`, change runtime behavior, score outputs, rescore outputs, unblind artifacts, inspect operator-only maps, update Google Sheets, start Batch C, or make broad validation/readiness claims.
+This review determines surface readiness and evidence labels only. It does not run the limited operator test, import screenshot observations as results, call providers, measure `/v1/solve`, change runtime behavior, score outputs, rescore outputs, unblind artifacts, inspect operator-only maps, update Google Sheets, start Batch C, or make broad validation/readiness claims.
+
+This review preserves two separate tracks:
+
+1. Portable-contract manual simulation track: the already-approved operator-test packet remains a manual portable Alpha behavior-contract test. Its evidence can be valid for that manual simulation purpose when correctly labeled, but it is not product/runtime, `/v1/solve`, provider, benchmark-validation, MVP-validation, or production-readiness evidence.
+2. Product/runtime execution-surface track: a separate future track needed only if the project wants product/runtime operator evidence. That track requires a future surface-fix/readiness lane and must not be inferred from the current manual packet.
 
 ## Findings
 
@@ -21,7 +26,7 @@ The preview route sends:
 
 When `MODEL_PROVIDER=local`, `service.app.solve` does not enter the OpenAI provider branch. It strips local solver control keys such as `route`, then calls the deterministic local `_tree_of_thought` path imported from `alpha_solver_entry`.
 
-Therefore local preview tests UI/local smoke continuity. It does not test provider-backed answer behavior and does not prove that the expert pane is executing the portable Alpha behavior contract.
+Therefore local preview tests UI/local smoke continuity. It does not test provider-backed answer behavior and does not prove that the expert pane is executing the portable Alpha behavior contract. This local-preview blocker does not invalidate the separate manual portable-contract simulation track; it only blocks using the local preview as answer-behavior evidence.
 
 ### 2. Whether local mode is expected to echo or produce deterministic placeholder output
 
@@ -43,19 +48,21 @@ No. The reviewed `/v1/solve` endpoint is implemented in `service.app.solve`. In 
 
 ### 5. Whether the limited operator test can validly run on the current local preview
 
-No. The current local preview can be used as a smoke path, but it is blocked for limited-operator behavior testing if it only echoes prompts or produces placeholder-like local output. Running the limited operator test on that surface would risk importing UI-smoke behavior as answer-behavior evidence.
+No. The current local preview can be used as a smoke path, but it is blocked for limited-operator behavior testing if it only echoes prompts or produces placeholder-like local output. Running the current packet on that local preview surface would risk importing UI-smoke behavior as answer-behavior evidence.
+
+This does not mean the already-approved operator packet requires a product/runtime surface. The PR #273 packet defined a portable-contract manual test, and that scope should be preserved through a correctly labeled manual simulation lane.
 
 The attempted local preview screenshots should remain non-results. They should not be classified as Alpha pass/fail results, scored, imported, or used to claim product/runtime readiness.
 
 ### 6. Whether a ChatGPT-project-thread test is product/runtime evidence
 
-No. A ChatGPT project-thread test can be classified only as prompt-contract/manual simulation evidence. It may help inspect the portable prompt contract manually, but it does not test the repository's web UI, `/v1/solve`, provider adapters, routing, runtime configuration, capture path, accounting path, or product execution behavior.
+No. A ChatGPT project-thread test can be classified only as portable-contract prompt/manual simulation evidence. It may help inspect the portable prompt contract manually and is aligned with the current operator-test packet if correctly labeled. It does not test the repository's web UI, `/v1/solve`, provider adapters, routing, runtime configuration, capture path, accounting path, or product execution behavior.
 
-### 7. What surface is required for a valid product-level operator test
+### 7. What surface is required only if the lane changes to product/runtime operator testing
 
-A valid product-level operator test requires an approved product execution surface that is proven, from repository wiring and/or an explicitly authorized implementation lane, to consume the intended Alpha behavior contract and produce substantive answers under controlled conditions.
+The current operator packet does not require a product/runtime surface because it is a portable-contract manual packet. If the project later wants product/runtime operator evidence, that separate future track requires an approved product execution surface that is proven, from repository wiring and/or an explicitly authorized implementation lane, to consume the intended Alpha behavior contract and produce substantive answers under controlled conditions.
 
-Minimum required properties:
+Minimum required properties for that future product/runtime track:
 
 - The surface must be an actual product/runtime surface, not only a ChatGPT prompt simulation.
 - The surface must be proven to consume the intended Alpha contract for the test lane.
@@ -110,7 +117,7 @@ Valid only for smoke. Blocked for limited-operator behavior testing if it echoes
 
 #### Readiness conclusion
 
-Valid only as prompt-contract/manual simulation evidence. It is not product/runtime evidence for this lane.
+Valid as portable-contract/manual simulation evidence and aligned with the current operator-test packet if correctly labeled. It is not product/runtime evidence.
 
 ### Runtime `/v1/solve`
 
@@ -127,7 +134,7 @@ Valid only as prompt-contract/manual simulation evidence. It is not product/runt
 
 #### Readiness conclusion
 
-Not evidence for this lane. It should not be used as operator-test evidence until a separate readiness/fix lane proves the endpoint consumes the intended Alpha contract under controlled conditions.
+Not evidence for the current manual portable-contract packet. It should not be used as product/runtime operator-test evidence until a separate readiness/fix lane proves the endpoint consumes the intended Alpha contract under controlled conditions.
 
 ### Potential live provider preview
 

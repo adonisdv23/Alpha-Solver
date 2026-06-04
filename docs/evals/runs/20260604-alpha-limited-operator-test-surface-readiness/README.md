@@ -6,9 +6,11 @@ Status: docs-only surface-readiness review complete; no operator-test results im
 
 ## Purpose
 
-Determine the correct execution surface for the limited Alpha operator test before any operator-test results are imported, scored, summarized, or treated as pass/fail evidence.
+Determine the correct execution surface label for the limited Alpha operator test before any operator-test results are imported, scored, summarized, or treated as pass/fail evidence.
 
 This lane responds to the local manual preview concern: `/dashboard/expert-preview` was attempted in local mode, but the plain and Alpha preview panes appeared to echo the submitted prompt rather than produce substantive answers. Those screenshots and observations are not Alpha pass/fail results and are not imported here.
+
+This review preserves the already-approved limited operator-test packet scope from PR #273: a portable Alpha behavior-contract manual test. It does not convert that packet into a product/runtime-surface test.
 
 ## Source files reviewed
 
@@ -27,12 +29,15 @@ This lane responds to the local manual preview concern: `/dashboard/expert-previ
 
 ## Summary decision
 
-The current local supervised preview is valid only as a UI/local smoke surface. It is not a valid behavior-testing surface for the limited operator test if it merely echoes prompts or produces deterministic placeholder/offline output.
+Keep two tracks separate:
 
-The limited operator test should not be run on the current local `/dashboard/expert-preview` surface as behavior evidence. ChatGPT project-thread testing may be used only as prompt-contract/manual simulation evidence, not product/runtime evidence. A valid product-level operator test requires a separately approved product surface that is proven to consume the intended Alpha behavior contract and can produce substantive answers under authorized execution conditions.
+1. Portable-contract manual simulation track: valid for manually testing the portable Alpha behavior contract when correctly labeled as simulation/manual portable-contract evidence only. This aligns with the current operator-test packet. It is not product/runtime evidence, `/v1/solve` evidence, provider evidence, benchmark validation, MVP validation, production-readiness evidence, or broad Alpha-superiority evidence.
+2. Product/runtime execution-surface track: a separate future track needed only if the project wants product/runtime operator evidence. The current local supervised preview is valid only as a UI/local smoke surface and remains blocked/invalid for behavior testing if it merely echoes prompts or produces deterministic placeholder/offline output.
+
+The current operator packet should not be changed into a product/runtime operator test unless a separate approved lane changes that scope.
 
 ## Recommended next lane
 
-Recommended next lane: `ALPHA-LIMITED-OPERATOR-TEST-SURFACE-FIX-001`.
+Recommended next lane: `ALPHA-LIMITED-OPERATOR-TEST-PROMPT-CONTRACT-SIMULATION-001`.
 
-This is recommended because the current local preview is blocked for behavior testing, ChatGPT-thread testing is not product/runtime evidence, and live provider or runtime wiring work would require separate authorization before any product-level operator-test execution.
+This recommendation preserves the original PR #273 packet scope: manual portable-contract operator testing. `ALPHA-LIMITED-OPERATOR-TEST-SURFACE-FIX-001` remains an optional future lane only if Adonis explicitly wants product/runtime surface evidence.
