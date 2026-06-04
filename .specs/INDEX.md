@@ -4,6 +4,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 
 | File | Title |
 | --- | --- |
+| `ALPHA-ANSWER-STRUCTURE-V2-001.md` | ALPHA-ANSWER-STRUCTURE-V2-001 |
 | `ALPHA-BREVITY-CONTROL-001.md` | ALPHA-BREVITY-CONTROL-001 |
 | `ALPHA-CLARIFY-THRESHOLD-001.md` | ALPHA-CLARIFY-THRESHOLD-001 · Answer Execution Prompts with Assumptions When Sufficient |
 | `ALPHA-FORMAT-PRESERVATION-001.md` | ALPHA-FORMAT-PRESERVATION-001 · Expert Answer Format Preservation |
