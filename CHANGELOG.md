@@ -21,6 +21,7 @@
 - Diagnostics now include scorer details, config snapshot and accounting summary.
 
 ### Documentation
+- 2026-06-04 | PR #267 | OUTPUT-DIFF-POST-IMPROVEMENT-BLIND-SCORING-001 | Done | Added blind-scoring artifacts for the post-improvement portable capture packet. Scored the sanitized Output A / Output B packet using the existing 14-dimension rubric while preserving blinding. Output A total 306, Output B total 311, blinded delta A-B -5, preferences A 3 / B 3 / Tie 2 / Inconclusive 0. No unblinding, raw-output inspection, operator-map inspection, GS update, Batch C, /v1/solve measurement, runtime/provider/model/routing changes, or validation/readiness/superiority claims.
 - Synced the Operator & Technology Manual baseline refresh from PR #182 and the final post-placeholder-cleanup refresh from PR #187.
 - Recorded PR #183's initial `LIVE-SMOKE-OPENAI-001` contract and PR #185's alignment of that spec with the implemented skipped-by-default live smoke.
 - Captured PR #186's health/readiness and rate-limit placeholder truth cleanup, keeping `NEW-HEALTH-001` and `NEW-RATE-001` as future/placeholder targets rather than implemented richer dependency checks or Redis-backed rate limiting.
