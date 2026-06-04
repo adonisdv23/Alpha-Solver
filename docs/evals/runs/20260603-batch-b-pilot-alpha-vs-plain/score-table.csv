@@ -1,0 +1,14 @@
+comparison_id,candidate_id,plain_total,alpha_total,alpha_delta,winner,token_cost_status,notes
+cmp-B1-CAND-001,B1-CAND-001,29,39,10,Alpha,not-captured,computed from blinded score sheet after approved unblinding
+cmp-B1-CAND-003,B1-CAND-003,41,38,-3,Plain,not-captured,computed from blinded score sheet after approved unblinding
+cmp-B1-CAND-005,B1-CAND-005,40,35,-5,Plain,not-captured,computed from blinded score sheet after approved unblinding
+cmp-B1-CAND-007,B1-CAND-007,36,39,3,Alpha,not-captured,computed from blinded score sheet after approved unblinding
+cmp-B1-CAND-009,B1-CAND-009,36,41,5,Alpha,not-captured,computed from blinded score sheet after approved unblinding
+cmp-B1-CAND-011,B1-CAND-011,39,40,1,Alpha,not-captured,computed from blinded score sheet after approved unblinding
+cmp-B1-CAND-013,B1-CAND-013,37,40,3,Alpha,not-captured,computed from blinded score sheet after approved unblinding
+cmp-B1-CAND-015,B1-CAND-015,38,30,-8,Plain,not-captured,computed from blinded score sheet after approved unblinding
+cmp-B1-CAND-017,B1-CAND-017,41,38,-3,Plain,not-captured,computed from blinded score sheet after approved unblinding
+cmp-B1-CAND-020,B1-CAND-020,19,39,20,Alpha,not-captured,computed from blinded score sheet after approved unblinding
+cmp-B1-CAND-021,B1-CAND-021,12,36,24,Alpha,not-captured,computed from blinded score sheet after approved unblinding
+cmp-B1-CAND-022,B1-CAND-022,37,40,3,Alpha,not-captured,computed from blinded score sheet after approved unblinding
+AGGREGATE,,405,455,50,Alpha 8 / Plain 4 / Tie 0,not-captured,limited 12-comparison Batch B pilot

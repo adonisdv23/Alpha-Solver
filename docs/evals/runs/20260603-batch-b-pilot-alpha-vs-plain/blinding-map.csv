@@ -1,0 +1,13 @@
+comparison_id,candidate_id,output_a_surface,output_b_surface,unblinding_status
+cmp-B1-CAND-001,B1-CAND-001,plain,alpha,approved_after_blind_scoring
+cmp-B1-CAND-003,B1-CAND-003,alpha,plain,approved_after_blind_scoring
+cmp-B1-CAND-005,B1-CAND-005,plain,alpha,approved_after_blind_scoring
+cmp-B1-CAND-007,B1-CAND-007,alpha,plain,approved_after_blind_scoring
+cmp-B1-CAND-009,B1-CAND-009,plain,alpha,approved_after_blind_scoring
+cmp-B1-CAND-011,B1-CAND-011,alpha,plain,approved_after_blind_scoring
+cmp-B1-CAND-013,B1-CAND-013,plain,alpha,approved_after_blind_scoring
+cmp-B1-CAND-015,B1-CAND-015,alpha,plain,approved_after_blind_scoring
+cmp-B1-CAND-017,B1-CAND-017,plain,alpha,approved_after_blind_scoring
+cmp-B1-CAND-020,B1-CAND-020,alpha,plain,approved_after_blind_scoring
+cmp-B1-CAND-021,B1-CAND-021,plain,alpha,approved_after_blind_scoring
+cmp-B1-CAND-022,B1-CAND-022,alpha,plain,approved_after_blind_scoring
