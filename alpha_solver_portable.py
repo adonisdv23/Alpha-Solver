@@ -35,6 +35,35 @@ Every response MUST include ALL of these sections:
 7. PIPELINE CONFIRMATION — the standard footer line
 
 If you respond without this structure, you have FAILED the protocol.
+
+MINIMAL ALPHA BEHAVIOR CONTRACT
+-------------------------------
+These rules constrain answer wording inside the SOLUTION field and any other
+user-visible prose without changing providers, models, routing, SAFE-OUT, or the
+SolverEnvelope shape:
+
+1. Direct answer first: when the user asks for a yes/no decision, reviewer
+   comment, one-sentence answer, concise rewrite, or next action, begin the
+   SOLUTION with that requested deliverable before explanation.
+2. Mode discipline: obey the requested answer shape before adding structure; do
+   not turn a reviewer comment, short answer, or safe rewrite into a full memo
+   unless the user asks for one or material risk requires compact caveats.
+3. No invented scaffolding: do not invent owners, dates, file paths, commands,
+   metrics, acceptance criteria, implementation status, provider behavior, or
+   operational artifacts that were not supplied or explicitly requested.
+4. Compact caveats: preserve uncertainty, safety, evidence limits, and claim
+   boundaries in the shortest wording that remains truthful.
+5. Safe claim wording: limited pilots may be described as "limited pilot favored
+   Alpha" and "planning evidence, not validation"; do not claim MVP validation,
+   broad Alpha superiority, plain-provider inferiority, production readiness,
+   benchmark success, exact billing accuracy, broad runtime readiness, or
+   provider orchestration.
+6. Evidence boundary: repository evidence controls over planning ledgers; say
+   "repo evidence overrides planning ledger" when the two conflict.
+7. Artifact stop conditions: if required score tables, capture packets, raw
+   provider payloads, or other source artifacts are missing or unavailable,
+   start with "Stop:" and do not reconstruct, rescore, rerun capture, call live
+   providers, update Sheets, or make proof/readiness claims.
 """
 
 from __future__ import annotations
@@ -115,6 +144,57 @@ EXPERT_ROSTER: List[Dict] = [
     {"id": "critical_thinker", "name": "Critical Thinker", "domains": ["logic", "fallacy", "bias", "assumption", "counterargument"], "strength": 0.88},
     {"id": "creative_strategist", "name": "Creative Strategist", "domains": ["innovation", "brainstorm", "alternative", "unconventional", "ideation"], "strength": 0.79},
 ]
+
+MINIMAL_BEHAVIOR_CONTRACT: Dict[str, Tuple[str, ...]] = {
+    "direct_answer_first": (
+        "Begin yes/no decisions, reviewer comments, one-sentence answers, "
+        "concise rewrites, and next actions with the requested deliverable.",
+        "Put necessary rationale or caveats after the direct answer, not before it.",
+    ),
+    "mode_discipline": (
+        "Do not expand a short answer, reviewer comment, or safe rewrite into a "
+        "full memo unless requested or risk requires compact caveats.",
+        "Use protocol/checklist structure only when the user asks for that mode.",
+    ),
+    "no_invented_scaffolding": (
+        "Do not invent owners, dates, file paths, commands, metrics, acceptance "
+        "criteria, implementation status, provider behavior, or operational artifacts.",
+    ),
+    "safe_claim_wording": (
+        "Use limited-evidence wording such as 'limited pilot favored Alpha' and "
+        "'planning evidence, not validation'.",
+        "Do not claim MVP validation, broad superiority, production readiness, "
+        "benchmark success, exact billing accuracy, broad runtime readiness, or "
+        "provider orchestration.",
+    ),
+    "evidence_boundary": (
+        "Repository evidence controls over planning ledgers.",
+        "Use 'repo evidence overrides planning ledger' when sources conflict.",
+    ),
+    "artifact_stop_conditions": (
+        "If required score tables, capture packets, or raw provider payloads are "
+        "missing or unavailable, start with 'Stop:'.",
+        "Do not reconstruct, rescore, rerun capture, call live providers, update "
+        "Sheets, or make proof/readiness claims when stop conditions are present.",
+    ),
+}
+
+
+def minimal_behavior_contract_summary() -> str:
+    """Return the portable prompt/protocol wording for minimal Alpha behavior.
+
+    This helper exposes the active standalone behavior contract for offline
+    tests and prompt-loading workflows. It only summarizes wording constraints;
+    it does not alter provider, model, routing, SAFE-OUT, or /v1/solve behavior.
+    """
+
+    lines = ["Minimal Alpha behavior contract:"]
+    for group, rules in MINIMAL_BEHAVIOR_CONTRACT.items():
+        label = group.replace("_", " ")
+        lines.append(f"- {label}:")
+        lines.extend(f"  - {rule}" for rule in rules)
+    return "\n".join(lines)
+
 
 EXPERT_SELECTION_TEMPLATE: str = """
 Expert Selection Protocol:

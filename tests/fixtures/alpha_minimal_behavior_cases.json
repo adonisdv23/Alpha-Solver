@@ -202,5 +202,6 @@
         "rescore"
       ]
     }
-  ]
+  ],
+  "portable_prompt_protocol_status": "implemented_in_alpha_solver_portable_prompt_protocol"
 }
