@@ -259,4 +259,6 @@ def test_test_plan_contains_required_sections_and_boundaries():
 
 def test_protected_runtime_contract_file_is_unchanged_by_this_lane():
     assert PORTABLE_CONTRACT.exists()
-    assert "Alpha Solver v2.3.0-P3" in _read(PORTABLE_CONTRACT)
+    text = _read(PORTABLE_CONTRACT)
+    for marker in ("LLM_PERSONA_PROTOCOL", "SAFE-OUT", "SolverEnvelope"):
+        assert marker in text
