@@ -142,6 +142,10 @@ def test_fixture_declares_contract_only_not_runtime_enforcement():
 
     assert data["schema_version"] == "alpha-minimal-behavior-contract-fixtures-v1"
     assert data["runtime_enforcement_status"] == "not_implemented_in_this_pr"
+    assert (
+        data["portable_prompt_protocol_status"]
+        == "implemented_in_alpha_solver_portable_prompt_protocol"
+    )
     assert set(data["required_safe_wording"]) == {
         "limited pilot favored Alpha",
         "does not establish broad superiority",
@@ -236,6 +240,35 @@ def test_answer_structure_modes_have_synthetic_examples():
     assert "protocol-checklist" in mode_to_ids["protocol_checklist"]
 
 
+def test_portable_minimal_behavior_summary_is_offline_and_bounded():
+    from alpha_solver_portable import minimal_behavior_contract_summary
+
+    summary = minimal_behavior_contract_summary()
+    normalized = _normalize(summary)
+
+    for phrase in (
+        "direct answer first",
+        "mode discipline",
+        "no invented scaffolding",
+        "safe claim wording",
+        "evidence boundary",
+        "artifact stop conditions",
+        "limited pilot favored alpha",
+        "planning evidence, not validation",
+        "repo evidence overrides planning ledger",
+        "start with 'stop:'",
+    ):
+        assert phrase in normalized
+    for forbidden in (
+        "provider orchestration is implemented",
+        "mvp is validated",
+        "production-ready",
+        "live providers were called",
+        "capture was rerun",
+        "sheets were updated",
+    ):
+        assert forbidden not in normalized
+
 def test_test_plan_contains_required_sections_and_boundaries():
     text = _read(TEST_PLAN)
     normalized = _normalize(text)
@@ -257,8 +290,32 @@ def test_test_plan_contains_required_sections_and_boundaries():
         assert phrase in normalized
 
 
-def test_protected_runtime_contract_file_is_unchanged_by_this_lane():
+def test_portable_contract_contains_minimal_behavior_protocol_wording():
     assert PORTABLE_CONTRACT.exists()
     text = _read(PORTABLE_CONTRACT)
+    normalized = _normalize(text)
+
     for marker in ("LLM_PERSONA_PROTOCOL", "SAFE-OUT", "SolverEnvelope"):
         assert marker in text
+    for phrase in (
+        "MINIMAL ALPHA BEHAVIOR CONTRACT",
+        "Direct answer first",
+        "Mode discipline",
+        "No invented scaffolding",
+        "Compact caveats",
+        "Safe claim wording",
+        "Evidence boundary",
+        "Artifact stop conditions",
+        "MINIMAL_BEHAVIOR_CONTRACT",
+        "minimal_behavior_contract_summary",
+    ):
+        assert phrase in text
+    for phrase in (
+        "without changing providers, models, routing, safe-out, or the solverenvelope shape",
+        "limited pilot favored alpha",
+        "planning evidence, not validation",
+        "repo evidence overrides planning ledger",
+        "start with \"stop:\"",
+        "does not alter provider, model, routing, safe-out, or /v1/solve behavior",
+    ):
+        assert phrase in normalized
