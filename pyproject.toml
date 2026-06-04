@@ -38,6 +38,7 @@ packages = [
     "alpha.core",
     "alpha.adapters",
     "alpha.providers",
+    "alpha.local_llm",
     "alpha.executors",
     "alpha.reasoning",
     "alpha.router",
