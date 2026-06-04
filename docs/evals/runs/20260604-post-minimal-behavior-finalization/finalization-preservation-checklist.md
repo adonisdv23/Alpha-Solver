@@ -2,14 +2,14 @@
 
 Hardening lane ID: `OUTPUT-DIFF-POST-IMPROVEMENT-FINALIZATION-CLUSTER-HARDENING-001`
 
-Lane scope: docs-only finalization-hardening follow-up after merged PR #270.
+Lane scope: optional docs-only finalization-hardening follow-up after merged PR #270.
 
 PR #270 remains the PR that completed the required finalization lanes:
 
 - `OUTPUT-DIFF-POST-IMPROVEMENT-INTERPRETATION-001`
 - `ALPHA-MINIMAL-CONTRACT-REFINEMENT-DECISION-001`
 
-This PR #271 follow-up does not mark those lanes newly completed again.
+This PR #271 follow-up does not mark those lanes newly completed again and only hardens the cluster-analysis basis already consistent with the PR #270 outcome.
 
 ## Checklist
 
@@ -19,7 +19,7 @@ This PR #271 follow-up does not mark those lanes newly completed again.
 - [x] `score-table.csv` was not modified.
 - [x] No rescoring occurred.
 - [x] No capture rerun occurred.
-- [x] No raw output content was used for interpretation.
+- [x] No raw output content was inspected or used for interpretation.
 - [x] No sanitized scorer-facing packet modification occurred.
 - [x] No locked blind score modification occurred.
 - [x] No operator-map assignment changes occurred.

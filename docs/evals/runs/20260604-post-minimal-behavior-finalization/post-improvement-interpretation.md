@@ -2,12 +2,12 @@
 
 Hardening lane ID: `OUTPUT-DIFF-POST-IMPROVEMENT-FINALIZATION-CLUSTER-HARDENING-001`
 
-Status: docs-only hardening update after merged PR #270. PR #270 remains the PR that completed the required finalization lanes:
+Status: optional docs-only hardening update after merged PR #270. PR #270 remains the required finalization completion PR for:
 
 - `OUTPUT-DIFF-POST-IMPROVEMENT-INTERPRETATION-001`
 - `ALPHA-MINIMAL-CONTRACT-REFINEMENT-DECISION-001`
 
-This follow-up does not re-complete those lanes. It preserves their outcome while clarifying the lift/polish/brevity basis for the already-recorded interpretation.
+PR #271 does not re-complete either required finalization lane. It preserves the PR #270 outcome and only hardens the lift/polish/brevity cluster-analysis basis.
 
 ## Source scored artifacts used
 
@@ -28,7 +28,7 @@ This hardening update uses only committed scored and preservation artifacts from
 - `.specs/EVAL-ARTIFACT-PRESERVE-001.md`
 - Prior preserved A3-1 and Batch B summary/scored artifacts under `docs/evals/runs/`
 
-`alpha_solver_portable.py` was inspected only as contextual contract surface for PR #263. Raw output content was not used.
+Raw output content was not inspected or used for this hardening update.
 
 ## Artifact integrity status
 
@@ -38,14 +38,14 @@ The PR #269 scored-artifact preservation checklist and unblinding application lo
 
 This PR #271 follow-up only edits finalization documents under `docs/evals/runs/20260604-post-minimal-behavior-finalization/`.
 
-## Locked blind result
+## Locked blind result preserved
 
 - Output A aggregate blinded total: 306
 - Output B aggregate blinded total: 311
 - Aggregate blinded delta, Output A minus Output B: -5
 - Blinded preference counts: Output A 3 / Output B 3 / Tie 2 / Inconclusive 0
 
-## Unblinded scored result
+## Unblinded scored result preserved
 
 - Alpha total: 314
 - Plain total: 303
@@ -54,13 +54,13 @@ This PR #271 follow-up only edits finalization documents under `docs/evals/runs/
 - Plain wins: 1
 - Ties: 2
 
-## Interpretation of delta
+## Interpretation of delta preserved
 
 Alpha's +11 result remains a modest positive Alpha result on a limited 8-comparison portable-surface diagnostic. The 5 / 1 / 2 win/loss/tie pattern is directionally favorable to Alpha, but the total-score margin is small relative to the approximately 300-point aggregate scale.
 
 This should not be treated as decisive evidence or as broad Alpha-over-plain superiority. It remains a limited portable-surface signal after the PR #263 minimal portable behavior contract, bounded by the prompt set, scorer rubric, committed scored artifacts, and artifact-preservation chain.
 
-## Outcome family classification
+## Outcome family preserved
 
 Formal family: **B. Mixed improvement with brevity/control concern**.
 
@@ -111,7 +111,7 @@ Interpretation hardening:
 - The -1 brevity delta is small in this run, but it keeps brevity/control as a live concern because Batch B previously showed a larger brevity weakness.
 - This cluster analysis hardens the PR #270 interpretation without changing the lane result, decision, next lane, or evidence boundary.
 
-## Comparison against A3-1
+## Comparison against A3-1 preserved
 
 A3-1 result:
 
@@ -122,7 +122,7 @@ A3-1 result:
 
 This post-improvement result moves in the opposite direction from A3-1: Alpha is ahead by +11 with 5 wins, 1 Plain win, and 2 ties. That supports the view that PR #263 likely helped the portable contract surface, but only with limited evidence. A3-1 did not establish broad plain-favored dominance, and this run does not erase the need for narrow evidence boundaries.
 
-## Comparison against Batch B
+## Comparison against Batch B preserved
 
 Batch B result:
 
@@ -141,26 +141,15 @@ Batch B diagnostic pattern:
 
 The post-improvement portable result is directionally consistent with Batch B in that Alpha again shows a positive aggregate and lift-cluster advantage while polish does not explain the result. It is weaker in magnitude than Batch B: +11 over 8 comparisons here versus +50 over 12 comparisons in Batch B. The brevity weakness is much smaller here (-1), but not eliminated as a decision concern because earlier evidence showed it can become material on brevity-sensitive prompts.
 
-## PR #263 verdict
+## PR #263 verdict preserved
 
 Verdict: **helped, limited evidence**.
 
 Rationale: the first post-PR #263 scored portable-surface run shows Alpha +11 with a 5 / 1 / 2 win/loss/tie pattern and a lift-cluster advantage of +10. The evidence is limited to this portable diagnostic and does not support broader claims.
 
-## What this proves
+## Evidence boundary preserved
 
-This proves only that, in the committed post-improvement portable-surface scored artifacts:
-
-- The artifact chain remained preserved for interpretation.
-- The canonical score table has 8 rows.
-- The locked blind scores mechanically map to Alpha 314, Plain 303, Alpha minus plain +11.
-- Alpha had 5 wins, Plain had 1 win, and 2 comparisons tied.
-- The per-dimension committed scores support a lift-cluster advantage for Alpha (+10), flat polish cluster (0), and slight brevity disadvantage (-1).
-- The PR #263 minimal portable contract has limited favorable evidence on this diagnostic surface.
-
-## What this does not prove
-
-This does not prove any of the following:
+This hardening update remains bounded to portable-surface evidence only. It does not provide evidence for:
 
 - `/v1/solve` behavior
 - Runtime API behavior
@@ -178,12 +167,13 @@ This does not prove any of the following:
 - Autonomous-optimization capability
 - Broad Alpha-over-plain superiority
 - Broad plain-over-Alpha inferiority
+- Batch C authorization
 
-## Recommended next lane
+## Recommended next lane preserved
 
 Recommended next lane remains: `ALPHA-BREVITY-CONTROL-REFINEMENT-001`.
 
-## Blocked work
+## Blocked work preserved
 
 The following remain blocked by the evidence boundary and should not be started from this hardening update:
 

@@ -2,7 +2,7 @@
 
 Hardening lane ID: `OUTPUT-DIFF-POST-IMPROVEMENT-FINALIZATION-CLUSTER-HARDENING-001`
 
-Status: docs-only next-lane hardening after merged PR #270. PR #270 remains the completion PR for the required finalization lanes.
+Status: optional docs-only next-lane hardening after merged PR #270. PR #270 remains the completion PR for the required finalization lanes, and PR #271 does not re-complete those lanes.
 
 ## Exact recommended next lane preserved
 

@@ -2,7 +2,7 @@
 
 Hardening lane ID: `OUTPUT-DIFF-POST-IMPROVEMENT-FINALIZATION-CLUSTER-HARDENING-001`
 
-Status: docs-only decision hardening after merged PR #270. PR #270 remains the completion PR for `ALPHA-MINIMAL-CONTRACT-REFINEMENT-DECISION-001`.
+Status: optional docs-only decision hardening after merged PR #270. PR #270 remains the completion PR for `ALPHA-MINIMAL-CONTRACT-REFINEMENT-DECISION-001`; PR #271 does not re-complete that lane.
 
 ## Source interpretation artifact
 
