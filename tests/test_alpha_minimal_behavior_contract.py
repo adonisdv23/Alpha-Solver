@@ -103,6 +103,20 @@ def _normalize(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip().lower()
 
 
+def _compact_envelope_block() -> str:
+    text = _read(PORTABLE_CONTRACT)
+    start = text.index("COMPACT-ENVELOPE EXCEPTION FOR LOW-HEADROOM TASKS")
+    end = text.index("MINIMAL ALPHA BEHAVIOR CONTRACT")
+    return text[start:end]
+
+
+def _strict_output_requirements_block() -> str:
+    text = _read(PORTABLE_CONTRACT)
+    start = text.index("STRICT OUTPUT REQUIREMENTS")
+    end = text.index("COMPACT-ENVELOPE EXCEPTION FOR LOW-HEADROOM TASKS")
+    return text[start:end]
+
+
 def _sentences(text: str) -> list[str]:
     return [part for part in re.split(r"(?<=[.!?])\s+", text.strip()) if part]
 
@@ -249,7 +263,11 @@ def test_portable_minimal_behavior_summary_is_offline_and_bounded():
     for phrase in (
         "direct answer first",
         "mode discipline",
+        "low headroom restraint",
+        "compact envelope mode",
         "no invented scaffolding",
+        "compact caveats",
+        "task relevant risk",
         "safe claim wording",
         "evidence boundary",
         "artifact stop conditions",
@@ -257,6 +275,18 @@ def test_portable_minimal_behavior_summary_is_offline_and_bounded():
         "planning evidence, not validation",
         "repo evidence overrides planning ledger",
         "start with 'stop:'",
+        "direct extractions",
+        "short confirmations",
+        "requested deliverable",
+        "do not open with process labels",
+        "keep the answer short",
+        "do not force heavy solver framing",
+        "keep solverenvelope labels",
+        "non-essential sections minimal",
+        "not expanded for low-headroom task",
+        "not applicable / no useful alternatives",
+        "do not turn every uncertainty into a long risk block",
+        "suppress generic risk boilerplate",
     ):
         assert phrase in normalized
     for forbidden in (
@@ -268,6 +298,119 @@ def test_portable_minimal_behavior_summary_is_offline_and_bounded():
         "sheets were updated",
     ):
         assert forbidden not in normalized
+
+
+def test_portable_summary_preserves_boundary_and_no_runtime_implication():
+    from alpha_solver_portable import minimal_behavior_contract_summary
+
+    summary = minimal_behavior_contract_summary()
+    normalized = _normalize(summary)
+
+    assert "minimal alpha behavior contract" in normalized
+    assert "does not alter provider, model, routing, safe-out, or /v1/solve behavior" in normalized
+    for phrase in (
+        "provider orchestration is implemented",
+        "routing behavior changed",
+        "model routing behavior changed",
+        "runtime api behavior changed",
+        "provider behavior changed",
+        "production readiness is confirmed",
+    ):
+        assert phrase not in normalized
+
+
+def test_portable_summary_requires_answer_first_low_headroom_and_compact_caveats():
+    from alpha_solver_portable import minimal_behavior_contract_summary
+
+    normalized = _normalize(minimal_behavior_contract_summary())
+
+    for phrase in (
+        "begin yes/no decisions",
+        "requested deliverable",
+        "put necessary rationale or caveats after the direct answer",
+        "do not open with process labels unless they materially help the user",
+        "for simple rewrites, formatting, direct extraction",
+        "one-step admin tasks",
+        "keep the answer short",
+        "do not force heavy solver framing",
+        "shortest wording that remains truthful",
+        "do not turn every uncertainty into a long risk block",
+    ):
+        assert phrase in normalized
+
+
+def test_portable_contract_resolves_envelope_low_headroom_conflict():
+    text = _read(PORTABLE_CONTRACT)
+    strict_block = _normalize(_strict_output_requirements_block())
+    compact_block = _normalize(_compact_envelope_block())
+
+    assert "every response must include all of these labels" in strict_block
+    assert "every response must include all of these sections" not in strict_block
+    assert "default full mode: 5 selected experts" in strict_block
+    assert "default full mode: 2+ alternative answers" in strict_block
+    assert text.index("default full mode: 5 selected experts") < text.index(
+        "COMPACT-ENVELOPE EXCEPTION FOR LOW-HEADROOM TASKS"
+    )
+    assert text.index("COMPACT-ENVELOPE EXCEPTION FOR LOW-HEADROOM TASKS") < text.index(
+        "MINIMAL ALPHA BEHAVIOR CONTRACT"
+    )
+    assert "default expert team and shortlist counts apply only outside" in compact_block
+    assert "overrides those default counts for low-headroom tasks" in compact_block
+    assert "does not remove the envelope labels" in compact_block
+
+
+def test_low_headroom_envelope_sections_may_be_minimal_not_expanded():
+    compact_block = _normalize(_compact_envelope_block())
+
+    assert "keep the solverenvelope labels" in compact_block
+    assert "make non-essential sections minimal" in compact_block
+    assert "solution must contain the direct answer first" in compact_block
+    assert (
+        "confidence, route, and safe-out state should be one concise line each"
+        in compact_block
+    )
+    assert "not expanded for low-headroom task" in compact_block
+    assert "do not force 5 full expert insights" in compact_block
+    assert "not applicable / no useful alternatives" in compact_block
+    assert "do not force 2 expanded alternatives" in compact_block
+    assert "do not add broad risk analysis" in compact_block
+    assert "multi-pass narration" in compact_block
+    assert "full memo" in compact_block
+
+
+def test_portable_summary_exposes_compact_envelope_exception():
+    from alpha_solver_portable import minimal_behavior_contract_summary
+
+    normalized = _normalize(minimal_behavior_contract_summary())
+
+    for phrase in (
+        "compact envelope mode",
+        "keep solverenvelope labels",
+        "non-essential sections minimal",
+        "solution contains the direct answer first",
+        "instead of 5 full expert insights",
+        "not applicable / no useful alternatives",
+        "instead of forcing 2 expanded alternatives",
+    ):
+        assert phrase in normalized
+
+
+def test_portable_summary_preserves_broad_non_claims():
+    from alpha_solver_portable import minimal_behavior_contract_summary
+
+    normalized = _normalize(minimal_behavior_contract_summary())
+
+    for phrase in (
+        "do not claim mvp validation",
+        "broad superiority",
+        "production readiness",
+        "benchmark success",
+        "exact billing accuracy",
+        "broad runtime readiness",
+        "provider orchestration",
+    ):
+        assert phrase in normalized
+
 
 def test_test_plan_contains_required_sections_and_boundaries():
     text = _read(TEST_PLAN)
@@ -301,8 +444,11 @@ def test_portable_contract_contains_minimal_behavior_protocol_wording():
         "MINIMAL ALPHA BEHAVIOR CONTRACT",
         "Direct answer first",
         "Mode discipline",
+        "Low-headroom restraint",
+        "COMPACT-ENVELOPE EXCEPTION",
         "No invented scaffolding",
         "Compact caveats",
+        "Task-relevant risk",
         "Safe claim wording",
         "Evidence boundary",
         "Artifact stop conditions",
