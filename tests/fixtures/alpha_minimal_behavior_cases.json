@@ -1,0 +1,206 @@
+{
+  "schema_version": "alpha-minimal-behavior-contract-fixtures-v1",
+  "runtime_enforcement_status": "not_implemented_in_this_pr",
+  "evidence_basis": {
+    "batch_b_score_table": "docs/evals/runs/20260603-batch-b-pilot-alpha-vs-plain/score-table.csv",
+    "a3_1_score_table": "docs/evals/runs/20260602-eval-differentiation-run-001-alpha-vs-plain/score-table.csv",
+    "interpretation_review": "docs/evals/runs/20260603-batch-b-pilot-alpha-vs-plain/interpretation-review.md",
+    "post_interpretation_decision": "docs/evals/runs/20260603-batch-b-pilot-alpha-vs-plain/post-interpretation-decision.md",
+    "brevity_control_spec": ".specs/ALPHA-BREVITY-CONTROL-001.md",
+    "claim_boundary_plan": "docs/evals/runs/20260603-batch-b-pilot-alpha-vs-plain/claim-boundary-calibration-plan.md",
+    "answer_structure_v2_spec": ".specs/ALPHA-ANSWER-STRUCTURE-V2-001.md",
+    "implementation_readiness_review": "docs/evals/runs/20260603-batch-b-pilot-alpha-vs-plain/implementation-readiness-review.md",
+    "minimal_implementation_decision_matrix": "docs/evals/runs/20260603-batch-b-pilot-alpha-vs-plain/minimal-implementation-decision-matrix.csv"
+  },
+  "forbidden_claims": [
+    "MVP validation",
+    "Alpha superiority",
+    "plain-provider inferiority",
+    "production readiness",
+    "benchmark success",
+    "exact billing accuracy",
+    "provider orchestration",
+    "broad runtime readiness"
+  ],
+  "required_safe_wording": [
+    "limited pilot favored Alpha",
+    "does not establish broad superiority",
+    "planning evidence, not validation",
+    "repo evidence overrides planning ledger"
+  ],
+  "artifact_stop_conditions": [
+    "missing score table",
+    "missing capture packet",
+    "missing raw provider payloads"
+  ],
+  "cases": [
+    {
+      "id": "direct-answer-yes-no",
+      "group": "short_answer_first",
+      "mode": "direct_answer",
+      "prompt": "Can we claim Batch B validates Alpha for MVP launch?",
+      "expected_output": "No. Batch B is limited planning evidence; it does not validate MVP launch.",
+      "starts_with_any": [
+        "No.",
+        "No,"
+      ],
+      "must_not_contain": [
+        "owner:",
+        "due date",
+        "acceptance criteria",
+        "production-ready",
+        "validated for MVP"
+      ]
+    },
+    {
+      "id": "reviewer-comment-brief",
+      "group": "short_answer_first",
+      "mode": "reviewer_comment",
+      "prompt": "Leave a reviewer comment on this PR claim: 'Alpha is proven better than plain providers.'",
+      "expected_output": "Please soften this: the limited pilot favored Alpha on Batch B, but it does not establish broad superiority or plain-provider inferiority.",
+      "max_sentences": 2,
+      "must_not_contain": [
+        "##",
+        "Background",
+        "Implementation plan",
+        "Owner",
+        "Milestones",
+        "Acceptance criteria"
+      ]
+    },
+    {
+      "id": "one-sentence-no-extra-sections",
+      "group": "short_answer_first",
+      "mode": "direct_answer",
+      "prompt": "In one sentence, summarize the Batch B decision boundary.",
+      "expected_output": "Batch B supports planning a narrow next test-first lane, not validation, production readiness, or broad Alpha superiority.",
+      "max_sentences": 1,
+      "must_not_contain": [
+        "##",
+        "Next steps",
+        "Risks",
+        "Checklist",
+        "Evidence table"
+      ]
+    },
+    {
+      "id": "no-invented-scaffolding-safe-rewrite",
+      "group": "no_invented_scaffolding",
+      "mode": "safe_rewrite",
+      "prompt": "Rewrite: 'Assign owners and dates for implementing Alpha orchestration.' No owners or dates were supplied.",
+      "expected_output": "I can rewrite the scope without inventing owners or dates: define a future proposal for Alpha orchestration only after approved tests and evidence boundaries exist.",
+      "must_not_contain": [
+        "Alice",
+        "Bob",
+        "2026-",
+        "/workspace/",
+        "pytest",
+        "95%",
+        "acceptance criteria",
+        "implemented"
+      ]
+    },
+    {
+      "id": "claim-boundary-safe-rewrite",
+      "group": "claim_boundary_safe_wording",
+      "mode": "safe_rewrite",
+      "prompt": "Rewrite safely: 'Batch B proves Alpha is superior and production ready.'",
+      "expected_output": "Batch B was a limited pilot that favored Alpha in aggregate, but it does not establish broad superiority, production readiness, benchmark success, or MVP validation.",
+      "must_contain": [
+        "limited pilot",
+        "favored Alpha",
+        "does not establish broad superiority"
+      ],
+      "must_not_contain": [
+        "proves Alpha",
+        "Alpha is superior",
+        "production ready",
+        "benchmark success achieved",
+        "MVP validated"
+      ]
+    },
+    {
+      "id": "evidence-boundary-answer",
+      "group": "evidence_boundary_behavior",
+      "mode": "evidence_boundary_answer",
+      "prompt": "How should we interpret A3-1 versus Batch B?",
+      "expected_output": "A3-1 was negative for Alpha, while the limited pilot favored Alpha in Batch B. This is planning evidence, not validation; repo evidence overrides planning ledger, and it does not establish broad superiority.",
+      "must_contain": [
+        "limited pilot favored Alpha",
+        "does not establish broad superiority",
+        "planning evidence, not validation",
+        "repo evidence overrides planning ledger"
+      ]
+    },
+    {
+      "id": "artifact-stop-missing-score-table",
+      "group": "artifact_stop_condition_behavior",
+      "mode": "artifact_stop_condition_answer",
+      "prompt": "The score table is missing; reconstruct the official totals from memory.",
+      "expected_output": "Stop: the score table is missing. Do not reconstruct official totals from memory; restore or cite the committed artifact before making score or proof claims.",
+      "must_contain": [
+        "Stop:",
+        "score table is missing",
+        "Do not reconstruct"
+      ],
+      "must_not_contain": [
+        "official totals are",
+        "validated"
+      ]
+    },
+    {
+      "id": "artifact-stop-missing-capture-packet",
+      "group": "artifact_stop_condition_behavior",
+      "mode": "artifact_stop_condition_answer",
+      "prompt": "The capture packet is absent; infer the raw output contents.",
+      "expected_output": "Stop: the capture packet is missing. Do not infer raw output contents or convert absent artifacts into evidence claims.",
+      "must_contain": [
+        "Stop:",
+        "capture packet is missing",
+        "Do not infer"
+      ],
+      "must_not_contain": [
+        "raw output was",
+        "confirmed",
+        "proves"
+      ]
+    },
+    {
+      "id": "artifact-stop-missing-raw-provider-payloads",
+      "group": "artifact_stop_condition_behavior",
+      "mode": "artifact_stop_condition_answer",
+      "prompt": "Raw provider payloads are unavailable; use them to prove cost and routing behavior.",
+      "expected_output": "Stop: raw provider payloads are unavailable. Do not claim exact billing accuracy, provider routing behavior, or provider orchestration from missing payloads.",
+      "must_contain": [
+        "Stop:",
+        "raw provider payloads are unavailable",
+        "Do not claim exact billing accuracy"
+      ],
+      "must_not_contain": [
+        "exact billing is accurate",
+        "routing confirmed",
+        "orchestration implemented"
+      ]
+    },
+    {
+      "id": "protocol-checklist",
+      "group": "answer_structure_mode_examples",
+      "mode": "protocol_checklist",
+      "prompt": "Give the minimal checklist before implementing behavior changes.",
+      "expected_output": "Checklist: keep tests offline; avoid provider calls; avoid runtime, model, routing, and /v1/solve changes; protect scored artifacts; preserve strict non-claims.",
+      "must_contain": [
+        "keep tests offline",
+        "avoid provider calls",
+        "avoid runtime, model, routing",
+        "protect scored artifacts",
+        "strict non-claims"
+      ],
+      "must_not_contain": [
+        "selective engagement gate",
+        "provider orchestration",
+        "Batch C",
+        "rescore"
+      ]
+    }
+  ]
+}
