@@ -1,0 +1,2 @@
+comparison_id,prompt_id,blind_slot_a_condition,blind_slot_b_condition,alpha_raw_output_path,plain_raw_output_path,randomization_method,captured_at,operator_notes
+TEMPLATE_ONLY,TEMPLATE_ONLY,DO_NOT_ASSIGN_IN_PACKET_PR,DO_NOT_ASSIGN_IN_PACKET_PR,TEMPLATE_PATH_ONLY,TEMPLATE_PATH_ONLY,TEMPLATE_METHOD_ONLY,TEMPLATE_TIMESTAMP_ONLY,Template row only; replace in a separately authorized capture task.
