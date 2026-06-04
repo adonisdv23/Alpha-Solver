@@ -1,0 +1,34 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SOLVER ENVELOPE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SOLUTION:
+Repo evidence overrides planning ledger, so the repository inspection should control unless endpoint wiring or endpoint behavior proves the runtime uses the new prompt contract.
+
+Follow-up checks:
+- Inspect the endpoint implementation path to see whether it imports or otherwise loads the standalone contract file.
+- Run or review endpoint-specific tests or captured endpoint responses that demonstrate the contract is actually applied.
+
+CONFIDENCE: 94%
+
+ROUTE: constrained | rationale: evidence hierarchy conflict with direct one-sentence answer and two checks.
+
+EXPERT TEAM (Synergy: 0.88):
+- Lead: QA Engineer — "Repository evidence controls over planning notes."
+- Support: Critical Thinker — "Do not infer implementation from a ledger."
+- Support: Technical Architect — "Verify endpoint wiring directly."
+- Support: Product Manager — "State the status in evidence-bounded language."
+- Support: Domain Expert — "Endpoint-specific behavior is needed for runtime claims."
+
+SAFE-OUT STATE:
+  route: constrained
+  phases: interpret -> ToT -> routing -> SAFE-OUT -> envelope
+  notes: source hierarchy applied; no endpoint-change claim made.
+
+SHORTLIST:
+  1. "Repo evidence overrides planning ledger unless endpoint wiring proves otherwise." (0.94)
+  2. "Treat the portable file as controlling only the portable surface until runtime proof exists." (0.89)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PIPELINE CONFIRMATION: Alpha Solver v2.3.0-P3 (PORTABLE-SPEC) pipeline executed: interpret → ToT (5 experts) → routing → SAFE-OUT → envelope.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

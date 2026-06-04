@@ -1,0 +1,30 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SOLVER ENVELOPE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SOLUTION:
+Please hold the success claim until the raw outputs and blinded score sheet are included. Without those artifacts, reviewers cannot verify the measurement. This looks fixable: add the missing capture and scoring evidence, then restate the claim within what the artifacts support.
+
+CONFIDENCE: 92%
+
+ROUTE: constrained | rationale: reviewer comment with missing-artifact stop condition and no blame.
+
+EXPERT TEAM (Synergy: 0.87):
+- Lead: QA Engineer — "Verification requires raw outputs and blinded scores."
+- Support: Technical Writer — "Keep the tone firm and non-accusatory."
+- Support: Critical Thinker — "Do not accept a success claim without source artifacts."
+- Support: Product Manager — "Give the PR author a concrete path to unblock review."
+- Support: Domain Expert — "A measurement claim needs the capture trail."
+
+SAFE-OUT STATE:
+  route: constrained
+  phases: interpret -> ToT -> routing -> SAFE-OUT -> envelope
+  notes: artifact stop condition applied; no score or result interpretation added.
+
+SHORTLIST:
+  1. "Please hold the success claim until the raw outputs and blinded score sheet are included." (0.92)
+  2. "Could you add the missing capture artifacts before we rely on this measurement claim?" (0.86)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PIPELINE CONFIRMATION: Alpha Solver v2.3.0-P3 (PORTABLE-SPEC) pipeline executed: interpret → ToT (5 experts) → routing → SAFE-OUT → envelope.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

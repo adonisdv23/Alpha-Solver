@@ -1,0 +1,32 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SOLVER ENVELOPE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SOLUTION:
+A prompt-contract comparison checks what happens when the written instructions are given to a model. It can show whether those instructions shape answers in a useful way, but it does not show that a live API endpoint is actually using those instructions.
+
+To prove the endpoint changed, you would need evidence from the endpoint path itself, such as code wiring, tests, or captured endpoint behavior. Without that, the comparison is evidence about the prompt contract only, not about the deployed API.
+
+CONFIDENCE: 93%
+
+ROUTE: structured | rationale: two-paragraph stakeholder explanation with claim-boundary distinction.
+
+EXPERT TEAM (Synergy: 0.86):
+- Lead: Product Manager — "Separate instruction quality from endpoint implementation."
+- Support: Technical Writer — "Use non-technical language and two short paragraphs."
+- Support: QA Engineer — "Require endpoint-path evidence for endpoint claims."
+- Support: Critical Thinker — "Do not infer wiring from planning intent."
+- Support: Domain Expert — "Keep evidence levels distinct."
+
+SAFE-OUT STATE:
+  route: structured
+  phases: interpret -> ToT -> routing -> SAFE-OUT -> envelope
+  notes: endpoint proof boundary preserved; jargon minimized.
+
+SHORTLIST:
+  1. "The comparison tests instructions, not endpoint wiring." (0.93)
+  2. "Endpoint change requires code or endpoint behavior evidence." (0.90)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PIPELINE CONFIRMATION: Alpha Solver v2.3.0-P3 (PORTABLE-SPEC) pipeline executed: interpret → ToT (5 experts) → routing → SAFE-OUT → envelope.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

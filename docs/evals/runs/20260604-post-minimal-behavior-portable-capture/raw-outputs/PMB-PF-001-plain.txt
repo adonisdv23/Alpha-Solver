@@ -1,0 +1,5 @@
+A recent pilot showed encouraging results for our AI workflow, but more evidence is needed before claiming production readiness or superiority over plain model calls.
+
+- Preserved raw outputs from both comparison conditions.
+- A blinded score sheet using agreed evaluation criteria.
+- Additional reliability, cost, and safety evidence from production-like use.

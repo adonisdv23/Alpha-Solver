@@ -1,0 +1,30 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SOLVER ENVELOPE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SOLUTION:
+The operator reviewed the checklist before capture.
+
+CONFIDENCE: 99%
+
+ROUTE: basic | rationale: simple active-voice conversion.
+
+EXPERT TEAM (Synergy: 0.83):
+- Lead: Technical Writer — "Move the operator into the subject position."
+- Support: Critical Thinker — "No extra claims or context are needed."
+- Support: QA Engineer — "Preserve the original meaning."
+- Support: Product Manager — "Keep the output to the requested transformation."
+- Support: Domain Expert — "The passive construction is fully reversible here."
+
+SAFE-OUT STATE:
+  route: basic
+  phases: interpret -> ToT -> routing -> SAFE-OUT -> envelope
+  notes: no safety constraint beyond exact formatting.
+
+SHORTLIST:
+  1. "The operator reviewed the checklist before capture." (0.99)
+  2. "Before capture, the operator reviewed the checklist." (0.97)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PIPELINE CONFIRMATION: Alpha Solver v2.3.0-P3 (PORTABLE-SPEC) pipeline executed: interpret → ToT (5 experts) → routing → SAFE-OUT → envelope.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

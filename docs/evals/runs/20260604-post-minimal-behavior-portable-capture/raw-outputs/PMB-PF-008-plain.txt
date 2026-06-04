@@ -1,0 +1,5 @@
+The repository inspection should control, because implementation evidence is stronger than a planning note unless the endpoint wiring or behavior is proven separately.
+
+Follow-up checks:
+- Inspect the runtime endpoint code path to see whether it loads the standalone prompt contract.
+- Run or review an endpoint-specific test that captures the endpoint applying that contract.
