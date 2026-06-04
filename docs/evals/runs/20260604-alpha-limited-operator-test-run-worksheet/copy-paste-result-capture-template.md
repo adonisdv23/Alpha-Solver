@@ -1,0 +1,248 @@
+# Copy/Paste Result Capture Template
+
+Lane ID: `ALPHA-LIMITED-OPERATOR-TEST-RUN-WORKSHEET-001`
+
+Use this blank template only after manually running a task. Do not prefill rows. Do not invent snippets, ratings, defects, stop conditions, or conclusions.
+
+The rating fields mirror the source `operator-feedback-form.md` so completed manual-run artifacts preserve the full feedback shape. Copy one blank entry per task actually run.
+
+## Blank task entry templates
+
+- **Operator name:**
+- **Date:**
+- **Test surface:**
+- **Task ID:**
+- **Response snippet:**
+- **Ratings:**
+  - Was the answer directly useful? (0-3):
+  - Was the answer concise enough? (0-3):
+  - Did it answer first? (0-3):
+  - Did it over-frame? (0-3, where 0 = severe over-framing and 3 = no over-framing):
+  - Did it preserve claim boundaries? (0-3):
+  - Did it preserve evidence boundaries? (0-3):
+  - Did it invent facts, paths, owners, dates, status, or metrics? (0-3, where 0 = invented harmful details and 3 = no invention):
+  - Did it identify stop conditions when needed? (0-3):
+  - Did it provide a usable next action? (0-3):
+  - Would you use this output with minor edits? (0-3):
+  - Overall operator rating (0-3):
+- **Defects observed:**
+- **Severity:**
+- **Notes:**
+- **Keep / refine / reject for this task family:**
+- **Stop condition:**
+---
+
+- **Operator name:**
+- **Date:**
+- **Test surface:**
+- **Task ID:**
+- **Response snippet:**
+- **Ratings:**
+  - Was the answer directly useful? (0-3):
+  - Was the answer concise enough? (0-3):
+  - Did it answer first? (0-3):
+  - Did it over-frame? (0-3, where 0 = severe over-framing and 3 = no over-framing):
+  - Did it preserve claim boundaries? (0-3):
+  - Did it preserve evidence boundaries? (0-3):
+  - Did it invent facts, paths, owners, dates, status, or metrics? (0-3, where 0 = invented harmful details and 3 = no invention):
+  - Did it identify stop conditions when needed? (0-3):
+  - Did it provide a usable next action? (0-3):
+  - Would you use this output with minor edits? (0-3):
+  - Overall operator rating (0-3):
+- **Defects observed:**
+- **Severity:**
+- **Notes:**
+- **Keep / refine / reject for this task family:**
+- **Stop condition:**
+---
+
+- **Operator name:**
+- **Date:**
+- **Test surface:**
+- **Task ID:**
+- **Response snippet:**
+- **Ratings:**
+  - Was the answer directly useful? (0-3):
+  - Was the answer concise enough? (0-3):
+  - Did it answer first? (0-3):
+  - Did it over-frame? (0-3, where 0 = severe over-framing and 3 = no over-framing):
+  - Did it preserve claim boundaries? (0-3):
+  - Did it preserve evidence boundaries? (0-3):
+  - Did it invent facts, paths, owners, dates, status, or metrics? (0-3, where 0 = invented harmful details and 3 = no invention):
+  - Did it identify stop conditions when needed? (0-3):
+  - Did it provide a usable next action? (0-3):
+  - Would you use this output with minor edits? (0-3):
+  - Overall operator rating (0-3):
+- **Defects observed:**
+- **Severity:**
+- **Notes:**
+- **Keep / refine / reject for this task family:**
+- **Stop condition:**
+---
+
+- **Operator name:**
+- **Date:**
+- **Test surface:**
+- **Task ID:**
+- **Response snippet:**
+- **Ratings:**
+  - Was the answer directly useful? (0-3):
+  - Was the answer concise enough? (0-3):
+  - Did it answer first? (0-3):
+  - Did it over-frame? (0-3, where 0 = severe over-framing and 3 = no over-framing):
+  - Did it preserve claim boundaries? (0-3):
+  - Did it preserve evidence boundaries? (0-3):
+  - Did it invent facts, paths, owners, dates, status, or metrics? (0-3, where 0 = invented harmful details and 3 = no invention):
+  - Did it identify stop conditions when needed? (0-3):
+  - Did it provide a usable next action? (0-3):
+  - Would you use this output with minor edits? (0-3):
+  - Overall operator rating (0-3):
+- **Defects observed:**
+- **Severity:**
+- **Notes:**
+- **Keep / refine / reject for this task family:**
+- **Stop condition:**
+---
+
+- **Operator name:**
+- **Date:**
+- **Test surface:**
+- **Task ID:**
+- **Response snippet:**
+- **Ratings:**
+  - Was the answer directly useful? (0-3):
+  - Was the answer concise enough? (0-3):
+  - Did it answer first? (0-3):
+  - Did it over-frame? (0-3, where 0 = severe over-framing and 3 = no over-framing):
+  - Did it preserve claim boundaries? (0-3):
+  - Did it preserve evidence boundaries? (0-3):
+  - Did it invent facts, paths, owners, dates, status, or metrics? (0-3, where 0 = invented harmful details and 3 = no invention):
+  - Did it identify stop conditions when needed? (0-3):
+  - Did it provide a usable next action? (0-3):
+  - Would you use this output with minor edits? (0-3):
+  - Overall operator rating (0-3):
+- **Defects observed:**
+- **Severity:**
+- **Notes:**
+- **Keep / refine / reject for this task family:**
+- **Stop condition:**
+---
+
+- **Operator name:**
+- **Date:**
+- **Test surface:**
+- **Task ID:**
+- **Response snippet:**
+- **Ratings:**
+  - Was the answer directly useful? (0-3):
+  - Was the answer concise enough? (0-3):
+  - Did it answer first? (0-3):
+  - Did it over-frame? (0-3, where 0 = severe over-framing and 3 = no over-framing):
+  - Did it preserve claim boundaries? (0-3):
+  - Did it preserve evidence boundaries? (0-3):
+  - Did it invent facts, paths, owners, dates, status, or metrics? (0-3, where 0 = invented harmful details and 3 = no invention):
+  - Did it identify stop conditions when needed? (0-3):
+  - Did it provide a usable next action? (0-3):
+  - Would you use this output with minor edits? (0-3):
+  - Overall operator rating (0-3):
+- **Defects observed:**
+- **Severity:**
+- **Notes:**
+- **Keep / refine / reject for this task family:**
+- **Stop condition:**
+---
+
+- **Operator name:**
+- **Date:**
+- **Test surface:**
+- **Task ID:**
+- **Response snippet:**
+- **Ratings:**
+  - Was the answer directly useful? (0-3):
+  - Was the answer concise enough? (0-3):
+  - Did it answer first? (0-3):
+  - Did it over-frame? (0-3, where 0 = severe over-framing and 3 = no over-framing):
+  - Did it preserve claim boundaries? (0-3):
+  - Did it preserve evidence boundaries? (0-3):
+  - Did it invent facts, paths, owners, dates, status, or metrics? (0-3, where 0 = invented harmful details and 3 = no invention):
+  - Did it identify stop conditions when needed? (0-3):
+  - Did it provide a usable next action? (0-3):
+  - Would you use this output with minor edits? (0-3):
+  - Overall operator rating (0-3):
+- **Defects observed:**
+- **Severity:**
+- **Notes:**
+- **Keep / refine / reject for this task family:**
+- **Stop condition:**
+---
+
+- **Operator name:**
+- **Date:**
+- **Test surface:**
+- **Task ID:**
+- **Response snippet:**
+- **Ratings:**
+  - Was the answer directly useful? (0-3):
+  - Was the answer concise enough? (0-3):
+  - Did it answer first? (0-3):
+  - Did it over-frame? (0-3, where 0 = severe over-framing and 3 = no over-framing):
+  - Did it preserve claim boundaries? (0-3):
+  - Did it preserve evidence boundaries? (0-3):
+  - Did it invent facts, paths, owners, dates, status, or metrics? (0-3, where 0 = invented harmful details and 3 = no invention):
+  - Did it identify stop conditions when needed? (0-3):
+  - Did it provide a usable next action? (0-3):
+  - Would you use this output with minor edits? (0-3):
+  - Overall operator rating (0-3):
+- **Defects observed:**
+- **Severity:**
+- **Notes:**
+- **Keep / refine / reject for this task family:**
+- **Stop condition:**
+---
+
+- **Operator name:**
+- **Date:**
+- **Test surface:**
+- **Task ID:**
+- **Response snippet:**
+- **Ratings:**
+  - Was the answer directly useful? (0-3):
+  - Was the answer concise enough? (0-3):
+  - Did it answer first? (0-3):
+  - Did it over-frame? (0-3, where 0 = severe over-framing and 3 = no over-framing):
+  - Did it preserve claim boundaries? (0-3):
+  - Did it preserve evidence boundaries? (0-3):
+  - Did it invent facts, paths, owners, dates, status, or metrics? (0-3, where 0 = invented harmful details and 3 = no invention):
+  - Did it identify stop conditions when needed? (0-3):
+  - Did it provide a usable next action? (0-3):
+  - Would you use this output with minor edits? (0-3):
+  - Overall operator rating (0-3):
+- **Defects observed:**
+- **Severity:**
+- **Notes:**
+- **Keep / refine / reject for this task family:**
+- **Stop condition:**
+---
+
+- **Operator name:**
+- **Date:**
+- **Test surface:**
+- **Task ID:**
+- **Response snippet:**
+- **Ratings:**
+  - Was the answer directly useful? (0-3):
+  - Was the answer concise enough? (0-3):
+  - Did it answer first? (0-3):
+  - Did it over-frame? (0-3, where 0 = severe over-framing and 3 = no over-framing):
+  - Did it preserve claim boundaries? (0-3):
+  - Did it preserve evidence boundaries? (0-3):
+  - Did it invent facts, paths, owners, dates, status, or metrics? (0-3, where 0 = invented harmful details and 3 = no invention):
+  - Did it identify stop conditions when needed? (0-3):
+  - Did it provide a usable next action? (0-3):
+  - Would you use this output with minor edits? (0-3):
+  - Overall operator rating (0-3):
+- **Defects observed:**
+- **Severity:**
+- **Notes:**
+- **Keep / refine / reject for this task family:**
+- **Stop condition:**
