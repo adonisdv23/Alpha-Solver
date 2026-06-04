@@ -17,11 +17,11 @@ The rating fields mirror the source `operator-feedback-form.md` so completed man
   - Was the answer directly useful? (0-3):
   - Was the answer concise enough? (0-3):
   - Did it answer first? (0-3):
-  - Did it over-frame? (0-3, where 0 = severe over-framing and 3 = no over-framing):
+  - Did it avoid over-framing? (0-3, where 0 = severe over-framing and 3 = no meaningful over-framing):
   - Did it preserve claim boundaries? (0-3):
   - Did it preserve evidence boundaries? (0-3):
-  - Did it invent facts, paths, owners, dates, status, or metrics? (0-3, where 0 = invented harmful details and 3 = no invention):
-  - Did it identify stop conditions when needed? (0-3):
+  - Did it avoid invented facts, paths, owners, dates, status, or metrics? (0-3, where 0 = harmful invention and 3 = no invention):
+  - Did it identify stop conditions when needed, or correctly avoid inventing one when not needed? (0-3):
   - Did it provide a usable next action? (0-3):
   - Would you use this output with minor edits? (0-3):
   - Overall operator rating (0-3):
@@ -41,11 +41,11 @@ The rating fields mirror the source `operator-feedback-form.md` so completed man
   - Was the answer directly useful? (0-3):
   - Was the answer concise enough? (0-3):
   - Did it answer first? (0-3):
-  - Did it over-frame? (0-3, where 0 = severe over-framing and 3 = no over-framing):
+  - Did it avoid over-framing? (0-3, where 0 = severe over-framing and 3 = no meaningful over-framing):
   - Did it preserve claim boundaries? (0-3):
   - Did it preserve evidence boundaries? (0-3):
-  - Did it invent facts, paths, owners, dates, status, or metrics? (0-3, where 0 = invented harmful details and 3 = no invention):
-  - Did it identify stop conditions when needed? (0-3):
+  - Did it avoid invented facts, paths, owners, dates, status, or metrics? (0-3, where 0 = harmful invention and 3 = no invention):
+  - Did it identify stop conditions when needed, or correctly avoid inventing one when not needed? (0-3):
   - Did it provide a usable next action? (0-3):
   - Would you use this output with minor edits? (0-3):
   - Overall operator rating (0-3):
@@ -65,11 +65,11 @@ The rating fields mirror the source `operator-feedback-form.md` so completed man
   - Was the answer directly useful? (0-3):
   - Was the answer concise enough? (0-3):
   - Did it answer first? (0-3):
-  - Did it over-frame? (0-3, where 0 = severe over-framing and 3 = no over-framing):
+  - Did it avoid over-framing? (0-3, where 0 = severe over-framing and 3 = no meaningful over-framing):
   - Did it preserve claim boundaries? (0-3):
   - Did it preserve evidence boundaries? (0-3):
-  - Did it invent facts, paths, owners, dates, status, or metrics? (0-3, where 0 = invented harmful details and 3 = no invention):
-  - Did it identify stop conditions when needed? (0-3):
+  - Did it avoid invented facts, paths, owners, dates, status, or metrics? (0-3, where 0 = harmful invention and 3 = no invention):
+  - Did it identify stop conditions when needed, or correctly avoid inventing one when not needed? (0-3):
   - Did it provide a usable next action? (0-3):
   - Would you use this output with minor edits? (0-3):
   - Overall operator rating (0-3):
@@ -89,11 +89,11 @@ The rating fields mirror the source `operator-feedback-form.md` so completed man
   - Was the answer directly useful? (0-3):
   - Was the answer concise enough? (0-3):
   - Did it answer first? (0-3):
-  - Did it over-frame? (0-3, where 0 = severe over-framing and 3 = no over-framing):
+  - Did it avoid over-framing? (0-3, where 0 = severe over-framing and 3 = no meaningful over-framing):
   - Did it preserve claim boundaries? (0-3):
   - Did it preserve evidence boundaries? (0-3):
-  - Did it invent facts, paths, owners, dates, status, or metrics? (0-3, where 0 = invented harmful details and 3 = no invention):
-  - Did it identify stop conditions when needed? (0-3):
+  - Did it avoid invented facts, paths, owners, dates, status, or metrics? (0-3, where 0 = harmful invention and 3 = no invention):
+  - Did it identify stop conditions when needed, or correctly avoid inventing one when not needed? (0-3):
   - Did it provide a usable next action? (0-3):
   - Would you use this output with minor edits? (0-3):
   - Overall operator rating (0-3):
@@ -113,11 +113,11 @@ The rating fields mirror the source `operator-feedback-form.md` so completed man
   - Was the answer directly useful? (0-3):
   - Was the answer concise enough? (0-3):
   - Did it answer first? (0-3):
-  - Did it over-frame? (0-3, where 0 = severe over-framing and 3 = no over-framing):
+  - Did it avoid over-framing? (0-3, where 0 = severe over-framing and 3 = no meaningful over-framing):
   - Did it preserve claim boundaries? (0-3):
   - Did it preserve evidence boundaries? (0-3):
-  - Did it invent facts, paths, owners, dates, status, or metrics? (0-3, where 0 = invented harmful details and 3 = no invention):
-  - Did it identify stop conditions when needed? (0-3):
+  - Did it avoid invented facts, paths, owners, dates, status, or metrics? (0-3, where 0 = harmful invention and 3 = no invention):
+  - Did it identify stop conditions when needed, or correctly avoid inventing one when not needed? (0-3):
   - Did it provide a usable next action? (0-3):
   - Would you use this output with minor edits? (0-3):
   - Overall operator rating (0-3):
@@ -137,11 +137,11 @@ The rating fields mirror the source `operator-feedback-form.md` so completed man
   - Was the answer directly useful? (0-3):
   - Was the answer concise enough? (0-3):
   - Did it answer first? (0-3):
-  - Did it over-frame? (0-3, where 0 = severe over-framing and 3 = no over-framing):
+  - Did it avoid over-framing? (0-3, where 0 = severe over-framing and 3 = no meaningful over-framing):
   - Did it preserve claim boundaries? (0-3):
   - Did it preserve evidence boundaries? (0-3):
-  - Did it invent facts, paths, owners, dates, status, or metrics? (0-3, where 0 = invented harmful details and 3 = no invention):
-  - Did it identify stop conditions when needed? (0-3):
+  - Did it avoid invented facts, paths, owners, dates, status, or metrics? (0-3, where 0 = harmful invention and 3 = no invention):
+  - Did it identify stop conditions when needed, or correctly avoid inventing one when not needed? (0-3):
   - Did it provide a usable next action? (0-3):
   - Would you use this output with minor edits? (0-3):
   - Overall operator rating (0-3):
@@ -161,11 +161,11 @@ The rating fields mirror the source `operator-feedback-form.md` so completed man
   - Was the answer directly useful? (0-3):
   - Was the answer concise enough? (0-3):
   - Did it answer first? (0-3):
-  - Did it over-frame? (0-3, where 0 = severe over-framing and 3 = no over-framing):
+  - Did it avoid over-framing? (0-3, where 0 = severe over-framing and 3 = no meaningful over-framing):
   - Did it preserve claim boundaries? (0-3):
   - Did it preserve evidence boundaries? (0-3):
-  - Did it invent facts, paths, owners, dates, status, or metrics? (0-3, where 0 = invented harmful details and 3 = no invention):
-  - Did it identify stop conditions when needed? (0-3):
+  - Did it avoid invented facts, paths, owners, dates, status, or metrics? (0-3, where 0 = harmful invention and 3 = no invention):
+  - Did it identify stop conditions when needed, or correctly avoid inventing one when not needed? (0-3):
   - Did it provide a usable next action? (0-3):
   - Would you use this output with minor edits? (0-3):
   - Overall operator rating (0-3):
@@ -185,11 +185,11 @@ The rating fields mirror the source `operator-feedback-form.md` so completed man
   - Was the answer directly useful? (0-3):
   - Was the answer concise enough? (0-3):
   - Did it answer first? (0-3):
-  - Did it over-frame? (0-3, where 0 = severe over-framing and 3 = no over-framing):
+  - Did it avoid over-framing? (0-3, where 0 = severe over-framing and 3 = no meaningful over-framing):
   - Did it preserve claim boundaries? (0-3):
   - Did it preserve evidence boundaries? (0-3):
-  - Did it invent facts, paths, owners, dates, status, or metrics? (0-3, where 0 = invented harmful details and 3 = no invention):
-  - Did it identify stop conditions when needed? (0-3):
+  - Did it avoid invented facts, paths, owners, dates, status, or metrics? (0-3, where 0 = harmful invention and 3 = no invention):
+  - Did it identify stop conditions when needed, or correctly avoid inventing one when not needed? (0-3):
   - Did it provide a usable next action? (0-3):
   - Would you use this output with minor edits? (0-3):
   - Overall operator rating (0-3):
@@ -209,11 +209,11 @@ The rating fields mirror the source `operator-feedback-form.md` so completed man
   - Was the answer directly useful? (0-3):
   - Was the answer concise enough? (0-3):
   - Did it answer first? (0-3):
-  - Did it over-frame? (0-3, where 0 = severe over-framing and 3 = no over-framing):
+  - Did it avoid over-framing? (0-3, where 0 = severe over-framing and 3 = no meaningful over-framing):
   - Did it preserve claim boundaries? (0-3):
   - Did it preserve evidence boundaries? (0-3):
-  - Did it invent facts, paths, owners, dates, status, or metrics? (0-3, where 0 = invented harmful details and 3 = no invention):
-  - Did it identify stop conditions when needed? (0-3):
+  - Did it avoid invented facts, paths, owners, dates, status, or metrics? (0-3, where 0 = harmful invention and 3 = no invention):
+  - Did it identify stop conditions when needed, or correctly avoid inventing one when not needed? (0-3):
   - Did it provide a usable next action? (0-3):
   - Would you use this output with minor edits? (0-3):
   - Overall operator rating (0-3):
@@ -233,11 +233,11 @@ The rating fields mirror the source `operator-feedback-form.md` so completed man
   - Was the answer directly useful? (0-3):
   - Was the answer concise enough? (0-3):
   - Did it answer first? (0-3):
-  - Did it over-frame? (0-3, where 0 = severe over-framing and 3 = no over-framing):
+  - Did it avoid over-framing? (0-3, where 0 = severe over-framing and 3 = no meaningful over-framing):
   - Did it preserve claim boundaries? (0-3):
   - Did it preserve evidence boundaries? (0-3):
-  - Did it invent facts, paths, owners, dates, status, or metrics? (0-3, where 0 = invented harmful details and 3 = no invention):
-  - Did it identify stop conditions when needed? (0-3):
+  - Did it avoid invented facts, paths, owners, dates, status, or metrics? (0-3, where 0 = harmful invention and 3 = no invention):
+  - Did it identify stop conditions when needed, or correctly avoid inventing one when not needed? (0-3):
   - Did it provide a usable next action? (0-3):
   - Would you use this output with minor edits? (0-3):
   - Overall operator rating (0-3):
