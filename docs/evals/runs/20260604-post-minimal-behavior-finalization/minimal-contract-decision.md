@@ -1,26 +1,30 @@
-# Minimal Contract Decision
+# Minimal Contract Decision Hardening
 
-Lane ID: `ALPHA-MINIMAL-CONTRACT-REFINEMENT-DECISION-001`
+Hardening lane ID: `OUTPUT-DIFF-POST-IMPROVEMENT-FINALIZATION-CLUSTER-HARDENING-001`
 
-Status: final contract decision for the current update plan.
+Status: docs-only decision hardening after merged PR #270. PR #270 remains the completion PR for `ALPHA-MINIMAL-CONTRACT-REFINEMENT-DECISION-001`.
 
 ## Source interpretation artifact
 
 Source interpretation artifact: `docs/evals/runs/20260604-post-minimal-behavior-finalization/post-improvement-interpretation.md`.
 
-## Decision
+## Decision preserved
 
 Decision: **Refine current contract**.
 
-## Recommended next lane
+This hardening update does not change the PR #270 decision.
+
+## Recommended next lane preserved
 
 Recommended next lane: `ALPHA-BREVITY-CONTROL-REFINEMENT-001`.
 
-## Rationale tied to interpretation
+This hardening update does not change the PR #270 next-lane recommendation.
 
-The post-improvement interpretation classified the result as **B. Mixed improvement with brevity/control concern**.
+## Rationale tied to hardened interpretation
 
-The decision is to refine rather than keep, simplify, defer, or cautiously expand because:
+The hardened post-improvement interpretation preserves the result as **B. Mixed improvement with brevity/control concern**.
+
+The decision remains to refine rather than keep, simplify, defer, or cautiously expand because:
 
 - The scored portable-surface result is favorable to Alpha but modest: Alpha 314, Plain 303, Alpha minus plain +11.
 - The comparison pattern is favorable but not decisive: Alpha wins 5, Plain wins 1, and 2 comparisons tie.
@@ -32,16 +36,16 @@ The decision is to refine rather than keep, simplify, defer, or cautiously expan
 
 ## What remains blocked
 
-The following remain blocked after this decision:
+The following remain blocked after this hardening update:
 
 - Batch C execution
 - Runtime/provider/model/routing changes
 - `/v1/solve` measurement or endpoint behavior claims
 - Production-readiness claims or docs
-- Google Sheets update from this docs-only finalization PR
+- Google Sheets update from this docs-only hardening PR
 - Changes to scored artifacts, raw outputs, sanitized packets, locked blind scores, or operator-map assignments
 - Broad validation, readiness, superiority, benchmark, billing, orchestration, automatic-recovery, adaptive-learning, self-optimization, or autonomous-optimization claims
 
 ## Non-claims
 
-This decision records a conservative contract-refinement choice only. It does not claim MVP validation, production-readiness, broad Alpha-over-plain superiority, broad plain-over-Alpha inferiority, benchmark-success, exact-billing accuracy, provider-orchestration proof, `/v1/solve` improvement, runtime-readiness, automatic-recovery capability, adaptive-learning capability, self-optimization capability, or autonomous-optimization capability.
+This hardening update records a conservative contract-refinement rationale only. It does not claim MVP validation, production-readiness, broad Alpha-over-plain superiority, broad plain-over-Alpha inferiority, benchmark-success, exact-billing accuracy, provider-orchestration proof, `/v1/solve` improvement, runtime-readiness, automatic-recovery capability, adaptive-learning capability, self-optimization capability, or autonomous-optimization capability.

@@ -1,12 +1,17 @@
-# Post-Improvement Interpretation
+# Post-Improvement Finalization Cluster Hardening
 
-Lane ID: `OUTPUT-DIFF-POST-IMPROVEMENT-INTERPRETATION-001`
+Hardening lane ID: `OUTPUT-DIFF-POST-IMPROVEMENT-FINALIZATION-CLUSTER-HARDENING-001`
 
-Status: interpretation complete; docs-only; portable-surface only.
+Status: docs-only hardening update after merged PR #270. PR #270 remains the PR that completed the required finalization lanes:
+
+- `OUTPUT-DIFF-POST-IMPROVEMENT-INTERPRETATION-001`
+- `ALPHA-MINIMAL-CONTRACT-REFINEMENT-DECISION-001`
+
+This follow-up does not re-complete those lanes. It preserves their outcome while clarifying the lift/polish/brevity basis for the already-recorded interpretation.
 
 ## Source scored artifacts used
 
-This interpretation uses only committed scored and preservation artifacts from the post-minimal-behavior portable capture lane:
+This hardening update uses only committed scored and preservation artifacts from the post-minimal-behavior portable capture lane:
 
 - `docs/evals/runs/20260604-post-minimal-behavior-portable-capture/score-table.csv`
 - `docs/evals/runs/20260604-post-minimal-behavior-portable-capture/scored-artifact-summary.md`
@@ -23,15 +28,15 @@ This interpretation uses only committed scored and preservation artifacts from t
 - `.specs/EVAL-ARTIFACT-PRESERVE-001.md`
 - Prior preserved A3-1 and Batch B summary/scored artifacts under `docs/evals/runs/`
 
-`alpha_solver_portable.py` was inspected only as the current portable contract surface associated with PR #263. Raw output content was not used.
+`alpha_solver_portable.py` was inspected only as contextual contract surface for PR #263. Raw output content was not used.
 
 ## Artifact integrity status
 
-Artifact integrity is preserved for this interpretation lane.
+Artifact integrity remains preserved.
 
-The scored-artifact preservation checklist and unblinding application log state that the locked blind score sheet was preserved, the operator-only map was preserved, no rescoring occurred, no capture rerun occurred, no raw outputs were read for scoring or interpretation, no raw outputs were modified, the sanitized scorer-facing packet was not modified, no locked score edits occurred, no Google Sheets update occurred, no Batch C work started, no runtime/provider/model/routing behavior changed, and no `/v1/solve` measurement occurred.
+The PR #269 scored-artifact preservation checklist and unblinding application log state that the locked blind score sheet was preserved, the operator-only map was preserved, no rescoring occurred, no capture rerun occurred, no raw outputs were read for scoring or interpretation, no raw outputs were modified, the sanitized scorer-facing packet was not modified, no locked score edits occurred, no Google Sheets update occurred, no Batch C work started, no runtime/provider/model/routing behavior changed, and no `/v1/solve` measurement occurred.
 
-This finalization lane adds only interpretation/decision documents under `docs/evals/runs/20260604-post-minimal-behavior-finalization/`.
+This PR #271 follow-up only edits finalization documents under `docs/evals/runs/20260604-post-minimal-behavior-finalization/`.
 
 ## Locked blind result
 
@@ -51,9 +56,9 @@ This finalization lane adds only interpretation/decision documents under `docs/e
 
 ## Interpretation of delta
 
-Alpha's +11 result is a modest positive Alpha result on a limited 8-comparison portable-surface diagnostic. The 5 / 1 / 2 win/loss/tie pattern is directionally favorable to Alpha, but the total-score margin is small relative to the approximately 300-point aggregate scale.
+Alpha's +11 result remains a modest positive Alpha result on a limited 8-comparison portable-surface diagnostic. The 5 / 1 / 2 win/loss/tie pattern is directionally favorable to Alpha, but the total-score margin is small relative to the approximately 300-point aggregate scale.
 
-This should not be treated as decisive evidence or as broad Alpha-over-plain superiority. It is a limited portable-surface signal after the PR #263 minimal portable behavior contract, and it remains bounded by the prompt set, scorer rubric, committed scored artifacts, and artifact-preservation chain.
+This should not be treated as decisive evidence or as broad Alpha-over-plain superiority. It remains a limited portable-surface signal after the PR #263 minimal portable behavior contract, bounded by the prompt set, scorer rubric, committed scored artifacts, and artifact-preservation chain.
 
 ## Outcome family classification
 
@@ -68,9 +73,9 @@ Unified taxonomy used:
 - E. Inconclusive result
 - F. Compromised artifact chain
 
-## Rationale for chosen family
+## Rationale for preserving Family B
 
-Family B is the conservative fit because:
+Family B remains the conservative fit because:
 
 - The aggregate result is positive for Alpha: +11 across 8 comparisons.
 - Alpha wins 5 comparisons, Plain wins 1, and 2 are ties.
@@ -79,9 +84,9 @@ Family B is the conservative fit because:
 - Brevity remains slightly negative for Alpha, and prior Batch B evidence identified brevity/control as a material Alpha weakness.
 - Several comparison margins are narrow, so the evidence supports refinement rather than expansion or runtime/readiness work.
 
-This is stronger than neutral near-parity because Alpha has a positive aggregate, a 5-to-1 win count, and a positive lift-cluster delta. It is not Family A because the total margin is modest, the surface is limited to portable behavior, and brevity/control remains a recurring concern.
+This remains stronger than neutral near-parity because Alpha has a positive aggregate, a 5-to-1 win count, and a positive lift-cluster delta. It remains below Family A because the total margin is modest, the surface is limited to portable behavior, and brevity/control remains a recurring concern.
 
-## Lift/polish/brevity review
+## Lift/polish/brevity hardening review
 
 The committed `score-table.csv` includes the per-dimension Alpha and plain scores needed to calculate the existing lift and polish clusters from `docs/evals/LIFT_DECISION_RULE.md`.
 
@@ -99,11 +104,12 @@ Calculated from committed scored artifacts:
 | Polish cluster | 69 | 69 | 0 |
 | Brevity only | 24 | 23 | -1 |
 
-Interpretation:
+Interpretation hardening:
 
 - The +10 lift-cluster delta accounts for most of the +11 aggregate result and is directionally aligned with Alpha's intended value: assumptions, hidden constraints, risk/failure framing, and comparative value.
 - The 0 polish-cluster delta argues against a polish-only explanation for the Alpha aggregate result.
 - The -1 brevity delta is small in this run, but it keeps brevity/control as a live concern because Batch B previously showed a larger brevity weakness.
+- This cluster analysis hardens the PR #270 interpretation without changing the lane result, decision, next lane, or evidence boundary.
 
 ## Comparison against A3-1
 
@@ -175,11 +181,11 @@ This does not prove any of the following:
 
 ## Recommended next lane
 
-Recommended next lane: `ALPHA-BREVITY-CONTROL-REFINEMENT-001`.
+Recommended next lane remains: `ALPHA-BREVITY-CONTROL-REFINEMENT-001`.
 
 ## Blocked work
 
-The following remain blocked by the evidence boundary and should not be started from this interpretation:
+The following remain blocked by the evidence boundary and should not be started from this hardening update:
 
 - Batch C execution
 - Runtime/provider/model/routing work
