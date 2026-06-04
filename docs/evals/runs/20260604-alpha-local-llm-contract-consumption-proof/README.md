@@ -22,11 +22,16 @@ smoke/offline deterministic behavior and is not overloaded for local LLM use.
 
 - `alpha/local_llm/__init__.py`
 - `alpha/local_llm/portable_contract.py`
+- `pyproject.toml`
 - `tests/test_local_llm_contract_consumption_proof.py`
 - `docs/evals/runs/20260604-alpha-local-llm-contract-consumption-proof/README.md`
 - `docs/evals/runs/20260604-alpha-local-llm-contract-consumption-proof/contract-consumption-proof.md`
 - `docs/evals/runs/20260604-alpha-local-llm-contract-consumption-proof/proof-preservation-checklist.md`
 - `docs/evals/runs/20260604-alpha-local-llm-contract-consumption-proof/recommended-next-lane.md`
+
+## Packaging preservation update
+
+PR #283 follow-up adds `alpha.local_llm` to the explicit setuptools package list so wheel/sdist installs include the proof helper package instead of passing only repo-root imports.
 
 ## What was proven
 
@@ -66,6 +71,8 @@ smoke/offline deterministic behavior and is not overloaded for local LLM use.
 - `python -m pytest tests/test_local_llm_contract_consumption_proof.py -q`
 - `python -m pytest tests/test_alpha_minimal_behavior_contract.py -q`
 - `MODEL_PROVIDER=local python scripts/check_env.py`
+- `python -m pip install --no-deps --target /tmp/alpha-solver-pkgcheck .`
+- `PYTHONPATH=/tmp/alpha-solver-pkgcheck python -c "import alpha.local_llm.portable_contract as pc; print(pc.__name__)"`
 
 ## Next recommended lane
 
