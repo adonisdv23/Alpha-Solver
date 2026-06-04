@@ -12,6 +12,7 @@ The operator request authorized this scored-artifacts lane to apply the operator
 
 - Source locked blind score sheet path: `docs/evals/runs/20260604-post-minimal-behavior-portable-capture/blinded-score-sheet.csv`
 - Source operator-only map path: `docs/evals/runs/20260604-post-minimal-behavior-portable-capture/operator-only-unblinding-map.csv`
+- Canonical score table path: `docs/evals/runs/20260604-post-minimal-behavior-portable-capture/score-table.csv`
 
 ## Preconditions checked
 

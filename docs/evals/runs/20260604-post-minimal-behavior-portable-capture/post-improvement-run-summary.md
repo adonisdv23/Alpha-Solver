@@ -18,6 +18,8 @@ Lane ID: `OUTPUT-DIFF-POST-IMPROVEMENT-SCORED-ARTIFACTS-001`
 
 ## Mapped Alpha/plain result
 
+Canonical score table: `docs/evals/runs/20260604-post-minimal-behavior-portable-capture/score-table.csv`
+
 - Alpha total: 314
 - Plain total: 303
 - Alpha minus plain delta: 11

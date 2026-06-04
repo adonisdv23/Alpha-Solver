@@ -6,7 +6,7 @@ Status: scored-artifact preservation complete for mechanical unblinding only.
 
 - [x] Locked blind score sheet preserved unchanged.
 - [x] Operator-only map preserved.
-- [x] Unblinded score table created.
+- [x] Canonical score table created.
 - [x] Arithmetic check created.
 - [x] Run summary created.
 - [x] Unblinding application log created.

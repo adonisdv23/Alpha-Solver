@@ -4,13 +4,13 @@ Lane ID: `OUTPUT-DIFF-POST-IMPROVEMENT-SCORED-ARTIFACTS-001`
 
 ## Method used
 
-A Python CSV check read the locked blind score sheet and the operator-only unblinding map, verified row alignment, verified integer dimension scores, recomputed row totals, applied the condition assignment mechanically, and wrote `unblinded-score-table.csv`. No scoring rubric semantics were changed.
+A Python CSV check read the locked blind score sheet and the operator-only unblinding map, verified row alignment, verified integer dimension scores, recomputed row totals, applied the condition assignment mechanically, and wrote `score-table.csv`. No scoring rubric semantics were changed.
 
 ## Row count check
 
 - Blind score rows: 8
 - Operator-only map rows: 8
-- Unblinded score table rows: 8
+- Canonical score table rows: 8
 - Comparison IDs aligned: yes
 - Prompt IDs aligned: yes
 

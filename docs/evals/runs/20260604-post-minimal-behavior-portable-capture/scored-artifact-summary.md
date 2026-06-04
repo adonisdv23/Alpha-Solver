@@ -14,7 +14,7 @@ Status: scored artifact produced by mechanical unblinding of locked blind scores
 
 - Locked blind score sheet: `docs/evals/runs/20260604-post-minimal-behavior-portable-capture/blinded-score-sheet.csv`
 - Operator-only unblinding map: `docs/evals/runs/20260604-post-minimal-behavior-portable-capture/operator-only-unblinding-map.csv`
-- Unblinded score table: `docs/evals/runs/20260604-post-minimal-behavior-portable-capture/unblinded-score-table.csv`
+- Canonical score table: `docs/evals/runs/20260604-post-minimal-behavior-portable-capture/score-table.csv`
 
 ## Locked blinded totals from PR #267
 
