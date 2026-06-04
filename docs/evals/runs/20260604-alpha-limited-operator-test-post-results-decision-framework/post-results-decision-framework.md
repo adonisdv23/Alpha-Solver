@@ -39,7 +39,7 @@ This decision may authorize a narrow portable-contract follow-up refinement. It 
 
 Allowed when the operator run is procedurally incomplete, affected by execution ambiguity, missing required task coverage, missing required feedback fields, or otherwise insufficient to support a stable interpretation.
 
-This decision may authorize rerunning the limited manual operator test or a tightly corrected version of it. It must not fill gaps by memory, inference, invented results, or external planning-ledger claims.
+This decision may authorize `ALPHA-LIMITED-OPERATOR-TEST-RERUN-001` to redo the limited manual operator test or a tightly corrected version of it. It must not fill gaps by memory, inference, invented results, or external planning-ledger claims.
 
 ### 4. Repair evidence chain
 
@@ -76,7 +76,7 @@ Every post-results decision must state:
 When more than one decision seems plausible:
 
 1. choose evidence repair over interpretation if provenance is weak;
-2. choose rerun over refinement if task coverage or feedback completeness is insufficient;
+2. choose `ALPHA-LIMITED-OPERATOR-TEST-RERUN-001` over refinement if task coverage or feedback completeness is insufficient;
 3. choose targeted refinement over readiness review if defects are material but bounded;
-4. choose second pass over readiness review if feedback is positive but sample/evidence breadth remains limited; and
+4. choose `ALPHA-LIMITED-OPERATOR-TEST-SECOND-PASS-001` over readiness review if a valid first pass is positive but sample/evidence breadth remains limited; and
 5. choose pause if any decision would require inventing results, expanding claims, or crossing protected surfaces.

@@ -73,9 +73,9 @@ Source interpretation artifact: `<path-to-post-results-interpretation>`
 Evidence boundary: imported artifacts were insufficient for a stable post-results decision.
 
 Reason rerun is required:
-- `<missing task coverage, incomplete feedback, procedural ambiguity, or equivalent issue>`
+- `<first run incomplete, wrong/blocked surface, incomplete evidence bundle, stop-condition rerun requirement, insufficient completed tasks, or equivalent issue>`
 
-Next lane: `<rerun lane ID or ALPHA-LIMITED-OPERATOR-TEST-SECOND-PASS-001 if approved as the corrected pass>`
+Next lane: `ALPHA-LIMITED-OPERATOR-TEST-RERUN-001`
 
 Blocked:
 - filling gaps from memory

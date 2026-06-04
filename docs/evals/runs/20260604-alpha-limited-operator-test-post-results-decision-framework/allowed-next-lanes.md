@@ -27,6 +27,36 @@ Not allowed:
 - provider orchestration;
 - production, MVP, or benchmark claims.
 
+
+### `ALPHA-LIMITED-OPERATOR-TEST-RERUN-001`
+
+Use when the first limited operator-test run cannot support interpretation because it was incomplete, blocked, or invalid.
+
+Applies when:
+
+- the first operator run was incomplete;
+- the tested surface was wrong or blocked;
+- the evidence bundle was too incomplete for interpretation;
+- a stop condition requires rerun after repair; or
+- the operator did not complete enough tasks.
+
+Allowed scope:
+
+- redo the limited portable-surface operator test under a separately approved rerun lane;
+- preserve corrected execution notes, operator feedback, defects, and evidence-chain records;
+- document why the prior run cannot be used as a valid first pass.
+
+Not allowed:
+
+- filling gaps in the prior run by memory, inference, external ledgers, or invented results;
+- treating an incomplete, blocked, or invalid first run as a valid pass;
+- Batch C execution, runtime work, provider calls, `/v1/solve` measurement, or readiness claims.
+
+Distinction from second pass:
+
+- `ALPHA-LIMITED-OPERATOR-TEST-SECOND-PASS-001` is a follow-up run after a valid first pass.
+- `ALPHA-LIMITED-OPERATOR-TEST-RERUN-001` is a redo because the first run was incomplete, blocked, or invalid.
+
 ### `ALPHA-PORTABLE-CONTRACT-FOLLOWUP-REFINEMENT-001`
 
 Use when interpreted feedback identifies bounded portable-contract defects that warrant targeted refinement.
