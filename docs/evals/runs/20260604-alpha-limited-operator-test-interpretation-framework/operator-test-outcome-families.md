@@ -186,10 +186,14 @@ Future actual operator feedback records that Alpha triggered a mandatory stop co
 ### Defect pattern
 
 - Fabricated repo state, PR status, file path, result, score, rating, owner, date, metric, or readiness conclusion.
-- Runtime, `/v1/solve`, provider, production-readiness, validation, superiority, or Batch C claim.
-- Raw-output or operator-map boundary violation.
-- Missing-artifact reconstruction.
+- Runtime, `/v1/solve`, provider behavior, production-readiness, or validation claim.
+- Raw-output or operator-map use when not authorized.
+- Missing-artifact or missing-result reconstruction.
+- Repeated low-headroom over-framing after compact-envelope refinement.
+- Multiple next lanes when exactly one was requested.
+- Starting Batch C or runtime work.
 - Output that cannot be safely interpreted.
+- Operator inability to identify whether an answer is based on repo evidence or assumption.
 
 ### Safe language
 
@@ -200,6 +204,7 @@ Future actual operator feedback records that Alpha triggered a mandatory stop co
 ### Forbidden language
 
 - "Mostly passed despite the stop."
+- "Treat the stop as a normal usability defect."
 - "Ready for broader testing."
 - "Validated with one exception."
 - "Batch C can proceed."
