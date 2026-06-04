@@ -29,9 +29,8 @@ Evidence still needed:
 - Repeatable scoring criteria, locked scores, and documented unblinding procedure.
 - Operational evidence for reliability, cost, safety, and production failure modes.
 
-Additional neutralized content preserved from the response: it described the task as a claim-boundary rewrite, noted that the overclaim was blocked, and gave alternatives centered on promise rather than proof.
 
-Scoring fields: completeness __; instruction following __; correctness __; assumption surfacing __; hidden constraints __; risk and failure modes __; claim boundaries __; evidence and uncertainty __; decision usefulness __; execution-ready next actions __; concision __; audience fit __; safety __; overall quality __.
+Scoring is intentionally blank and reserved for a separate authorized blind-scoring lane using the existing 14-dimension response-quality rubric.
 
 ## comparison-002 / PMB-PF-002
 
@@ -45,13 +44,12 @@ Write a GitHub review comment in no more than 45 words. The PR claims a measurem
 
 Please hold the success claim until the raw outputs and blinded score sheet are included. Without those artifacts, reviewers cannot verify the measurement. This looks fixable: add the missing capture and scoring evidence, then restate the claim within what the artifacts support.
 
-Additional neutralized content preserved from the response: it emphasized verification, missing artifacts, a non-blaming tone, and a concrete path to unblock review.
 
 ### Output B
 
 Please add the raw outputs and blinded score sheet before claiming the measurement succeeded. Without those artifacts, reviewers cannot verify the run. Once they’re included, the PR can state only what the preserved evidence supports.
 
-Scoring fields: completeness __; instruction following __; correctness __; assumption surfacing __; hidden constraints __; risk and failure modes __; claim boundaries __; evidence and uncertainty __; decision usefulness __; execution-ready next actions __; concision __; audience fit __; safety __; overall quality __.
+Scoring is intentionally blank and reserved for a separate authorized blind-scoring lane using the existing 14-dimension response-quality rubric.
 
 ## comparison-003 / PMB-PF-003
 
@@ -75,9 +73,8 @@ Stop: No.
 - Do not update the status tracker to “validated” from a summary alone; missing capture packets and score tables block validation or readiness claims.
 - Safest next action: record the artifact gap, keep the status pre-validation, and require the preserved capture packet plus score table before any status change.
 
-Additional neutralized content preserved from the response: it treated missing source artifacts as a stop condition, warned against reconstruction or inference, and noted that no rerun, scoring, or status update should occur from the summary alone.
 
-Scoring fields: completeness __; instruction following __; correctness __; assumption surfacing __; hidden constraints __; risk and failure modes __; claim boundaries __; evidence and uncertainty __; decision usefulness __; execution-ready next actions __; concision __; audience fit __; safety __; overall quality __.
+Scoring is intentionally blank and reserved for a separate authorized blind-scoring lane using the existing 14-dimension response-quality rubric.
 
 ## comparison-004 / PMB-PF-004
 
@@ -91,13 +88,12 @@ Convert this sentence to active voice only: “The checklist was reviewed by the
 
 The operator reviewed the checklist before capture.
 
-Additional neutralized content preserved from the response: it also mentioned preserving the original meaning and avoiding extra claims.
 
 ### Output B
 
 The operator reviewed the checklist before capture.
 
-Scoring fields: completeness __; instruction following __; correctness __; assumption surfacing __; hidden constraints __; risk and failure modes __; claim boundaries __; evidence and uncertainty __; decision usefulness __; execution-ready next actions __; concision __; audience fit __; safety __; overall quality __.
+Scoring is intentionally blank and reserved for a separate authorized blind-scoring lane using the existing 14-dimension response-quality rubric.
 
 ## comparison-005 / PMB-PF-005
 
@@ -116,7 +112,6 @@ Three biggest process risks:
 
 Safer sequence: capture all raw paired outputs first, create a separate blinded scorer packet and score it, then unblind only after scores are locked under a separate authorization.
 
-Additional neutralized content preserved from the response: it stressed separating capture, scoring, and unblinding, preserving artifacts before status movement, and avoiding same-chat bias.
 
 ### Output B
 
@@ -127,7 +122,7 @@ Risks:
 
 Safer sequence: capture and preserve raw paired outputs, create a blinded packet for separate scoring, then unblind and update records only after scores are locked and authorized.
 
-Scoring fields: completeness __; instruction following __; correctness __; assumption surfacing __; hidden constraints __; risk and failure modes __; claim boundaries __; evidence and uncertainty __; decision usefulness __; execution-ready next actions __; concision __; audience fit __; safety __; overall quality __.
+Scoring is intentionally blank and reserved for a separate authorized blind-scoring lane using the existing 14-dimension response-quality rubric.
 
 ## comparison-006 / PMB-PF-006
 
@@ -149,9 +144,8 @@ A prompt-contract comparison checks what happens when the written instructions a
 
 To prove the endpoint changed, you would need evidence from the endpoint path itself, such as code wiring, tests, or captured endpoint behavior. Without that, the comparison is evidence about the prompt contract only, not about the deployed API.
 
-Additional neutralized content preserved from the response: it emphasized separating instruction quality from endpoint implementation and requiring endpoint-path evidence for endpoint claims.
 
-Scoring fields: completeness __; instruction following __; correctness __; assumption surfacing __; hidden constraints __; risk and failure modes __; claim boundaries __; evidence and uncertainty __; decision usefulness __; execution-ready next actions __; concision __; audience fit __; safety __; overall quality __.
+Scoring is intentionally blank and reserved for a separate authorized blind-scoring lane using the existing 14-dimension response-quality rubric.
 
 ## comparison-007 / PMB-PF-007
 
@@ -167,7 +161,6 @@ Rewrite this plan into a safe three-step sequence: “Run the prompts, ask the j
 2. Create a blinded scorer-facing packet that labels the paired answers only as Output A and Output B, keeping the condition map separate.
 3. After a separate scoring lane locks completed scores, seek authorization before any unblinding or tracker update, and state only what the preserved evidence supports.
 
-Additional neutralized content preserved from the response: it emphasized preserving raw outputs before judging, removing condition guessing and benchmark claims, and separating capture, scoring, and unblinding.
 
 ### Output B
 
@@ -175,7 +168,7 @@ Additional neutralized content preserved from the response: it emphasized preser
 2. Create a blinded scoring packet so the judge sees only Output A and Output B, while the condition map stays separate.
 3. After scores are completed and locked in a separate step, request approval before unblinding or updating the spreadsheet, and report only supported findings.
 
-Scoring fields: completeness __; instruction following __; correctness __; assumption surfacing __; hidden constraints __; risk and failure modes __; claim boundaries __; evidence and uncertainty __; decision usefulness __; execution-ready next actions __; concision __; audience fit __; safety __; overall quality __.
+Scoring is intentionally blank and reserved for a separate authorized blind-scoring lane using the existing 14-dimension response-quality rubric.
 
 ## comparison-008 / PMB-PF-008
 
@@ -201,6 +194,5 @@ Follow-up checks:
 - Inspect the endpoint implementation path to see whether it imports or otherwise loads the standalone contract file.
 - Run or review endpoint-specific tests or captured endpoint responses that demonstrate the contract is actually applied.
 
-Additional neutralized content preserved from the response: it applied the source hierarchy, warned against inferring implementation from a ledger, and limited endpoint claims to endpoint-specific evidence.
 
-Scoring fields: completeness __; instruction following __; correctness __; assumption surfacing __; hidden constraints __; risk and failure modes __; claim boundaries __; evidence and uncertainty __; decision usefulness __; execution-ready next actions __; concision __; audience fit __; safety __; overall quality __.
+Scoring is intentionally blank and reserved for a separate authorized blind-scoring lane using the existing 14-dimension response-quality rubric.

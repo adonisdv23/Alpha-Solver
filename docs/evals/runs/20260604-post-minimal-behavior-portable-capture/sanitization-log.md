@@ -14,6 +14,10 @@ Status: operator-only sanitization record. This file is not scorer-facing.
 - Sanitization was applied symmetrically: both outputs were rendered under neutral Output A / Output B labels with no source labels.
 - The operator-only assignment map was kept out of the scorer-facing packet.
 
+## Pre-merge scorer-facing refinement
+
+A pre-merge refinement removed the repeated scorer-facing phrase `Additional neutralized content preserved from the response:` because that sanitizer-added marker appeared only on one side of the blinded comparisons and could reveal condition identity. Raw outputs remain unchanged. The operator-only map remains unchanged. No scoring occurred. No unblinding occurred. Only scorer-facing sanitizer wording was changed. Substantive user-facing answer content was preserved where possible; non-answer envelope scaffolding and identity-leaking markers were removed or neutralized.
+
 ## Per-comparison notes
 
 | Comparison ID | Prompt ID | Sanitization notes |
