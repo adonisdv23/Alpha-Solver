@@ -1,0 +1,4 @@
+No.
+
+- Do not mark it validated until the underlying capture packet and score table are found or recreated through an approved, fully documented run.
+- Safest next action: mark the evidence as incomplete and request the missing artifacts before updating the tracker.

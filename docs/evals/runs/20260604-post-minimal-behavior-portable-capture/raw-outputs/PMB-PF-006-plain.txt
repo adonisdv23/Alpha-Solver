@@ -1,0 +1,3 @@
+A prompt-contract comparison tests the instructions themselves: if you give a model a certain set of instructions, do the answers change in the expected way? That can be useful, but it is not the same as showing that an API endpoint is using those instructions.
+
+To prove the endpoint changed, you need evidence from the endpoint’s implementation or behavior, such as code wiring, tests, or captured API responses. Otherwise, the result only supports a claim about the prompt-contract test.

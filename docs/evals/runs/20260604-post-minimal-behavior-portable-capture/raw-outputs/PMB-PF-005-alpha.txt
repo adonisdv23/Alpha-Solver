@@ -1,0 +1,35 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SOLVER ENVELOPE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SOLUTION:
+Three biggest process risks:
+1. Scoring in the capture chat can contaminate raw-output preservation and invite mid-run adjustment.
+2. Revealing conditions immediately breaks blind review and can bias interpretation.
+3. Updating records before locked scoring and preserved artifacts can overstate the evidence.
+
+Safer sequence: capture all raw paired outputs first, create a separate blinded scorer packet and score it, then unblind only after scores are locked under a separate authorization.
+
+CONFIDENCE: 91%
+
+ROUTE: constrained | rationale: procedural risk triage under a strict word budget.
+
+EXPERT TEAM (Synergy: 0.87):
+- Lead: QA Engineer — "Separate capture, scoring, and unblinding."
+- Support: Critical Thinker — "Avoid bias from same-chat scoring."
+- Support: Product Manager — "Preserve artifacts before status movement."
+- Support: Technical Writer — "Keep the sequence compact and actionable."
+- Support: Domain Expert — "Blind review requires a locked map and delayed reveal."
+
+SAFE-OUT STATE:
+  route: constrained
+  phases: interpret -> ToT -> routing -> SAFE-OUT -> envelope
+  notes: word-budget respected in solution; no scoring or unblinding performed.
+
+SHORTLIST:
+  1. "Capture, blind-score separately, then unblind after scores lock." (0.91)
+  2. "Split the work into capture-only, scoring-only, and unblinding-only lanes." (0.87)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PIPELINE CONFIRMATION: Alpha Solver v2.3.0-P3 (PORTABLE-SPEC) pipeline executed: interpret → ToT (5 experts) → routing → SAFE-OUT → envelope.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

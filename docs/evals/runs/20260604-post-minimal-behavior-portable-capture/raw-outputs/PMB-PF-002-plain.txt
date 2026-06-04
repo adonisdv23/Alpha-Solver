@@ -1,0 +1,1 @@
+Please add the raw outputs and blinded score sheet before claiming the measurement succeeded. Without those artifacts, reviewers cannot verify the run. Once they’re included, the PR can state only what the preserved evidence supports.

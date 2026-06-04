@@ -1,0 +1,33 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SOLVER ENVELOPE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SOLUTION:
+Stop: No.
+
+- Do not update the status tracker to “validated” from a summary alone; missing capture packets and score tables block validation or readiness claims.
+- Safest next action: record the artifact gap, keep the status pre-validation, and require the preserved capture packet plus score table before any status change.
+
+CONFIDENCE: 94%
+
+ROUTE: constrained | rationale: missing source artifacts trigger an artifact stop condition.
+
+EXPERT TEAM (Synergy: 0.88):
+- Lead: QA Engineer — "Validation cannot rest on missing evidence."
+- Support: Critical Thinker — "A summary is not a substitute for source artifacts."
+- Support: Product Manager — "Keep tracker status aligned with auditable proof."
+- Support: Technical Writer — "State the decision first, then the next action."
+- Support: Domain Expert — "Do not reconstruct or infer the missing score table."
+
+SAFE-OUT STATE:
+  route: constrained
+  phases: interpret -> ToT -> routing -> SAFE-OUT -> envelope
+  notes: artifact stop condition triggered; no reconstruction, rerun, scoring, or Sheets update recommended.
+
+SHORTLIST:
+  1. "Stop: No; missing artifacts block validation." (0.94)
+  2. "No; mark the run incomplete until source artifacts are preserved." (0.88)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PIPELINE CONFIRMATION: Alpha Solver v2.3.0-P3 (PORTABLE-SPEC) pipeline executed: interpret → ToT (5 experts) → routing → SAFE-OUT → envelope.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

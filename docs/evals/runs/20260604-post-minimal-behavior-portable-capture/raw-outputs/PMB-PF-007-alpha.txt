@@ -1,0 +1,32 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SOLVER ENVELOPE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SOLUTION:
+1. Run the frozen prompts under both comparison conditions and preserve the raw outputs exactly before any judging.
+2. Create a blinded scorer-facing packet that labels the paired answers only as Output A and Output B, keeping the condition map separate.
+3. After a separate scoring lane locks completed scores, seek authorization before any unblinding or tracker update, and state only what the preserved evidence supports.
+
+CONFIDENCE: 92%
+
+ROUTE: constrained | rationale: safe three-step sequence that preserves blinding and removes unsupported claims.
+
+EXPERT TEAM (Synergy: 0.87):
+- Lead: QA Engineer — "Preserve raw outputs before judging."
+- Support: Critical Thinker — "Remove condition guessing and benchmark claims."
+- Support: Product Manager — "Keep status updates downstream of locked evidence."
+- Support: Technical Writer — "Turn the unsafe plan into three clear steps."
+- Support: Domain Expert — "Separate capture, scoring, and unblinding lanes."
+
+SAFE-OUT STATE:
+  route: constrained
+  phases: interpret -> ToT -> routing -> SAFE-OUT -> envelope
+  notes: unsafe steps removed; no score, unblinding, spreadsheet update, or benchmark claim included.
+
+SHORTLIST:
+  1. "Capture raw outputs, blind the packet, score later before authorized unblinding." (0.92)
+  2. "Separate comparison, blind review, and evidence-limited reporting." (0.88)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PIPELINE CONFIRMATION: Alpha Solver v2.3.0-P3 (PORTABLE-SPEC) pipeline executed: interpret → ToT (5 experts) → routing → SAFE-OUT → envelope.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
