@@ -22,7 +22,7 @@ PR #270 interpreted the post-improvement result as Alpha 314 / Plain 303 / Alpha
 
 - Strengthened answer-first wording for direct answers, concise rewrites, direct extractions, short confirmations, and next actions.
 - Added low-headroom restraint wording for simple rewrites, formatting, reviewer-facing edits, and one-step admin tasks.
-- Resolved the envelope-vs-low-headroom conflict by adding a compact-envelope / minimal-section mode: low-headroom tasks keep SolverEnvelope labels while allowing non-essential sections such as EXPERT TEAM and SHORTLIST to stay minimal.
+- Resolved the envelope-vs-low-headroom conflict by adding a compact-envelope / minimal-section mode: low-headroom tasks keep SolverEnvelope labels while allowing non-essential sections such as EXPERT TEAM and SHORTLIST to stay minimal, with default expanded counts applying only outside compact-envelope mode.
 - Added compact caveat and task-relevant risk wording to suppress generic risk boilerplate while preserving truthful uncertainty and claim boundaries.
 - Kept artifact stop conditions, evidence-boundary behavior, and safe claim wording intact.
 

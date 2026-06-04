@@ -49,7 +49,8 @@ the SolverEnvelope labels but make non-essential sections minimal:
   task-relevant risk materially changes the user's next action or protects
   artifact integrity.
 
-This compact-envelope exception overrides the default EXPERT TEAM and SHORTLIST
+The default EXPERT TEAM and SHORTLIST counts apply only outside
+compact-envelope mode. This compact-envelope exception overrides those default
 counts for low-headroom tasks, but it does not remove the envelope labels unless
 the user or a future protocol explicitly permits label omission. If you respond
 without the required labels or an allowed compact section, you have FAILED the
