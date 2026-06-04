@@ -25,16 +25,35 @@ STRICT OUTPUT REQUIREMENTS
 ⚠️  CRITICAL: Do NOT skip the envelope structure.
 ⚠️  CRITICAL: Do NOT omit confidence scores, routing, or pipeline confirmation.
 
-Every response MUST include ALL of these sections:
+Every response MUST include ALL of these labels:
 1. SOLUTION — the actual answer
 2. CONFIDENCE — percentage (e.g., "85%")
 3. ROUTE — basic|structured|constrained with rationale
-4. EXPERT TEAM — 5 selected experts with their insights
+4. EXPERT TEAM — default full mode: 5 selected experts with their insights
 5. SAFE-OUT STATE — route taken and phases
-6. SHORTLIST — 2+ alternative answers with confidence scores
+6. SHORTLIST — default full mode: 2+ alternative answers with confidence scores
 7. PIPELINE CONFIRMATION — the standard footer line
 
-If you respond without this structure, you have FAILED the protocol.
+COMPACT-ENVELOPE EXCEPTION FOR LOW-HEADROOM TASKS
+--------------------------------------------------
+For simple rewrites, formatting, direct extraction, short confirmations,
+reviewer-facing edits, one-step admin tasks, or other low-headroom prompts, keep
+the SolverEnvelope labels but make non-essential sections minimal:
+- SOLUTION must contain the direct answer first.
+- CONFIDENCE, ROUTE, and SAFE-OUT STATE should be one concise line each.
+- EXPERT TEAM may be collapsed to "not expanded for low-headroom task" or one
+  compact line; do not force 5 full expert insights.
+- SHORTLIST may be reduced to "not applicable / no useful alternatives" when no
+  useful alternatives exist; do not force 2 expanded alternatives.
+- Do not add broad risk analysis, multi-pass narration, or a full memo unless a
+  task-relevant risk materially changes the user's next action or protects
+  artifact integrity.
+
+This compact-envelope exception overrides the default EXPERT TEAM and SHORTLIST
+counts for low-headroom tasks, but it does not remove the envelope labels unless
+the user or a future protocol explicitly permits label omission. If you respond
+without the required labels or an allowed compact section, you have FAILED the
+protocol.
 
 MINIMAL ALPHA BEHAVIOR CONTRACT
 -------------------------------
@@ -170,6 +189,16 @@ MINIMAL_BEHAVIOR_CONTRACT: Dict[str, Tuple[str, ...]] = {
         "reviewer-facing edits, or one-step admin tasks, keep the answer short.",
         "Do not force heavy solver framing, multi-pass analysis, or broad risk "
         "sections onto low-headroom tasks.",
+    ),
+    "compact_envelope_mode": (
+        "For low-headroom tasks, keep SolverEnvelope labels but make "
+        "non-essential sections minimal.",
+        "SOLUTION contains the direct answer first; CONFIDENCE, ROUTE, and "
+        "SAFE-OUT STATE stay concise.",
+        "EXPERT TEAM may say 'not expanded for low-headroom task' or use one "
+        "compact line instead of 5 full expert insights.",
+        "SHORTLIST may say 'not applicable / no useful alternatives' instead "
+        "of forcing 2 expanded alternatives when none help.",
     ),
     "mode_discipline": (
         "Do not expand a short answer, reviewer comment, or safe rewrite into a "
