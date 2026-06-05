@@ -15,3 +15,12 @@ from .portable_contract import (  # noqa: F401
     load_portable_contract,
     run_fake_local_llm_contract_proof,
 )
+from .provider_adapter import (  # noqa: F401
+    LocalLLMAdapterMessage,
+    LocalLLMAdapterRequest,
+    LocalLLMAdapterResult,
+    LocalLLMProviderBackend,
+    StubLocalLLMProviderBackend,
+    build_local_llm_adapter_request,
+    run_local_llm_provider_adapter,
+)
