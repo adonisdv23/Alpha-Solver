@@ -1,6 +1,6 @@
 # Evidence Boundary
 
-This packet may prepare a future local smoke packet only.
+This packet may prepare a future local smoke packet only, as a blocked draft reference pending endpoint-locality hardening.
 
 This packet is not:
 
@@ -20,4 +20,4 @@ This packet is not:
 - exact billing evidence;
 - provider orchestration evidence.
 
-Any later smoke result must be labeled separately by the future execution lane and must not retroactively change this packet boundary.
+Any later smoke result must be blocked until localhost or loopback endpoint validation is implemented, reviewed, and separately authorized.

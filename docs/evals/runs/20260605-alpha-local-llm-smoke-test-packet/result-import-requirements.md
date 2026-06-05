@@ -1,10 +1,11 @@
 # Result Import Requirements
 
-If a later approved lane executes smoke, result import into repository docs must be sanitized and bounded.
+If a later approved lane executes smoke after endpoint-locality hardening, result import into repository docs must be sanitized and bounded.
 
 ## Required imports
 
 - Future lane ID and approval reference.
+- Endpoint-locality hardening review reference.
 - Exact command as executed, with operator-supplied fields documented.
 - Exit code and pass/fail/error classification.
 - Sanitized endpoint pattern limited to localhost loopback.

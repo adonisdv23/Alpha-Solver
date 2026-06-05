@@ -18,6 +18,12 @@
 | Empty output | `empty_model_output_non_evidence` or proof-seam `empty_output_non_evidence`. |
 | Non-assistant role | `malformed_response_non_evidence` parser error. |
 
+## Unresolved fail-closed case
+
+Endpoint-locality enforcement is not yet covered. A later smoke lane must not run until the backend fails closed on non-loopback / non-local endpoint URLs before invoking any transport.
+
+The future hardening lane must add tests proving hosted URLs such as `https://example.com/api/chat` fail closed without transport invocation.
+
 ## Boundary
 
 All reviewed failures are offline-only. They do not prove model execution, local service availability, runtime integration, or answer quality.

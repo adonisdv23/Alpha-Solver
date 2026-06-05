@@ -2,8 +2,9 @@
 
 - [x] Reviewed PR #302 implementation as offline adapter/parser implementation only.
 - [x] Confirmed the implementation remains behind an injected backend seam.
-- [x] Confirmed default-off behavior when no transport is injected.
-- [x] Confirmed no-provider-by-default behavior.
+- [x] Confirmed default construction has no transport and fails closed when no transport is injected.
+- [ ] Endpoint-locality enforcement is not yet implemented for injected `endpoint_url` values.
+- [ ] No-provider/default-off locality is not fully passed for future smoke progression.
 - [x] Confirmed default tests do not require network or provider calls.
 - [x] Confirmed non-object response fixtures fail closed with `malformed_response_non_evidence`.
 - [x] Confirmed timeout failure returns `timeout_non_evidence`.

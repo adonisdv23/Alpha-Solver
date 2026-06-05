@@ -1,11 +1,9 @@
 # Selected Next Lane
 
-Selected lane:
+Selected corrective next lane:
 
-`ALPHA-LOCAL-LLM-SMOKE-TEST-PACKET-001`
-
-Status: prepared in this same PR.
+`ALPHA-LOCAL-LLM-ENDPOINT-LOCALITY-HARDENING-001`
 
 ## Rationale
 
-The authorization decision permits packet preparation only. It does not permit execution. The packet documents the exact future boundary and required operator-supplied fields.
+Smoke execution cannot proceed from this PR because endpoint-locality fail-closed enforcement is unresolved. The next lane must implement and review localhost or loopback endpoint validation before any later smoke authorization can be reconsidered.

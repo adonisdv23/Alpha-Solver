@@ -1,14 +1,16 @@
 # Smoke Packet Preservation Checklist
 
-- [x] Prepared packet only.
+- [x] Kept packet as draft/prepared reference only.
+- [x] Marked packet blocked pending endpoint-locality hardening.
 - [x] Did not execute smoke.
 - [x] Included command template only.
 - [x] Marked command fields as operator-supplied placeholders.
 - [x] Did not include an actual model name.
 - [x] Used only a localhost loopback endpoint pattern.
-- [x] Did not include provider access material or access material.
+- [x] Did not include provider access material.
 - [x] Did not include private endpoint URLs or nonpublic network endpoints.
 - [x] Required later explicit operator approval before execution.
+- [x] Required endpoint-locality hardening before execution.
 - [x] Required finite timeout.
 - [x] Required default-skipped smoke behavior.
 - [x] Prohibited hosted fallback.

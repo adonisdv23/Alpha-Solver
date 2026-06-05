@@ -2,9 +2,9 @@
 
 - [x] Did not run smoke.
 - [x] Did not authorize direct smoke execution in this PR.
-- [x] Authorized packet preparation only.
-- [x] Selected `ALPHA-LOCAL-LLM-SMOKE-TEST-PACKET-001`.
-- [x] Marked the packet as prepared in this same PR.
+- [x] Kept packet preparation as a blocked draft reference only.
+- [x] Selected `ALPHA-LOCAL-LLM-ENDPOINT-LOCALITY-HARDENING-001` as the corrective next lane.
+- [x] Required endpoint-locality hardening before any future smoke execution.
 - [x] Required later explicit operator approval before execution.
 - [x] Required localhost-only endpoint for any future execution.
 - [x] Required exact operator-supplied model name in the future lane.

@@ -2,7 +2,7 @@
 
 Do not run this command in this PR.
 
-All angle-bracket values are operator-supplied fields for a later explicit execution lane.
+This template is blocked until endpoint-locality hardening is merged and reviewed. All angle-bracket values are operator-supplied fields for a later explicit execution lane.
 
 ```bash
 ALPHA_LOCAL_LLM_SMOKE=1 \
@@ -14,10 +14,11 @@ python -m pytest -q '<FUTURE_DEFAULT_SKIPPED_SMOKE_TEST_PATH>' -k '<FUTURE_SMOKE
 
 ## Template constraints
 
+- Endpoint-locality hardening must fail closed on non-loopback / non-local endpoint URLs before any transport invocation.
 - Endpoint must remain localhost-only using a loopback host pattern.
 - Model name must be supplied by the operator in the future execution lane.
 - Timeout must be finite.
 - The referenced smoke test must be skipped by default unless the explicit opt-in flag is set.
-- No provider access material or access material may be passed.
+- No provider access material may be passed.
 - No hosted service fallback may be enabled.
 - The command is a template only and has not been executed.

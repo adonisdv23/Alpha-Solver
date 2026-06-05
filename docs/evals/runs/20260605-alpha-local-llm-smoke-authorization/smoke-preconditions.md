@@ -2,6 +2,9 @@
 
 A future execution lane must require all of the following before any local smoke command is run:
 
+- Endpoint-locality hardening has been implemented and reviewed.
+- Backend fails closed on non-loopback / non-local endpoint URLs before invoking any transport.
+- Tests prove hosted URLs such as `https://example.com/api/chat` fail closed without transport invocation.
 - Explicit operator approval naming the execution lane.
 - Localhost-only endpoint using a loopback host pattern.
 - Exact model name supplied by the operator in the future execution lane.

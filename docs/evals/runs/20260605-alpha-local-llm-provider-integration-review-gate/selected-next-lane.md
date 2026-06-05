@@ -2,8 +2,8 @@
 
 Selected next lane:
 
-`ALPHA-LOCAL-LLM-SMOKE-AUTHORIZATION-001`
+`ALPHA-LOCAL-LLM-ENDPOINT-LOCALITY-HARDENING-001`
 
 ## Rationale
 
-The offline implementation review gate passed for adapter/parser inspection. The next decision point is not smoke execution; it is a separate authorization boundary that decides what, if anything, may be prepared for future smoke work.
+The offline implementation review gate is blocked / conditional for smoke progression because endpoint-locality fail-closed enforcement is not yet implemented for injected endpoint URLs. The next lane must harden localhost or loopback endpoint validation and add tests proving non-local hosted URLs fail closed before any transport invocation.
