@@ -27,9 +27,13 @@ This decision is based only on these imported results and interpretation files:
 
 ## Selected next lane
 
-`ALPHA-LIMITED-OPERATOR-TEST-TARGETED-PORTABLE-CONTRACT-REFINEMENT-OUTPUT-FORMAT-CONTAMINATION-001`
+`ALPHA-PORTABLE-CONTRACT-FOLLOWUP-REFINEMENT-001`
 
 Family: targeted portable-contract refinement for output-format contamination.
+
+## Correction note
+
+PR #292 originally selected a bespoke lane ID. This corrective PR aligns the selected next lane with the pre-committed post-results framework. The decision substance is unchanged: targeted portable-contract refinement for output-format contamination. No ratings, totals, evidence, interpretation, or blocked-work status changed.
 
 ## Decision summary
 
