@@ -65,6 +65,31 @@ class LocalLLMProviderBackend(Protocol):
         """Return text for an adapter request."""
 
 
+class OllamaJSONTransport(Protocol):
+    """Injected JSON transport for an Ollama-style local HTTP endpoint.
+
+    Default adapter construction does not provide a transport, so this protocol
+    keeps network execution opt-in and testable with offline fakes.
+    """
+
+    def __call__(
+        self,
+        *,
+        endpoint_url: str,
+        payload: Mapping[str, Any],
+        timeout_seconds: float,
+    ) -> Mapping[str, Any]:
+        """Return a decoded JSON response for a mapped Ollama-style payload."""
+
+
+class LocalLLMProviderAdapterError(PortableContractError):
+    """Fail-closed backend error carrying a stable adapter reason code."""
+
+    def __init__(self, reason_code: str, detail: str | None = None):
+        super().__init__(detail or reason_code)
+        self.reason_code = reason_code
+
+
 @dataclass
 class StubLocalLLMProviderBackend:
     """Offline stub backend that records requests and performs no I/O."""
@@ -78,6 +103,53 @@ class StubLocalLLMProviderBackend:
         if self.fail:
             raise PortableContractError("stub local LLM provider adapter failed")
         return self.output_text
+
+
+@dataclass
+class OllamaLocalHTTPBackend:
+    """Default-off Ollama-style local HTTP backend behind the injected seam.
+
+    The class maps Alpha Solver adapter requests to the Ollama ``/api/chat``
+    JSON shape and parses Ollama-style JSON responses. It performs no network
+    I/O unless an explicit transport callable is injected by a later approved
+    smoke lane. Offline tests inject fake transports only.
+    """
+
+    model: str
+    endpoint_url: str = "http://127.0.0.1:11434/api/chat"
+    timeout_seconds: float = 10.0
+    transport: OllamaJSONTransport | None = None
+    calls: list[LocalLLMAdapterRequest] = field(default_factory=list)
+    payloads: list[Mapping[str, Any]] = field(default_factory=list)
+
+    def generate(self, request: LocalLLMAdapterRequest) -> str:
+        self.calls.append(request)
+        payload = build_ollama_chat_payload(request, model=self.model)
+        self.payloads.append(payload)
+        if self.transport is None:
+            raise LocalLLMProviderAdapterError(
+                "provider_backend_disabled_non_evidence",
+                "Ollama-style backend requires an injected transport and is default-off",
+            )
+        try:
+            response = self.transport(
+                endpoint_url=self.endpoint_url,
+                payload=payload,
+                timeout_seconds=self.timeout_seconds,
+            )
+        except TimeoutError as exc:
+            raise LocalLLMProviderAdapterError("timeout_non_evidence", str(exc)) from exc
+        except ConnectionError as exc:
+            raise LocalLLMProviderAdapterError(
+                "connection_failure_non_evidence", str(exc)
+            ) from exc
+        except LocalLLMProviderAdapterError:
+            raise
+        except Exception as exc:
+            raise LocalLLMProviderAdapterError(
+                "backend_error_non_evidence", str(exc)
+            ) from exc
+        return parse_ollama_chat_response(response)
 
 
 def _normalize_mode(provider_mode: str) -> str:
@@ -138,6 +210,50 @@ def build_local_llm_adapter_request(
     )
 
 
+def build_ollama_chat_payload(
+    request: LocalLLMAdapterRequest,
+    *,
+    model: str,
+    stream: bool = False,
+    options: Mapping[str, Any] | None = None,
+) -> Mapping[str, Any]:
+    """Map an adapter request to an Ollama-style ``/api/chat`` payload."""
+
+    if request.provider_mode != _LOCAL_LLM_ADAPTER_MODE:
+        raise LocalLLMProviderAdapterError("provider_mode_mismatch_non_evidence")
+    if not model.strip():
+        raise LocalLLMProviderAdapterError("missing_model_non_evidence")
+    payload: dict[str, Any] = {
+        "model": model,
+        "messages": [
+            {"role": message.role, "content": message.content}
+            for message in request.messages
+        ],
+        "stream": stream,
+    }
+    if options is not None:
+        payload["options"] = dict(options)
+    return payload
+
+
+def parse_ollama_chat_response(response: Any) -> str:
+    """Extract assistant text from a static Ollama-style JSON response."""
+
+    if not isinstance(response, Mapping):
+        raise LocalLLMProviderAdapterError("malformed_response_non_evidence")
+    message = response.get("message")
+    if not isinstance(message, Mapping):
+        raise LocalLLMProviderAdapterError("malformed_response_non_evidence")
+    if message.get("role") not in {None, "assistant"}:
+        raise LocalLLMProviderAdapterError("malformed_response_non_evidence")
+    content = message.get("content")
+    if not isinstance(content, str):
+        raise LocalLLMProviderAdapterError("malformed_response_non_evidence")
+    if not content.strip():
+        raise LocalLLMProviderAdapterError("empty_model_output_non_evidence")
+    return content
+
+
 def _is_prompt_echo(output_text: str, request: LocalLLMAdapterRequest) -> bool:
     stripped = output_text.strip()
     return stripped in {request.user_prompt.strip(), request.system.strip()}
@@ -171,12 +287,13 @@ def run_local_llm_provider_adapter(
     try:
         output_text = backend.generate(request)
     except Exception as exc:  # injected-backend-only failure normalization
+        reason = getattr(exc, "reason_code", f"adapter_error:{exc.__class__.__name__}")
         return LocalLLMAdapterResult(
             request=request,
             output_text="",
             status="failed_closed",
-            reason=f"adapter_error:{exc.__class__.__name__}",
-            metadata=result_metadata,
+            reason=reason,
+            metadata={**result_metadata, "failure_label": "failed_closed_result"},
         )
 
     if not output_text.strip():
@@ -185,7 +302,7 @@ def run_local_llm_provider_adapter(
             output_text=output_text,
             status="failed_closed",
             reason="empty_model_output_non_evidence",
-            metadata=result_metadata,
+            metadata={**result_metadata, "failure_label": "failed_closed_result"},
         )
     if _is_prompt_echo(output_text, request):
         return LocalLLMAdapterResult(
@@ -193,7 +310,7 @@ def run_local_llm_provider_adapter(
             output_text=output_text,
             status="failed_closed",
             reason="prompt_echo_non_evidence",
-            metadata=result_metadata,
+            metadata={**result_metadata, "failure_label": "failed_closed_result"},
         )
 
     return LocalLLMAdapterResult(
