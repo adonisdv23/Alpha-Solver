@@ -11,7 +11,7 @@ Status: preservation checklist for this docs-only framework.
 - [x] The lane defines all required future outcome branches.
 - [x] Every outcome branch maps to exactly one next lane.
 - [x] The lane states that the future actual decision must select exactly one next lane based on imported evidence.
-- [x] Narrow success criteria are documented without readiness, quality, benchmark, production, billing, superiority, or orchestration claims.
+- [x] Narrow success criteria require a non-failed adapter result and exclude any `failed_closed` status or fail-closed label, without readiness, quality, benchmark, production, billing, superiority, or orchestration claims.
 - [x] Evidence-boundary language remains narrow.
 - [x] Blocked claims are documented.
 - [x] The recommended next lane is `ALPHA-LOCAL-LLM-SMOKE-RESULTS-IMPORT-001`.

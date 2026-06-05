@@ -10,7 +10,7 @@ A future actual decision must select exactly one next lane based on imported evi
 
 | Future imported outcome branch | Classification trigger for future evidence | Required next lane |
 | --- | --- | --- |
-| Passed cleanly | Imported evidence satisfies all narrow success criteria without fail-closed labels, skipped execution, blocked execution, timeout, connection failure, malformed response, empty output, prompt echo, system echo, endpoint locality failure, environment setup failure, or model availability failure. | `ALPHA-LOCAL-LLM-RUNTIME-INTEGRATION-PLANNING-001` |
+| Passed cleanly | Imported evidence satisfies all narrow success criteria with a non-failed adapter result and without `failed_closed` status, fail-closed labels, skipped execution, blocked execution, timeout, connection failure, malformed response, empty output, prompt echo, system echo, endpoint locality failure, environment setup failure, or model availability failure. | `ALPHA-LOCAL-LLM-RUNTIME-INTEGRATION-PLANNING-001` |
 | Failed due to endpoint locality | Imported evidence shows the command was not confined to a localhost or loopback endpoint, or endpoint locality validation failed closed. | `ALPHA-LOCAL-LLM-ENDPOINT-LOCALITY-REPAIR-001` |
 | Failed due to environment setup | Imported evidence shows the smoke could not run because required local environment setup was missing, invalid, or inconsistent before model interaction could be evaluated. | `ALPHA-LOCAL-LLM-SMOKE-ENVIRONMENT-RETRY-001` |
 | Failed due to model unavailable | Imported evidence shows the endpoint was reachable but the exact operator-supplied local model was unavailable, missing, unloaded, or not selectable. | `ALPHA-LOCAL-LLM-MODEL-AVAILABILITY-RETRY-001` |

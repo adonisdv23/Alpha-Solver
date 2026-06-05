@@ -34,7 +34,7 @@ If multiple symptoms are present, the future decision should choose the immediat
 7. malformed response;
 8. empty output;
 9. prompt or system echo;
-10. passed cleanly.
+10. passed cleanly only when no `failed_closed` status or fail-closed label is present.
 
 This priority order is not a result. It is only a tie-breaker for future imported evidence.
 
