@@ -26,3 +26,8 @@ It is not evidence for:
 ## Preserved source fields
 
 The final decision preserves `behavior_evidence: false`, `status: "non_evidence"`, and `reason: "local_llm_provider_adapter_wiring_only"` as the controlling evidence-boundary fields.
+
+
+## Import caveat
+
+The final decision preserves the missing literal terminal command and missing numeric exit code as caveats. It does not reconstruct the command and does not import or invent a numeric exit code.

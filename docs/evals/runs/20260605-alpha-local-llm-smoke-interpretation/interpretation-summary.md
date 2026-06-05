@@ -11,3 +11,10 @@ The raw response artifact also preserves assistant content `OK`. The raw respons
 ## Interpretation limits
 
 The `done_reason: "length"` caveat is not interpreted as a readiness, quality, runtime, benchmark, or orchestration claim. The imported adapter result remains `status: "non_evidence"` with `behavior_evidence: false`.
+
+
+## Import caveat
+
+The interpretation preserves the import caveat that the pasted artifact does not separately include the literal terminal command text or a numeric process exit code. No numeric exit code is imported, and the missing command/exit-code fields are not reconstructed.
+
+This caveat limits the interpretation to the preserved executed artifact: `executed: true`, `exception: null`, completed timestamps, stdout-equivalent generated output, sanitized request artifact, and raw response artifact.

@@ -16,6 +16,8 @@ Lane ID: `ALPHA-LOCAL-LLM-SMOKE-INTERPRETATION-001`
 - Raw assistant content: `OK`
 - Raw response completion marker: `done: true`
 - Raw response caveat: `done_reason: "length"`
+- Literal terminal command: not separately preserved in the pasted artifact; not reconstructed
+- Numeric process exit code: not separately preserved in the pasted artifact; no numeric exit code imported
 
 ## Observed outcome statement
 

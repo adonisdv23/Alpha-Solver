@@ -9,3 +9,8 @@ This interpretation uses only the imported local smoke evidence. It does not use
 ## Explicit non-expansion
 
 This interpretation is not evidence for hosted providers, `/v1/solve`, dashboard preview, runtime integration, MVP status, production use, Alpha quality, Alpha-superiority claims, Batch C, benchmark results, billing, provider orchestration, or broad local-model quality.
+
+
+## Missing terminal metadata caveat
+
+The interpretation does not reconstruct the literal terminal command text or numeric process exit code. Both remain absent from the pasted artifact and are preserved as caveats.

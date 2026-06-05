@@ -12,3 +12,5 @@ Lane ID: `ALPHA-LOCAL-LLM-SMOKE-INTERPRETATION-001`
 - [x] Preserves raw response `done_reason: "length"` as a caveat only.
 - [x] Does not infer local-model quality.
 - [x] Does not infer runtime, product, benchmark, billing, or orchestration readiness.
+- [x] Preserves missing literal terminal command as an import caveat.
+- [x] Preserves missing numeric exit code as an import caveat and does not invent one.

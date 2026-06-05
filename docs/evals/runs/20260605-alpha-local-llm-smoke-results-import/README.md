@@ -19,3 +19,7 @@ This folder imports the pasted `ALPHA-LOCAL-LLM-SMOKE-TEST-EXECUTION-001.md` evi
 ## Evidence boundary
 
 This import preserves local smoke evidence only. It does not expand the evidence boundary beyond the pasted execution artifact.
+
+## Import caveat
+
+The pasted artifact does not separately preserve the literal terminal command text or a numeric process exit code. Those fields are not marked complete, no numeric exit code is imported, and neither field is reconstructed. The import proceeds only because the artifact records `executed: true`, `exception: null`, completed timestamps, stdout-equivalent content, a sanitized request artifact, and a raw response artifact.
