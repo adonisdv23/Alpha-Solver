@@ -10,7 +10,7 @@ Exactly one next lane is selected:
 
 ## Scope of selected next lane
 
-The selected next lane should implement the explicit, default-off, localhost-only hybrid local LLM mode described by this specification package, while preserving the blocked surfaces and evidence boundaries defined here.
+The selected next lane should implement the explicit, default-off, localhost-only hybrid local LLM mode described by the canonical contract `.specs/LOCAL-LLM-RUNTIME-INTEGRATION-001.md`, while using this docs/evals package as the lane record and supporting package and preserving the blocked surfaces and evidence boundaries defined here.
 
 ## Non-selections
 

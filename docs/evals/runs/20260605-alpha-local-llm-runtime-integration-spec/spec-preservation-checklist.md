@@ -5,6 +5,8 @@ Lane ID: `ALPHA-LOCAL-LLM-RUNTIME-INTEGRATION-SPEC-001`
 ## Scope checks
 
 - [x] Docs-only package created under `docs/evals/runs/20260605-alpha-local-llm-runtime-integration-spec/`.
+- [x] Canonical implementation contract registered at `.specs/LOCAL-LLM-RUNTIME-INTEGRATION-001.md`.
+- [x] Future implementation lanes must reference `.specs/LOCAL-LLM-RUNTIME-INTEGRATION-001.md` as the canonical contract.
 - [x] No source code changes are authorized by this package.
 - [x] No test code changes are authorized by this package.
 - [x] No runtime implementation is included.
@@ -43,6 +45,10 @@ Lane ID: `ALPHA-LOCAL-LLM-RUNTIME-INTEGRATION-SPEC-001`
 - [x] This package is not `/v1/solve` readiness.
 - [x] This package is not dashboard preview readiness.
 - [x] This package is not MVP validation, production readiness, benchmark evidence, provider orchestration evidence, or Alpha superiority evidence.
+
+## Registry checks
+
+- [x] `.specs/INDEX.md` includes `LOCAL-LLM-RUNTIME-INTEGRATION-001.md`.
 
 ## Next-lane check
 

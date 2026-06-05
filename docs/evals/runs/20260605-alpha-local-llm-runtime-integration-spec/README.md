@@ -2,12 +2,13 @@
 
 Lane ID: `ALPHA-LOCAL-LLM-RUNTIME-INTEGRATION-SPEC-001`
 
-This docs-only package converts prior local LLM planning and safety-gate scaffold material into a concrete specification for a later implementation lane.
+This docs-only package records the evaluation/specification lane and supporting material for the canonical implementation contract in `.specs/LOCAL-LLM-RUNTIME-INTEGRATION-001.md`.
 
 ## Package status
 
 - Scope: specification only.
 - Allowed file area: `docs/evals/runs/20260605-alpha-local-llm-runtime-integration-spec/`.
+- Canonical implementation contract: `.specs/LOCAL-LLM-RUNTIME-INTEGRATION-001.md`.
 - Source changes: none authorized here.
 - Test changes: none authorized here.
 - Provider, `/v1/solve`, dashboard, and runtime behavior changes: none authorized here.
@@ -43,6 +44,10 @@ This package is derived from the following existing repository materials:
 13. `evidence-boundary.md`
 14. `spec-preservation-checklist.md`
 15. `selected-next-lane.md`
+
+## Canonical contract
+
+Future implementation lanes must reference `.specs/LOCAL-LLM-RUNTIME-INTEGRATION-001.md` as the canonical contract. This docs/evals package remains the lane record and supporting package.
 
 ## Selected backend strategy
 

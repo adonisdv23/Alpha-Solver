@@ -6,7 +6,7 @@ Lane ID: `ALPHA-LOCAL-LLM-RUNTIME-INTEGRATION-SPEC-001`
 
 This PR is a runtime integration specification only.
 
-It records a selected backend strategy, contracts, implementation boundaries, and future test/smoke requirements for the selected next lane.
+It records the docs/evals lane record and supporting package for the canonical implementation contract in `.specs/LOCAL-LLM-RUNTIME-INTEGRATION-001.md`, including selected strategy, boundaries, and future test/smoke requirements for the selected next lane.
 
 ## What this PR is not
 

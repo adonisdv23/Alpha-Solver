@@ -4,11 +4,11 @@ Lane ID: `ALPHA-LOCAL-LLM-RUNTIME-INTEGRATION-SPEC-001`
 
 ## Boundary purpose
 
-This document defines the minimal file-change boundary for the future implementation lane. It does not authorize changes in this docs-only lane.
+This document records the docs/evals supporting view of the minimal file-change boundary for the future implementation lane. The canonical implementation contract is `.specs/LOCAL-LLM-RUNTIME-INTEGRATION-001.md`. This document does not authorize changes in this docs-only lane.
 
 ## Minimal future implementation boundary
 
-The future implementation lane should prefer the smallest file set needed to wire explicit local LLM mode while preserving default-off behavior. Expected candidate files are:
+Future implementation lanes must reference `.specs/LOCAL-LLM-RUNTIME-INTEGRATION-001.md` as the canonical contract and should prefer the smallest file set needed to wire explicit local LLM mode while preserving default-off behavior. Expected candidate files are:
 
 - `alpha/local_llm/provider_adapter.py` for endpoint, timeout, transport, parser, fail-closed, and provenance refinements;
 - the narrow runtime configuration module or entrypoint code that selects provider mode, if needed after inspection;

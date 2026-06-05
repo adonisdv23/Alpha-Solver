@@ -4,9 +4,9 @@ Lane ID: `ALPHA-LOCAL-LLM-RUNTIME-INTEGRATION-SPEC-001`
 
 ## Purpose
 
-Define the minimum future implementation contract for adding local LLM as an optional MVP-compatible backend while keeping the required MVP path independent of local model availability.
+Summarize the supporting evaluation/specification lane for the canonical implementation contract in `.specs/LOCAL-LLM-RUNTIME-INTEGRATION-001.md`. The canonical spec defines the minimum future implementation contract for adding local LLM as an optional backend while keeping existing operation independent of local model availability.
 
-This package specifies boundaries only. It does not implement the local LLM runtime path, does not change tests, and does not call any model or provider.
+This docs/evals package specifies supporting boundaries only. Future implementation lanes must reference `.specs/LOCAL-LLM-RUNTIME-INTEGRATION-001.md` as the canonical contract. This lane does not implement the local LLM runtime path, does not change tests, and does not call any model or provider.
 
 ## Selected strategy
 
