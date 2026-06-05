@@ -1,0 +1,23 @@
+# Implementation Review Checklist
+
+- [x] Reviewed PR #302 implementation as offline adapter/parser implementation only.
+- [x] Confirmed the implementation remains behind an injected backend seam.
+- [x] Confirmed default-off behavior when no transport is injected.
+- [x] Confirmed no-provider-by-default behavior.
+- [x] Confirmed default tests do not require network or provider calls.
+- [x] Confirmed non-object response fixtures fail closed with `malformed_response_non_evidence`.
+- [x] Confirmed timeout failure returns `timeout_non_evidence`.
+- [x] Confirmed connection failure returns `connection_failure_non_evidence`.
+- [x] Confirmed backend error returns `backend_error_non_evidence` or the existing adapter-error normalization.
+- [x] Confirmed prompt echo fails closed with `prompt_echo_non_evidence`.
+- [x] Confirmed system echo fails closed with `prompt_echo_non_evidence`.
+- [x] Confirmed missing contract fails before backend invocation.
+- [x] Confirmed empty contract fails before backend invocation.
+- [x] Confirmed fingerprint mismatch fails before backend invocation.
+- [x] Confirmed disabled backend fails closed with `provider_backend_disabled_non_evidence`.
+- [x] Confirmed malformed response fails closed with `malformed_response_non_evidence`.
+- [x] Confirmed empty output fails closed with `empty_model_output_non_evidence` or `empty_output_non_evidence` in the older proof seam.
+- [x] Confirmed non-assistant role fails closed with `malformed_response_non_evidence`.
+- [x] Confirmed `behavior_evidence` remains `False`.
+- [x] Confirmed evidence labels remain offline/non-evidence only.
+- [x] Confirmed no runtime routing, public solve route, dashboard preview, hosted-provider, provider-key, operator evidence, Batch C, benchmark, billing, or provider-orchestration work was added.
