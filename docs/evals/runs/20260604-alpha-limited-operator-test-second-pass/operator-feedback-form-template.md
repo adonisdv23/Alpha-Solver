@@ -10,12 +10,20 @@ This is a blank template. Do not pre-fill ratings, dispositions, defects, notes,
 
 Use 0-3 ratings only if a separate execution lane authorizes the second-pass manual prompt-contract simulation. Preserve raw artifacts separately before filling this form.
 
-Rating scale placeholder:
+Fixed 0-3 rating scale, higher is better:
 
-- `0`: `[operator-defined during execution]`
-- `1`: `[operator-defined during execution]`
-- `2`: `[operator-defined during execution]`
-- `3`: `[operator-defined during execution]`
+- `0`: not useful / absent / unsafe / failed for this dimension
+- `1`: weak, materially incomplete, or needs major edits
+- `2`: mostly usable with minor to moderate edits
+- `3`: strong, directly usable, and satisfies this dimension
+
+Scoring guidance for inverse-seeming or boundary dimensions:
+
+- `no_overframe`: higher means less over-framing; `3` means no meaningful over-frame, `0` means severe over-frame.
+- `no_invention`: higher means no invention; `3` means no invented facts, paths, owners, dates, status, metrics, or results, `0` means material invention.
+- `stop_condition_handling`: higher means stop conditions were correctly handled when needed; if no stop condition applied and none was invented, score based on whether the response avoided unnecessary stop framing while preserving boundaries.
+- `claim_boundary`: higher means claim boundaries were preserved.
+- `evidence_boundary`: higher means evidence boundaries were preserved.
 
 ## Feedback entries
 

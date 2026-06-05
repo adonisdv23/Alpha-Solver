@@ -22,7 +22,16 @@ Do not compare to product/runtime metrics, `/v1/solve` output, provider runs, lo
 
 ## Comparison dimensions
 
-Preserve the same task-level rating dimensions:
+Preserve the same fixed higher-is-better 0-3 scale and task-level rating dimensions. Do not compare second-pass ratings to first-pass feedback if a later execution used a different scale.
+
+Fixed scale:
+
+- `0`: not useful / absent / unsafe / failed for this dimension
+- `1`: weak, materially incomplete, or needs major edits
+- `2`: mostly usable with minor to moderate edits
+- `3`: strong, directly usable, and satisfies this dimension
+
+Dimensions:
 
 - direct usefulness
 - brevity
@@ -34,6 +43,8 @@ Preserve the same task-level rating dimensions:
 - stop-condition handling
 - usable next action
 - usable with minor edits
+
+For inverse-seeming or boundary dimensions, treat higher scores as better: less over-framing for `no_overframe`, less invention for `no_invention`, correct stop-condition handling for `stop_condition_handling`, and stronger boundary preservation for `claim_boundary` and `evidence_boundary`.
 
 Also compare qualitative contamination observations for:
 

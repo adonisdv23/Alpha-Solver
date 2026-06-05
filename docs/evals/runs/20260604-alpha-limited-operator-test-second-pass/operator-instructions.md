@@ -31,7 +31,16 @@ For each task:
 
 ## Scoring dimensions to preserve
 
-Use the same 0-3 rating dimensions preserved from the earlier imported operator feedback:
+Use the same fixed higher-is-better 0-3 rating scale and dimensions preserved from the earlier imported operator feedback. Do not define a new scale during execution.
+
+Fixed scale:
+
+- `0`: not useful / absent / unsafe / failed for this dimension
+- `1`: weak, materially incomplete, or needs major edits
+- `2`: mostly usable with minor to moderate edits
+- `3`: strong, directly usable, and satisfies this dimension
+
+Dimensions:
 
 - direct usefulness
 - brevity
@@ -43,6 +52,8 @@ Use the same 0-3 rating dimensions preserved from the earlier imported operator 
 - stop-condition handling
 - usable next action
 - usable with minor edits
+
+For `no_overframe`, `no_invention`, `stop_condition_handling`, `claim_boundary`, and `evidence_boundary`, use the dimension-specific guidance in `operator-feedback-form-template.md` so higher scores consistently mean stronger boundary-preserving behavior.
 
 ## Stop-condition handling
 

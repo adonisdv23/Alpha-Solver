@@ -46,6 +46,9 @@ Status: packet prepared, second-pass test not yet executed
 
 - [ ] Feedback form is blank.
 - [ ] Result log is blank.
+- [ ] Feedback form uses the fixed higher-is-better 0-3 scale carried over for first-pass comparability.
+- [ ] Feedback form does not allow the operator to define a new scale during execution.
+- [ ] Feedback form includes explicit scoring guidance for `no_overframe`, `no_invention`, `stop_condition_handling`, `claim_boundary`, and `evidence_boundary`.
 - [ ] Feedback form preserves direct usefulness, brevity, answer-first, no over-frame, claim boundary, evidence boundary, no invention, stop-condition handling, usable next action, and usable with minor edits.
 - [ ] Result log includes raw artifact preservation fields.
 - [ ] Result log includes explicit stop-condition fields for every task.
