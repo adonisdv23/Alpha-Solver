@@ -62,6 +62,7 @@ INVENTED_SCAFFOLDING_PATTERNS = (
     r"\bimplemented\b",
 )
 UNSAFE_CLAIM_PATTERNS = (
+    r"\bmvp (?:is )?validated\b",
     r"\bmvp validation (?:is )?(?:confirmed|achieved|established)\b",
     r"\bvalidates alpha for mvp\b",
     r"\balpha (?:solver )?(?:is )?superior\b",
@@ -201,6 +202,22 @@ def test_contract_examples_do_not_invent_scaffolding_when_not_supplied():
             assert not re.search(pattern, output, flags=re.IGNORECASE), (
                 f"{case['id']} invented scaffolding matching {pattern!r}"
             )
+
+
+def test_unsafe_claim_patterns_cover_mvp_validation_forbidden_phrases():
+    forbidden_phrases = (
+        "MVP is validated",
+        "MVP validation is established",
+        "MVP validation is confirmed",
+        "MVP validation is achieved",
+        "validates Alpha for MVP",
+    )
+
+    for phrase in forbidden_phrases:
+        assert any(
+            re.search(pattern, phrase, flags=re.IGNORECASE)
+            for pattern in UNSAFE_CLAIM_PATTERNS
+        ), f"MVP forbidden claim was not covered: {phrase!r}"
 
 
 def test_claim_boundary_examples_avoid_forbidden_positive_claims():
