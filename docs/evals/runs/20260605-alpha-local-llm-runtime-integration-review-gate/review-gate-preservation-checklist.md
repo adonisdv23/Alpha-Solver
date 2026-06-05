@@ -1,0 +1,39 @@
+# Review Gate Preservation Checklist
+
+- [x] Changes are docs-only under `docs/evals/runs/20260605-alpha-local-llm-runtime-integration-review-gate/`.
+- [x] No source code changed.
+- [x] No test code changed.
+- [x] No runtime code changed.
+- [x] No provider code changed.
+- [x] No `/v1/solve` code changed.
+- [x] No dashboard code changed.
+- [x] No local model call was made.
+- [x] No hosted provider call was made.
+- [x] No network call was made.
+- [x] No provider key was used.
+- [x] No smoke execution was performed.
+- [x] No smoke result was imported.
+- [x] Canonical spec `.specs/LOCAL-LLM-RUNTIME-INTEGRATION-001.md` was reviewed.
+- [x] `.specs/INDEX.md` was reviewed for the canonical spec entry.
+- [x] Local LLM runtime mode remains optional and default-off.
+- [x] Explicit operator opt-in is required.
+- [x] Localhost / loopback HTTP endpoints only are accepted.
+- [x] Non-local endpoints fail closed.
+- [x] Malformed endpoints fail closed.
+- [x] Unsupported schemes fail closed.
+- [x] Userinfo-bearing URLs fail closed.
+- [x] Invalid ports fail closed.
+- [x] Exact local model name is required.
+- [x] Finite positive timeout is required.
+- [x] Provider keys are rejected for local LLM mode.
+- [x] Silent hosted-provider fallback is prohibited.
+- [x] HTTP redirects are not followed and fail closed.
+- [x] `behavior_evidence=false` remains preserved.
+- [x] Local LLM provenance is distinguishable from hosted provider output.
+- [x] `/v1/solve` remains blocked from local LLM mode.
+- [x] Dashboard preview remains blocked from local LLM mode.
+- [x] Tests use injected fakes only and do not make real local model or hosted provider calls.
+- [x] Full-suite failures are recorded as unrelated/pre-existing and do not hide local LLM blockers.
+- [x] Operator runbook and smoke packet scaffold are sufficient for a future manual smoke lane.
+- [x] Exactly one selected next lane is recorded.
+- [x] Evidence-boundary language remains narrow.
