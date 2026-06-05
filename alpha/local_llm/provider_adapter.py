@@ -236,9 +236,11 @@ def build_ollama_chat_payload(
     return payload
 
 
-def parse_ollama_chat_response(response: Mapping[str, Any]) -> str:
+def parse_ollama_chat_response(response: Any) -> str:
     """Extract assistant text from a static Ollama-style JSON response."""
 
+    if not isinstance(response, Mapping):
+        raise LocalLLMProviderAdapterError("malformed_response_non_evidence")
     message = response.get("message")
     if not isinstance(message, Mapping):
         raise LocalLLMProviderAdapterError("malformed_response_non_evidence")

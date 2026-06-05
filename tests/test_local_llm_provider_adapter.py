@@ -256,6 +256,10 @@ def test_ollama_backend_uses_injected_transport_only_and_records_payload():
 @pytest.mark.parametrize(
     ("fixture", "reason"),
     [
+        ([], "malformed_response_non_evidence"),
+        (None, "malformed_response_non_evidence"),
+        ("plain string", "malformed_response_non_evidence"),
+        (42, "malformed_response_non_evidence"),
         ({}, "malformed_response_non_evidence"),
         ({"message": "not a mapping"}, "malformed_response_non_evidence"),
         ({"message": {"role": "tool", "content": "text"}}, "malformed_response_non_evidence"),
