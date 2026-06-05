@@ -15,7 +15,8 @@ Lane ID: `ALPHA-BATCH-C-SCORING-RUBRIC-PACKET-001`
 - Score only against the task prompt and preserved output evidence.
 - Use the task-to-rubric map to identify applicable dimensions.
 - Record concise defect notes using `defect-taxonomy.md`.
-- Leave score cells blank for tasks blocked by stop conditions.
+- Leave score cells blank for tasks blocked by stop conditions; do not record a 0 for blocked tasks.
+- Exclude blocked tasks from aggregate totals unless a later approved scoring protocol explicitly defines otherwise.
 - Do not infer missing output, task prompts, sanitized entries, or source evidence.
 
 ## Actions not allowed by this packet

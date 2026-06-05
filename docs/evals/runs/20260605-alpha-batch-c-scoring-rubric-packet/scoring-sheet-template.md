@@ -6,7 +6,7 @@ Template status: blank scorer-facing template only. No Batch C outputs are prese
 
 ## Task-level scoring sheet
 
-Use only in a future approved scoring lane after stop-condition checks pass.
+Use only in a future approved scoring lane after stop-condition checks pass. Stop-condition tasks keep blank score cells; do not enter 0 for blocked tasks.
 
 | Task | Raw output present? | Task prompt present? | Scorer-facing sanitized entry present? | Stop condition? | Direct answer first | Low-headroom restraint | Requested output shape | No process-style lead-in | No unnecessary wrapper label | No accidental literal-label artifact | Claim-boundary discipline | Evidence-boundary discipline | Stop-condition handling | No unsupported reconstruction | Redaction/sensitive-data handling | Concise next-action quality | Defect code(s) | Scorer notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -25,7 +25,7 @@ Use only in a future approved scoring lane after stop-condition checks pass.
 
 ## Run-level summary template
 
-Complete only in a future approved scoring/import lane.
+Complete only in a future approved scoring/import lane. Blocked tasks are excluded from aggregate totals unless a later approved scoring protocol defines otherwise.
 
 | Field | Value |
 | --- | --- |
