@@ -10,7 +10,7 @@ This docs-only folder records the post-results decision from the Batch C import,
 
 ## Decision basis
 
-All tasks are `Keep` or one minor `Refine`, and no blocking defects remain. Raw evidence is complete and scoring/import is not blocked by redaction or artifact-integrity issues.
+Corrected applicable-dimension scoring records 173 / 174. All tasks are `Keep` or one minor `Refine`, and no blocking defects remain. Raw evidence is complete and scoring/import is not blocked by redaction or artifact-integrity issues.
 
 ## Evidence boundary
 

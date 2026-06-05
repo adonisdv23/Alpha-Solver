@@ -9,13 +9,14 @@ This interpretation is limited to imported and scored Batch C manual prompt-cont
 ## Results interpreted
 
 - Evaluable preserved task outputs: 12.
-- Aggregate scoring result: 431 / 432.
+- Aggregate scoring result: 173 / 174, based only on applicable primary and secondary dimensions from the Batch C task-to-rubric map.
+- Non-applicable dimensions marked `N/A` and excluded from totals: 86.
 - Dispositions: 11 `Keep`, 1 minor `Refine`, 0 `Reject`, 0 `Stop condition`.
 - Residual task-output defects: one minor `D-WORDING-DRIFT` on `BC-007`.
 
 ## Interpretation
 
-The Batch C outputs are complete and mostly clean against the approved prompt-contract scoring rubric. The scoring record supports a narrow conclusion that the preserved manual outputs generally followed the requested low-headroom, evidence-bounded response shapes.
+The Batch C outputs are complete and mostly clean against the approved prompt-contract scoring rubric when scored only on applicable dimensions. The scoring record supports a narrow conclusion that the preserved manual outputs generally followed the requested low-headroom, evidence-bounded response shapes for their mapped primary and secondary dimensions.
 
 The single residual defect is minor: `BC-007` correctly identifies repository evidence as controlling over a planning ledger, but its final next-action phrase is slightly broader than the most conservative preservation wording. This is a task-output wording defect, not a source cleanup or provenance defect.
 

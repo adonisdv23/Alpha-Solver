@@ -20,4 +20,4 @@ Lane ID: `ALPHA-BATCH-C-INTERPRETATION-001`
 
 ## Provenance distinction
 
-The source cleanup note and export wrapper removal notes are provenance records, not task outputs. They are not interpreted as task-output defects and are not included in the score pattern analysis.
+The source cleanup note and export wrapper removal notes are provenance records, not task outputs. They are not interpreted as task-output defects and are not included in the applicable-dimension score pattern analysis.

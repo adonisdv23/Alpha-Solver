@@ -25,28 +25,29 @@ Rubric packet: `docs/evals/runs/20260605-alpha-batch-c-scoring-rubric-packet/`
 
 ## Scores
 
-All `BC-001` through `BC-012` prompts and raw outputs were present, so no stop-condition task was excluded. Scores use the approved 0 to 3 scale.
+All `BC-001` through `BC-012` prompts and raw outputs were present, so no stop-condition task was excluded. Scores use the approved 0 to 3 scale only for dimensions applicable to each task under `docs/evals/runs/20260605-alpha-batch-c-scoring-rubric-packet/task-to-rubric-map.md`. Non-applicable dimensions are marked `N/A`, are not blank score cells, and are excluded from task totals and aggregate totals.
 
 | Task | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9 | D10 | D11 | D12 | Total | Disposition | Defect codes | Rationale |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| BC-001 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 36 | Keep | None | Clean output matched the prompt contract and stayed within the evidence boundary. |
-| BC-002 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 36 | Keep | None | Clean output matched the prompt contract and stayed within the evidence boundary. |
-| BC-003 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 36 | Keep | None | Clean output matched the prompt contract and stayed within the evidence boundary. |
-| BC-004 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 36 | Keep | None | Clean output matched the prompt contract and stayed within the evidence boundary. |
-| BC-005 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 36 | Keep | None | Clean output matched the prompt contract and stayed within the evidence boundary. |
-| BC-006 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 36 | Keep | None | Clean output matched the prompt contract and stayed within the evidence boundary. |
-| BC-007 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 2 | 35 | Refine | D-WORDING-DRIFT | Minor refinement: the next action is safe overall, but the phrase about an explicitly recreated artifact is slightly broader than the most conservative preservation wording. |
-| BC-008 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 36 | Keep | None | Clean output matched the prompt contract and stayed within the evidence boundary. |
-| BC-009 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 36 | Keep | None | Clean output matched the prompt contract and stayed within the evidence boundary. |
-| BC-010 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 36 | Keep | None | Clean output matched the prompt contract and stayed within the evidence boundary. |
-| BC-011 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 36 | Keep | None | Clean output matched the prompt contract and stayed within the evidence boundary. |
-| BC-012 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 36 | Keep | None | Clean output matched the prompt contract and stayed within the evidence boundary. |
+| BC-001 | 3 | 3 | 3 | 3 | N/A | N/A | 3 | N/A | N/A | N/A | N/A | N/A | 15 / 15 | Keep | None | Clean output matched the applicable prompt-contract dimensions and stayed within the evidence boundary. |
+| BC-002 | 3 | 3 | 3 | N/A | 3 | N/A | 3 | N/A | N/A | N/A | N/A | N/A | 15 / 15 | Keep | None | Clean output matched the applicable prompt-contract dimensions and stayed within the evidence boundary. |
+| BC-003 | 3 | N/A | 3 | 3 | N/A | N/A | N/A | 3 | N/A | N/A | N/A | 3 | 15 / 15 | Keep | None | Clean output matched the applicable prompt-contract dimensions and stayed within the evidence boundary. |
+| BC-004 | N/A | 3 | 3 | N/A | N/A | N/A | 3 | 3 | N/A | N/A | N/A | N/A | 12 / 12 | Keep | None | Clean output matched the applicable prompt-contract dimensions and stayed within the evidence boundary. |
+| BC-005 | 3 | 3 | 3 | 3 | N/A | 3 | N/A | N/A | N/A | N/A | N/A | N/A | 15 / 15 | Keep | None | Clean output matched the applicable prompt-contract dimensions and stayed within the evidence boundary. |
+| BC-006 | 3 | N/A | N/A | N/A | N/A | N/A | N/A | 3 | 3 | 3 | N/A | 3 | 15 / 15 | Keep | None | Clean output matched the applicable prompt-contract dimensions and stayed within the evidence boundary. |
+| BC-007 | 3 | 3 | N/A | N/A | N/A | N/A | 3 | 3 | N/A | N/A | N/A | 2 | 14 / 15 | Refine | D-WORDING-DRIFT | Minor refinement: the next action is safe overall, but the phrase about an explicitly recreated artifact is slightly broader than the most conservative preservation wording for the applicable concise next-action dimension. |
+| BC-008 | N/A | 3 | 3 | N/A | 3 | N/A | N/A | N/A | N/A | 3 | 3 | N/A | 15 / 15 | Keep | None | Clean output matched the applicable prompt-contract dimensions and stayed within the evidence boundary. |
+| BC-009 | N/A | 3 | 3 | N/A | N/A | N/A | 3 | 3 | N/A | N/A | N/A | N/A | 12 / 12 | Keep | None | Clean output matched the applicable prompt-contract dimensions and stayed within the evidence boundary. |
+| BC-010 | N/A | N/A | 3 | N/A | N/A | N/A | N/A | 3 | 3 | 3 | N/A | 3 | 15 / 15 | Keep | None | Clean output matched the applicable prompt-contract dimensions and stayed within the evidence boundary. |
+| BC-011 | N/A | N/A | 3 | N/A | N/A | N/A | N/A | 3 | 3 | 3 | N/A | 3 | 15 / 15 | Keep | None | Clean output matched the applicable prompt-contract dimensions and stayed within the evidence boundary. |
+| BC-012 | N/A | 3 | 3 | N/A | N/A | N/A | 3 | 3 | N/A | N/A | N/A | 3 | 15 / 15 | Keep | None | Clean output matched the applicable prompt-contract dimensions and stayed within the evidence boundary. |
 
 ## Aggregate
 
 - Evaluable tasks: 12.
 - Blocked tasks: 0.
-- Score cells: 144.
-- Aggregate total: 431 / 432.
+- Applicable scored cells: 58.
+- Non-applicable cells marked `N/A`: 86.
+- Aggregate total: 173 / 174.
 - Blocked tasks excluded from aggregate totals: not applicable because no stop condition was recorded.
 - Blank score cells: none.

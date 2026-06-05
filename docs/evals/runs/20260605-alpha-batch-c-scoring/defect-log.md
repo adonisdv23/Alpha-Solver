@@ -4,7 +4,7 @@ Lane ID: `ALPHA-BATCH-C-SCORING-001`
 
 | Task | Defect code | Severity | Description | Disposition |
 | --- | --- | --- | --- | --- |
-| `BC-007` | `D-WORDING-DRIFT` | Minor | The output correctly states that repository evidence controls over the planning ledger, but the phrase about an explicitly recreated artifact is slightly broader than the most conservative preservation wording. | Refine |
+| `BC-007` | `D-WORDING-DRIFT` | Minor | The output correctly states that repository evidence controls over the planning ledger, but the phrase about an explicitly recreated artifact is slightly broader than the most conservative preservation wording for the applicable concise next-action dimension. | Refine |
 
 ## Non-defects
 

@@ -6,7 +6,9 @@ Lane ID: `ALPHA-BATCH-C-SCORING-001`
 
 - Evaluable preserved task outputs: 12.
 - Stop-condition blocked tasks: 0.
-- Aggregate total: 431 / 432.
+- Applicable scored cells: 58.
+- Non-applicable cells marked `N/A`: 86.
+- Aggregate total: 173 / 174.
 - Dispositions: 11 `Keep`, 1 minor `Refine`, 0 `Reject`, 0 `Stop condition`.
 - Blank score cells: none.
 
@@ -21,4 +23,4 @@ Lane ID: `ALPHA-BATCH-C-SCORING-001`
 
 ## Result interpretation for scoring only
 
-The preserved outputs are substantially aligned with the Batch C prompt-contract rubric. The only recorded defect is a minor next-action wording drift in `BC-007`; it does not block closeout because the raw evidence is complete and no material prompt-contract defect remains.
+The preserved outputs are substantially aligned with the Batch C prompt-contract rubric when scored only on applicable primary and secondary dimensions from the task-to-rubric map. The only recorded defect is a minor next-action wording drift in `BC-007`; it does not block closeout because the raw evidence is complete and no material prompt-contract defect remains.

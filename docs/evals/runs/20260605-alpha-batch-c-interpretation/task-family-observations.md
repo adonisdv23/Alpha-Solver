@@ -9,4 +9,4 @@ Lane ID: `ALPHA-BATCH-C-INTERPRETATION-001`
 | Stop-condition and artifact-boundary handling | `BC-006`, `BC-010`, `BC-011` | Outputs preserved stop or anomaly handling and avoided assigning scores or importing from missing raw evidence. |
 | Repository evidence control | `BC-007` | Output correctly stated that repository evidence controls over a planning ledger; minor wording drift was recorded for the next-action phrase. |
 
-These observations are limited to the scored manual prompt-contract outputs and do not generalize to product, runtime, provider, endpoint, benchmark, readiness, or comparative claims.
+These observations are limited to the applicable-dimension scores for the manual prompt-contract outputs and do not generalize to product, runtime, provider, endpoint, benchmark, readiness, or comparative claims.

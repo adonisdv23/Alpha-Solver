@@ -15,7 +15,7 @@ Because all tasks are `Keep` or only minor `Refine` with no blocking defects, th
 - Raw evidence is complete for `BC-001` through `BC-012`.
 - Prompts are complete for `BC-001` through `BC-012`.
 - Scorer-facing sanitized entries are complete for `BC-001` through `BC-012`.
-- Scoring records 11 `Keep`, 1 minor `Refine`, 0 `Reject`, and 0 `Stop condition`.
+- Corrected applicable-dimension scoring records 173 / 174, with 11 `Keep`, 1 minor `Refine`, 0 `Reject`, and 0 `Stop condition`.
 - No redaction or artifact-integrity issue blocks import or scoring.
 
 ## Evidence boundary
