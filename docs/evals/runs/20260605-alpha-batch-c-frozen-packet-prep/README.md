@@ -42,6 +42,22 @@ This packet is derived from repository evidence only:
 - `reviewer-checklist.md`
 - `selected-next-lane.md`
 
+
+## Prior-run baseline values preserved
+
+These values are preserved unchanged from the required prior-run baseline context for future Batch C operators/scorers:
+
+| baseline item | preserved value |
+| --- | --- |
+| First pass total | 270 / 300 |
+| First pass dispositions | Keep 5, Refine 5 |
+| Second pass total | 283 / 300 |
+| Second pass dispositions | Keep 8, Refine 2, Reject 0 |
+| Second pass stop-condition counts | no 9, yes 1 |
+| LT2-005 arithmetic correction | 25 / 30 |
+
+These preserved values are baseline context only. They are not new scoring, not rescoring, not Batch C results, and not a Batch C readiness claim.
+
 ## Frozen packet status
 
 The task set and packet text in this folder are frozen once committed. Future human operators may copy the packet for a separately approved manual run, but this PR does not perform the run.

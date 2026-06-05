@@ -13,6 +13,31 @@ This is the frozen Batch C prompt-contract simulation packet. After this file is
 - The feedback, scorer-facing sanitization, and import scaffolds in this folder.
 - The residual-risk and claim-boundary language in this folder.
 
+
+## Prior-run baseline values preserved
+
+Future Batch C operators/scorers must preserve these prior-run baseline values unchanged as context when using this frozen packet:
+
+| baseline item | preserved value |
+| --- | --- |
+| First pass total | 270 / 300 |
+| First pass dispositions | Keep 5, Refine 5 |
+| Second pass total | 283 / 300 |
+| Second pass dispositions | Keep 8, Refine 2, Reject 0 |
+| Second pass stop-condition counts | no 9, yes 1 |
+| LT2-005 arithmetic correction | 25 / 30 |
+
+Exact baseline value strings for reviewer checks:
+
+- First pass total: 270 / 300
+- First pass dispositions: Keep 5, Refine 5
+- Second pass total: 283 / 300
+- Second pass dispositions: Keep 8, Refine 2, Reject 0
+- Second pass stop-condition counts: no 9, yes 1
+- LT2-005 arithmetic correction: 25 / 30
+
+These baseline values are copied context for future operators/scorers. They are not new scoring, not rescoring, not Batch C results, and not a Batch C readiness claim.
+
 ## Portable prompt-contract behavior boundary
 
 Batch C is designed only to exercise the current portable prompt-contract behavior boundary from `alpha_solver_portable.py`:

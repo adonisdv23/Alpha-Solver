@@ -23,6 +23,17 @@ Lane ID: `ALPHA-BATCH-C-FROZEN-PACKET-PREP-001`
 - [ ] Results-import scaffold requires future raw/scored artifacts before import.
 - [ ] Redaction rules cover private URLs, private transcripts, provider identifiers, private endpoints, keys, secrets, credentials, and operator-only notes.
 
+
+## Prior-run baseline values
+
+- [ ] Confirm First pass total is preserved as 270 / 300.
+- [ ] Confirm First pass dispositions are preserved as Keep 5, Refine 5.
+- [ ] Confirm Second pass total is preserved as 283 / 300.
+- [ ] Confirm Second pass dispositions are preserved as Keep 8, Refine 2, Reject 0.
+- [ ] Confirm Second pass stop-condition counts are preserved as no 9, yes 1.
+- [ ] Confirm LT2-005 arithmetic correction is preserved as 25 / 30.
+- [ ] Confirm baseline values are future operator/scorer context only and are not new scoring, not rescoring, not Batch C results, and not a Batch C readiness claim.
+
 ## Boundaries
 
 - [ ] No Batch C execution occurred.

@@ -2,6 +2,22 @@
 
 Lane ID: `ALPHA-BATCH-C-FROZEN-PACKET-PREP-001`
 
+
+## Prior-run baseline values preserved
+
+These prior-run baseline values must remain visible to future Batch C operators/scorers and must not be changed in this frozen packet:
+
+| baseline item | preserved value |
+| --- | --- |
+| First pass total | 270 / 300 |
+| First pass dispositions | Keep 5, Refine 5 |
+| Second pass total | 283 / 300 |
+| Second pass dispositions | Keep 8, Refine 2, Reject 0 |
+| Second pass stop-condition counts | no 9, yes 1 |
+| LT2-005 arithmetic correction | 25 / 30 |
+
+The values above are baseline context only. They are not new scoring, not rescoring, not Batch C results, and not a Batch C readiness claim.
+
 ## Preserved residual risks from the prior decision packet
 
 | residual risk | preservation requirement for Batch C |

@@ -16,6 +16,17 @@ Lane ID: `ALPHA-BATCH-C-FROZEN-PACKET-PREP-001`
 - [ ] Confirm anomalies are recorded without editing raw output.
 - [ ] Confirm missing raw output triggers a stop condition.
 
+
+## Prior-run baseline values
+
+- [ ] Confirm First pass total remains 270 / 300.
+- [ ] Confirm First pass dispositions remain Keep 5, Refine 5.
+- [ ] Confirm Second pass total remains 283 / 300.
+- [ ] Confirm Second pass dispositions remain Keep 8, Refine 2, Reject 0.
+- [ ] Confirm Second pass stop-condition counts remain no 9, yes 1.
+- [ ] Confirm LT2-005 arithmetic correction remains 25 / 30.
+- [ ] Confirm these values are treated as baseline context for future Batch C operators/scorers, not new scoring, not rescoring, not Batch C results, and not a Batch C readiness claim.
+
 ## Residual risks
 
 - [ ] Confirm LT2-001 process-style lead-in risk remains visible to scorers.
