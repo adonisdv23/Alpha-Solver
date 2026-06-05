@@ -63,6 +63,7 @@ INVENTED_SCAFFOLDING_PATTERNS = (
 )
 UNSAFE_CLAIM_PATTERNS = (
     r"\bmvp (?:is )?validated\b",
+    r"\bmvp validation (?:is )?(?:confirmed|achieved|established)\b",
     r"\bvalidates alpha for mvp\b",
     r"\balpha (?:solver )?(?:is )?superior\b",
     r"\bplain providers? (?:are|is) inferior\b",
@@ -203,6 +204,22 @@ def test_contract_examples_do_not_invent_scaffolding_when_not_supplied():
             )
 
 
+def test_unsafe_claim_patterns_cover_mvp_validation_forbidden_phrases():
+    forbidden_phrases = (
+        "MVP is validated",
+        "MVP validation is established",
+        "MVP validation is confirmed",
+        "MVP validation is achieved",
+        "validates Alpha for MVP",
+    )
+
+    for phrase in forbidden_phrases:
+        assert any(
+            re.search(pattern, phrase, flags=re.IGNORECASE)
+            for pattern in UNSAFE_CLAIM_PATTERNS
+        ), f"MVP forbidden claim was not covered: {phrase!r}"
+
+
 def test_claim_boundary_examples_avoid_forbidden_positive_claims():
     for case in _fixture()["cases"]:
         normalized_output = _normalize(case["expected_output"])
@@ -291,7 +308,7 @@ def test_portable_minimal_behavior_summary_is_offline_and_bounded():
         assert phrase in normalized
     for forbidden in (
         "provider orchestration is implemented",
-        "mvp is validated",
+        "mvp validation is established",
         "production-ready",
         "live providers were called",
         "capture was rerun",
@@ -313,7 +330,7 @@ def test_portable_summary_preserves_boundary_and_no_runtime_implication():
         "routing behavior changed",
         "model routing behavior changed",
         "runtime api behavior changed",
-        "provider behavior changed",
+        "provider-side behavior changed",
         "production readiness is confirmed",
     ):
         assert phrase not in normalized
@@ -410,6 +427,73 @@ def test_portable_summary_preserves_broad_non_claims():
         "provider orchestration",
     ):
         assert phrase in normalized
+
+
+def test_output_format_refinement_examples_are_answer_shape_first():
+    from alpha_solver_portable import OUTPUT_FORMAT_REFINEMENT_EXAMPLES
+
+    reviewer = OUTPUT_FORMAT_REFINEMENT_EXAMPLES["concise_reviewer_comment"]
+    replacement = OUTPUT_FORMAT_REFINEMENT_EXAMPLES["replacement_wording"]
+    checklist = OUTPUT_FORMAT_REFINEMENT_EXAMPLES["preservation_checklist"]
+    status = OUTPUT_FORMAT_REFINEMENT_EXAMPLES["two_sentence_status_update"]
+    template = OUTPUT_FORMAT_REFINEMENT_EXAMPLES["compact_template"]
+
+    assert reviewer.startswith("Please tighten")
+    assert not re.match(r"^(analysis|process|reasoning|draft|comment|standard|replacement):", reviewer, re.IGNORECASE)
+
+    assert replacement.startswith("The post-improvement run is limited")
+    assert "standard:" not in replacement.lower()
+    assert "Replacement:" not in replacement
+
+    assert checklist.startswith("- [ ] Preserve")
+    assert not checklist.lower().startswith(("analysis:", "process:", "here is", "standard:"))
+
+    assert len(_sentences(status)) <= 2
+    assert status.startswith("The portable-contract follow-up")
+    assert template.startswith("Decision:")
+
+
+def test_output_format_refinement_contract_suppresses_visible_process_and_wrappers():
+    from alpha_solver_portable import minimal_behavior_contract_summary
+
+    normalized = _normalize(minimal_behavior_contract_summary())
+
+    for phrase in (
+        "output format contamination guard",
+        "suppress visible process-style text",
+        "suppress wrapper labels",
+        "do not emit accidental literal-label artifacts such as 'standard:'",
+        "concise rewrite, reviewer-comment, replacement wording, checklist",
+        "status update, and compact prompt/template tasks",
+        "requested answer shape before any caveat",
+        "avoid unnecessary memo framing",
+        "start with checklist bullets",
+        "start with the template or prompt",
+    ):
+        assert phrase in normalized
+
+
+def test_refinement_examples_preserve_missing_results_batch_c_and_boundaries():
+    from alpha_solver_portable import (
+        OUTPUT_FORMAT_REFINEMENT_EXAMPLES,
+        minimal_behavior_contract_summary,
+    )
+
+    summary = minimal_behavior_contract_summary()
+    normalized = _normalize(summary)
+    checklist = OUTPUT_FORMAT_REFINEMENT_EXAMPLES["preservation_checklist"]
+    replacement = OUTPUT_FORMAT_REFINEMENT_EXAMPLES["replacement_wording"]
+
+    assert "start with 'stop:'" in normalized
+    assert "do not reconstruct" in normalized
+    assert "do not reconstruct missing results" in checklist.lower()
+    assert "keep batch c blocked" in checklist.lower()
+    assert "batch c readiness" in replacement.lower()
+    assert "planning evidence, not validation" in replacement
+    assert "does not establish broad superiority" in replacement
+    assert "repo evidence overrides planning ledger" in normalized
+    assert "limited pilot favored alpha" in normalized
+
 
 
 def test_test_plan_contains_required_sections_and_boundaries():
