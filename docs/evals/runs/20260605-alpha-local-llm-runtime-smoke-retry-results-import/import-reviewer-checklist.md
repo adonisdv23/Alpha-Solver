@@ -1,0 +1,30 @@
+# Import Reviewer Checklist
+
+- [x] Retry source artifact exists at `docs/evals/runs/20260605-alpha-local-llm-runtime-smoke-execution-retry/source-evidence/ALPHA-LOCAL-LLM-RUNTIME-SMOKE-EXECUTION-RETRY-002.md`.
+- [x] Only the repo-source retry artifact was imported.
+- [x] Source path is preserved exactly.
+- [x] `attempt_id: 002` is imported.
+- [x] Retry reason is imported exactly.
+- [x] Attempt 001 failure context is imported and treated as runner/import-path failure.
+- [x] Attempt 002 repo-root `PYTHONPATH` correction is imported.
+- [x] Exact executable shell command is imported.
+- [x] Exact Python script is imported.
+- [x] Script call to `run_configured_local_llm_runtime` with `USER_PROMPT` is imported.
+- [x] Script JSON serialization of returned result is imported.
+- [x] Precheck command and `exit_code: 0` are imported.
+- [x] `smoke_ran: yes` is imported.
+- [x] `smoke_exit_code: 0` is imported.
+- [x] Localhost / loopback endpoint is imported.
+- [x] `gemma3:4b` model is imported.
+- [x] `timeout_seconds: 120` is imported.
+- [x] `output_text: OK` is imported.
+- [x] `status: non_evidence` is imported.
+- [x] `reason: local_llm_provider_adapter_wiring_only` is imported.
+- [x] `behavior_evidence: false` is imported.
+- [x] `no_hosted_fallback: true` is imported.
+- [x] `no_provider_keys_required: true` is imported.
+- [x] Prompt source fingerprint metadata is preserved.
+- [x] Stdout and stderr sections are preserved.
+- [x] Local artifact hygiene caveats are preserved.
+- [x] Terminal wrapper noise is not imported as smoke evidence.
+- [x] Evidence-boundary language remains narrow.
