@@ -385,6 +385,10 @@ def test_ollama_backend_fails_closed_on_system_contract_echo_from_static_fixture
         "http://192.168.1.25:11434/api/chat",
         "ftp://127.0.0.1:11434/api/chat",
         "http:///api/chat",
+        "http://127.0.0.1:bad/api/chat",
+        "http://localhost:bad/api/chat",
+        "http://[::1]:bad/api/chat",
+        "http://127.0.0.1:99999/api/chat",
         "",
     ],
 )

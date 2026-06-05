@@ -12,6 +12,7 @@ Lane ID: `ALPHA-LOCAL-LLM-ENDPOINT-LOCALITY-HARDENING-001`
 | Private LAN IP endpoint | `endpoint_not_local_non_evidence`; transport not invoked |
 | Non-HTTP scheme | `endpoint_not_local_non_evidence`; transport not invoked |
 | Missing host / malformed URL | `endpoint_not_local_non_evidence`; transport not invoked |
+| Loopback host with invalid / out-of-range port | `endpoint_not_local_non_evidence`; transport not invoked |
 | Empty endpoint | `endpoint_not_local_non_evidence`; transport not invoked |
 | 127.0.0.1 loopback endpoint | allowed to reach injected fake transport |
 | localhost loopback endpoint | allowed to reach injected fake transport |

@@ -187,6 +187,10 @@ def validate_ollama_local_endpoint(endpoint_url: str) -> str:
         raise LocalLLMProviderAdapterError("endpoint_not_local_non_evidence")
     if not _is_loopback_hostname(parsed.hostname):
         raise LocalLLMProviderAdapterError("endpoint_not_local_non_evidence")
+    try:
+        parsed.port
+    except ValueError:
+        raise LocalLLMProviderAdapterError("endpoint_not_local_non_evidence") from None
     return endpoint_url.strip()
 
 

@@ -26,7 +26,13 @@ Examples covered by offline tests:
 - `http://192.168.1.25:11434/api/chat`
 - `ftp://127.0.0.1:11434/api/chat`
 - `http:///api/chat`
+- `http://127.0.0.1:bad/api/chat` (loopback host with invalid port)
+- `http://localhost:bad/api/chat` (loopback host with invalid port)
+- `http://[::1]:bad/api/chat` (loopback host with invalid port)
+- `http://127.0.0.1:99999/api/chat` (loopback host with out-of-range port)
 - empty endpoint string
+
+A loopback hostname with a malformed or out-of-range port still fails closed: `urlsplit()` defers port validation, so the validator forces a `parsed.port` read and rejects the endpoint before transport invocation.
 
 ## Boundary
 
