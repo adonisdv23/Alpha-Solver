@@ -1,16 +1,16 @@
-# Local LLM Runtime Track Closeout
+# Local LLM Runtime Track Closeout Review
 
 Lane ID: `ALPHA-LOCAL-LLM-RUNTIME-TRACK-CLOSEOUT-001`
 
-This folder closes the local LLM runtime track based on the imported runtime smoke execution evidence and final decision.
+This folder records that local LLM runtime track closeout is blocked by a command-provenance defect in the imported smoke artifact.
 
-## Terminal next action
+## Selected next lane
 
-`STOP-HERE-LOCAL-LLM-RUNTIME-TRACK-CLOSED`
+`ALPHA-LOCAL-LLM-RUNTIME-SMOKE-EXECUTION-RETRY-001`
 
 ## Scope
 
-This closeout summarizes the completed local LLM runtime track only. Batch C is already closed separately and is not modified here.
+This package does not close the local LLM runtime track. Batch C is already closed separately and is not modified here.
 
 ## Files
 

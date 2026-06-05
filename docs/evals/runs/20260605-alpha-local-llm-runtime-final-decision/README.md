@@ -2,11 +2,15 @@
 
 Lane ID: `ALPHA-LOCAL-LLM-RUNTIME-FINAL-DECISION-001`
 
-This folder records the final local LLM runtime decision from the imported and interpreted runtime smoke evidence.
+This folder records the revised final local LLM runtime decision from the imported and interpreted runtime smoke evidence.
 
 ## Decision
 
-Selected terminal next action: `STOP-HERE-LOCAL-LLM-RUNTIME-TRACK-CLOSED`
+Selected next lane: `ALPHA-LOCAL-LLM-RUNTIME-SMOKE-EXECUTION-RETRY-001`
+
+## Reason
+
+The preserved runtime stdout is retained, but the preserved command summary is incomplete or non-reproducible as exact executable provenance. Because a required raw provenance field is incomplete, the local LLM runtime track is not closed.
 
 ## Files
 

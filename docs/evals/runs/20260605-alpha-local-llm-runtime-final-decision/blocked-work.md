@@ -2,7 +2,7 @@
 
 Lane ID: `ALPHA-LOCAL-LLM-RUNTIME-FINAL-DECISION-001`
 
-The selected terminal next action does not authorize any of the following work:
+The selected retry lane does not authorize any of the following work:
 
 - `/v1/solve` exposure;
 - dashboard exposure;

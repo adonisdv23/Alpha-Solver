@@ -2,14 +2,14 @@
 
 Lane ID: `ALPHA-LOCAL-LLM-RUNTIME-FINAL-DECISION-001`
 
-## Selected terminal next action
+## Selected next lane
 
-`STOP-HERE-LOCAL-LLM-RUNTIME-TRACK-CLOSED`
+`ALPHA-LOCAL-LLM-RUNTIME-SMOKE-EXECUTION-RETRY-001`
 
 ## Selection rationale
 
-The imported source artifact satisfies the closeout decision rule: import complete, precheck `exit_code: 0`, `smoke_ran: yes`, `smoke_exit_code: 0`, `status: non_evidence`, `output_text: OK`, `behavior_evidence: false`, `no_hosted_fallback: true`, `no_provider_keys_required: true`, and no artifact-integrity blocker remaining.
+The preserved runtime stdout is retained as source evidence, but the preserved command summary is incomplete or non-reproducible as exact executable provenance. It imports `run_configured_local_llm_runtime`, does not call the function, does not pass a user prompt, does not serialize the result, and cannot itself produce the imported JSON stdout.
 
-## Non-selection of further lanes
+## Closeout status
 
-No further local LLM runtime lane is recommended unless the operator explicitly reopens the track.
+Local LLM runtime track closeout is blocked by the command-provenance defect.

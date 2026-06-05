@@ -63,7 +63,9 @@ Environment looks good. This validates configuration only; no remote provider AP
 - model: `gemma3:4b`
 - timeout_seconds: `120`
 
-## Exact smoke command summary imported from source artifact
+## Preserved non-executing command summary imported from source artifact
+
+The source artifact labels the following block as an exact smoke command summary, and this import preserves the recorded text exactly. This block is not treated as exact executable provenance because it imports `run_configured_local_llm_runtime` but does not call that function, does not pass a user prompt, does not serialize the result, and cannot itself produce the imported JSON stdout.
 
 ```bash
 MODEL_PROVIDER=local_llm \

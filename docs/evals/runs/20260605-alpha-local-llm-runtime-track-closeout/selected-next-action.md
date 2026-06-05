@@ -2,10 +2,10 @@
 
 Lane ID: `ALPHA-LOCAL-LLM-RUNTIME-TRACK-CLOSEOUT-001`
 
-## Terminal next action
+## Selected next lane
 
-`STOP-HERE-LOCAL-LLM-RUNTIME-TRACK-CLOSED`
+`ALPHA-LOCAL-LLM-RUNTIME-SMOKE-EXECUTION-RETRY-001`
 
 ## Operator note
 
-No further local LLM runtime lane is recommended unless the operator explicitly reopens the track.
+Local LLM runtime track closeout is blocked until retry smoke execution provides complete, reproducible executable command provenance for the recorded stdout.

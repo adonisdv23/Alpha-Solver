@@ -2,12 +2,12 @@
 
 Lane ID: `ALPHA-LOCAL-LLM-RUNTIME-TRACK-CLOSEOUT-001`
 
-## Lane bundle completed by this docs-only PR
+## Lane bundle addressed by this docs-only PR
 
 1. `ALPHA-LOCAL-LLM-RUNTIME-SMOKE-RESULTS-IMPORT-001`
 2. `ALPHA-LOCAL-LLM-RUNTIME-SMOKE-INTERPRETATION-001`
 3. `ALPHA-LOCAL-LLM-RUNTIME-FINAL-DECISION-001`
-4. `ALPHA-LOCAL-LLM-RUNTIME-TRACK-CLOSEOUT-001`
+4. `ALPHA-LOCAL-LLM-RUNTIME-TRACK-CLOSEOUT-001` — blocked by command-provenance defect
 
 ## Prior local LLM runtime track evidence referenced
 

@@ -6,7 +6,7 @@ This folder interprets only the imported runtime smoke evidence from `docs/evals
 
 ## Interpretation outcome
 
-The imported evidence supports only this bounded statement: the merged optional local LLM runtime path executed one local loopback smoke and returned the recorded non-evidence result.
+The imported runtime stdout is preserved, but the preserved command summary is incomplete or non-reproducible as exact executable provenance. Therefore the smoke cannot be used for local LLM runtime track closeout.
 
 ## Files
 

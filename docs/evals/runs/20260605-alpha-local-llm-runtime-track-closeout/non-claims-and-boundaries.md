@@ -4,11 +4,11 @@ Lane ID: `ALPHA-LOCAL-LLM-RUNTIME-TRACK-CLOSEOUT-001`
 
 ## Evidence boundary
 
-This closeout imports, interprets, decides, and closes out from local LLM runtime smoke execution evidence only.
+This package imports, interprets, and decides from local LLM runtime smoke execution evidence only. It records that closeout is blocked by incomplete executable command provenance.
 
 ## Non-claims
 
-This closeout is not:
+This package is not:
 
 - local model quality evidence;
 - hosted provider evidence;
@@ -25,4 +25,4 @@ This closeout is not:
 
 ## Future work boundary
 
-Future `/v1/solve` exposure, dashboard exposure, provider fallback, evidence-model promotion, model-quality evaluation, or MVP adoption would require separate explicit lanes and are not authorized by this closeout.
+Future `/v1/solve` exposure, dashboard exposure, provider fallback, evidence-model promotion, model-quality evaluation, MVP adoption, or local LLM runtime track closeout would require separate explicit lanes and are not authorized by this package.

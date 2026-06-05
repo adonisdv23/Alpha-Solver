@@ -15,6 +15,8 @@ Lane ID: `ALPHA-LOCAL-LLM-RUNTIME-SMOKE-INTERPRETATION-001`
 - [x] `no_hosted_fallback: true` is recorded.
 - [x] `no_provider_keys_required: true` is recorded.
 - [x] Metadata distinction between local LLM runtime output and hosted provider output is recorded.
-- [x] Bounded supported statement is preserved.
+- [x] Runtime stdout is preserved.
+- [x] Command-provenance defect is recorded.
+- [x] Closeout is not supported by this smoke import.
 - [x] Unsupported claims are explicitly excluded.
 - [x] Worktree caveat is preserved and not hidden.

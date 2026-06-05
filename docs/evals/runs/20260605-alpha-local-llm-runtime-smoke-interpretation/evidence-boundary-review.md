@@ -8,7 +8,7 @@ This interpretation imports and interprets local LLM runtime smoke execution evi
 
 ## What the evidence supports
 
-The evidence supports only that the merged optional local LLM runtime path executed one local loopback smoke with precheck `exit_code: 0`, runtime `smoke_exit_code: 0`, `status: non_evidence`, `reason: local_llm_provider_adapter_wiring_only`, `output_text: OK`, `behavior_evidence: false`, `no_hosted_fallback: true`, and `no_provider_keys_required: true`.
+The evidence preserves runtime stdout and metadata recording precheck `exit_code: 0`, runtime `smoke_exit_code: 0`, `status: non_evidence`, `reason: local_llm_provider_adapter_wiring_only`, `output_text: OK`, `behavior_evidence: false`, `no_hosted_fallback: true`, and `no_provider_keys_required: true`. Because exact executable command provenance is incomplete, the evidence does not support local LLM runtime track closeout.
 
 ## What the evidence does not support
 

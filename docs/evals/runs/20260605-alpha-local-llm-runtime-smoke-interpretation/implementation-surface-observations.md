@@ -18,4 +18,4 @@ These observations are limited to what the imported runtime smoke evidence recor
 
 ## Narrow implementation implication
 
-The imported evidence is consistent with a bounded runtime smoke of the optional local LLM runtime path. It does not prove implementation readiness beyond the single recorded local loopback smoke outcome.
+The imported runtime stdout and metadata are preserved, but exact executable command provenance is incomplete. The preserved command summary cannot itself produce the imported JSON stdout, so the evidence does not support local LLM runtime track closeout and requires a retry lane.

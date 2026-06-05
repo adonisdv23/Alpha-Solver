@@ -2,7 +2,7 @@
 
 Lane ID: `ALPHA-LOCAL-LLM-RUNTIME-TRACK-CLOSEOUT-001`
 
-The closeout does not authorize:
+This blocked-closeout package does not authorize:
 
 - source code changes;
 - test code changes;

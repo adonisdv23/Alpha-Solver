@@ -30,4 +30,4 @@ Lane ID: `ALPHA-LOCAL-LLM-RUNTIME-TRACK-CLOSEOUT-001`
 
 ## Bounded summary
 
-The smoke result supports only that the merged optional local LLM runtime path executed one local loopback smoke and returned the recorded non-evidence result.
+The runtime stdout is preserved, but the preserved command summary is incomplete or non-reproducible as exact executable provenance. The smoke result does not support local LLM runtime track closeout; retry execution is selected.

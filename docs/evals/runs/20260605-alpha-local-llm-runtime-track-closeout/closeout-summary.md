@@ -2,15 +2,15 @@
 
 Lane ID: `ALPHA-LOCAL-LLM-RUNTIME-TRACK-CLOSEOUT-001`
 
-## Closeout decision
+## Closeout status
 
-The local LLM runtime track is closed with exactly one terminal next action:
+Local LLM runtime track closeout is blocked. The selected next lane is:
 
-`STOP-HERE-LOCAL-LLM-RUNTIME-TRACK-CLOSED`
+`ALPHA-LOCAL-LLM-RUNTIME-SMOKE-EXECUTION-RETRY-001`
 
 ## Basis
 
-The imported runtime smoke source artifact records a successful bounded local loopback runtime smoke:
+The imported runtime smoke source artifact preserves runtime stdout and metadata, including:
 
 - precheck command `python3 scripts/check_env.py` with `exit_code: 0`;
 - `smoke_ran: yes`;
@@ -26,10 +26,8 @@ The imported runtime smoke source artifact records a successful bounded local lo
 - `no_hosted_fallback: true`;
 - `no_provider_keys_required: true`.
 
+However, the preserved command summary is not exact executable provenance for the imported JSON stdout. It imports `run_configured_local_llm_runtime`, does not call the function, does not pass a user prompt, does not serialize the result, and cannot itself produce the imported JSON stdout.
+
 ## Track boundary
 
-This closeout summarizes the completed local LLM runtime track only. Batch C is already closed separately and is not modified here.
-
-## Reopen rule
-
-No further local LLM runtime lane is recommended unless the operator explicitly reopens the track.
+This package summarizes why local LLM runtime track closeout is blocked. Batch C is already closed separately and is not modified here.

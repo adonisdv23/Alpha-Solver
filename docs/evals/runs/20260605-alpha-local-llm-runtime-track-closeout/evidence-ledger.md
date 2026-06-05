@@ -24,4 +24,4 @@ Lane ID: `ALPHA-LOCAL-LLM-RUNTIME-TRACK-CLOSEOUT-001`
 
 ## Evidence use restriction
 
-The closeout uses local LLM runtime smoke execution evidence only and does not import terminal wrapper noise, uploaded files, terminal transcripts outside the repo-source artifact, PR descriptions, prior prompt summaries, reconstructed fields, local model calls by Codex, or hosted provider calls.
+This package uses local LLM runtime smoke execution evidence only and does not import terminal wrapper noise, uploaded files, terminal transcripts outside the repo-source artifact, PR descriptions, prior prompt summaries, reconstructed fields, local model calls by Codex, or hosted provider calls.
