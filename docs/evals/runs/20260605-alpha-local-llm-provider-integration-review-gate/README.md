@@ -24,6 +24,6 @@ This directory records a review of the offline Ollama-style adapter/parser imple
 
 Review gate result: blocked / conditional for smoke progression.
 
-Offline parser/adapter tests and source review support the inert adapter/parser findings, but endpoint-locality enforcement remains unresolved for future smoke execution. The backend currently accepts an injected `endpoint_url` value without first proving it is localhost, loopback, or otherwise explicitly approved local-only before a transport could be invoked.
+Offline parser/adapter tests passed in the prior implementation evidence and source review supports the inert adapter/parser findings, but endpoint-locality enforcement remains unresolved for future smoke execution. The backend currently accepts an injected `endpoint_url` value without first proving it is localhost, loopback, or otherwise explicitly approved local-only before a transport could be invoked.
 
 The next selected lane from this gate is `ALPHA-LOCAL-LLM-ENDPOINT-LOCALITY-HARDENING-001`.
