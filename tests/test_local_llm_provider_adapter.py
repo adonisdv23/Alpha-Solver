@@ -2,14 +2,19 @@ from __future__ import annotations
 
 import sys
 from hashlib import sha256
+from urllib import error as urllib_error
 from pathlib import Path
 
 import pytest
 
 from alpha.local_llm.portable_contract import PortableContractError, load_portable_contract
 from alpha.local_llm.provider_adapter import (
+    LocalLLMProviderAdapterError,
+    OllamaLocalHTTPBackend,
     StubLocalLLMProviderBackend,
+    build_ollama_chat_payload,
     build_local_llm_adapter_request,
+    parse_ollama_assistant_text,
     run_local_llm_provider_adapter,
 )
 
@@ -161,3 +166,189 @@ def test_adapter_fails_closed_on_fingerprint_mismatch(tmp_path):
             contract_path=contract,
             expected_sha256="0" * 64,
         )
+
+
+def test_ollama_payload_mapping_preserves_system_user_separation():
+    user_prompt = "Map this adapter request to an Ollama chat payload."
+    request = build_local_llm_adapter_request(user_prompt)
+
+    payload = build_ollama_chat_payload(request, model="offline-fixture-model")
+
+    assert payload["model"] == "offline-fixture-model"
+    assert payload["stream"] is False
+    assert payload["options"] == {"temperature": 0}
+    assert payload["messages"] == [
+        {"role": "system", "content": request.system},
+        {"role": "user", "content": user_prompt},
+    ]
+    assert user_prompt not in payload["messages"][0]["content"]
+
+
+def test_ollama_backend_uses_injected_transport_for_offline_request_mapping():
+    captured: dict[str, object] = {}
+
+    def offline_transport(endpoint, payload, timeout_seconds):
+        captured["endpoint"] = endpoint
+        captured["payload"] = payload
+        captured["timeout_seconds"] = timeout_seconds
+        return {"message": {"role": "assistant", "content": "offline fixture response"}}
+
+    request = build_local_llm_adapter_request("Use only the injected transport.")
+    backend = OllamaLocalHTTPBackend(
+        endpoint="http://127.0.0.1:11434/api/chat",
+        model="offline-fixture-model",
+        timeout_seconds=1.25,
+        enabled=True,
+        transport=offline_transport,
+    )
+
+    output_text = backend.generate(request)
+
+    assert output_text == "offline fixture response"
+    assert captured["endpoint"] == "http://127.0.0.1:11434/api/chat"
+    assert captured["timeout_seconds"] == 1.25
+    assert captured["payload"] == {
+        "model": "offline-fixture-model",
+        "stream": False,
+        "messages": [
+            {"role": "system", "content": request.system},
+            {"role": "user", "content": request.user_prompt},
+        ],
+        "options": {"temperature": 0},
+    }
+
+
+def test_ollama_backend_default_off_makes_no_network_call(monkeypatch):
+    def forbidden_urlopen(*args, **kwargs):
+        raise AssertionError("default-off backend must not open a socket")
+
+    monkeypatch.setattr("alpha.local_llm.provider_adapter.urllib_request.urlopen", forbidden_urlopen)
+    backend = OllamaLocalHTTPBackend()
+
+    result = run_local_llm_provider_adapter(
+        "Default-off backend should fail closed before transport.", backend=backend
+    )
+
+    assert result.status == "failed_closed"
+    assert result.reason == "ollama_backend_disabled_non_evidence"
+    assert result.metadata["behavior_evidence"] is False
+
+
+def test_parse_ollama_successful_assistant_text_from_static_fixture():
+    fixture = {
+        "model": "offline-fixture-model",
+        "message": {"role": "assistant", "content": "Assistant text from fixture."},
+        "done": True,
+    }
+
+    assert parse_ollama_assistant_text(fixture) == "Assistant text from fixture."
+
+
+@pytest.mark.parametrize(
+    ("fixture", "reason_code"),
+    [
+        ({}, "malformed_ollama_response_non_evidence"),
+        ({"message": None}, "malformed_ollama_response_non_evidence"),
+        ({"message": {"role": "assistant"}}, "malformed_ollama_response_non_evidence"),
+        ({"message": {"role": "assistant", "content": ["not text"]}}, "malformed_ollama_response_non_evidence"),
+        ({"message": {"role": "assistant", "content": "   "}}, "empty_ollama_response_non_evidence"),
+    ],
+)
+def test_parse_ollama_fail_closed_for_malformed_or_empty_static_fixtures(fixture, reason_code):
+    with pytest.raises(LocalLLMProviderAdapterError) as exc_info:
+        parse_ollama_assistant_text(fixture)
+
+    assert exc_info.value.reason_code == reason_code
+
+
+def test_parse_ollama_fail_closed_for_prompt_echo_with_request_context():
+    request = build_local_llm_adapter_request("Do not echo fixture prompt.")
+
+    with pytest.raises(LocalLLMProviderAdapterError) as exc_info:
+        parse_ollama_assistant_text(
+            {"message": {"role": "assistant", "content": "Do not echo fixture prompt."}},
+            request=request,
+        )
+
+    assert exc_info.value.reason_code == "prompt_echo_non_evidence"
+
+
+@pytest.mark.parametrize(
+    ("transport_error", "expected_reason"),
+    [
+        (TimeoutError("offline timeout fixture"), "ollama_timeout_non_evidence"),
+        (OSError("offline connection failure fixture"), "ollama_connection_failure_non_evidence"),
+        (
+            urllib_error.HTTPError(
+                "http://127.0.0.1:11434/api/chat", 500, "fixture backend error", {}, None
+            ),
+            "ollama_backend_error_non_evidence",
+        ),
+    ],
+)
+def test_ollama_backend_fail_closed_for_transport_errors(transport_error, expected_reason):
+    def offline_transport(endpoint, payload, timeout_seconds):
+        raise transport_error
+
+    backend = OllamaLocalHTTPBackend(enabled=True, transport=offline_transport)
+
+    result = run_local_llm_provider_adapter("Exercise fail-closed transport.", backend=backend)
+
+    assert result.status == "failed_closed"
+    assert result.reason == expected_reason
+    assert result.output_text == ""
+    assert result.behavior_evidence is False
+
+
+def test_ollama_backend_fail_closed_for_malformed_response_from_transport():
+    backend = OllamaLocalHTTPBackend(enabled=True, transport=lambda endpoint, payload, timeout: {})
+
+    result = run_local_llm_provider_adapter("Malformed response should fail closed.", backend=backend)
+
+    assert result.status == "failed_closed"
+    assert result.reason == "malformed_ollama_response_non_evidence"
+    assert result.behavior_evidence is False
+
+
+def test_ollama_backend_fail_closed_for_empty_response_from_transport():
+    backend = OllamaLocalHTTPBackend(
+        enabled=True,
+        transport=lambda endpoint, payload, timeout: {"message": {"content": "   "}},
+    )
+
+    result = run_local_llm_provider_adapter("Empty response should fail closed.", backend=backend)
+
+    assert result.status == "failed_closed"
+    assert result.reason == "empty_ollama_response_non_evidence"
+    assert result.behavior_evidence is False
+
+
+def test_ollama_backend_fail_closed_for_backend_prompt_echo():
+    user_prompt = "Backend must not echo this prompt."
+    backend = OllamaLocalHTTPBackend(
+        enabled=True,
+        transport=lambda endpoint, payload, timeout: {"message": {"content": user_prompt}},
+    )
+
+    result = run_local_llm_provider_adapter(user_prompt, backend=backend)
+
+    assert result.status == "failed_closed"
+    assert result.reason == "prompt_echo_non_evidence"
+    assert result.behavior_evidence is False
+
+
+def test_ollama_backend_fail_closed_for_nonlocal_endpoint_before_transport():
+    def forbidden_transport(endpoint, payload, timeout_seconds):
+        raise AssertionError("non-local endpoint must fail before transport")
+
+    backend = OllamaLocalHTTPBackend(
+        endpoint="https://example.invalid/api/chat",
+        enabled=True,
+        transport=forbidden_transport,
+    )
+
+    result = run_local_llm_provider_adapter("Reject non-local endpoint.", backend=backend)
+
+    assert result.status == "failed_closed"
+    assert result.reason == "ollama_endpoint_not_local_non_evidence"
+    assert result.behavior_evidence is False
