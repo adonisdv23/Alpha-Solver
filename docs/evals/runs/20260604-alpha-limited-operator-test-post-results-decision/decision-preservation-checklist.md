@@ -18,7 +18,7 @@ Use this checklist to review the docs-only post-results decision packet.
 
 ## Decision checks
 
-- [x] Exactly one next lane is selected: `ALPHA-LIMITED-OPERATOR-TEST-TARGETED-PORTABLE-CONTRACT-REFINEMENT-OUTPUT-FORMAT-CONTAMINATION-001`.
+- [x] Exactly one next lane is selected: `ALPHA-PORTABLE-CONTRACT-FOLLOWUP-REFINEMENT-001`.
 - [x] The selected lane targets output-format contamination.
 - [x] Follow-up operator testing remains blocked until separately authorized after targeted refinement.
 - [x] Broader readiness review remains blocked until separately authorized.

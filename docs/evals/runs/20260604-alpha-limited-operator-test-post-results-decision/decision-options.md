@@ -30,4 +30,4 @@ Rationale: continued hold on Batch C remains a blocked-work condition, not the a
 
 Only Option A is selected:
 
-`ALPHA-LIMITED-OPERATOR-TEST-TARGETED-PORTABLE-CONTRACT-REFINEMENT-OUTPUT-FORMAT-CONTAMINATION-001`
+`ALPHA-PORTABLE-CONTRACT-FOLLOWUP-REFINEMENT-001`
