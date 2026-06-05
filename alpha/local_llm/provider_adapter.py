@@ -10,7 +10,9 @@ only and is never behavior, runtime, or readiness evidence.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from ipaddress import ip_address
 from typing import Any, Mapping, Protocol
+from urllib.parse import urlsplit
 
 from .portable_contract import PortableContract, PortableContractError, load_portable_contract
 
@@ -123,6 +125,7 @@ class OllamaLocalHTTPBackend:
     payloads: list[Mapping[str, Any]] = field(default_factory=list)
 
     def generate(self, request: LocalLLMAdapterRequest) -> str:
+        endpoint_url = validate_ollama_local_endpoint(self.endpoint_url)
         self.calls.append(request)
         payload = build_ollama_chat_payload(request, model=self.model)
         self.payloads.append(payload)
@@ -133,7 +136,7 @@ class OllamaLocalHTTPBackend:
             )
         try:
             response = self.transport(
-                endpoint_url=self.endpoint_url,
+                endpoint_url=endpoint_url,
                 payload=payload,
                 timeout_seconds=self.timeout_seconds,
             )
@@ -160,6 +163,31 @@ def _normalize_mode(provider_mode: str) -> str:
             "MODEL_PROVIDER=local remains smoke-only"
         )
     return normalized
+
+
+def _is_loopback_hostname(hostname: str | None) -> bool:
+    if hostname is None:
+        return False
+    normalized = hostname.strip().lower().rstrip(".")
+    if normalized == "localhost":
+        return True
+    try:
+        return ip_address(normalized).is_loopback
+    except ValueError:
+        return False
+
+
+def validate_ollama_local_endpoint(endpoint_url: str) -> str:
+    """Return a valid local endpoint URL or fail closed before transport use."""
+
+    if not isinstance(endpoint_url, str) or not endpoint_url.strip():
+        raise LocalLLMProviderAdapterError("endpoint_not_local_non_evidence")
+    parsed = urlsplit(endpoint_url.strip())
+    if parsed.scheme not in {"http", "https"}:
+        raise LocalLLMProviderAdapterError("endpoint_not_local_non_evidence")
+    if not _is_loopback_hostname(parsed.hostname):
+        raise LocalLLMProviderAdapterError("endpoint_not_local_non_evidence")
+    return endpoint_url.strip()
 
 
 def build_local_llm_adapter_request(
