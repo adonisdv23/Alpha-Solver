@@ -371,7 +371,7 @@ def test_ollama_backend_fails_closed_on_system_contract_echo_from_static_fixture
     )
 
     assert result.status == "failed_closed"
-    assert result.reason == "prompt_echo_non_evidence"
+    assert result.reason == "system_echo_non_evidence"
     assert result.metadata["failure_label"] == "failed_closed_result"
     assert result.behavior_evidence is False
 

@@ -7,7 +7,7 @@ from typing import Any, Mapping
 # User-facing provider values mirror scripts/check_env.py. Accepting a
 # provider here validates configuration shape only; it does not imply that
 # remote LLM API execution is implemented.
-USER_FACING_PROVIDERS = {"local", "none", "openai", "anthropic", "gemini", "google"}
+USER_FACING_PROVIDERS = {"local", "local_llm", "none", "openai", "anthropic", "gemini", "google"}
 
 # Internal/test-only provider retained for config-loader tests and local harnesses.
 # Do not document this as a user-facing remote provider.

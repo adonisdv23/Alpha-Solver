@@ -7,12 +7,23 @@ basic invariants hold. No secret values are ever printed.
 from __future__ import annotations
 
 import os
+from pathlib import Path
 import sys
 from typing import List
 
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 SECRET_KEYS = ("KEY", "TOKEN", "SECRET")
-ALLOWED_PROVIDERS = {"local", "none", "openai", "anthropic", "gemini", "google"}
+ALLOWED_PROVIDERS = {"local", "local_llm", "none", "openai", "anthropic", "gemini", "google"}
 _NO_KEY_PROVIDERS = {"local", "none"}
+_LOCAL_LLM_PROVIDER_KEYS = (
+    "OPENAI_API_KEY",
+    "ANTHROPIC_API_KEY",
+    "GOOGLE_API_KEY",
+    "GEMINI_API_KEY",
+    "DEEPSEEK_API_KEY",
+)
 
 
 def _is_truthy(value: str | None) -> bool:
@@ -39,6 +50,31 @@ def _missing(var: str) -> bool:
     return value is None or not value.strip()
 
 
+def _validate_local_llm_env() -> List[str]:
+    errors: List[str] = []
+    if not _is_truthy(os.getenv("ALPHA_LOCAL_LLM_ENABLED")):
+        errors.append("ALPHA_LOCAL_LLM_ENABLED must be true for MODEL_PROVIDER=local_llm")
+    for var in (
+        "ALPHA_LOCAL_LLM_ENDPOINT",
+        "ALPHA_LOCAL_LLM_MODEL",
+        "ALPHA_LOCAL_LLM_TIMEOUT_SECONDS",
+    ):
+        if _missing(var):
+            errors.append(var)
+    for var in _LOCAL_LLM_PROVIDER_KEYS:
+        if not _missing(var):
+            errors.append(f"{var} must be unset for MODEL_PROVIDER=local_llm")
+    if not errors:
+        try:
+            from alpha.local_llm.provider_adapter import LocalLLMRuntimeConfig
+
+            LocalLLMRuntimeConfig.from_env()
+        except Exception as exc:
+            reason = getattr(exc, "reason_code", exc.__class__.__name__)
+            errors.append(f"local_llm configuration failed closed: {reason}")
+    return errors
+
+
 def main() -> int:
     missing: List[str] = []
     provider_raw = os.getenv("MODEL_PROVIDER", "")
@@ -59,7 +95,9 @@ def main() -> int:
         )
         return 1
 
-    if provider and provider not in _NO_KEY_PROVIDERS:
+    if provider == "local_llm":
+        missing.extend(_validate_local_llm_env())
+    elif provider and provider not in _NO_KEY_PROVIDERS:
         for var in _required_keys_for_provider(provider):
             if _missing(var):
                 missing.append(var)
