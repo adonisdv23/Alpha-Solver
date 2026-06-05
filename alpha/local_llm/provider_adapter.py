@@ -16,7 +16,8 @@ from math import isfinite
 import os
 from typing import Any, Mapping, Protocol
 from urllib.parse import urlsplit
-from urllib.request import Request as URLRequest, urlopen
+from urllib.error import HTTPError
+from urllib.request import HTTPRedirectHandler, Request as URLRequest, build_opener
 
 from .portable_contract import PortableContract, PortableContractError, load_portable_contract
 
@@ -106,6 +107,22 @@ class LocalLLMProviderAdapterError(PortableContractError):
     def __init__(self, reason_code: str, detail: str | None = None):
         super().__init__(detail or reason_code)
         self.reason_code = reason_code
+
+
+_REDIRECT_STATUS_CODES = frozenset({301, 302, 303, 307, 308})
+
+
+class _FailClosedRedirectHandler(HTTPRedirectHandler):
+    """urllib redirect handler that refuses every redirect target."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):  # type: ignore[no-untyped-def]
+        return None
+
+
+def _local_no_redirect_opener():
+    """Build an opener for local runtime calls that never follows redirects."""
+
+    return build_opener(_FailClosedRedirectHandler)
 
 
 def _truthy(value: str | None) -> bool:
@@ -496,8 +513,16 @@ def urllib_ollama_json_transport(
         headers={"Content-Type": "application/json", "Accept": "application/json"},
         method="POST",
     )
-    with urlopen(request, timeout=timeout_seconds) as response:  # nosec B310 - loopback URL only
-        decoded = json.loads(response.read().decode("utf-8"))
+    try:
+        with _local_no_redirect_opener().open(request, timeout=timeout_seconds) as response:
+            decoded = json.loads(response.read().decode("utf-8"))
+    except HTTPError as exc:
+        if exc.code in _REDIRECT_STATUS_CODES:
+            raise LocalLLMProviderAdapterError(
+                "endpoint_redirect_non_evidence",
+                "Local LLM endpoint redirects are disabled",
+            ) from exc
+        raise
     if not isinstance(decoded, Mapping):
         raise LocalLLMProviderAdapterError("malformed_response_non_evidence")
     return decoded

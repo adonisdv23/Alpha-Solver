@@ -7,6 +7,7 @@ Offline tests cover fail-closed behavior for:
 - invalid, missing, non-finite, zero, or negative timeout;
 - forbidden provider keys;
 - non-local endpoint;
+- endpoint redirect before any redirected request is made;
 - malformed / ambiguous endpoint;
 - unsupported `https` or userinfo-bearing endpoint;
 - connection failure;

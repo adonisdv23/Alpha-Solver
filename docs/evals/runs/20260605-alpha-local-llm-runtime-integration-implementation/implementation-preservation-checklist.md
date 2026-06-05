@@ -5,6 +5,7 @@
 - [x] Local LLM runtime mode remains optional and default-off.
 - [x] Explicit operator opt-in is required.
 - [x] Only localhost / loopback endpoints are accepted.
+- [x] HTTP redirects are disabled and treated as local fail-closed non-evidence outcomes.
 - [x] Exact local model name is required.
 - [x] Finite timeout is required.
 - [x] Provider keys are rejected for local LLM runtime mode.

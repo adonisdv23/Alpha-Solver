@@ -2,6 +2,7 @@
 
 Checks run in this implementation lane:
 
+- `python -m pytest -q tests/test_local_llm_runtime_integration.py` — passed, including redirect fail-closed coverage for 301, 302, 303, 307, and 308.
 - `python -m pytest -q tests/test_local_llm_runtime_integration.py tests/test_local_llm_provider_adapter.py` — passed.
 - `python -m pytest -q tests/test_config_validation.py tests/config/test_loader.py` — passed.
 - `python -m pytest -q tests/test_api_endpoints.py::test_solve_local_mode_ignores_provider_factory tests/test_api_endpoints.py::test_solve_expert_route_local_mode_preserves_local_response tests/ui/test_expert_preview.py::test_local_provider_expert_preview_ignores_route_context` — passed with upstream deprecation warnings.

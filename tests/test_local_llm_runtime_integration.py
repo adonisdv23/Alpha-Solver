@@ -202,3 +202,60 @@ def test_backend_missing_model_fails_closed_before_transport_invocation():
     assert result.status == "failed_closed"
     assert result.reason == "missing_model_non_evidence"
     assert observed["called"] is False
+
+@pytest.mark.parametrize("status_code", [301, 302, 303, 307, 308])
+def test_urllib_transport_redirects_fail_closed_without_following_non_local_target(
+    monkeypatch, status_code
+):
+    from urllib.error import HTTPError
+
+    from alpha.local_llm import provider_adapter
+
+    observed_urls: list[str] = []
+
+    class FakeNoRedirectOpener:
+        def open(self, request, timeout):
+            observed_urls.append(request.full_url)
+            raise HTTPError(
+                request.full_url,
+                status_code,
+                "redirect fixture",
+                {"Location": "https://api.openai.com/v1/chat/completions"},
+                None,
+            )
+
+    monkeypatch.setattr(
+        provider_adapter,
+        "_local_no_redirect_opener",
+        lambda: FakeNoRedirectOpener(),
+    )
+
+    result = run_configured_local_llm_runtime(
+        "Redirects must fail closed without following Location.",
+        env=_valid_env(),
+    )
+
+    assert result.status == "failed_closed"
+    assert result.reason == "endpoint_redirect_non_evidence"
+    assert result.metadata["behavior_evidence"] is False
+    assert result.metadata["no_hosted_fallback"] is True
+    assert observed_urls == ["http://127.0.0.1:11434/api/chat"]
+    assert "https://api.openai.com/v1/chat/completions" not in observed_urls
+
+
+@pytest.mark.parametrize("status_code", [301, 302, 303, 307, 308])
+def test_fail_closed_redirect_handler_never_constructs_redirect_request(status_code):
+    from alpha.local_llm.provider_adapter import _FailClosedRedirectHandler
+
+    handler = _FailClosedRedirectHandler()
+
+    redirected = handler.redirect_request(
+        None,
+        None,
+        status_code,
+        "redirect fixture",
+        {"Location": "https://example.com/not-local"},
+        "https://example.com/not-local",
+    )
+
+    assert redirected is None
