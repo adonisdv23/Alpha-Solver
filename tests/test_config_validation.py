@@ -167,7 +167,7 @@ def test_check_env_unknown_provider_lists_allowed_values():
     assert result.returncode != 0
     assert "Unknown MODEL_PROVIDER" in result.stdout
     assert "Allowed values" in result.stdout
-    for provider in ("local", "none", "openai", "anthropic", "gemini", "google"):
+    for provider in ("local", "local_llm", "none", "openai", "anthropic", "gemini", "google"):
         assert provider in result.stdout
 
 
@@ -175,3 +175,55 @@ def test_redaction(caplog):
     with caplog.at_level("DEBUG"):
         load_config(env={"MODEL_PROVIDER": "openai", "OPENAI_API_KEY": "secret"})
     assert "secret" not in caplog.text
+
+
+def test_check_env_local_llm_requires_explicit_runtime_config_without_provider_keys():
+    result = _run_check_env({"MODEL_PROVIDER": "local_llm"})
+    assert result.returncode != 0
+    assert "ALPHA_LOCAL_LLM_ENABLED" in result.stdout
+    assert "ALPHA_LOCAL_LLM_ENDPOINT" in result.stdout
+    assert "ALPHA_LOCAL_LLM_MODEL" in result.stdout
+    assert "ALPHA_LOCAL_LLM_TIMEOUT_SECONDS" in result.stdout
+
+
+def test_check_env_local_llm_accepts_loopback_without_provider_keys():
+    result = _run_check_env(
+        {
+            "MODEL_PROVIDER": "local_llm",
+            "ALPHA_LOCAL_LLM_ENABLED": "true",
+            "ALPHA_LOCAL_LLM_ENDPOINT": "http://127.0.0.1:11434/api/chat",
+            "ALPHA_LOCAL_LLM_MODEL": "llama3.2:1b-local-fixture",
+            "ALPHA_LOCAL_LLM_TIMEOUT_SECONDS": "2.5",
+        }
+    )
+    assert result.returncode == 0
+    assert "Environment looks good" in result.stdout
+
+
+def test_check_env_local_llm_rejects_provider_keys():
+    result = _run_check_env(
+        {
+            "MODEL_PROVIDER": "local_llm",
+            "ALPHA_LOCAL_LLM_ENABLED": "true",
+            "ALPHA_LOCAL_LLM_ENDPOINT": "http://127.0.0.1:11434/api/chat",
+            "ALPHA_LOCAL_LLM_MODEL": "llama3.2:1b-local-fixture",
+            "ALPHA_LOCAL_LLM_TIMEOUT_SECONDS": "2.5",
+            "OPENAI_API_KEY": "sk-not-used",
+        }
+    )
+    assert result.returncode != 0
+    assert "OPENAI_API_KEY must be unset" in result.stdout
+
+
+def test_check_env_local_llm_rejects_remote_endpoint():
+    result = _run_check_env(
+        {
+            "MODEL_PROVIDER": "local_llm",
+            "ALPHA_LOCAL_LLM_ENABLED": "true",
+            "ALPHA_LOCAL_LLM_ENDPOINT": "http://example.com/api/chat",
+            "ALPHA_LOCAL_LLM_MODEL": "llama3.2:1b-local-fixture",
+            "ALPHA_LOCAL_LLM_TIMEOUT_SECONDS": "2.5",
+        }
+    )
+    assert result.returncode != 0
+    assert "endpoint_not_local_non_evidence" in result.stdout
