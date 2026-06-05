@@ -374,3 +374,83 @@ def test_ollama_backend_fails_closed_on_system_contract_echo_from_static_fixture
     assert result.reason == "prompt_echo_non_evidence"
     assert result.metadata["failure_label"] == "failed_closed_result"
     assert result.behavior_evidence is False
+
+
+@pytest.mark.parametrize(
+    "endpoint_url",
+    [
+        "https://example.com/api/chat",
+        "http://example.com/api/chat",
+        "https://api.openai.com/v1/chat/completions",
+        "http://192.168.1.25:11434/api/chat",
+        "ftp://127.0.0.1:11434/api/chat",
+        "http:///api/chat",
+        "http://127.0.0.1:bad/api/chat",
+        "http://localhost:bad/api/chat",
+        "http://[::1]:bad/api/chat",
+        "http://127.0.0.1:99999/api/chat",
+        "",
+    ],
+)
+def test_ollama_backend_rejects_non_local_endpoints_before_transport_invocation(endpoint_url):
+    from alpha.local_llm.provider_adapter import OllamaLocalHTTPBackend
+
+    observed = {"called": False}
+
+    def fake_transport(*, endpoint_url, payload, timeout_seconds):
+        observed["called"] = True
+        return {"message": {"role": "assistant", "content": "must not be called"}}
+
+    backend = OllamaLocalHTTPBackend(
+        model="offline-fixture-model",
+        endpoint_url=endpoint_url,
+        transport=fake_transport,
+    )
+
+    result = run_local_llm_provider_adapter(
+        "Reject non-local endpoints before transport.", backend=backend
+    )
+
+    assert result.status == "failed_closed"
+    assert result.reason == "endpoint_not_local_non_evidence"
+    assert result.metadata["failure_label"] == "failed_closed_result"
+    assert result.behavior_evidence is False
+    assert observed["called"] is False
+    assert len(backend.calls) == 0
+    assert len(backend.payloads) == 0
+
+
+@pytest.mark.parametrize(
+    "endpoint_url",
+    [
+        "http://127.0.0.1:11434/api/chat",
+        "http://localhost:11434/api/chat",
+        "http://[::1]:11434/api/chat",
+    ],
+)
+def test_ollama_backend_allows_loopback_endpoints_to_reach_injected_transport(endpoint_url):
+    from alpha.local_llm.provider_adapter import OllamaLocalHTTPBackend
+
+    observed = {"called": False, "endpoint_url": None}
+
+    def fake_transport(*, endpoint_url, payload, timeout_seconds):
+        observed["called"] = True
+        observed["endpoint_url"] = endpoint_url
+        return {"message": {"role": "assistant", "content": "local fixture"}}
+
+    backend = OllamaLocalHTTPBackend(
+        model="offline-fixture-model",
+        endpoint_url=endpoint_url,
+        transport=fake_transport,
+    )
+
+    result = run_local_llm_provider_adapter(
+        "Allow local endpoints to fake transport.", backend=backend
+    )
+
+    assert result.status == "non_evidence"
+    assert result.reason == "local_llm_provider_adapter_wiring_only"
+    assert result.output_text == "local fixture"
+    assert result.behavior_evidence is False
+    assert observed["called"] is True
+    assert observed["endpoint_url"] == endpoint_url
