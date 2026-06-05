@@ -19,8 +19,12 @@ from .provider_adapter import (  # noqa: F401
     LocalLLMAdapterMessage,
     LocalLLMAdapterRequest,
     LocalLLMAdapterResult,
+    LocalLLMProviderAdapterError,
     LocalLLMProviderBackend,
+    OllamaLocalHTTPBackend,
     StubLocalLLMProviderBackend,
+    build_ollama_chat_payload,
     build_local_llm_adapter_request,
+    parse_ollama_chat_response,
     run_local_llm_provider_adapter,
 )
