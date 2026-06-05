@@ -54,15 +54,56 @@ Replace placeholders only after the implementation has merged and the exact oper
 ```
 
 ```bash
-# Confirm the endpoint is loopback or localhost before runtime smoke.
+# Confirm the endpoint is an unambiguous HTTP localhost or loopback URL before runtime smoke.
 python - <<'PY'
-from urllib.parse import urlparse
+from ipaddress import ip_address
+from urllib.parse import urlsplit
+
 endpoint = "TBD"
-parsed = urlparse(endpoint)
-print(parsed.scheme, parsed.hostname, parsed.port, parsed.path)
-assert parsed.hostname in {"localhost", "127.0.0.1", "::1"}
+
+try:
+    parsed = urlsplit(endpoint)
+
+    if parsed.scheme != "http":
+        raise ValueError("local LLM endpoints must use the http scheme")
+
+    if not parsed.netloc or parsed.hostname is None:
+        raise ValueError("local LLM endpoint must include an unambiguous host")
+
+    if parsed.username is not None or parsed.password is not None:
+        raise ValueError("local LLM endpoint must not include username/password/userinfo")
+
+    # Accessing parsed.port forces urllib to reject invalid and out-of-range ports.
+    port = parsed.port
+    effective_port = port if port is not None else 80
+
+    hostname = parsed.hostname
+    is_allowed_name = hostname == "localhost"
+    try:
+        is_loopback_ip = ip_address(hostname).is_loopback
+    except ValueError:
+        is_loopback_ip = False
+
+    if not (is_allowed_name or is_loopback_ip):
+        raise ValueError("local LLM endpoint host must be localhost or a loopback IP")
+
+    if parsed.fragment:
+        raise ValueError("local LLM endpoint must not include a fragment")
+
+    print("accepted local endpoint", parsed.scheme, hostname, effective_port, parsed.path)
+except ValueError as exc:
+    raise SystemExit(f"rejected local LLM endpoint: {exc}")
 PY
 ```
+
+This template must reject malformed, ambiguous, non-HTTP, non-loopback, and userinfo-bearing endpoints before any future runtime smoke. Examples that must be rejected include:
+
+- `ftp://127.0.0.1:11434/api/chat` because the scheme is not `http`;
+- `https://127.0.0.1:11434/api/chat` because the scheme is not `http`;
+- `http://user:pass@127.0.0.1:11434/api/chat` because userinfo is present;
+- hosted URLs such as `http://api.example.com/api/chat`;
+- LAN or private-network URLs such as `http://192.168.1.10:11434/api/chat` or `http://10.0.0.5:11434/api/chat`;
+- invalid-port URLs such as `http://127.0.0.1:99999/api/chat` or `http://127.0.0.1:notaport/api/chat`.
 
 ```bash
 # Confirm required provider-key variables are not needed for local mode.

@@ -28,9 +28,9 @@ Expected operator action: stop or record a local failure. Do not download or swi
 
 ### Endpoint not local
 
-Use this category when the endpoint is remote, hosted, LAN, private-network, malformed, ambiguous, unsupported, missing a host, includes userinfo, or does not parse as localhost or loopback.
+Use this category when the endpoint is remote, hosted, LAN, private-network, malformed, ambiguous, unsupported, non-HTTP, missing a host, includes userinfo, has an invalid or out-of-range port, or does not parse deterministically as localhost or loopback.
 
-Expected operator action: stop. Local mode must accept only localhost or loopback endpoints.
+Expected operator action: stop. Local mode must accept only HTTP localhost or loopback endpoints with no username, password, or userinfo.
 
 ### Timeout
 
