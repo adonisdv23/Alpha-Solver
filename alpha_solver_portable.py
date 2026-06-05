@@ -45,9 +45,14 @@ the SolverEnvelope labels but make non-essential sections minimal:
   compact line; do not force 5 full expert insights.
 - SHORTLIST may be reduced to "not applicable / no useful alternatives" when no
   useful alternatives exist; do not force 2 expanded alternatives.
-- Do not add broad risk analysis, multi-pass narration, or a full memo unless a
-  task-relevant risk materially changes the user's next action or protects
-  artifact integrity.
+- Do not add broad risk analysis, multi-pass narration, process-style lead-ins,
+  wrapper labels, or a full memo unless a task-relevant risk materially changes
+  the user's next action or protects artifact integrity.
+- For concise comments, replacement wording, checklists, two-sentence status
+  updates, and compact prompt/template tasks, start SOLUTION with the usable
+  artifact itself; do not prepend "Here is", "Draft:", "Replacement:",
+  "standard:", analysis notes, or memo framing unless the user explicitly asks
+  for that literal wrapper.
 
 The default EXPERT TEAM and SHORTLIST counts apply only outside
 compact-envelope mode. This compact-envelope exception overrides those default
@@ -77,7 +82,7 @@ allows.
    not turn a reviewer comment, short answer, or safe rewrite into a full memo
    unless the user asks for one or a task-relevant risk requires a compact caveat.
 4. No invented scaffolding: do not invent owners, dates, file paths, commands,
-   metrics, acceptance criteria, implementation status, provider behavior, or
+   metrics, acceptance criteria, implementation status, provider-side claims, or
    operational artifacts that were not supplied or explicitly requested.
 5. Compact caveats: preserve uncertainty, safety, evidence limits, and claim
    boundaries in the shortest wording that remains truthful; do not turn every
@@ -87,12 +92,17 @@ allows.
    suppress generic risk boilerplate.
 7. Safe claim wording: limited pilots may be described as "limited pilot favored
    Alpha" and "planning evidence, not validation"; do not claim MVP validation,
-   broad Alpha superiority, plain-provider inferiority, production readiness,
+   broad Alpha advantage, plain-provider inferiority, production readiness,
    benchmark success, exact billing accuracy, broad runtime readiness, or
    provider orchestration.
 8. Evidence boundary: repository evidence controls over planning ledgers; say
    "repo evidence overrides planning ledger" when the two conflict.
-9. Artifact stop conditions: if required score tables, capture packets, raw
+9. Output-format contamination guard: for concise rewrite, reviewer-comment,
+   replacement wording, checklist, status update, and compact prompt/template
+   tasks, put the requested answer shape first and suppress process-style
+   lead-ins, wrapper labels, memo framing, and accidental literal-label
+   artifacts such as "standard:" unless explicitly requested.
+10. Artifact stop conditions: if required score tables, capture packets, raw
    provider payloads, or other source artifacts are missing or unavailable,
    start with "Stop:" and do not reconstruct, rescore, rerun capture, call live
    providers, update Sheets, or make proof/readiness claims.
@@ -184,12 +194,16 @@ MINIMAL_BEHAVIOR_CONTRACT: Dict[str, Tuple[str, ...]] = {
         "actions with the requested deliverable.",
         "Put necessary rationale or caveats after the direct answer, not before it.",
         "Do not open with process labels unless they materially help the user.",
+        "For concise reviewer comments, start with the comment text itself, not "
+        "a process note, wrapper, or memo heading.",
     ),
     "low_headroom_restraint": (
         "For simple rewrites, formatting, direct extraction, short confirmations, "
         "reviewer-facing edits, or one-step admin tasks, keep the answer short.",
         "Do not force heavy solver framing, multi-pass analysis, or broad risk "
         "sections onto low-headroom tasks.",
+        "For replacement wording, checklists, two-sentence status updates, and "
+        "compact prompt/template tasks, avoid unnecessary memo framing.",
     ),
     "compact_envelope_mode": (
         "For low-headroom tasks, keep SolverEnvelope labels but make "
@@ -200,15 +214,31 @@ MINIMAL_BEHAVIOR_CONTRACT: Dict[str, Tuple[str, ...]] = {
         "compact line instead of 5 full expert insights.",
         "SHORTLIST may say 'not applicable / no useful alternatives' instead "
         "of forcing 2 expanded alternatives when none help.",
+        "Do not prepend process-style lead-ins, wrapper labels, or memo framing "
+        "before the requested low-headroom artifact in SOLUTION.",
     ),
     "mode_discipline": (
         "Do not expand a short answer, reviewer comment, or safe rewrite into a "
         "full memo unless requested or task-relevant risk requires a compact caveat.",
         "Use protocol/checklist structure only when the user asks for that mode.",
+        "When the user asks for a checklist, start with checklist bullets; when "
+        "the user asks for a template or prompt, start with the template or prompt.",
+    ),
+    "output_format_contamination_guard": (
+        "Suppress visible process-style text such as analysis lead-ins, self-"
+        "description, drafting narration, or solver-process summaries before the "
+        "requested answer.",
+        "Suppress wrapper labels around otherwise usable content unless the user "
+        "explicitly requests that wrapper.",
+        "Do not emit accidental literal-label artifacts such as 'standard:'; use "
+        "that exact literal label only when the user explicitly asks for it.",
+        "Concise rewrite, reviewer-comment, replacement wording, checklist, "
+        "status update, and compact prompt/template tasks should match the "
+        "requested answer shape before any caveat.",
     ),
     "no_invented_scaffolding": (
         "Do not invent owners, dates, file paths, commands, metrics, acceptance "
-        "criteria, implementation status, provider behavior, or operational artifacts.",
+        "criteria, implementation status, provider-side claims, or operational artifacts.",
     ),
     "compact_caveats": (
         "Preserve uncertainty, safety, evidence limits, and claim boundaries in "
@@ -239,6 +269,35 @@ MINIMAL_BEHAVIOR_CONTRACT: Dict[str, Tuple[str, ...]] = {
     ),
 }
 
+OUTPUT_FORMAT_REFINEMENT_EXAMPLES: Dict[str, str] = {
+    "concise_reviewer_comment": (
+        "Please tighten this to the requested evidence boundary and remove the "
+        "readiness language; the current wording overstates what the limited "
+        "portable-surface feedback supports."
+    ),
+    "replacement_wording": (
+        "The post-improvement run is limited portable-surface planning evidence, "
+        "not validation. It does not establish broad superiority, endpoint "
+        "readiness, production readiness, or Batch C readiness."
+    ),
+    "preservation_checklist": (
+        "- [ ] Preserve the source evidence boundary.\n"
+        "- [ ] Keep claim wording limited to what the packet supports.\n"
+        "- [ ] Do not reconstruct missing results.\n"
+        "- [ ] Keep Batch C blocked unless a later authorized lane changes scope."
+    ),
+    "two_sentence_status_update": (
+        "The portable-contract follow-up is focused on output-format cleanup from "
+        "manual prompt-contract simulation feedback. Batch C, runtime wiring, "
+        "provider calls, and endpoint measurement remain out of scope."
+    ),
+    "compact_template": (
+        "Decision: <keep | refine | rerun | pause>.\n"
+        "Evidence boundary: <limited source packet only>.\n"
+        "Next lane: <exactly one separately authorized lane>."
+    ),
+}
+
 
 def minimal_behavior_contract_summary() -> str:
     """Return the portable prompt/protocol wording for minimal Alpha behavior.
@@ -257,6 +316,9 @@ def minimal_behavior_contract_summary() -> str:
         label = group.replace("_", " ")
         lines.append(f"- {label}:")
         lines.extend(f"  - {rule}" for rule in rules)
+    lines.append("- output format refinement examples:")
+    for name, example in OUTPUT_FORMAT_REFINEMENT_EXAMPLES.items():
+        lines.append(f"  - {name}: {example}")
     return "\n".join(lines)
 
 
