@@ -11,3 +11,7 @@ Preserved checks:
 - safe negative boundary disclaimers in pass two remain allowed by the existing sentence-scoped check.
 
 The tests cover forbidden pass-one terms across considerations, assumptions, missing information, and risk flags, and cover pass-two forbidden claim suppression.
+
+## PR #342 correction
+
+Pass-one boundary screening is sentence scoped by reusing the same forbidden-claim helper as pass two. A negated disclaimer sentence can remain allowed, but a separate forbidden positive sentence in the same pass-one field still fails closed before pass two.

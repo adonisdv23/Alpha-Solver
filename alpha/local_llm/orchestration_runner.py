@@ -459,7 +459,7 @@ def _unsafe_output(output_text: str, system_text: str, prompt_text: str) -> bool
 
 def _pass_one_has_forbidden_boundary_claim(gate: _PassOneGate) -> bool:
     return any(
-        _FORBIDDEN_BOUNDARY_TERM_RE.search(text) and not _NEGATED_BOUNDARY_CLAIM_RE.search(text)
+        _has_forbidden_boundary_claim(text)
         for text in (
             *gate.considerations,
             *gate.assumptions,

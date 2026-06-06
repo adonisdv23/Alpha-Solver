@@ -556,7 +556,7 @@ def test_pass_one_forbidden_boundary_claim_fails_closed_without_exposing_fields(
         ("considerations", "This confirms dashboard readiness."),
         ("assumptions", "Assume it is ready for production."),
         ("assumptions", "Assume Alpha is superior."),
-        ("missing_information", "Need proof of local model quality."),
+        ("missing_information", "This proves local model quality."),
         ("risk_flags", "validated billing accuracy"),
         ("risk_flags", "evidence-model promotion validated"),
     ],
@@ -590,6 +590,66 @@ def test_prompt_five_boundary_guard_blocks_forbidden_pass_one_fields_without_exp
     assert result["considerations"] == []
     assert result["assumptions"] == []
     assert len(transport.calls) == 1
+
+
+def test_pass_one_boundary_guard_is_sentence_scoped_for_mixed_negated_and_positive_claim():
+    forbidden_text = "This does not prove production readiness. It validates dashboard readiness."
+    transport = SequencedTransport(
+        _pass_one(
+            mode="answer_with_assumptions",
+            considerations=[forbidden_text],
+            assumptions=["Assume ordinary local-only execution."],
+            confidence=0.8,
+            missing_information=[],
+            risk_flags=["low"],
+        ),
+        "Unexpected pass two answer.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Keep mixed boundary claims out of pass one.",
+        env=_valid_env(),
+        transport=transport,
+    )
+
+    assert result["status"] in {"failed_closed", "blocked"}
+    assert result["mode"] == "block"
+    assert result["pass_count"] == 1
+    _assert_compatible_answer_fields(result, "")
+    assert forbidden_text not in result["answer"]
+    assert forbidden_text not in result["final_answer"]
+    assert result["considerations"] == []
+    assert result["assumptions"] == []
+    assert len(transport.calls) == 1
+
+
+def test_pass_one_boundary_guard_allows_negated_disclaimer_only_on_bounded_path():
+    disclaimer = "This does not prove production readiness."
+    final_answer = "Proceed with a bounded local plan while preserving the stated assumption."
+    transport = SequencedTransport(
+        _pass_one(
+            mode="answer_with_assumptions",
+            considerations=[disclaimer, "The planning scope is local and bounded."],
+            assumptions=["Assume later profiling will guide the implementation choice."],
+            confidence=0.8,
+            missing_information=["Profiler results can be supplied later."],
+            risk_flags=["startup performance optimization"],
+        ),
+        final_answer,
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Plan local Python CLI startup improvements with assumptions.",
+        env=_valid_env(),
+        transport=transport,
+    )
+
+    assert result["status"] == "ok"
+    assert result["mode"] == "answer_with_assumptions"
+    assert result["pass_count"] == 2
+    assert disclaimer in result["considerations"]
+    _assert_compatible_answer_fields(result, final_answer)
+    assert len(transport.calls) == 2
 
 
 @pytest.mark.parametrize("field", ["behavior_evidence", "no_hosted_fallback", "no_provider_keys_required"])

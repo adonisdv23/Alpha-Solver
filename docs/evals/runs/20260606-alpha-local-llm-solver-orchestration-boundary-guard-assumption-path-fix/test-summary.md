@@ -13,3 +13,7 @@ Covered behavior:
 - Existing local-only and compatibility invariants remain covered.
 
 No local model calls, hosted provider calls, network calls, smoke rerun, source artifact import, or Google Sheets update were performed.
+
+## PR #342 correction tests
+
+Additional fake-transport coverage verifies that mixed negated and positive pass-one boundary claims in one field fail closed without exposure, while a negated disclaimer-only field can proceed when the bounded assumption gate is otherwise satisfied.
