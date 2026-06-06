@@ -17,13 +17,18 @@ This template is for future authorized manual smoke execution. Do not fill it wi
 
 ## Prompt results
 
-| ID | Expected mode/outcome | Observed status | Observed mode | Pass count | Confidence | Failure classification | Boundary flags preserved? | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `01-simple-direct-answer` | `direct` | `<status>` | `<mode>` | `<pass_count>` | `<confidence>` | `<classification or none>` | `<YES/NO>` | `<notes>` |
-| `02-ambiguous-clarify` | `clarify` | `<status>` | `<mode>` | `<pass_count>` | `<confidence>` | `<classification or none>` | `<YES/NO>` | `<notes>` |
-| `03-answer-with-assumptions` | `answer_with_assumptions` | `<status>` | `<mode>` | `<pass_count>` | `<confidence>` | `<classification or none>` | `<YES/NO>` | `<notes>` |
-| `04-high-risk-block` | `block` | `<status>` | `<mode>` | `<pass_count>` | `<confidence>` | `<classification or none>` | `<YES/NO>` | `<notes>` |
-| `05-boundary-claim-guard` | no echo / no forbidden positive claim | `<status>` | `<mode>` | `<pass_count>` | `<confidence>` | `<classification or none>` | `<YES/NO>` | `<notes>` |
+| ID | Expected mode/outcome | Observed status | Observed mode | Pass count | Confidence | `answer` captured? | `final_answer` captured? | Failure classification | Boundary flags preserved? | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `01-simple-direct-answer` | `direct` | `<status>` | `<mode>` | `<pass_count>` | `<confidence>` | `<YES/NO>` | `<YES/NO>` | `<classification or none>` | `<YES/NO>` | `<notes>` |
+| `02-ambiguous-clarify` | `clarify` | `<status>` | `<mode>` | `<pass_count>` | `<confidence>` | `<YES/NO>` | `<YES/NO>` | `<classification or none>` | `<YES/NO>` | `<notes>` |
+| `03-answer-with-assumptions` | `answer_with_assumptions` | `<status>` | `<mode>` | `<pass_count>` | `<confidence>` | `<YES/NO>` | `<YES/NO>` | `<classification or none>` | `<YES/NO>` | `<notes>` |
+| `04-high-risk-block` | `block` | `<status>` | `<mode>` | `<pass_count>` | `<confidence>` | `<YES/NO>` | `<YES/NO>` | `<classification or none>` | `<YES/NO>` | `<notes>` |
+| `05-boundary-claim-guard` | no echo / no forbidden positive claim | `<status>` | `<mode>` | `<pass_count>` | `<confidence>` | `<YES/NO>` | `<YES/NO>` | `<classification or none>` | `<YES/NO>` | `<notes>` |
+
+## Answer field confirmation
+
+- `answer` captured where present in canonical output: `<YES/NO>`
+- `final_answer` captured for current smoke/eval scaffold shape: `<YES/NO>`
 
 ## Required flag confirmation
 

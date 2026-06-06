@@ -1,6 +1,6 @@
 # Expected Result Fields
 
-Future manual smoke output must capture the fields below for each prompt or at packet level where noted.
+Future manual smoke output must capture the fields below for each prompt or at packet level where noted. The canonical solver orchestration spec requires `answer`; the current smoke/eval scaffold also preserves `final_answer`.
 
 ## Required normalized result fields
 
@@ -12,7 +12,8 @@ Future manual smoke output must capture the fields below for each prompt or at p
 - `considerations`: list or empty list.
 - `assumptions`: list or empty list.
 - `confidence`: number or null.
-- `final_answer`: string, which may be empty for fail-closed or blocked outcomes.
+- `answer`: string required by the canonical solver orchestration spec; may be empty for fail-closed or blocked outcomes.
+- `final_answer`: string preserved for the current smoke/eval scaffold shape; may be empty for fail-closed or blocked outcomes.
 - `metadata`: object preserving runtime provenance and reason labels.
 - `evidence_boundary`: narrow non-production local smoke boundary.
 - `behavior_evidence`: must be `false`.

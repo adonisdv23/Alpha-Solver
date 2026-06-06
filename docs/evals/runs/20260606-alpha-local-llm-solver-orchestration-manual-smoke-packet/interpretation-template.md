@@ -20,6 +20,8 @@ Use this template after future authorized manual smoke artifacts are captured an
 
 ## Prompt-by-prompt interpretation
 
+For every prompt, interpret both `answer` and `final_answer`: `answer` is required by the canonical solver orchestration spec, and `final_answer` is preserved for the current smoke/eval scaffold shape.
+
 ### `01-simple-direct-answer`
 
 - Expected mode: `direct`

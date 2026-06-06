@@ -1,6 +1,6 @@
 # Exact Command Template
 
-This is a copy/paste-ready Python script template for Adonis to run from repo root after the review gate returns `AUTHORIZE_MANUAL_LOCAL_ORCHESTRATION_SMOKE`.
+This is a copy/paste-ready shell/Python script template for Adonis to run from repo root after the review gate returns `AUTHORIZE_MANUAL_LOCAL_ORCHESTRATION_SMOKE`.
 
 ## Required execution boundary
 
@@ -18,13 +18,13 @@ Do not add provider keys. Do not dump the full environment.
 
 ## Copy/paste command
 
+The command below first writes the actual runner script to a concrete file, then executes that file. Python script provenance and checksum are computed from the actual `manual-smoke-runner.py` file that is executed, not from a stdin placeholder.
+
 ```bash
-PYTHONPATH="$(pwd)" \
-ALPHA_LOCAL_LLM_ENABLED="true" \
-ALPHA_LOCAL_LLM_ENDPOINT="<LOCAL_OLLAMA_LOOPBACK_ENDPOINT>" \
-ALPHA_LOCAL_LLM_MODEL="<LOCAL_OLLAMA_MODEL>" \
-ALPHA_LOCAL_LLM_TIMEOUT_SECONDS="<LOCAL_TIMEOUT_SECONDS>" \
-python - <<'PY'
+ARTIFACT_DIR="docs/evals/runs/20260606-alpha-local-llm-solver-orchestration-manual-smoke-source-artifact"
+RUNNER_PATH="$ARTIFACT_DIR/manual-smoke-runner.py"
+mkdir -p "$ARTIFACT_DIR"
+cat > "$RUNNER_PATH" <<'PY'
 from __future__ import annotations
 
 import contextlib
@@ -39,14 +39,16 @@ import subprocess
 import sys
 import traceback
 from typing import Any
+from urllib.parse import urlsplit
 
 from alpha.local_llm.orchestration_runner import run_local_llm_solver_orchestration
 
 ARTIFACT_DIR = Path(
     "docs/evals/runs/20260606-alpha-local-llm-solver-orchestration-manual-smoke-source-artifact"
 )
-ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
-SCRIPT_TEXT = Path(__file__).read_text() if "__file__" in globals() and Path(__file__).exists() else "<stdin script; see command-provenance.txt>"
+RUNNER_PATH = ARTIFACT_DIR / "manual-smoke-runner.py"
+LOOPBACK_HOSTS = frozenset({"127.0.0.1", "localhost", "::1"})
+SUPPORTED_LOCAL_SCHEMES = frozenset({"http"})
 
 PROMPTS = [
     {
@@ -103,13 +105,27 @@ def run_cmd(args: list[str]) -> dict[str, Any]:
 
 def endpoint_summary(raw_endpoint: str) -> str:
     value = (raw_endpoint or "").strip()
-    if value.startswith("http://127.0.0.1"):
-        return "http://127.0.0.1:<PORT>/<PATH>"
-    if value.startswith("http://localhost"):
-        return "http://localhost:<PORT>/<PATH>"
-    if value.startswith("http://[::1]"):
-        return "http://[::1]:<PORT>/<PATH>"
-    return "<NON_LOOPBACK_OR_UNSET_ENDPOINT_REDACTED>"
+    if not value:
+        return "<NON_LOOPBACK_OR_UNSET_ENDPOINT_REDACTED>"
+    try:
+        parsed = urlsplit(value)
+    except ValueError:
+        return "<NON_LOOPBACK_OR_UNSET_ENDPOINT_REDACTED>"
+    try:
+        hostname = parsed.hostname
+    except ValueError:
+        return "<NON_LOOPBACK_OR_UNSET_ENDPOINT_REDACTED>"
+    if (
+        parsed.scheme not in SUPPORTED_LOCAL_SCHEMES
+        or not parsed.netloc
+        or not hostname
+        or parsed.username is not None
+        or parsed.password is not None
+        or hostname not in LOOPBACK_HOSTS
+    ):
+        return "<NON_LOOPBACK_OR_UNSET_ENDPOINT_REDACTED>"
+    display_host = "[::1]" if hostname == "::1" else hostname
+    return f"{parsed.scheme}://{display_host}:<PORT>/<PATH>"
 
 
 def redact(value: Any) -> Any:
@@ -156,12 +172,21 @@ def collect_one(prompt_record: dict[str, str]) -> dict[str, Any]:
 
 
 def main() -> int:
+    ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
     repo_status = run_cmd(["git", "status", "--short", "--branch"])
     repo_head = run_cmd(["git", "rev-parse", "HEAD"])
     diff_name_only = run_cmd(["git", "diff", "--name-only"])
+    script_bytes = RUNNER_PATH.read_bytes()
+    script_provenance = {
+        "source": "actual executed script file",
+        "path": "<REPO_ROOT>/docs/evals/runs/20260606-alpha-local-llm-solver-orchestration-manual-smoke-source-artifact/manual-smoke-runner.py",
+        "sha256": hashlib.sha256(script_bytes).hexdigest(),
+        "byte_count": len(script_bytes),
+    }
     command_provenance = {
         "invoked_from": "<REPO_ROOT>",
-        "python_executable": sys.executable.replace(str(Path.cwd()), "<REPO_ROOT>"),
+        "runner_path": script_provenance["path"],
+        "python_executable": "<PYTHON_EXECUTABLE_PATH_REDACTED>",
         "python_version": sys.version,
         "platform": platform.platform(),
         "cwd": "<REPO_ROOT>",
@@ -174,10 +199,6 @@ def main() -> int:
         "provider_key_presence": {key: bool(os.environ.get(key)) for key in FORBIDDEN_PROVIDER_KEYS},
         "note": "No full environment dump captured; provider key values are never printed.",
     }
-    script_provenance = {
-        "source": "stdin command template from manual smoke packet",
-        "sha256": hashlib.sha256(SCRIPT_TEXT.encode("utf-8")).hexdigest(),
-    }
     results = [collect_one(prompt_record) for prompt_record in PROMPTS]
     packet = {
         "future_smoke_lane": "see selected-next-lane.md",
@@ -186,6 +207,7 @@ def main() -> int:
         "provider_mode_required": "local_llm",
         "orchestration_mode_expected": "non_production_local_solver_orchestration",
         "strategy_expected": "local_expert_two_pass",
+        "required_result_fields_note": "Canonical spec requires answer; current smoke/eval scaffold also preserves final_answer.",
         "behavior_evidence": False,
         "no_hosted_fallback": True,
         "no_provider_keys_required": True,
@@ -205,17 +227,38 @@ def main() -> int:
     (ARTIFACT_DIR / "command-provenance.txt").write_text(json.dumps(command_provenance, indent=2, sort_keys=True) + "\n")
     (ARTIFACT_DIR / "python-script-provenance.json").write_text(json.dumps(script_provenance, indent=2, sort_keys=True) + "\n")
     (ARTIFACT_DIR / "repo-status.txt").write_text(repo_status["stdout"] + repo_status["stderr"])
-    print(json.dumps({"artifact_dir": str(ARTIFACT_DIR), "output_path": str(output_path), "result_count": len(results)}, indent=2))
+    print(json.dumps({"artifact_dir": str(ARTIFACT_DIR), "output_path": str(output_path), "runner_path": str(RUNNER_PATH), "result_count": len(results)}, indent=2))
     return 0
 
 raise SystemExit(main())
 PY
+PYTHONPATH="$(pwd)" \
+ALPHA_LOCAL_LLM_ENABLED="true" \
+ALPHA_LOCAL_LLM_ENDPOINT="<LOCAL_OLLAMA_LOOPBACK_ENDPOINT>" \
+ALPHA_LOCAL_LLM_MODEL="<LOCAL_OLLAMA_MODEL>" \
+ALPHA_LOCAL_LLM_TIMEOUT_SECONDS="<LOCAL_TIMEOUT_SECONDS>" \
+python "$RUNNER_PATH" \
+  > "$ARTIFACT_DIR/manual-smoke-runner.stdout.txt" \
+  2> "$ARTIFACT_DIR/manual-smoke-runner.stderr.txt"
+RUNNER_STATUS=$?
+printf '%s\n' "$RUNNER_STATUS" > "$ARTIFACT_DIR/manual-smoke-runner.exit-status.txt"
+printf 'manual smoke runner exit status: %s\n' "$RUNNER_STATUS"
+printf 'stdout: %s\n' "$ARTIFACT_DIR/manual-smoke-runner.stdout.txt"
+printf 'stderr: %s\n' "$ARTIFACT_DIR/manual-smoke-runner.stderr.txt"
+printf 'redacted output: %s\n' "$ARTIFACT_DIR/manual-smoke-redacted-output.json"
+exit "$RUNNER_STATUS"
 ```
 
 ## Output contract
 
+The command writes the actual executed script file to:
+
+`docs/evals/runs/20260606-alpha-local-llm-solver-orchestration-manual-smoke-source-artifact/manual-smoke-runner.py`
+
 The command writes a redacted JSON packet to:
 
 `docs/evals/runs/20260606-alpha-local-llm-solver-orchestration-manual-smoke-source-artifact/manual-smoke-redacted-output.json`
+
+It also writes command provenance, Python script provenance/checksum, repo status, stdout, stderr, and exit-status artifacts in the same future artifact folder.
 
 That future artifact path is for Adonis's local execution output and requires a later source artifact preservation PR or equivalent repo-source preservation step.

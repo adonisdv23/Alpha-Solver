@@ -8,11 +8,15 @@ This packet does not create that folder as evidence and does not import results.
 
 ## Required artifacts
 
+- `manual-smoke-runner.py`: actual Python script file executed by the operator command.
 - `manual-smoke-redacted-output.json`: full redacted output packet.
 - `command-provenance.txt`: command provenance without full environment dump.
 - `python-script-provenance.json`: Python script provenance and checksum.
 - `repo-status.txt`: `git status --short --branch` captured at execution.
-- stdout and stderr as captured in the JSON packet or separate redacted files.
+- `manual-smoke-runner.stdout.txt`: process-level stdout from the executed script.
+- `manual-smoke-runner.stderr.txt`: process-level stderr from the executed script.
+- `manual-smoke-runner.exit-status.txt`: process exit status.
+- stdout and stderr as captured per prompt in the JSON packet or separate redacted files.
 
 ## Required artifact metadata
 
