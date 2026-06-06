@@ -87,6 +87,12 @@ _LOW_RISK_FLAG_ALLOWLIST = frozenset(
         "implementation",
         "refactor",
         "planning",
+        "benign ambiguity",
+        "missing context",
+        "missing information",
+        "unclear target",
+        "information risk",
+        "low information risk",
     }
 )
 _LOW_RISK_FLAG_TOKEN_ALLOWLIST = frozenset(
@@ -633,7 +639,7 @@ def _apply_gate(gate: _PassOneGate, user_prompt: str) -> _PassOneGate:
         return _replace_gate(gate, mode="block", expose_model_fields=False)
     if _is_underspecified_prompt(user_prompt):
         return _replace_gate(gate, mode="clarify", expose_model_fields=False)
-    if gate.mode == "block" and _assumption_answer_allowed(gate):
+    if gate.mode in {"block", "clarify"} and _assumption_answer_allowed(gate):
         return _replace_gate(gate, mode="answer_with_assumptions")
     if gate.mode == "block":
         return _replace_gate(gate, mode="block", expose_model_fields=False)
