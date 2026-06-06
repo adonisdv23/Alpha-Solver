@@ -43,6 +43,14 @@ class SequencedTransport:
         return {"message": {"role": "assistant", "content": content}}
 
 
+def _assert_compatible_answer_fields(result, expected_answer: str) -> None:
+    assert "answer" in result
+    assert "final_answer" in result
+    assert result["answer"] == expected_answer
+    assert result["final_answer"] == expected_answer
+    assert result["answer"] == result["final_answer"]
+
+
 def _pass_one(**overrides):
     data = {
         "mode": "direct",
@@ -65,6 +73,7 @@ def test_default_off_local_llm_config_fails_closed_without_transport_call():
 
     assert result["status"] == "failed_closed"
     assert result["mode"] == "block"
+    _assert_compatible_answer_fields(result, "")
     assert result["metadata"]["reason"] == "local_llm_disabled_non_evidence"
     assert transport.calls == []
 
@@ -79,6 +88,7 @@ def test_non_local_endpoint_fails_closed_through_existing_validation_path():
     )
 
     assert result["status"] == "failed_closed"
+    _assert_compatible_answer_fields(result, "")
     assert result["metadata"]["reason"] == "endpoint_not_local_non_evidence"
     assert transport.calls == []
 
@@ -113,7 +123,7 @@ def test_happy_path_returns_normalized_local_orchestration_result():
     assert result["considerations"] == ["Use the local bounded context."]
     assert result["assumptions"] == []
     assert result["confidence"] == 0.82
-    assert result["final_answer"] == "Final local answer."
+    _assert_compatible_answer_fields(result, "Final local answer.")
     assert result["metadata"]["local_backend"] == "ollama_chat"
     assert result["metadata"]["endpoint_is_loopback"] is True
 
@@ -140,6 +150,7 @@ def test_malformed_pass_one_without_safe_section_fallback_fails_closed():
 
     assert result["status"] == "failed_closed"
     assert result["mode"] not in {"direct", "answer_with_assumptions"}
+    _assert_compatible_answer_fields(result, "")
     assert len(transport.calls) == 1
 
 
@@ -158,6 +169,10 @@ def test_unparseable_confidence_cannot_choose_answer_with_assumptions():
 
     assert result["status"] == "clarify"
     assert result["mode"] == "clarify"
+    _assert_compatible_answer_fields(
+        result,
+        "Please clarify the missing information before a local answer can be attempted.",
+    )
     assert result["mode"] != "answer_with_assumptions"
     assert len(transport.calls) == 1
 
@@ -182,6 +197,7 @@ def test_answer_with_assumptions_requires_safe_confidence_and_bounded_assumption
     assert allowed_result["status"] == "ok"
     assert allowed_result["mode"] == "answer_with_assumptions"
     assert allowed_result["pass_count"] == 2
+    _assert_compatible_answer_fields(allowed_result, "Final answer with the explicit assumption.")
 
     denied = SequencedTransport(
         _pass_one(
@@ -199,6 +215,10 @@ def test_answer_with_assumptions_requires_safe_confidence_and_bounded_assumption
 
     assert denied_result["status"] == "clarify"
     assert denied_result["mode"] != "answer_with_assumptions"
+    _assert_compatible_answer_fields(
+        denied_result,
+        "Please clarify the missing information before a local answer can be attempted.",
+    )
     assert len(denied.calls) == 1
 
 
@@ -213,7 +233,8 @@ def test_pass_two_forbidden_boundary_claim_fails_closed_without_exposing_answer(
     assert result["status"] == "failed_closed"
     assert result["mode"] == "block"
     assert result["metadata"]["reason"] == "pass_two_boundary_claim_violation_non_evidence"
-    assert result["final_answer"] == ""
+    _assert_compatible_answer_fields(result, "")
+    assert forbidden_answer not in result["answer"]
     assert forbidden_answer not in result["final_answer"]
     assert result["behavior_evidence"] is False
 
@@ -235,8 +256,9 @@ def test_pass_two_safe_boundary_disclaimer_is_not_blocked(disclaimer):
     )
 
     assert result["status"] == "ok"
-    assert result["final_answer"] == disclaimer
+    _assert_compatible_answer_fields(result, disclaimer)
     assert result["behavior_evidence"] is False
+
 
 def test_pass_two_failure_fails_closed():
     transport = SequencedTransport(_pass_one(), "__TIMEOUT__")
@@ -249,6 +271,7 @@ def test_pass_two_failure_fails_closed():
     assert result["mode"] == "block"
     assert result["metadata"]["reason"] == "pass_two_failure:timeout_non_evidence"
     assert result["pass_count"] == 2
+    _assert_compatible_answer_fields(result, "")
 
 
 @pytest.mark.parametrize("echo_pass", [1, 2])
@@ -281,6 +304,33 @@ def test_prompt_echo_or_system_echo_fails_closed(echo_pass):
 
     assert result["status"] == "failed_closed"
     assert result["mode"] == "block"
+    _assert_compatible_answer_fields(result, "")
+
+
+def test_blocked_outcome_includes_empty_compatible_answer_fields():
+    transport = SequencedTransport(_pass_one(mode="block", risk_flags=["policy risk"]))
+
+    result = run_local_llm_solver_orchestration(
+        "Block instead of answering.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] == "blocked"
+    assert result["mode"] == "block"
+    _assert_compatible_answer_fields(result, "")
+
+
+def test_clarify_outcome_includes_matching_answer_fields_with_message():
+    transport = SequencedTransport(
+        _pass_one(mode="clarify", missing_information=["Need the target format."])
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Clarify before answering.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] == "clarify"
+    assert result["mode"] == "clarify"
+    _assert_compatible_answer_fields(result, "Please clarify: Need the target format.")
 
 
 def test_mode_is_always_one_of_supported_values_for_all_terminal_statuses():
