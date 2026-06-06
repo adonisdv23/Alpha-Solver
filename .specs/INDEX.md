@@ -33,6 +33,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 | `HIGHER-HEADROOM-EVAL-001.md` | HIGHER-HEADROOM-EVAL-001 · Higher-Headroom Alpha-vs-Plain Prompt Set |
 | `FINOPS-BUDGET-001.md` | FINOPS-BUDGET-001 · Budget Guardrails |
 | `LOCAL-LLM-RUNTIME-INTEGRATION-001.md` | LOCAL-LLM-RUNTIME-INTEGRATION-001 · Local LLM Runtime Integration Implementation Contract |
+| `LOCAL-LLM-SOLVER-ORCHESTRATION-001.md` | LOCAL-LLM-SOLVER-ORCHESTRATION-001 · Local LLM Solver Orchestration Integration Contract |
 | `MCP-001.md` | CODE SPEC — MCP-001 · MCP Registry Loader & Wiring (MCP) |
 | `MCP-002.md` | CODE SPEC — MCP-002 · Router decision rule (MCP) |
 | `MCP-003.md` | CODE SPEC — MCP-003 · MCP OAuth/Secrets scaffold (auth surface) (MCP) |
