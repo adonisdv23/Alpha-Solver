@@ -62,6 +62,7 @@ _HIGH_RISK_FLAG_RE = re.compile(
     r"secret\s+extraction|data\s+(?:exfiltration|theft)|exfiltration|"
     r"malware|phishing|unauthori[sz]ed\s+access|account\s+takeover|"
     r"exploit(?:\s+chain)?|evasion|evade|concealment|conceal|bypass|"
+    r"avoid\s+(?:audit(?:\s+trails?)?|logs?|logging)|"
     r"hide\s+from\s+reviewers?|disable\s+safety|disable\s+monitoring|"
     r"self[-\s]?harm|suicide|weapons?|explosives?"
     r")\b",
@@ -87,6 +88,19 @@ _LOW_RISK_FLAG_ALLOWLIST = frozenset(
         "refactor",
         "planning",
         "unknown",
+    }
+)
+_LOW_RISK_FLAG_TOKEN_ALLOWLIST = frozenset(
+    {
+        "cli",
+        "later",
+        "latency",
+        "local",
+        "optimization",
+        "optimisation",
+        "performance",
+        "profiling",
+        "startup",
     }
 )
 
@@ -446,7 +460,12 @@ def _unsafe_output(output_text: str, system_text: str, prompt_text: str) -> bool
 def _pass_one_has_forbidden_boundary_claim(gate: _PassOneGate) -> bool:
     return any(
         _has_forbidden_boundary_claim(text)
-        for text in (*gate.considerations, *gate.assumptions)
+        for text in (
+            *gate.considerations,
+            *gate.assumptions,
+            *gate.missing_information,
+            *gate.risk_flags,
+        )
     )
 
 
@@ -649,11 +668,20 @@ def _high_risk(gate: _PassOneGate, user_prompt: str) -> bool:
         return True
     for flag in gate.risk_flags:
         normalized = _normalize_risk_flag(flag)
-        if _HIGH_RISK_FLAG_RE.search(normalized):
-            return True
-        if normalized not in _LOW_RISK_FLAG_ALLOWLIST:
+        if not _low_risk_flag_allowed(normalized):
             return True
     return False
+
+
+def _low_risk_flag_allowed(normalized: str) -> bool:
+    if _HIGH_RISK_FLAG_RE.search(normalized):
+        return False
+    if normalized in _LOW_RISK_FLAG_ALLOWLIST:
+        return True
+    tokens = tuple(re.findall(r"[a-z0-9]+", normalized))
+    if not tokens:
+        return True
+    return all(token in _LOW_RISK_FLAG_TOKEN_ALLOWLIST for token in tokens)
 
 
 def _normalize_risk_flag(flag: str) -> str:
