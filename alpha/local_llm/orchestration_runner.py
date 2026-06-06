@@ -668,7 +668,7 @@ def _assumption_answer_allowed(gate: _PassOneGate) -> bool:
         return False
     if gate.missing_information and len(gate.missing_information) > 2:
         return False
-    for text in (*gate.considerations, *gate.assumptions):
+    for text in (*gate.considerations, *gate.assumptions, *gate.missing_information):
         if _HIGH_RISK_TEXT_RE.search(text) or _HIGH_RISK_FLAG_RE.search(text):
             return False
         if _has_forbidden_boundary_claim(text):

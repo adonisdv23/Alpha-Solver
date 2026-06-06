@@ -4,6 +4,7 @@ Focused fake-transport tests were added or updated for:
 
 - pass-one `block` plus underspecified prompt clarifies without pass two;
 - pass-one `block` plus bounded assumptions proceeds to pass two;
+- pass-one `block` plus high-risk missing information blocks without pass two;
 - high-risk prompts still block without normal answer fields;
 - high-risk outputs do not expose unsafe considerations or assumptions;
 - serious risk flags block without pass two;

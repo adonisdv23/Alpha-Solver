@@ -221,6 +221,37 @@ def test_pass_one_block_bounded_assumptions_proceeds_to_pass_two():
     assert len(transport.calls) == 2
 
 
+def test_pass_one_block_missing_information_high_risk_cue_blocks_without_pass_two():
+    unsafe_missing_information = "Need approval to bypass monitoring."
+    transport = SequencedTransport(
+        _pass_one(
+            mode="block",
+            considerations=["Profiling can support a bounded local optimization plan."],
+            assumptions=["Assume the target is a local fixture hot path with observable latency."],
+            confidence=0.8,
+            missing_information=[unsafe_missing_information],
+            risk_flags=["optimization"],
+        ),
+        "Unexpected pass two answer.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Plan a bounded performance improvement for the local fixture.",
+        env=_valid_env(),
+        transport=transport,
+    )
+
+    assert result["status"] in {"blocked", "failed_closed"}
+    assert result["mode"] == "block"
+    assert result["pass_count"] == 1
+    _assert_compatible_answer_fields(result, "")
+    assert unsafe_missing_information not in result["answer"]
+    assert unsafe_missing_information not in result["final_answer"]
+    assert result["considerations"] == []
+    assert result["assumptions"] == []
+    assert len(transport.calls) == 1
+
+
 def test_serious_risk_flag_blocks_even_when_prompt_text_is_neutral():
     transport = SequencedTransport(
         _pass_one(
