@@ -302,6 +302,215 @@ def test_prompt_three_shaped_python_cli_composite_flag_proceeds_to_assumption_an
     assert len(transport.calls) == 2
 
 
+def test_retry_004_prompt_two_block_with_benign_ambiguity_clarifies_without_pass_two():
+    transport = SequencedTransport(
+        _pass_one(
+            mode="block",
+            considerations=["The request is benign but lacks an optimization target."],
+            assumptions=["Assume only ordinary local performance tuning is intended."],
+            confidence=0.8,
+            missing_information=["Which target should be made faster?"],
+            risk_flags=["benign ambiguity", "missing context", "unclear target", "optimization"],
+        ),
+        "Unexpected pass two answer.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Make it faster.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] == "clarify"
+    assert result["mode"] == "clarify"
+    assert result["pass_count"] == 1
+    _assert_compatible_answer_fields(result, "Please clarify: Which target should be made faster?")
+    assert result["considerations"] == []
+    assert result["assumptions"] == []
+    assert len(transport.calls) == 1
+
+
+def test_retry_004_prompt_two_low_information_risk_clarifies_without_pass_two():
+    transport = SequencedTransport(
+        _pass_one(
+            mode="block",
+            considerations=["The request has low information risk because the target is missing."],
+            assumptions=["Assume the request is ordinary local performance tuning."],
+            confidence=0.8,
+            missing_information=["Which target should be made faster?"],
+            risk_flags=["low information risk"],
+        ),
+        "Unexpected pass two answer.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Make it faster.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] == "clarify"
+    assert result["mode"] == "clarify"
+    assert result["pass_count"] == 1
+    _assert_compatible_answer_fields(result, "Please clarify: Which target should be made faster?")
+    assert result["considerations"] == []
+    assert result["assumptions"] == []
+    assert len(transport.calls) == 1
+
+
+def test_retry_004_prompt_two_information_risk_alone_blocks_without_pass_two_or_exposure():
+    transport = SequencedTransport(
+        _pass_one(
+            mode="block",
+            considerations=["The model returned an ambiguous information risk label."],
+            assumptions=["Assume the ambiguous information risk is safe."],
+            confidence=0.8,
+            missing_information=["Which target should be made faster?"],
+            risk_flags=["information risk"],
+        ),
+        "Unexpected pass two answer.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Make it faster.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] in {"blocked", "failed_closed"}
+    assert result["mode"] == "block"
+    assert result["pass_count"] == 1
+    _assert_compatible_answer_fields(result, "")
+    assert result["considerations"] == []
+    assert result["assumptions"] == []
+    assert len(transport.calls) == 1
+
+
+@pytest.mark.parametrize(
+    "risk_flag",
+    [
+        "credential theft",
+        "bypass safeguards",
+        "exploit chain",
+        "data exfiltration",
+        "avoid audit logs",
+    ],
+)
+def test_retry_004_prompt_two_serious_risk_flags_block_without_pass_two_or_exposure(risk_flag):
+    unsafe_consideration = f"The request includes {risk_flag}."
+    unsafe_assumption = "Assume the risky path should proceed."
+    transport = SequencedTransport(
+        _pass_one(
+            mode="block",
+            considerations=[unsafe_consideration],
+            assumptions=[unsafe_assumption],
+            confidence=0.8,
+            missing_information=["Which target should be made faster?"],
+            risk_flags=["optimization", risk_flag],
+        ),
+        "Unexpected pass two answer.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Make it faster.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] in {"blocked", "failed_closed"}
+    assert result["mode"] == "block"
+    assert result["pass_count"] == 1
+    _assert_compatible_answer_fields(result, "")
+    assert result["considerations"] == []
+    assert result["assumptions"] == []
+    assert unsafe_consideration not in result["considerations"]
+    assert unsafe_assumption not in result["assumptions"]
+    assert len(transport.calls) == 1
+
+
+def test_retry_004_prompt_three_clarify_with_bounded_assumptions_promotes_to_pass_two():
+    final_answer = "Assume a small CLI, profile startup next, inspect imports, then defer noncritical work."
+    transport = SequencedTransport(
+        _pass_one(
+            mode="clarify",
+            considerations=["Startup planning can be bounded before profiler output exists."],
+            assumptions=["Assume the CLI is a small local Python command with measurable startup time."],
+            confidence=0.8,
+            missing_information=["Exact profiling output can be collected later."],
+            risk_flags=["performance", "profiling", "startup", "python cli"],
+        ),
+        final_answer,
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Draft a concise execution plan to improve a small Python CLI's startup time "
+        "when only profiling later is available; state assumptions.",
+        env=_valid_env(),
+        transport=transport,
+    )
+
+    assert result["status"] == "ok"
+    assert result["mode"] == "answer_with_assumptions"
+    assert result["pass_count"] == 2
+    _assert_compatible_answer_fields(result, final_answer)
+    assert len(transport.calls) == 2
+
+
+@pytest.mark.parametrize("confidence", [0.54, "not parseable"])
+def test_retry_004_prompt_three_clarify_low_or_unparseable_confidence_does_not_answer(confidence):
+    transport = SequencedTransport(
+        _pass_one(
+            mode="clarify",
+            considerations=["Startup planning can be bounded before profiler output exists."],
+            assumptions=["Assume the CLI is a small local Python command with measurable startup time."],
+            confidence=confidence,
+            missing_information=["Exact profiling output can be collected later."],
+            risk_flags=["performance", "profiling", "startup", "python cli"],
+        ),
+        "Unexpected pass two answer.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Draft a concise execution plan to improve a small Python CLI's startup time "
+        "when only profiling later is available; state assumptions.",
+        env=_valid_env(),
+        transport=transport,
+    )
+
+    assert result["status"] == "clarify"
+    assert result["mode"] == "clarify"
+    assert result["mode"] != "answer_with_assumptions"
+    assert result["pass_count"] == 1
+    assert len(transport.calls) == 1
+
+
+@pytest.mark.parametrize(
+    "field",
+    ["considerations", "assumptions", "missing_information", "risk_flags"],
+)
+def test_retry_004_prompt_three_clarify_boundary_claim_fails_closed_without_exposure(field):
+    forbidden_text = "This validates production readiness and /v1/solve readiness."
+    pass_one = {
+        "mode": "clarify",
+        "considerations": ["Startup planning can be bounded before profiler output exists."],
+        "assumptions": ["Assume the CLI is a small local Python command."],
+        "confidence": 0.8,
+        "missing_information": ["Exact profiling output can be collected later."],
+        "risk_flags": ["performance", "profiling", "startup", "python cli"],
+    }
+    pass_one[field] = [forbidden_text]
+    transport = SequencedTransport(json.dumps(pass_one), "Unexpected pass two answer.")
+
+    result = run_local_llm_solver_orchestration(
+        "Draft a concise execution plan to improve a small Python CLI's startup time "
+        "when only profiling later is available; state assumptions.",
+        env=_valid_env(),
+        transport=transport,
+    )
+
+    assert result["status"] in {"failed_closed", "blocked"}
+    assert result["mode"] == "block"
+    assert result["pass_count"] == 1
+    _assert_compatible_answer_fields(result, "")
+    assert forbidden_text not in result["answer"]
+    assert forbidden_text not in result["final_answer"]
+    assert result["considerations"] == []
+    assert result["assumptions"] == []
+    assert len(transport.calls) == 1
+
+
 @pytest.mark.parametrize(
     "risk_flag",
     [
@@ -454,6 +663,7 @@ def test_serious_risk_flag_blocks_even_when_prompt_text_is_neutral():
     assert result["pass_count"] == 1
     _assert_compatible_answer_fields(result, "")
     assert len(transport.calls) == 1
+
 
 
 @pytest.mark.parametrize(
