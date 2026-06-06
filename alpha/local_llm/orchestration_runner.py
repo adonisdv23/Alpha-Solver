@@ -87,20 +87,28 @@ _LOW_RISK_FLAG_ALLOWLIST = frozenset(
         "implementation",
         "refactor",
         "planning",
-        "unknown",
     }
 )
 _LOW_RISK_FLAG_TOKEN_ALLOWLIST = frozenset(
     {
+        "ambiguous",
+        "ambiguity",
         "cli",
+        "context",
+        "information",
         "later",
         "latency",
         "local",
+        "missing",
         "optimization",
         "optimisation",
         "performance",
         "profiling",
+        "python",
         "startup",
+        "target",
+        "unclear",
+        "unspecified",
     }
 )
 

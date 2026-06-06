@@ -249,6 +249,59 @@ def test_prompt_three_shaped_bounded_assumptions_with_composite_flag_proceeds_to
     assert len(transport.calls) == 2
 
 
+def test_prompt_two_shaped_block_with_safe_ambiguity_flag_clarifies_without_pass_two():
+    transport = SequencedTransport(
+        _pass_one(
+            mode="block",
+            considerations=["The optimization target is unclear."],
+            confidence=0.8,
+            missing_information=["Which target should be made faster?"],
+            risk_flags=["optimization target unclear"],
+        ),
+        "Unexpected pass two answer.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Make it faster.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] == "clarify"
+    assert result["mode"] == "clarify"
+    assert result["pass_count"] == 1
+    _assert_compatible_answer_fields(result, "Please clarify: Which target should be made faster?")
+    assert result["considerations"] == []
+    assert result["assumptions"] == []
+    assert len(transport.calls) == 1
+
+
+def test_prompt_three_shaped_python_cli_composite_flag_proceeds_to_assumption_answer():
+    final_answer = "Profile imports, measure startup, then make the smallest local change."
+    transport = SequencedTransport(
+        _pass_one(
+            mode="block",
+            considerations=["Startup time can be planned with later profiling."],
+            assumptions=["Assume the target is a small local Python CLI."],
+            confidence=0.85,
+            missing_information=["Exact profiling output can be collected later."],
+            risk_flags=["python cli startup performance optimization"],
+        ),
+        final_answer,
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Draft a concise execution plan to improve a small Python CLI's startup time "
+        "when only profiling later is available; state assumptions.",
+        env=_valid_env(),
+        transport=transport,
+    )
+
+    assert result["status"] == "ok"
+    assert result["mode"] == "answer_with_assumptions"
+    assert result["pass_count"] == 2
+    _assert_compatible_answer_fields(result, final_answer)
+    assert len(transport.calls) == 2
+
+
 @pytest.mark.parametrize(
     "risk_flag",
     [
@@ -300,6 +353,34 @@ def test_composite_risk_flag_with_high_risk_token_blocks_without_pass_two(risk_f
             mode="answer_with_assumptions",
             considerations=["The safe-looking tokens are not enough to override serious risk text."],
             assumptions=["Assume the local fixture otherwise appears bounded."],
+            confidence=0.8,
+            risk_flags=[risk_flag],
+        ),
+        "Unexpected pass two answer.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Plan local Python CLI startup improvements with assumptions.",
+        env=_valid_env(),
+        transport=transport,
+    )
+
+    assert result["status"] in {"blocked", "failed_closed"}
+    assert result["mode"] == "block"
+    assert result["pass_count"] == 1
+    _assert_compatible_answer_fields(result, "")
+    assert result["considerations"] == []
+    assert result["assumptions"] == []
+    assert len(transport.calls) == 1
+
+
+@pytest.mark.parametrize("risk_flag", ["unknown", "unknown risk", "medium risk"])
+def test_unknown_or_non_allowlisted_risk_flags_block_without_exposure(risk_flag):
+    transport = SequencedTransport(
+        _pass_one(
+            mode="answer_with_assumptions",
+            considerations=["The request otherwise appears bounded."],
+            assumptions=["Assume a local fixture."],
             confidence=0.8,
             risk_flags=[risk_flag],
         ),
@@ -424,7 +505,7 @@ def test_low_risk_assumptions_with_optimization_flags_proceeds_to_pass_two():
             assumptions=["Assume changes are limited to a local profiling plan for the fixture."],
             confidence=0.73,
             missing_information=["Optional exact profiler preference."],
-            risk_flags=["optimization", "profiling", "latency", "unknown"],
+            risk_flags=["optimization", "profiling", "latency"],
         ),
         "Answer with bounded optimization assumptions.",
     )
