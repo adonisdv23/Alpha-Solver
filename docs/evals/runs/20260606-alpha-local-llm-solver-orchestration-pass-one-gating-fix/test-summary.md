@@ -4,6 +4,8 @@ Focused fake-transport tests were added or preserved for:
 
 - direct mode with empty pass-one considerations;
 - deterministic clarification for `Make it faster.`;
+- serious model-detected risk flags with neutral prompt text;
+- malware, exfiltration, token theft, and phishing risk flags;
 - bounded `answer_with_assumptions` with ordinary optimization/profiling flags;
 - high-risk safety-monitoring and reviewer-concealment blocking;
 - pass-one forbidden boundary-claim non-exposure;

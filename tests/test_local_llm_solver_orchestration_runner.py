@@ -167,6 +167,53 @@ def test_ambiguous_optimization_prompt_clarifies_without_pass_two():
     assert len(transport.calls) == 1
 
 
+def test_serious_risk_flag_blocks_even_when_prompt_text_is_neutral():
+    transport = SequencedTransport(
+        _pass_one(
+            mode="direct",
+            considerations=["The prompt text is neutral, but the risk flag is serious."],
+            confidence=0.84,
+            missing_information=[],
+            risk_flags=["credential theft"],
+        ),
+        "Unexpected pass two answer.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Summarize this local fixture.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] in {"blocked", "failed_closed"}
+    assert result["mode"] == "block"
+    assert result["pass_count"] == 1
+    _assert_compatible_answer_fields(result, "")
+    assert len(transport.calls) == 1
+
+
+@pytest.mark.parametrize("risk_flag", ["malware", "exfiltration", "token theft", "phishing"])
+def test_malware_and_exfiltration_style_risk_flags_block_without_pass_two(risk_flag):
+    transport = SequencedTransport(
+        _pass_one(
+            mode="direct",
+            considerations=["Pass one detected a serious risk category."],
+            confidence=0.84,
+            missing_information=[],
+            risk_flags=[risk_flag],
+        ),
+        "Unexpected pass two answer.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Summarize this local fixture.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] in {"blocked", "failed_closed"}
+    assert result["mode"] == "block"
+    assert result["pass_count"] == 1
+    _assert_compatible_answer_fields(result, "")
+    assert len(transport.calls) == 1
+
+
 def test_low_risk_assumptions_with_optimization_flags_proceeds_to_pass_two():
     transport = SequencedTransport(
         _pass_one(

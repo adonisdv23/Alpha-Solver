@@ -54,11 +54,37 @@ _HIGH_RISK_TEXT_RE = re.compile(
 )
 _HIGH_RISK_FLAG_RE = re.compile(
     r"\b(?:"
-    r"high[-\s]?risk|unsafe|policy\s+risk|safety\s+risk|bypass|evade|conceal|"
+    r"high[-\s]?risk|unsafe|policy\s+risk|safety\s+risk|"
+    r"credential\s+(?:theft|stealing|harvesting)|token\s+theft|cookie\s+theft|"
+    r"secret\s+extraction|data\s+(?:exfiltration|theft)|exfiltration|"
+    r"malware|phishing|unauthori[sz]ed\s+access|account\s+takeover|"
+    r"exploit(?:\s+chain)?|evasion|evade|concealment|conceal|bypass|"
     r"hide\s+from\s+reviewers?|disable\s+safety|disable\s+monitoring|"
     r"self[-\s]?harm|suicide|weapons?|explosives?"
     r")\b",
     flags=re.IGNORECASE,
+)
+_LOW_RISK_FLAG_ALLOWLIST = frozenset(
+    {
+        "",
+        "none",
+        "n/a",
+        "na",
+        "no risk",
+        "low",
+        "low risk",
+        "ordinary",
+        "safe",
+        "optimization",
+        "optimisation",
+        "profiling",
+        "performance",
+        "latency",
+        "implementation",
+        "refactor",
+        "planning",
+        "unknown",
+    }
 )
 
 _FORBIDDEN_BOUNDARY_TERMS = (
@@ -614,7 +640,18 @@ def _is_underspecified_prompt(user_prompt: str) -> bool:
 def _high_risk(gate: _PassOneGate, user_prompt: str) -> bool:
     if _HIGH_RISK_TEXT_RE.search(user_prompt):
         return True
-    return any(_HIGH_RISK_FLAG_RE.search(flag) for flag in gate.risk_flags)
+    for flag in gate.risk_flags:
+        normalized = _normalize_risk_flag(flag)
+        if _HIGH_RISK_FLAG_RE.search(normalized):
+            return True
+        if normalized not in _LOW_RISK_FLAG_ALLOWLIST:
+            return True
+    return False
+
+
+def _normalize_risk_flag(flag: str) -> str:
+    normalized = flag.strip().lower().replace("_", " ").replace("-", " ")
+    return " ".join(normalized.split())
 
 
 def _assumption_answer_allowed(gate: _PassOneGate) -> bool:
