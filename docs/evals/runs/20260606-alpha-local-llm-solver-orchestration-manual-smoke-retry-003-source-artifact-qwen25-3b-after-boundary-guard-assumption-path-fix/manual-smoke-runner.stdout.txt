@@ -1,0 +1,6 @@
+{
+  "artifact_dir": "docs/evals/runs/20260606-alpha-local-llm-solver-orchestration-manual-smoke-retry-003-source-artifact-qwen25-3b-after-boundary-guard-assumption-path-fix",
+  "output_path": "docs/evals/runs/20260606-alpha-local-llm-solver-orchestration-manual-smoke-retry-003-source-artifact-qwen25-3b-after-boundary-guard-assumption-path-fix/manual-smoke-redacted-output.json",
+  "runner_path": "docs/evals/runs/20260606-alpha-local-llm-solver-orchestration-manual-smoke-retry-003-source-artifact-qwen25-3b-after-boundary-guard-assumption-path-fix/manual-smoke-runner.py",
+  "result_count": 5
+}
