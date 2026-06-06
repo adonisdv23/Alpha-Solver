@@ -37,6 +37,30 @@ _MAX_SECTION_ITEMS = 6
 _MAX_ITEM_CHARS = 240
 _MIN_ASSUME_CONFIDENCE = 0.55
 
+_UNDERSPECIFIED_PROMPT_RE = re.compile(
+    r"^\s*(?:make|improve|optimi[sz]e|fix|update|change|tune|refactor)\s+"
+    r"(?:it|this|that|them|things?)\b[\s.!?]*$",
+    flags=re.IGNORECASE,
+)
+_HIGH_RISK_TEXT_RE = re.compile(
+    r"\b(?:"
+    r"disable\s+safety|turn\s+off\s+safety|bypass\s+(?:safeguards?|safety|monitoring)|"
+    r"hide\s+(?:changes?|this)\s+from\s+reviewers?|conceal\s+(?:changes?|activity|this)|"
+    r"evade\s+(?:detection|monitoring|review)|avoid\s+(?:detection|review)|"
+    r"disable\s+(?:monitoring|logging|audit|alerts?)|self[-\s]?harm|suicide|"
+    r"weapons?|explosives?"
+    r")\b",
+    flags=re.IGNORECASE,
+)
+_HIGH_RISK_FLAG_RE = re.compile(
+    r"\b(?:"
+    r"high[-\s]?risk|unsafe|policy\s+risk|safety\s+risk|bypass|evade|conceal|"
+    r"hide\s+from\s+reviewers?|disable\s+safety|disable\s+monitoring|"
+    r"self[-\s]?harm|suicide|weapons?|explosives?"
+    r")\b",
+    flags=re.IGNORECASE,
+)
+
 _FORBIDDEN_BOUNDARY_TERMS = (
     r"production\s+readiness",
     r"runtime\s+readiness",
@@ -52,6 +76,16 @@ _FORBIDDEN_BOUNDARY_TERMS = (
     r"dashboard\s+readiness",
     r"evidence[-\s]?model\s+promotion",
     r"billing\s+accuracy",
+    r"ready\s+for\s+production",
+    r"validated\s+for\s+production",
+    r"production\s+validated",
+    r"validated\s+benchmark",
+    r"provider[-\s]?orchestration",
+    r"/?v1/solve",
+    r"dashboard",
+    r"alpha\s+(?:is\s+)?(?:better|best|superior|outperforms?)",
+    r"promot(?:e|es|ed|ing)\s+(?:the\s+)?evidence",
+    r"local\s+model\s+(?:is\s+)?(?:good|strong|reliable|validated|ready|quality|high\s+quality)",
 )
 _FORBIDDEN_BOUNDARY_TERM_RE = re.compile(
     r"(?<!\w)(?:" + "|".join(_FORBIDDEN_BOUNDARY_TERMS) + r")(?!\w)",
@@ -65,6 +99,11 @@ _POSITIVE_BOUNDARY_CLAIM_RE = re.compile(
     r"|\b(?:is|are|was|were|be|being|been|constitutes|serves\s+as|counts\s+as)\b"
     r".{0,80}\b(?:evidence|validation|readiness|superiority|promotion|success)\b",
     flags=re.IGNORECASE | re.DOTALL,
+)
+_SELF_ASSERTING_BOUNDARY_CLAIM_RE = re.compile(
+    r"\b(?:ready|validated|valid|orchestrat(?:e|es|ed|ing)|outperforms?|"
+    r"superior|better|best|promot(?:e|es|ed|ing)|high\s+quality|reliable|billing)\b",
+    flags=re.IGNORECASE,
 )
 _NEGATED_BOUNDARY_CLAIM_RE = re.compile(
     r"\b(?:does|do|did|is|are|was|were|can|could|will|would|should)\s+not\s+"
@@ -136,6 +175,13 @@ def run_local_llm_solver_orchestration(
         gate = _parse_pass_one(pass_one.output_text)
     except ValueError as exc:
         return _failed_from_adapter(pass_one, pass_count=1, reason=str(exc))
+
+    if _pass_one_has_forbidden_boundary_claim(gate):
+        return _failed_from_adapter(
+            pass_one,
+            pass_count=1,
+            reason="pass_one_boundary_claim_violation_non_evidence",
+        )
 
     gated = _apply_gate(gate, user_prompt)
     if gated.mode == "clarify":
@@ -368,6 +414,13 @@ def _unsafe_output(output_text: str, system_text: str, prompt_text: str) -> bool
     return False
 
 
+def _pass_one_has_forbidden_boundary_claim(gate: _PassOneGate) -> bool:
+    return any(
+        _has_forbidden_boundary_claim(text)
+        for text in (*gate.considerations, *gate.assumptions)
+    )
+
+
 def _has_forbidden_boundary_claim(output_text: str) -> bool:
     """Return true when untrusted Pass 2 text makes positive evidence claims.
 
@@ -383,6 +436,8 @@ def _has_forbidden_boundary_claim(output_text: str) -> bool:
         if _NEGATED_BOUNDARY_CLAIM_RE.search(sentence):
             continue
         if _POSITIVE_BOUNDARY_CLAIM_RE.search(sentence):
+            return True
+        if _SELF_ASSERTING_BOUNDARY_CLAIM_RE.search(sentence):
             return True
     return False
 
@@ -518,17 +573,19 @@ def _parse_confidence(value: Any) -> float | None:
 
 
 def _apply_gate(gate: _PassOneGate, user_prompt: str) -> _PassOneGate:
-    if gate.confidence is None and gate.mode in {"direct", "answer_with_assumptions"}:
-        return _replace_gate(gate, mode="clarify")
     if gate.mode == "block":
         return gate
     if _high_risk(gate, user_prompt):
         return _replace_gate(gate, mode="block")
+    if _is_underspecified_prompt(user_prompt):
+        return _replace_gate(gate, mode="clarify")
+    if gate.confidence is None and gate.mode in {"direct", "answer_with_assumptions"}:
+        return _replace_gate(gate, mode="clarify")
+    if gate.mode == "direct" and gate.missing_information:
+        return _replace_gate(gate, mode="clarify")
     if gate.mode == "answer_with_assumptions":
         if not _assumption_answer_allowed(gate):
             return _replace_gate(gate, mode="clarify")
-    if gate.mode == "direct" and not gate.considerations:
-        return _replace_gate(gate, mode="clarify")
     return gate
 
 
@@ -544,12 +601,20 @@ def _replace_gate(gate: _PassOneGate, *, mode: str) -> _PassOneGate:
     )
 
 
-def _high_risk(gate: _PassOneGate, user_prompt: str) -> bool:
-    prompt = user_prompt.lower()
-    if any(word in prompt for word in ("self-harm", "suicide", "weapon", "explosive")):
+def _is_underspecified_prompt(user_prompt: str) -> bool:
+    prompt = " ".join(user_prompt.strip().split())
+    if _UNDERSPECIFIED_PROMPT_RE.fullmatch(prompt):
         return True
-    risky = {flag.lower().strip() for flag in gate.risk_flags}
-    return any(flag not in {"", "none", "low", "low risk", "ordinary"} for flag in risky)
+    words = re.findall(r"[a-z0-9_]+", prompt.lower())
+    if len(words) <= 4 and any(word in {"it", "this", "that", "them"} for word in words):
+        return True
+    return False
+
+
+def _high_risk(gate: _PassOneGate, user_prompt: str) -> bool:
+    if _HIGH_RISK_TEXT_RE.search(user_prompt):
+        return True
+    return any(_HIGH_RISK_FLAG_RE.search(flag) for flag in gate.risk_flags)
 
 
 def _assumption_answer_allowed(gate: _PassOneGate) -> bool:
