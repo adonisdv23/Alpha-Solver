@@ -23,4 +23,4 @@
 
 ## Review method
 
-The review compared the merged implementation and focused tests against the runtime integration and solver orchestration specs. No smoke execution, local model call, hosted provider call, network call, result import, Google Sheets update, `/v1/solve` change, dashboard change, provider change, source change, or test-code change was performed by this lane.
+The review compared the merged implementation and focused tests against the runtime integration and solver orchestration specs. PR #332 also includes the narrow `answer` / `final_answer` compatibility source and test fix. No smoke execution, local model call, hosted provider call, network call, result import, Google Sheets update, `/v1/solve` change, dashboard change, provider change, or runtime exposure change was performed by this lane.

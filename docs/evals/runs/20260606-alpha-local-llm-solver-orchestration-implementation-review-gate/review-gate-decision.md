@@ -21,7 +21,7 @@ The reviewed implementation satisfies the docs-only review requirements for auth
 - `answer_with_assumptions` requires safely parsed confidence and bounded assumptions;
 - Pass 2 only runs after allowed answer modes;
 - Pass 2 fails closed on required unsafe conditions;
-- normalized Alpha-style fields are present;
+- normalized Alpha-style fields are present, including canonical `answer` and scaffold-compatible `final_answer`;
 - `/v1/solve` and dashboard preview are not exposed;
 - no smoke execution, local model call, or result import occurred in this lane.
 

@@ -1,6 +1,6 @@
 # Evidence Boundary
 
-This PR is a docs-only implementation review gate.
+This review-gate packet is documentation-only review evidence. PR #332 also includes the narrow output-field compatibility source/test fix for `answer` and `final_answer`.
 
 It is not:
 
@@ -23,7 +23,7 @@ It is not:
 
 ## Explicit non-actions
 
-This lane performed no local model calls, no hosted provider calls, no network calls, no smoke execution, no result import, no Google Sheets update, no `/v1/solve` changes, no dashboard changes, no source-code changes, no test-code changes, no runtime changes, and no provider changes.
+This lane performed no local model calls, no hosted provider calls, no network calls, no smoke execution, no result import, no Google Sheets update, no `/v1/solve` changes, no dashboard changes, no runtime exposure changes, and no provider changes. Source/test changes in PR #332 are limited to the output-field compatibility fix and focused assertions.
 
 ## Narrow authorization
 

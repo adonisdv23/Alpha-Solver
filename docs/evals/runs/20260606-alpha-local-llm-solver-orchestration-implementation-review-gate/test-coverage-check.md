@@ -14,7 +14,7 @@ The focused offline tests cover the review gate's required implementation behavi
 - non-local endpoint failure;
 - provider key rejection;
 - no hosted fallback indicators;
-- normalized Alpha-style fields;
+- normalized Alpha-style fields, including both `answer` and `final_answer`;
 - Pass 1 JSON parsing;
 - bounded safe section parsing;
 - malformed, empty, echoed, or ambiguous Pass 1 failure behavior;
@@ -23,6 +23,8 @@ The focused offline tests cover the review gate's required implementation behavi
 - bounded assumptions for `answer_with_assumptions`;
 - Pass 2 fail-closed behavior;
 - forbidden pass-two evidence-boundary claim blocking;
+- matching `answer` and `final_answer` values for normal answer and clarify outcomes;
+- empty safe `answer` and `final_answer` values for blocked and failed-closed outcomes;
 - `/v1/solve` and dashboard non-exposure;
 - absence of hosted provider credential usage in the runner.
 

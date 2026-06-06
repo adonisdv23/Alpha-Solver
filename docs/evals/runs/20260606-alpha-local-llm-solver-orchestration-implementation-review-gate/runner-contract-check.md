@@ -19,12 +19,17 @@
   - `considerations`
   - `assumptions`
   - `confidence`
+  - `answer`
   - `final_answer`
   - `metadata`
   - `evidence_boundary`
   - `behavior_evidence`
   - `no_hosted_fallback`
   - `no_provider_keys_required`
+- `answer` is required by the canonical solver orchestration spec.
+- `final_answer` is preserved for the current smoke/eval scaffold shape.
+- The implementation now returns both `answer` and `final_answer` from the same user-facing answer text.
+- Focused tests verify the fields match for normal answer outcomes and remain safe for clarify, blocked, and failed-closed outcomes.
 - Terminal outcomes preserve `behavior_evidence=false`.
 - Terminal outcomes preserve `no_hosted_fallback=true`.
 - Terminal outcomes preserve `no_provider_keys_required=true`.

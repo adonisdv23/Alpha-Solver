@@ -18,7 +18,7 @@ See `selected-next-lane.md`.
 
 ## Scope
 
-This review inspected the specified specs, implementation files, focused tests, and supporting lane artifacts. It did not change source, tests, runtime behavior, providers, `/v1/solve`, dashboard preview, result import artifacts, or external planning/status ledgers.
+This review inspected the specified specs, implementation files, focused tests, and supporting lane artifacts. PR #332 also carries the narrow output-field compatibility fix in `alpha/local_llm/orchestration_runner.py` and `tests/test_local_llm_solver_orchestration_runner.py`; it does not change runtime exposure, providers, `/v1/solve`, dashboard preview, result import artifacts, or external planning/status ledgers.
 
 ## Packet files
 
