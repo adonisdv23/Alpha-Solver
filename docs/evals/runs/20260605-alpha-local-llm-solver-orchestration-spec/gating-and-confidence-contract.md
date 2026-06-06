@@ -13,7 +13,9 @@ The local orchestration runner must choose exactly one mode:
 
 Confidence is a local orchestration signal only. It is not model-quality evidence, benchmark evidence, production-readiness evidence, or MVP validation.
 
-If confidence cannot be parsed safely or if missing information is material, the runner must prefer `clarify`, `answer_with_assumptions`, `block`, or fail-closed behavior rather than presenting unsupported local output as a successful answer.
+If Pass 1 confidence cannot be parsed safely, or if Pass 1 output is unsafe, empty, echoed, malformed, or ambiguous, the runner must not choose `direct` or `answer_with_assumptions`. It must fail closed, clarify, or block.
+
+If confidence is parsed safely but material information is missing, the runner may choose `answer_with_assumptions` only when assumptions are explicit, bounded, low-risk, and supported by parsed considerations. Otherwise it must clarify, block, or fail closed.
 
 ## Boundary
 
