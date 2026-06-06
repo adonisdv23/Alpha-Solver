@@ -1,0 +1,22 @@
+{
+  "cwd": "<REPO_ROOT>",
+  "invoked_from": "<REPO_ROOT>",
+  "note": "No full environment dump captured; provider key values are never printed.",
+  "platform": "macOS-26.2-arm64-arm-64bit",
+  "provider_key_presence": {
+    "ANTHROPIC_API_KEY": false,
+    "DEEPSEEK_API_KEY": false,
+    "GEMINI_API_KEY": false,
+    "GOOGLE_API_KEY": false,
+    "OPENAI_API_KEY": false
+  },
+  "python_executable": "<PYTHON_EXECUTABLE_PATH_REDACTED>",
+  "python_version": "3.9.6 (default, Dec  2 2025, 07:27:58) \n[Clang 17.0.0 (clang-1700.6.3.2)]",
+  "runner_path": "<REPO_ROOT>/docs/evals/runs/20260606-alpha-local-llm-solver-orchestration-manual-smoke-retry-004-source-artifact-qwen25-3b-after-retry-003-observed-failure-fix/manual-smoke-runner.py",
+  "safe_env": {
+    "ALPHA_LOCAL_LLM_ENABLED": "true",
+    "ALPHA_LOCAL_LLM_ENDPOINT_SUMMARY": "http://127.0.0.1:<PORT>/<PATH>",
+    "ALPHA_LOCAL_LLM_MODEL": "qwen2.5:3b",
+    "ALPHA_LOCAL_LLM_TIMEOUT_SECONDS": "60"
+  }
+}
