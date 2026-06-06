@@ -258,6 +258,7 @@ def _base_result(
         "considerations": list(considerations),
         "assumptions": list(assumptions),
         "confidence": confidence,
+        "answer": final_answer,
         "final_answer": final_answer,
         "metadata": {**(metadata or {}), "behavior_evidence": False},
         "evidence_boundary": _TERMINAL_EVIDENCE_BOUNDARY,
