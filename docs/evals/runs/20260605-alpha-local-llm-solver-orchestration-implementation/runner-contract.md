@@ -43,7 +43,7 @@ If Pass 1 is empty, echoed, malformed, unsafe, ambiguous, or has confidence that
 
 ## Pass 2
 
-Pass 2 is invoked only after a `direct` or allowed `answer_with_assumptions` gate. Runtime failure, timeout, empty output, prompt echo, system echo, malformed local runtime output, or other contract failure returns `failed_closed`.
+Pass 2 is invoked only after a `direct` or allowed `answer_with_assumptions` gate. Runtime failure, timeout, empty output, prompt echo, system echo, malformed local runtime output, forbidden positive evidence-boundary claims, or other contract failure returns `failed_closed`.
 
 ## Normalized result
 

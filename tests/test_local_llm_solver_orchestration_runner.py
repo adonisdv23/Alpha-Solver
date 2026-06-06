@@ -202,6 +202,42 @@ def test_answer_with_assumptions_requires_safe_confidence_and_bounded_assumption
     assert len(denied.calls) == 1
 
 
+def test_pass_two_forbidden_boundary_claim_fails_closed_without_exposing_answer():
+    forbidden_answer = "This proves production readiness and MVP validation."
+    transport = SequencedTransport(_pass_one(), forbidden_answer)
+
+    result = run_local_llm_solver_orchestration(
+        "Do not allow boundary claims.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] == "failed_closed"
+    assert result["mode"] == "block"
+    assert result["metadata"]["reason"] == "pass_two_boundary_claim_violation_non_evidence"
+    assert result["final_answer"] == ""
+    assert forbidden_answer not in result["final_answer"]
+    assert result["behavior_evidence"] is False
+
+
+@pytest.mark.parametrize(
+    "disclaimer",
+    [
+        "This does not prove production readiness or MVP validation.",
+        "This is not MVP validation.",
+        "This is not benchmark evidence.",
+        "No production readiness is claimed.",
+    ],
+)
+def test_pass_two_safe_boundary_disclaimer_is_not_blocked(disclaimer):
+    transport = SequencedTransport(_pass_one(), disclaimer)
+
+    result = run_local_llm_solver_orchestration(
+        "Allow safe boundary disclaimers.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] == "ok"
+    assert result["final_answer"] == disclaimer
+    assert result["behavior_evidence"] is False
+
 def test_pass_two_failure_fails_closed():
     transport = SequencedTransport(_pass_one(), "__TIMEOUT__")
 

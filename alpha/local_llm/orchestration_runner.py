@@ -37,6 +37,45 @@ _MAX_SECTION_ITEMS = 6
 _MAX_ITEM_CHARS = 240
 _MIN_ASSUME_CONFIDENCE = 0.55
 
+_FORBIDDEN_BOUNDARY_TERMS = (
+    r"production\s+readiness",
+    r"runtime\s+readiness",
+    r"broad\s+runtime\s+readiness",
+    r"mvp\s+validation",
+    r"benchmark\s+success",
+    r"benchmark\s+evidence",
+    r"alpha\s+superiority",
+    r"local\s+model\s+quality",
+    r"hosted\s+provider\s+evidence",
+    r"provider\s+orchestration\s+evidence",
+    r"/?v1/solve\s+readiness",
+    r"dashboard\s+readiness",
+    r"evidence[-\s]?model\s+promotion",
+    r"billing\s+accuracy",
+)
+_FORBIDDEN_BOUNDARY_TERM_RE = re.compile(
+    r"(?<!\w)(?:" + "|".join(_FORBIDDEN_BOUNDARY_TERMS) + r")(?!\w)",
+    flags=re.IGNORECASE,
+)
+_POSITIVE_BOUNDARY_CLAIM_RE = re.compile(
+    r"\b(?:prove|proves|proved|proving|validate|validates|validated|validating|"
+    r"confirm|confirms|confirmed|confirming|establish|establishes|established|"
+    r"establishing|demonstrate|demonstrates|demonstrated|demonstrating|"
+    r"claim|claims|claimed|claiming|show|shows|showed|showing)\b"
+    r"|\b(?:is|are|was|were|be|being|been|constitutes|serves\s+as|counts\s+as)\b"
+    r".{0,80}\b(?:evidence|validation|readiness|superiority|promotion|success)\b",
+    flags=re.IGNORECASE | re.DOTALL,
+)
+_NEGATED_BOUNDARY_CLAIM_RE = re.compile(
+    r"\b(?:does|do|did|is|are|was|were|can|could|will|would|should)\s+not\s+"
+    r"(?:prove|validate|confirm|establish|demonstrate|claim|show|constitute|serve\s+as|count\s+as)\b"
+    r"|\b(?:doesn't|don't|didn't|isn't|aren't|wasn't|weren't|cannot|can't)\s+"
+    r"(?:prove|validate|confirm|establish|demonstrate|claim|show|constitute|serve\s+as|count\s+as)\b"
+    r"|\b(?:is|are|was|were)\s+not\b.{0,80}\b(?:evidence|validation|readiness|superiority|promotion|success)\b"
+    r"|\bno\b.{0,80}\b(?:is|are|was|were)?\s*(?:claimed|claim|evidence|validation|readiness|promotion)\b",
+    flags=re.IGNORECASE | re.DOTALL,
+)
+
 
 @dataclass(frozen=True)
 class _PassOneGate:
@@ -145,6 +184,14 @@ def run_local_llm_solver_orchestration(
             pass_two,
             pass_count=2,
             reason="unsafe_or_echoed_pass_two_output_non_evidence",
+            pass_one=pass_one,
+            gate=gated,
+        )
+    if _has_forbidden_boundary_claim(pass_two.output_text):
+        return _failed_from_adapter(
+            pass_two,
+            pass_count=2,
+            reason="pass_two_boundary_claim_violation_non_evidence",
             pass_one=pass_one,
             gate=gated,
         )
@@ -317,6 +364,25 @@ def _unsafe_output(output_text: str, system_text: str, prompt_text: str) -> bool
     lowered = stripped.lower()
     if "llm_persona_protocol" in lowered or "non-production local llm orchestration pass" in lowered:
         return True
+    return False
+
+
+def _has_forbidden_boundary_claim(output_text: str) -> bool:
+    """Return true when untrusted Pass 2 text makes positive evidence claims.
+
+    The check is intentionally conservative and sentence scoped: it blocks
+    obvious positive claims about readiness, validation, superiority, evidence,
+    promotion, or billing accuracy while allowing explicit boundary disclaimers
+    such as "does not prove production readiness."
+    """
+
+    for sentence in re.split(r"(?<=[.!?])\s+|[\r\n]+", output_text):
+        if not _FORBIDDEN_BOUNDARY_TERM_RE.search(sentence):
+            continue
+        if _NEGATED_BOUNDARY_CLAIM_RE.search(sentence):
+            continue
+        if _POSITIVE_BOUNDARY_CLAIM_RE.search(sentence):
+            return True
     return False
 
 
