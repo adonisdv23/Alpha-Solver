@@ -101,6 +101,7 @@ _LOW_RISK_FLAG_TOKEN_ALLOWLIST = frozenset(
         "cli",
         "context",
         "information",
+        "insufficient",
         "later",
         "latency",
         "local",
@@ -108,6 +109,7 @@ _LOW_RISK_FLAG_TOKEN_ALLOWLIST = frozenset(
         "optimization",
         "optimisation",
         "performance",
+        "planning",
         "profiling",
         "python",
         "startup",
@@ -151,14 +153,14 @@ _POSITIVE_BOUNDARY_CLAIM_RE = re.compile(
     r"\b(?:prove|proves|proved|proving|validate|validates|validated|validating|"
     r"confirm|confirms|confirmed|confirming|establish|establishes|established|"
     r"establishing|demonstrate|demonstrates|demonstrated|demonstrating|"
-    r"claim|claims|claimed|claiming|show|shows|showed|showing)\b"
+    r"claim|claims|claimed|claiming|show|shows|showed|showing|ensur(?:e|es|ed|ing))\b"
     r"|\b(?:is|are|was|were|be|being|been|constitutes|serves\s+as|counts\s+as)\b"
     r".{0,80}\b(?:evidence|validation|readiness|superiority|promotion|success)\b",
     flags=re.IGNORECASE | re.DOTALL,
 )
 _SELF_ASSERTING_BOUNDARY_CLAIM_RE = re.compile(
-    r"\b(?:ready|validated|valid|orchestrat(?:e|es|ed|ing)|outperforms?|"
-    r"superior|better|best|promot(?:e|es|ed|ing)|high\s+quality|reliable|billing)\b",
+    r"\b(?:ready|readiness|validated|validation|valid|orchestrat(?:e|es|ed|ing)|outperforms?|"
+    r"superior|better|best|promot(?:e|es|ed|ing)|promotion|high\s+quality|reliable|billing)\b",
     flags=re.IGNORECASE,
 )
 _NEGATED_BOUNDARY_CLAIM_RE = re.compile(
@@ -296,6 +298,7 @@ def run_local_llm_solver_orchestration(
             reason="pass_two_boundary_claim_violation_non_evidence",
             pass_one=pass_one,
             gate=gated,
+            expose_gate_fields=False,
         )
 
     return _base_result(
@@ -381,13 +384,16 @@ def _failed_from_adapter(
     reason: str,
     pass_one: LocalLLMAdapterResult | None = None,
     gate: _PassOneGate | None = None,
+    expose_gate_fields: bool = True,
 ) -> dict[str, Any]:
+    exposed_considerations = gate.considerations if gate and expose_gate_fields else ()
+    exposed_assumptions = gate.assumptions if gate and expose_gate_fields else ()
     return _base_result(
         status="failed_closed",
         mode="block",
         pass_count=pass_count,
-        considerations=gate.considerations if gate else (),
-        assumptions=gate.assumptions if gate else (),
+        considerations=exposed_considerations,
+        assumptions=exposed_assumptions,
         confidence=gate.confidence if gate else None,
         metadata=_metadata(pass_one=pass_one or adapter_result, pass_two=adapter_result if pass_one else None),
         reason=reason,
@@ -634,10 +640,12 @@ def _parse_confidence(value: Any) -> float | None:
 
 
 def _apply_gate(gate: _PassOneGate, user_prompt: str) -> _PassOneGate:
+    if _high_risk_prompt_or_fields(gate, user_prompt):
+        return _replace_gate(gate, mode="block", expose_model_fields=False)
+    if _is_underspecified_prompt(user_prompt) and _safe_underspecified_clarify_allowed(gate):
+        return _replace_gate(gate, mode="clarify", expose_model_fields=False)
     if _high_risk(gate, user_prompt):
         return _replace_gate(gate, mode="block", expose_model_fields=False)
-    if _is_underspecified_prompt(user_prompt):
-        return _replace_gate(gate, mode="clarify", expose_model_fields=False)
     if gate.mode in {"block", "clarify"} and _assumption_answer_allowed(gate):
         return _replace_gate(gate, mode="answer_with_assumptions")
     if gate.mode == "block":
@@ -674,6 +682,24 @@ def _is_underspecified_prompt(user_prompt: str) -> bool:
     if len(words) <= 4 and any(word in {"it", "this", "that", "them"} for word in words):
         return True
     return False
+
+
+def _safe_underspecified_clarify_allowed(gate: _PassOneGate) -> bool:
+    return all(_low_risk_flag_allowed(_normalize_risk_flag(flag)) for flag in gate.risk_flags)
+
+
+def _high_risk_prompt_or_fields(gate: _PassOneGate, user_prompt: str) -> bool:
+    if _HIGH_RISK_TEXT_RE.search(user_prompt):
+        return True
+    return any(
+        _HIGH_RISK_FLAG_RE.search(text) or _HIGH_RISK_TEXT_RE.search(text)
+        for text in (
+            *gate.considerations,
+            *gate.assumptions,
+            *gate.missing_information,
+            *gate.risk_flags,
+        )
+    )
 
 
 def _high_risk(gate: _PassOneGate, user_prompt: str) -> bool:
