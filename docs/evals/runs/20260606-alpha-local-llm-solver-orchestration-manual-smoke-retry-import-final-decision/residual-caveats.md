@@ -8,4 +8,4 @@
 - This record is separate from dashboard readiness.
 - This record is separate from MVP validation, production readiness, benchmark evidence, provider orchestration evidence, Alpha superiority evidence, evidence-model promotion, broad runtime readiness evidence, or billing evidence.
 - The source artifact's preserved `repo-status.txt` includes untracked paths from the original smoke environment; this lane does not interpret those paths as current workspace status or modify them.
-- The next lane should fix clarify and answer-with-assumptions gating without weakening high-risk blocking or pass-one boundary-claim fail-closed behavior.
+- The next lane should fix clarify, answer-with-assumptions, and high-risk non-exposure gating without weakening high-risk blocking or pass-one boundary-claim fail-closed behavior.

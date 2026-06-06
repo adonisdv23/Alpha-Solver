@@ -23,6 +23,6 @@
 ## Decision controls
 
 - [x] Exactly one final decision is recorded: `MANUAL_LOCAL_ORCHESTRATION_SMOKE_RETRY_FAIL_REQUIRES_FIX`.
-- [x] Exactly one selected next lane is recorded: `ALPHA-LOCAL-LLM-SOLVER-ORCHESTRATION-CLARIFY-AND-ASSUMPTION-GATING-FIX-001`.
+- [x] Exactly one selected next lane is recorded: `ALPHA-LOCAL-LLM-SOLVER-ORCHESTRATION-CLARIFY-ASSUMPTION-HIGH-RISK-NONEXPOSURE-FIX-001`.
 - [x] Evidence-boundary language remains narrow.
 - [x] Exit status `0` is not treated as proof that expected smoke behavior passed.
