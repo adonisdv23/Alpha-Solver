@@ -45,10 +45,13 @@ _UNDERSPECIFIED_PROMPT_RE = re.compile(
 _HIGH_RISK_TEXT_RE = re.compile(
     r"\b(?:"
     r"disable\s+safety|turn\s+off\s+safety|bypass\s+(?:safeguards?|safety|monitoring)|"
-    r"hide\s+(?:changes?|this)\s+from\s+reviewers?|conceal\s+(?:changes?|activity|this)|"
-    r"evade\s+(?:detection|monitoring|review)|avoid\s+(?:detection|review)|"
-    r"disable\s+(?:monitoring|logging|audit|alerts?)|self[-\s]?harm|suicide|"
-    r"weapons?|explosives?"
+    r"hide\s+(?:changes?|this|activity)\s+from\s+reviewers?|conceal\s+(?:changes?|activity|this)|"
+    r"evade\s+(?:detection|monitoring|review)|"
+    r"avoid\s+(?:detection|review|logs?|logging|audit(?:\s+trails?)?|alerts?)|"
+    r"prevent\s+(?:alerts?|audit(?:\s+trails?)?)|"
+    r"disable\s+(?:monitoring|logging|audit|alerts?|automated\s+checks?)|"
+    r"hiding\s+changes?|concealment|bypass(?:ing)?\s+(?:monitoring|automated\s+checks?)|"
+    r"self[-\s]?harm|suicide|weapons?|explosives?"
     r")\b",
     flags=re.IGNORECASE,
 )
@@ -599,12 +602,14 @@ def _parse_confidence(value: Any) -> float | None:
 
 
 def _apply_gate(gate: _PassOneGate, user_prompt: str) -> _PassOneGate:
-    if gate.mode == "block":
-        return gate
     if _high_risk(gate, user_prompt):
-        return _replace_gate(gate, mode="block")
+        return _replace_gate(gate, mode="block", expose_model_fields=False)
     if _is_underspecified_prompt(user_prompt):
-        return _replace_gate(gate, mode="clarify")
+        return _replace_gate(gate, mode="clarify", expose_model_fields=False)
+    if gate.mode == "block" and _assumption_answer_allowed(gate):
+        return _replace_gate(gate, mode="answer_with_assumptions")
+    if gate.mode == "block":
+        return _replace_gate(gate, mode="block", expose_model_fields=False)
     if gate.confidence is None and gate.mode in {"direct", "answer_with_assumptions"}:
         return _replace_gate(gate, mode="clarify")
     if gate.mode == "direct" and gate.missing_information:
@@ -615,11 +620,13 @@ def _apply_gate(gate: _PassOneGate, user_prompt: str) -> _PassOneGate:
     return gate
 
 
-def _replace_gate(gate: _PassOneGate, *, mode: str) -> _PassOneGate:
+def _replace_gate(
+    gate: _PassOneGate, *, mode: str, expose_model_fields: bool = True
+) -> _PassOneGate:
     return _PassOneGate(
         mode=mode,
-        considerations=gate.considerations,
-        assumptions=gate.assumptions,
+        considerations=gate.considerations if expose_model_fields else (),
+        assumptions=gate.assumptions if expose_model_fields else (),
         confidence=gate.confidence,
         missing_information=gate.missing_information,
         risk_flags=gate.risk_flags,
@@ -661,6 +668,11 @@ def _assumption_answer_allowed(gate: _PassOneGate) -> bool:
         return False
     if gate.missing_information and len(gate.missing_information) > 2:
         return False
+    for text in (*gate.considerations, *gate.assumptions):
+        if _HIGH_RISK_TEXT_RE.search(text) or _HIGH_RISK_FLAG_RE.search(text):
+            return False
+        if _has_forbidden_boundary_claim(text):
+            return False
     for assumption in gate.assumptions:
         lowered = assumption.lower()
         if lowered in {"none", "n/a", "unknown"} or "unbounded" in lowered:

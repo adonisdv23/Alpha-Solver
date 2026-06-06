@@ -167,6 +167,60 @@ def test_ambiguous_optimization_prompt_clarifies_without_pass_two():
     assert len(transport.calls) == 1
 
 
+def test_pass_one_block_underspecified_prompt_clarifies_without_pass_two_or_assumptions():
+    unsafe_assumption = "Assume unsupported deployment details from the model."
+    transport = SequencedTransport(
+        _pass_one(
+            mode="block",
+            considerations=["The optimization target is not identified."],
+            assumptions=[unsafe_assumption],
+            confidence=0.8,
+            missing_information=["Which component should be made faster?"],
+            risk_flags=["optimization", "performance"],
+        ),
+        "Unexpected pass two answer.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Make it faster.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] == "clarify"
+    assert result["mode"] == "clarify"
+    assert result["pass_count"] == 1
+    _assert_compatible_answer_fields(result, "Please clarify: Which component should be made faster?")
+    assert result["assumptions"] == []
+    assert unsafe_assumption not in result["assumptions"]
+    assert len(transport.calls) == 1
+
+
+def test_pass_one_block_bounded_assumptions_proceeds_to_pass_two():
+    final_answer = "Use profiling first, then optimize the bounded local hot path."
+    transport = SequencedTransport(
+        _pass_one(
+            mode="block",
+            considerations=["Profiling can support a bounded local optimization plan."],
+            assumptions=["Assume the target is a local fixture hot path with observable latency."],
+            confidence=0.8,
+            missing_information=["Optional profiler preference."],
+            risk_flags=["optimization", "profiling", "latency", "performance"],
+        ),
+        final_answer,
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Plan a bounded performance improvement for the local fixture.",
+        env=_valid_env(),
+        transport=transport,
+    )
+
+    assert result["status"] == "ok"
+    assert result["mode"] == "answer_with_assumptions"
+    assert result["pass_count"] == 2
+    _assert_compatible_answer_fields(result, final_answer)
+    assert len(transport.calls) == 2
+
+
 def test_serious_risk_flag_blocks_even_when_prompt_text_is_neutral():
     transport = SequencedTransport(
         _pass_one(
@@ -190,7 +244,24 @@ def test_serious_risk_flag_blocks_even_when_prompt_text_is_neutral():
     assert len(transport.calls) == 1
 
 
-@pytest.mark.parametrize("risk_flag", ["malware", "exfiltration", "token theft", "phishing"])
+@pytest.mark.parametrize(
+    "risk_flag",
+    [
+        "credential theft",
+        "malware",
+        "exfiltration",
+        "token theft",
+        "phishing",
+        "unauthorized access",
+        "exploit",
+        "evasion",
+        "concealment",
+        "bypass",
+        "self-harm",
+        "weapons",
+        "explosives",
+    ],
+)
 def test_malware_and_exfiltration_style_risk_flags_block_without_pass_two(risk_flag):
     transport = SequencedTransport(
         _pass_one(
@@ -254,6 +325,64 @@ def test_high_risk_prompt_blocks_without_normal_answer():
     assert result["mode"] == "block"
     assert result["pass_count"] == 1
     _assert_compatible_answer_fields(result, "")
+    assert result["considerations"] == []
+    assert result["assumptions"] == []
+    assert len(transport.calls) == 1
+
+
+def test_high_risk_prompt_does_not_expose_unsafe_considerations_or_assumptions():
+    unsafe_consideration = "Avoid logs, prevent alerts, and disable automated checks."
+    unsafe_assumption = "Assume the change can be hidden from reviewers and audit trails."
+    transport = SequencedTransport(
+        _pass_one(
+            mode="block",
+            considerations=[unsafe_consideration],
+            assumptions=[unsafe_assumption],
+            confidence=0.91,
+            risk_flags=["low"],
+        ),
+        "Unexpected pass two answer.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Disable safety monitoring and hide changes from reviewers.",
+        env=_valid_env(),
+        transport=transport,
+    )
+
+    assert result["status"] in {"blocked", "failed_closed"}
+    assert result["mode"] == "block"
+    assert result["pass_count"] == 1
+    _assert_compatible_answer_fields(result, "")
+    assert result["considerations"] == []
+    assert result["assumptions"] == []
+    assert unsafe_consideration not in result["considerations"]
+    assert unsafe_assumption not in result["assumptions"]
+    assert len(transport.calls) == 1
+
+
+def test_non_allowlisted_risk_flag_blocks_by_default_without_pass_two():
+    transport = SequencedTransport(
+        _pass_one(
+            mode="block",
+            considerations=["The risk flag is not on the ordinary allowlist."],
+            assumptions=["Assume this unknown risk is safe."],
+            confidence=0.8,
+            risk_flags=["ambiguous external automation"],
+        ),
+        "Unexpected pass two answer.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Summarize this local fixture.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] in {"blocked", "failed_closed"}
+    assert result["mode"] == "block"
+    assert result["pass_count"] == 1
+    _assert_compatible_answer_fields(result, "")
+    assert result["considerations"] == []
+    assert result["assumptions"] == []
     assert len(transport.calls) == 1
 
 
