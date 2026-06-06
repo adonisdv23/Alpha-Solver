@@ -1,0 +1,282 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import pytest
+
+from alpha.local_llm.orchestration_runner import (
+    SUPPORTED_MODES,
+    run_local_llm_solver_orchestration,
+)
+
+
+def _valid_env(**overrides: str) -> dict[str, str]:
+    env = {
+        "ALPHA_LOCAL_LLM_ENABLED": "true",
+        "ALPHA_LOCAL_LLM_ENDPOINT": "http://127.0.0.1:11434/api/chat",
+        "ALPHA_LOCAL_LLM_MODEL": "llama3.2:1b-local-fixture",
+        "ALPHA_LOCAL_LLM_TIMEOUT_SECONDS": "2.5",
+    }
+    env.update(overrides)
+    return env
+
+
+class SequencedTransport:
+    def __init__(self, *contents: str):
+        self.contents = list(contents)
+        self.calls = []
+
+    def __call__(self, *, endpoint_url, payload, timeout_seconds):
+        self.calls.append(
+            {
+                "endpoint_url": endpoint_url,
+                "payload": payload,
+                "timeout_seconds": timeout_seconds,
+            }
+        )
+        if not self.contents:
+            raise ConnectionError("unexpected local transport call")
+        content = self.contents.pop(0)
+        if content == "__TIMEOUT__":
+            raise TimeoutError("fake local timeout")
+        return {"message": {"role": "assistant", "content": content}}
+
+
+def _pass_one(**overrides):
+    data = {
+        "mode": "direct",
+        "considerations": ["Use the local bounded context."],
+        "assumptions": [],
+        "confidence": 0.82,
+        "missing_information": [],
+        "risk_flags": ["low"],
+    }
+    data.update(overrides)
+    return json.dumps(data)
+
+
+def test_default_off_local_llm_config_fails_closed_without_transport_call():
+    transport = SequencedTransport(_pass_one())
+
+    result = run_local_llm_solver_orchestration(
+        "Explain a tiny fixture.", env={}, transport=transport
+    )
+
+    assert result["status"] == "failed_closed"
+    assert result["mode"] == "block"
+    assert result["metadata"]["reason"] == "local_llm_disabled_non_evidence"
+    assert transport.calls == []
+
+
+def test_non_local_endpoint_fails_closed_through_existing_validation_path():
+    transport = SequencedTransport(_pass_one())
+
+    result = run_local_llm_solver_orchestration(
+        "Endpoint must stay local.",
+        env=_valid_env(ALPHA_LOCAL_LLM_ENDPOINT="http://example.com/api/chat"),
+        transport=transport,
+    )
+
+    assert result["status"] == "failed_closed"
+    assert result["metadata"]["reason"] == "endpoint_not_local_non_evidence"
+    assert transport.calls == []
+
+
+def test_hosted_provider_keys_are_not_required_or_used():
+    transport = SequencedTransport(_pass_one(), "Final local answer.")
+
+    result = run_local_llm_solver_orchestration(
+        "Provider keys are not needed.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] == "ok"
+    assert result["no_provider_keys_required"] is True
+    assert result["metadata"]["no_provider_keys_required"] is True
+    assert len(transport.calls) == 2
+    assert all(call["payload"]["model"] == "llama3.2:1b-local-fixture" for call in transport.calls)
+
+
+def test_happy_path_returns_normalized_local_orchestration_result():
+    transport = SequencedTransport(_pass_one(), "Final local answer.")
+
+    result = run_local_llm_solver_orchestration(
+        "Answer with local orchestration.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] == "ok"
+    assert result["provider_mode"] == "local_llm"
+    assert result["orchestration_mode"] == "non_production_local_solver_orchestration"
+    assert result["strategy"] == "local_expert_two_pass"
+    assert result["pass_count"] == 2
+    assert result["mode"] == "direct"
+    assert result["considerations"] == ["Use the local bounded context."]
+    assert result["assumptions"] == []
+    assert result["confidence"] == 0.82
+    assert result["final_answer"] == "Final local answer."
+    assert result["metadata"]["local_backend"] == "ollama_chat"
+    assert result["metadata"]["endpoint_is_loopback"] is True
+
+
+@pytest.mark.parametrize("field", ["behavior_evidence", "no_hosted_fallback", "no_provider_keys_required"])
+def test_result_preserves_required_non_evidence_flags(field):
+    transport = SequencedTransport(_pass_one(), "Final local answer.")
+
+    result = run_local_llm_solver_orchestration(
+        "Preserve non-evidence flags.", env=_valid_env(), transport=transport
+    )
+
+    expected = False if field == "behavior_evidence" else True
+    assert result[field] is expected
+    assert result["metadata"][field] is expected
+
+
+def test_malformed_pass_one_without_safe_section_fallback_fails_closed():
+    transport = SequencedTransport('{"mode": "direct", confidence: maybe')
+
+    result = run_local_llm_solver_orchestration(
+        "Malformed pass one must not answer.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] == "failed_closed"
+    assert result["mode"] not in {"direct", "answer_with_assumptions"}
+    assert len(transport.calls) == 1
+
+
+def test_unparseable_confidence_cannot_choose_answer_with_assumptions():
+    transport = SequencedTransport(
+        _pass_one(
+            mode="answer_with_assumptions",
+            assumptions=["Assume a bounded local fixture."],
+            confidence="pretty confident",
+        )
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Bad confidence must clarify instead.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] == "clarify"
+    assert result["mode"] == "clarify"
+    assert result["mode"] != "answer_with_assumptions"
+    assert len(transport.calls) == 1
+
+
+def test_answer_with_assumptions_requires_safe_confidence_and_bounded_assumptions():
+    allowed = SequencedTransport(
+        _pass_one(
+            mode="answer_with_assumptions",
+            considerations=["The request is low risk and bounded."],
+            assumptions=["Assume the fixture input is complete enough for a concise answer."],
+            confidence=0.74,
+            missing_information=["Optional exact wording preference."],
+            risk_flags=["low"],
+        ),
+        "Final answer with the explicit assumption.",
+    )
+
+    allowed_result = run_local_llm_solver_orchestration(
+        "Answer under a bounded assumption.", env=_valid_env(), transport=allowed
+    )
+
+    assert allowed_result["status"] == "ok"
+    assert allowed_result["mode"] == "answer_with_assumptions"
+    assert allowed_result["pass_count"] == 2
+
+    denied = SequencedTransport(
+        _pass_one(
+            mode="answer_with_assumptions",
+            considerations=["The request has some context."],
+            assumptions=[],
+            confidence=0.74,
+            risk_flags=["low"],
+        )
+    )
+
+    denied_result = run_local_llm_solver_orchestration(
+        "Missing assumptions must not answer.", env=_valid_env(), transport=denied
+    )
+
+    assert denied_result["status"] == "clarify"
+    assert denied_result["mode"] != "answer_with_assumptions"
+    assert len(denied.calls) == 1
+
+
+def test_pass_two_failure_fails_closed():
+    transport = SequencedTransport(_pass_one(), "__TIMEOUT__")
+
+    result = run_local_llm_solver_orchestration(
+        "Pass two timeout must fail closed.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] == "failed_closed"
+    assert result["mode"] == "block"
+    assert result["metadata"]["reason"] == "pass_two_failure:timeout_non_evidence"
+    assert result["pass_count"] == 2
+
+
+@pytest.mark.parametrize("echo_pass", [1, 2])
+def test_prompt_echo_or_system_echo_fails_closed(echo_pass):
+    def echoing_transport(*, endpoint_url, payload, timeout_seconds):
+        if echo_pass == 1 or len(echoing_transport.calls) == 1:
+            content = payload["messages"][1]["content"]
+        else:
+            content = "Final local answer."
+        echoing_transport.calls += 1
+        return {"message": {"role": "assistant", "content": content}}
+
+    echoing_transport.calls = 1
+    first = _pass_one() if echo_pass == 2 else None
+    if first is not None:
+        transport = SequencedTransport(first)
+
+        def mixed_transport(*, endpoint_url, payload, timeout_seconds):
+            if transport.calls:
+                return {"message": {"role": "assistant", "content": payload["messages"][1]["content"]}}
+            return transport(endpoint_url=endpoint_url, payload=payload, timeout_seconds=timeout_seconds)
+
+        active_transport = mixed_transport
+    else:
+        active_transport = echoing_transport
+
+    result = run_local_llm_solver_orchestration(
+        "Echoes must fail closed.", env=_valid_env(), transport=active_transport
+    )
+
+    assert result["status"] == "failed_closed"
+    assert result["mode"] == "block"
+
+
+def test_mode_is_always_one_of_supported_values_for_all_terminal_statuses():
+    cases = [
+        SequencedTransport(_pass_one(), "Final local answer."),
+        SequencedTransport(_pass_one(mode="clarify", missing_information=["Need X."])),
+        SequencedTransport(_pass_one(mode="block", risk_flags=["policy risk"])),
+        SequencedTransport("not parseable"),
+    ]
+
+    for transport in cases:
+        result = run_local_llm_solver_orchestration(
+            "Mode must be normalized.", env=_valid_env(), transport=transport
+        )
+        assert result["mode"] in SUPPORTED_MODES
+
+
+def test_runner_is_not_mounted_into_v1_solve_or_dashboard_preview():
+    service_app = Path("service/app.py").read_text(encoding="utf-8")
+    dashboard_preview = Path("alpha/webapp/routes/expert_preview.py").read_text(encoding="utf-8")
+
+    assert "run_local_llm_solver_orchestration" not in service_app
+    assert "orchestration_runner" not in service_app
+    assert "run_local_llm_solver_orchestration" not in dashboard_preview
+    assert "orchestration_runner" not in dashboard_preview
+
+
+def test_hosted_provider_code_path_is_not_modified_by_runner_import():
+    import alpha.local_llm.orchestration_runner as runner
+
+    source = Path(runner.__file__).read_text(encoding="utf-8")
+
+    assert "OPENAI_API_KEY" not in source
+    assert "ANTHROPIC_API_KEY" not in source
+    assert "run_configured_local_llm_runtime" in source
