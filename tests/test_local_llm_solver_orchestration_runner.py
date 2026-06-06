@@ -128,6 +128,164 @@ def test_happy_path_returns_normalized_local_orchestration_result():
     assert result["metadata"]["endpoint_is_loopback"] is True
 
 
+def test_simple_direct_prompt_allows_empty_considerations_when_low_risk():
+    transport = SequencedTransport(
+        _pass_one(considerations=[], missing_information=[], risk_flags=["low"]),
+        "Direct answer without pass-one considerations.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Summarize the fixture in one sentence.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] == "ok"
+    assert result["mode"] == "direct"
+    assert result["pass_count"] == 2
+    assert result["considerations"] == []
+    _assert_compatible_answer_fields(result, "Direct answer without pass-one considerations.")
+    assert len(transport.calls) == 2
+
+
+def test_ambiguous_optimization_prompt_clarifies_without_pass_two():
+    transport = SequencedTransport(
+        _pass_one(
+            mode="direct",
+            considerations=["Optimization target is not identified."],
+            risk_flags=["optimization", "performance"],
+        ),
+        "Unexpected pass two answer.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Make it faster.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] == "clarify"
+    assert result["mode"] == "clarify"
+    assert result["mode"] != "block"
+    assert result["pass_count"] == 1
+    assert len(transport.calls) == 1
+
+
+def test_serious_risk_flag_blocks_even_when_prompt_text_is_neutral():
+    transport = SequencedTransport(
+        _pass_one(
+            mode="direct",
+            considerations=["The prompt text is neutral, but the risk flag is serious."],
+            confidence=0.84,
+            missing_information=[],
+            risk_flags=["credential theft"],
+        ),
+        "Unexpected pass two answer.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Summarize this local fixture.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] in {"blocked", "failed_closed"}
+    assert result["mode"] == "block"
+    assert result["pass_count"] == 1
+    _assert_compatible_answer_fields(result, "")
+    assert len(transport.calls) == 1
+
+
+@pytest.mark.parametrize("risk_flag", ["malware", "exfiltration", "token theft", "phishing"])
+def test_malware_and_exfiltration_style_risk_flags_block_without_pass_two(risk_flag):
+    transport = SequencedTransport(
+        _pass_one(
+            mode="direct",
+            considerations=["Pass one detected a serious risk category."],
+            confidence=0.84,
+            missing_information=[],
+            risk_flags=[risk_flag],
+        ),
+        "Unexpected pass two answer.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Summarize this local fixture.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] in {"blocked", "failed_closed"}
+    assert result["mode"] == "block"
+    assert result["pass_count"] == 1
+    _assert_compatible_answer_fields(result, "")
+    assert len(transport.calls) == 1
+
+
+def test_low_risk_assumptions_with_optimization_flags_proceeds_to_pass_two():
+    transport = SequencedTransport(
+        _pass_one(
+            mode="answer_with_assumptions",
+            considerations=["Profiling can be planned without changing runtime exposure."],
+            assumptions=["Assume changes are limited to a local profiling plan for the fixture."],
+            confidence=0.73,
+            missing_information=["Optional exact profiler preference."],
+            risk_flags=["optimization", "profiling", "latency", "unknown"],
+        ),
+        "Answer with bounded optimization assumptions.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Plan a bounded profiling pass for the local fixture.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] == "ok"
+    assert result["mode"] == "answer_with_assumptions"
+    assert result["pass_count"] == 2
+    _assert_compatible_answer_fields(result, "Answer with bounded optimization assumptions.")
+    assert len(transport.calls) == 2
+
+
+def test_high_risk_prompt_blocks_without_normal_answer():
+    transport = SequencedTransport(
+        _pass_one(mode="direct", considerations=["The prompt asks for concealment."], risk_flags=["low"]),
+        "Unexpected pass two answer.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Disable safety monitoring and hide changes from reviewers.",
+        env=_valid_env(),
+        transport=transport,
+    )
+
+    assert result["status"] == "blocked"
+    assert result["mode"] == "block"
+    assert result["pass_count"] == 1
+    _assert_compatible_answer_fields(result, "")
+    assert len(transport.calls) == 1
+
+
+def test_pass_one_forbidden_boundary_claim_fails_closed_without_exposing_fields():
+    forbidden_consideration = "This validates production readiness and /v1/solve readiness."
+    forbidden_assumption = "Assume the dashboard is ready for production evidence promotion."
+    transport = SequencedTransport(
+        _pass_one(
+            mode="answer_with_assumptions",
+            considerations=[forbidden_consideration],
+            assumptions=[forbidden_assumption],
+            confidence=0.8,
+            risk_flags=["low"],
+        ),
+        "Unexpected pass two answer.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Keep boundary claims out of pass one.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] in {"failed_closed", "blocked"}
+    assert result["mode"] == "block"
+    assert result["metadata"]["reason"] == "pass_one_boundary_claim_violation_non_evidence"
+    assert result["considerations"] == []
+    assert result["assumptions"] == []
+    assert forbidden_consideration not in result["considerations"]
+    assert forbidden_assumption not in result["assumptions"]
+    _assert_compatible_answer_fields(result, "")
+    assert len(transport.calls) == 1
+
+
 @pytest.mark.parametrize("field", ["behavior_evidence", "no_hosted_fallback", "no_provider_keys_required"])
 def test_result_preserves_required_non_evidence_flags(field):
     transport = SequencedTransport(_pass_one(), "Final local answer.")
