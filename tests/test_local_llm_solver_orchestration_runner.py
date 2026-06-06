@@ -221,6 +221,106 @@ def test_pass_one_block_bounded_assumptions_proceeds_to_pass_two():
     assert len(transport.calls) == 2
 
 
+def test_prompt_three_shaped_bounded_assumptions_with_composite_flag_proceeds_to_pass_two():
+    final_answer = "Profile startup, inspect imports, defer larger changes, and keep assumptions explicit."
+    transport = SequencedTransport(
+        _pass_one(
+            mode="block",
+            considerations=["Startup latency work can be planned before profiling results are available."],
+            assumptions=["Assume the CLI is a small local Python tool with no external service dependency."],
+            confidence=0.76,
+            missing_information=["Exact profiler output can be collected later."],
+            risk_flags=["startup performance optimization"],
+        ),
+        final_answer,
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Draft a concise execution plan to improve a small Python CLI's startup time "
+        "when only profiling later is available; state assumptions.",
+        env=_valid_env(),
+        transport=transport,
+    )
+
+    assert result["status"] == "ok"
+    assert result["mode"] == "answer_with_assumptions"
+    assert result["pass_count"] == 2
+    _assert_compatible_answer_fields(result, final_answer)
+    assert len(transport.calls) == 2
+
+
+@pytest.mark.parametrize(
+    "risk_flag",
+    [
+        "performance optimization",
+        "startup performance",
+        "startup performance optimization",
+        "latency optimization",
+        "local profiling",
+    ],
+)
+def test_benign_composite_low_risk_flags_can_use_bounded_assumption_path(risk_flag):
+    final_answer = f"Bounded assumption answer for {risk_flag}."
+    transport = SequencedTransport(
+        _pass_one(
+            mode="answer_with_assumptions",
+            considerations=["The planning scope is local, bounded, and limited to performance work."],
+            assumptions=["Assume later measurements will guide the final implementation choice."],
+            confidence=0.75,
+            missing_information=["Profiler results can be supplied later."],
+            risk_flags=[risk_flag],
+        ),
+        final_answer,
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Plan local Python CLI startup improvements with assumptions.",
+        env=_valid_env(),
+        transport=transport,
+    )
+
+    assert result["status"] == "ok"
+    assert result["mode"] == "answer_with_assumptions"
+    assert result["pass_count"] == 2
+    _assert_compatible_answer_fields(result, final_answer)
+    assert len(transport.calls) == 2
+
+
+@pytest.mark.parametrize(
+    "risk_flag",
+    [
+        "performance optimization bypass",
+        "startup performance credential theft",
+        "latency optimization exfiltration",
+    ],
+)
+def test_composite_risk_flag_with_high_risk_token_blocks_without_pass_two(risk_flag):
+    transport = SequencedTransport(
+        _pass_one(
+            mode="answer_with_assumptions",
+            considerations=["The safe-looking tokens are not enough to override serious risk text."],
+            assumptions=["Assume the local fixture otherwise appears bounded."],
+            confidence=0.8,
+            risk_flags=[risk_flag],
+        ),
+        "Unexpected pass two answer.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Plan local Python CLI startup improvements with assumptions.",
+        env=_valid_env(),
+        transport=transport,
+    )
+
+    assert result["status"] in {"blocked", "failed_closed"}
+    assert result["mode"] == "block"
+    assert result["pass_count"] == 1
+    _assert_compatible_answer_fields(result, "")
+    assert result["considerations"] == []
+    assert result["assumptions"] == []
+    assert len(transport.calls) == 1
+
+
 def test_pass_one_block_missing_information_high_risk_cue_blocks_without_pass_two():
     unsafe_missing_information = "Need approval to bypass monitoring."
     transport = SequencedTransport(
@@ -443,6 +543,52 @@ def test_pass_one_forbidden_boundary_claim_fails_closed_without_exposing_fields(
     assert forbidden_consideration not in result["considerations"]
     assert forbidden_assumption not in result["assumptions"]
     _assert_compatible_answer_fields(result, "")
+    assert len(transport.calls) == 1
+
+
+@pytest.mark.parametrize(
+    ("field", "forbidden_text"),
+    [
+        ("considerations", "This validates production readiness."),
+        ("considerations", "This proves benchmark evidence."),
+        ("considerations", "This confirms provider orchestration evidence."),
+        ("considerations", "This proves /v1/solve readiness."),
+        ("considerations", "This confirms dashboard readiness."),
+        ("assumptions", "Assume it is ready for production."),
+        ("assumptions", "Assume Alpha is superior."),
+        ("missing_information", "Need proof of local model quality."),
+        ("risk_flags", "validated billing accuracy"),
+        ("risk_flags", "evidence-model promotion validated"),
+    ],
+)
+def test_prompt_five_boundary_guard_blocks_forbidden_pass_one_fields_without_exposure(
+    field, forbidden_text
+):
+    pass_one = {
+        "mode": "answer_with_assumptions",
+        "considerations": ["The safe portion is bounded."],
+        "assumptions": ["Assume ordinary local-only execution."],
+        "confidence": 0.8,
+        "missing_information": [],
+        "risk_flags": ["low"],
+    }
+    pass_one[field] = [forbidden_text]
+    transport = SequencedTransport(json.dumps(pass_one), "Unexpected pass two answer.")
+
+    result = run_local_llm_solver_orchestration(
+        "State the boundary safely without echoing readiness claims.",
+        env=_valid_env(),
+        transport=transport,
+    )
+
+    assert result["status"] in {"failed_closed", "blocked"}
+    assert result["mode"] == "block"
+    assert result["pass_count"] == 1
+    _assert_compatible_answer_fields(result, "")
+    assert forbidden_text not in result["answer"]
+    assert forbidden_text not in result["final_answer"]
+    assert result["considerations"] == []
+    assert result["assumptions"] == []
     assert len(transport.calls) == 1
 
 
