@@ -151,8 +151,12 @@ def validate_safe_scalar(value: Any, label: str, field: str) -> None:
     if isinstance(value, int) and not isinstance(value, bool):
         return
     if isinstance(value, str):
-        if field in allowed_enum_values and value not in allowed_enum_values[field]:
-            fail(f"{label} has unexpected enum value for {field}")
+        if field in allowed_enum_values:
+            if value not in allowed_enum_values[field]:
+                fail(f"{label} has unexpected enum value for {field}")
+            # Contract-safe enum values are schema metadata, not raw text; do not
+            # broad-scan them for substrings such as "assumptions".
+            return
         if len(value) > 160 or not safe_token_pattern.fullmatch(value):
             fail(f"{label} is not a safe diagnostic token")
         assert_no_raw_fragments(value, label)
