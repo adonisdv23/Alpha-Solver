@@ -33,6 +33,7 @@ INDEX_LANE_MAP = Path("docs/evals/runs/local-llm-solver-orchestration-index/lane
 PACKET_DIR_MARKERS = (
     "local-llm-solver-orchestration",
     "20260607-local-llm-controlled-usage-operator-run-001",
+    "alpha-solver-post-level-3-",
 )
 SOURCE_ARTIFACT_MARKERS = (
     "/source-artifact/",
@@ -128,7 +129,7 @@ def _is_source_artifact(path: Path) -> bool:
 
 
 def is_packet_dir(path: Path, root: Path = ROOT) -> bool:
-    """Return True when a directory is a local LLM orchestration packet."""
+    """Return True when a directory is an in-scope orchestration packet."""
     rel = _repo_relative(path, root).as_posix()
     if _is_source_artifact(Path(rel)):
         return False
