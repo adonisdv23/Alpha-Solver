@@ -1,4 +1,4 @@
-.PHONY: run test test-gates fmt lint env-check clean smoke release
+.PHONY: run test test-gates check-local-llm-evidence-boundaries fmt lint env-check clean smoke release
 
 run:
 	uvicorn service.app:app --host 0.0.0.0 --port 8000
@@ -8,6 +8,9 @@ test:
 
 test-gates:
 	pytest -q -k "determinism or policy or budget or metrics"
+
+check-local-llm-evidence-boundaries:
+	python scripts/check_local_llm_evidence_boundaries.py
 
 fmt:
 	black . >/dev/null 2>&1 || echo "black not installed"
