@@ -14,18 +14,21 @@ The direct commands are deterministic, offline documentation checks. They should
 
 ## Aggregate Makefile coverage
 
-The current `Makefile` contains an aggregate target for the evidence-boundary checker only:
+Use the full local LLM solver orchestration guardrail-suite target when it is available on the branch:
 
 ```bash
-make check-local-llm-evidence-boundaries
+make check-local-llm-orchestration-guardrails
 ```
 
-No current aggregate Makefile target was found for the docs path/link checker or the packet consistency checker, so run those checkers directly:
+That aggregate target runs all three guardrail checkers:
 
 ```bash
+python scripts/check_local_llm_evidence_boundaries.py
 python scripts/check_local_llm_doc_paths.py
 python scripts/check_local_llm_packet_consistency.py
 ```
+
+Keep the direct checker commands as fallback or manual alternatives when a branch does not yet contain the aggregate target, when triaging one checker at a time, or when a review asks for direct script evidence. Running the aggregate target or the direct static commands does not start the release-readiness ladder.
 
 ## Suggested focused validation order
 

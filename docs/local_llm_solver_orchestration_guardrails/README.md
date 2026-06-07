@@ -20,7 +20,7 @@ This runbook is based on the accepted repository-local checker and doc artifacts
 ## Runbook files
 
 - `checker-inventory.md` describes each checker and the boundary it protects.
-- `how-to-run.md` lists direct checker commands and the current aggregate Makefile coverage.
+- `how-to-run.md` lists the full guardrail-suite Makefile command plus direct fallback commands.
 - `failure-triage.md` explains how to interpret common failures without weakening evidence boundaries.
 - `common-fixes.md` gives safe documentation-only repair patterns.
 - `non-actions.md` records actions this runbook does not authorize.
