@@ -68,6 +68,10 @@ def test_required_phrase_only_in_checks_run_does_not_satisfy_enforcement(tmp_pat
         f'`rg "{missing_phrase}" docs/evals/runs/.../closeout`\n',
         encoding="utf-8",
     )
+    (tmp_path / FINAL_PACKET_DIR / "command-log.md").write_text(
+        f"command output mentioned {missing_phrase}\n",
+        encoding="utf-8",
+    )
 
     findings = find_required_final_packet_findings(tmp_path)
 

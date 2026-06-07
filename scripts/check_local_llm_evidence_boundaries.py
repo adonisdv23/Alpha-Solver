@@ -38,6 +38,9 @@ BLOCKER_FALLBACK_LANE = "ALPHA-LOCAL-LLM-SOLVER-ORCHESTRATION-EVIDENCE-BOUNDARY-
 FINAL_PACKET_DIR = Path(
     "docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/closeout"
 )
+# Only these decision/boundary/status files may satisfy required final-packet
+# phrases. checks-run.md, command logs, and other check/log files are
+# intentionally excluded so recorded rg commands cannot satisfy evidence terms.
 AUTHORITATIVE_FINAL_PACKET_FILES = (
     "README.md",
     "accepted-result.md",
