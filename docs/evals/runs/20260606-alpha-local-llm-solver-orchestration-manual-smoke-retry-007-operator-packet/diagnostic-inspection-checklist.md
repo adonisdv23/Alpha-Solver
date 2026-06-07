@@ -16,6 +16,7 @@ Use this checklist after the exact Mac command finishes and before any later ret
 - Confirm `metadata.gate_trace` includes safe diagnostic metadata such as:
   - `prompt_shape=underspecified_edit_or_performance`; and
   - `apply_gate_decision=shape_clarify` or an equivalent safe clarify-routing enum.
+- Confirm Prompt 2 may include `risk_flag_rejected_reason=vague_risk_advisory_for_shape` as a safe enum diagnostic token when a vague risk advisory is rejected for shape-based clarify routing.
 - Confirm Prompt 2 does not expose raw model considerations, assumptions, missing information, risk flags, answer text, or raw prompt text through `gate_trace`.
 
 ## Prompt 3 assumption routing

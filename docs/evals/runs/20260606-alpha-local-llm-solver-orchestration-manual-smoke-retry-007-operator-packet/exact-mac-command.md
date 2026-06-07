@@ -86,6 +86,7 @@ allowed_trace_fields = [
     "blocked_reason_code",
     "blocked_reason_codes",
     "high_risk_reason_code",
+    "risk_flag_rejected_reason",
     "assumption_gate_failed_reason_codes",
 ]
 allowed_result_fields = ["status", "mode", "pass_count"]
@@ -119,6 +120,9 @@ allowed_enum_values = {
         "enum_only_no_raw_text",
         "redacted",
         "safe_enums_only",
+    },
+    "risk_flag_rejected_reason": {
+        "vague_risk_advisory_for_shape",
     },
 }
 
