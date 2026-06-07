@@ -86,6 +86,59 @@ def test_current_repo_local_llm_packets_pass_packet_consistency_check():
     assert check_packet_consistency(packet_dirs) == []
 
 
+def test_default_discovery_includes_release_readiness_ladder_packet():
+    packet_dirs = iter_packet_dirs()
+
+    assert (
+        Path("docs/evals/runs/alpha-solver-post-level-3-release-readiness-ladder")
+        in packet_dirs
+    )
+
+
+def test_default_discovery_includes_future_post_level_3_level_4_packet(tmp_path):
+    packet_dir = Path(
+        "docs/evals/runs/"
+        "alpha-solver-post-level-3-level-4-pre-product-surface-requirements"
+    )
+    _write_packet(
+        tmp_path,
+        packet_dir,
+        selected_text=(
+            "`ALPHA-SOLVER-POST-LEVEL-3-LEVEL-4-"
+            "PRE-PRODUCT-SURFACE-REQUIREMENTS-NEXT-001`\n"
+        ),
+    )
+
+    assert iter_packet_dirs(tmp_path) == [packet_dir]
+
+
+def test_default_discovery_excludes_post_level_3_source_artifact_payloads(tmp_path):
+    packet_dir = Path("docs/evals/runs/alpha-solver-post-level-3-fixture")
+    nested_source_artifact_dir = packet_dir / "source-artifact"
+    named_source_artifact_dir = Path(
+        "docs/evals/runs/alpha-solver-post-level-3-source-artifact-fixture"
+    )
+    suffix_source_artifact_dir = Path(
+        "docs/evals/runs/alpha-solver-post-level-3-level-4-source-artifact"
+    )
+    _write_packet(tmp_path, packet_dir)
+    _write_packet(tmp_path, nested_source_artifact_dir)
+    _write_packet(tmp_path, named_source_artifact_dir)
+    _write_packet(tmp_path, suffix_source_artifact_dir)
+
+    packet_dirs = iter_packet_dirs(tmp_path)
+
+    assert packet_dir in packet_dirs
+    assert nested_source_artifact_dir not in packet_dirs
+    assert named_source_artifact_dir not in packet_dirs
+    assert suffix_source_artifact_dir not in packet_dirs
+    assert not any(
+        part == "source-artifact" or part.endswith("-source-artifact")
+        for path in packet_dirs
+        for part in path.parts
+    )
+
+
 def test_no_further_lanes_with_selected_implementation_lane_fails(tmp_path):
     packet_dir = Path(
         "docs/evals/runs/"
