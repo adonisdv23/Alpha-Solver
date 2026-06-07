@@ -1,0 +1,6 @@
+{
+  "artifact_dir": "docs/evals/runs/20260606-alpha-local-llm-solver-orchestration-manual-smoke-retry-007-source-artifact-qwen25-3b-after-diagnostic-router-reset",
+  "output_path": "docs/evals/runs/20260606-alpha-local-llm-solver-orchestration-manual-smoke-retry-007-source-artifact-qwen25-3b-after-diagnostic-router-reset/manual-smoke-redacted-output.json",
+  "runner_path": "docs/evals/runs/20260606-alpha-local-llm-solver-orchestration-manual-smoke-retry-007-source-artifact-qwen25-3b-after-diagnostic-router-reset/manual-smoke-runner.py",
+  "result_count": 5
+}
