@@ -2,7 +2,7 @@
   "answer": "",
   "assumptions": [],
   "behavior_evidence": false,
-  "confidence": 0.5,
+  "confidence": 0.75,
   "considerations": [],
   "evidence_boundary": "non-production local solver orchestration only; not runtime smoke execution, local model quality evidence, hosted provider evidence, /v1/solve readiness, dashboard readiness, MVP validation, production readiness, benchmark evidence, provider orchestration evidence, Alpha superiority evidence, evidence-model promotion, or broad runtime readiness evidence",
   "final_answer": "",

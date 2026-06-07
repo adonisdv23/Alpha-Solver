@@ -1,6 +1,7 @@
 test_case_id=L3-FROZEN-TC-002
-prompt_source=artifacts/level3_validation_execution_001/prompts/L3-FROZEN-TC-002.txt
-repo_head=8543b2270e40f4052ab7ee062d7c50cf2f3a72b5
+prompt_source=docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/source-artifact/prompts/L3-FROZEN-TC-002.txt
+prompt_invocation_mode=inline --prompt
+repo_head=a8dbe0e41e66d24ee6ed4c0e19630f97bbe866b2
 model=qwen2.5:3b
 endpoint_url=http://127.0.0.1:11434/api/chat
 endpoint_expected_loopback=true

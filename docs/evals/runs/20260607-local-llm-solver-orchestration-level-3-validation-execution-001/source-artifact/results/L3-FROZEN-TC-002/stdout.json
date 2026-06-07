@@ -1,16 +1,11 @@
 {
-  "answer": "Please clarify: Definition or scope of what 'make it better' encompasses; Impact on stakeholders and operations; Any existing constraints or limitations",
+  "answer": "",
   "assumptions": [],
   "behavior_evidence": false,
-  "confidence": 0.5,
-  "considerations": [
-    "Determine what 'make it better' means in this context.",
-    "Consider the impact on current operations and stakeholders.",
-    "Identify any potential risks associated with making changes.",
-    "Explore alternative solutions before committing to a course of action."
-  ],
+  "confidence": 0.6,
+  "considerations": [],
   "evidence_boundary": "non-production local solver orchestration only; not runtime smoke execution, local model quality evidence, hosted provider evidence, /v1/solve readiness, dashboard readiness, MVP validation, production readiness, benchmark evidence, provider orchestration evidence, Alpha superiority evidence, evidence-model promotion, or broad runtime readiness evidence",
-  "final_answer": "Please clarify: Definition or scope of what 'make it better' encompasses; Impact on stakeholders and operations; Any existing constraints or limitations",
+  "final_answer": "",
   "metadata": {
     "backend_class": "ollama-local-http-runtime",
     "behavior_evidence": false,
@@ -18,11 +13,15 @@
     "endpoint_is_loopback": true,
     "evidence_label": "non_evidence_local_llm_provider_adapter_wiring",
     "gate_trace": {
-      "apply_gate_decision": "kept_model_mode",
+      "apply_gate_decision": "blocked_unknown_nonshape_risk",
+      "blocked_reason_code": "unknown_or_nonallowlisted_risk_flag",
+      "blocked_reason_codes": [
+        "unknown_or_nonallowlisted_risk_flag"
+      ],
       "boundary_failure_stage": "none",
       "diagnostic_redaction": "enum_only_no_raw_text",
       "diagnostic_schema_version": 1,
-      "expose_model_fields": true,
+      "expose_model_fields": false,
       "pass_one_selected_mode": "clarify",
       "pass_two_called": false,
       "prompt_shape": "generic"
@@ -68,12 +67,12 @@
     "strategy": "local_expert_two_pass",
     "timeout_seconds": 60.0
   },
-  "mode": "clarify",
+  "mode": "block",
   "no_hosted_fallback": true,
   "no_provider_keys_required": true,
   "orchestration_mode": "non_production_local_solver_orchestration",
   "pass_count": 1,
   "provider_mode": "local_llm",
-  "status": "clarify",
+  "status": "blocked",
   "strategy": "local_expert_two_pass"
 }

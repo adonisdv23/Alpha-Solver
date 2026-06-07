@@ -1,20 +1,18 @@
 {
-  "answer": "To solve this, start with 18 tokens. After spending 7 tokens, the operator has:\n\n\\[ 18 - 7 = 11 \\] \n\ntokens left. Then receiving 5 more tokens brings the total to:\n\n\\[ 11 + 5 = 16 \\]\n\nSo, there are 16 tokens remaining.",
+  "answer": "The operator initially had 18 tokens. After spending 7 tokens, the number of tokens became \\(18 - 7 = 11\\). Then, receiving 5 more tokens brings the total to \\(11 + 5 = 16\\) tokens. Therefore, there are now 16 tokens remaining.",
   "assumptions": [
-    "No other operations or transactions affect the token count.",
-    "All tokens are considered as whole and indivisible units.",
-    "The arithmetic operations (+, -, =) follow standard rules."
+    "Tokens are counted as a whole number without decimals."
   ],
   "behavior_evidence": false,
-  "confidence": 0.95,
+  "confidence": 0.9,
   "considerations": [
-    "Tokens are initially 18.",
-    "7 tokens are spent.",
-    "5 more tokens are received.",
-    "The final count is the initial count minus spent tokens plus received tokens."
+    "Start with initial number of tokens (18)",
+    "Subtract spent tokens (7)",
+    "Add received tokens (5)",
+    "Calculate remaining tokens"
   ],
   "evidence_boundary": "non-production local solver orchestration only; not runtime smoke execution, local model quality evidence, hosted provider evidence, /v1/solve readiness, dashboard readiness, MVP validation, production readiness, benchmark evidence, provider orchestration evidence, Alpha superiority evidence, evidence-model promotion, or broad runtime readiness evidence",
-  "final_answer": "To solve this, start with 18 tokens. After spending 7 tokens, the operator has:\n\n\\[ 18 - 7 = 11 \\] \n\ntokens left. Then receiving 5 more tokens brings the total to:\n\n\\[ 11 + 5 = 16 \\]\n\nSo, there are 16 tokens remaining.",
+  "final_answer": "The operator initially had 18 tokens. After spending 7 tokens, the number of tokens became \\(18 - 7 = 11\\). Then, receiving 5 more tokens brings the total to \\(11 + 5 = 16\\) tokens. Therefore, there are now 16 tokens remaining.",
   "metadata": {
     "backend_class": "ollama-local-http-runtime",
     "behavior_evidence": false,
@@ -27,7 +25,7 @@
       "diagnostic_redaction": "enum_only_no_raw_text",
       "diagnostic_schema_version": 1,
       "expose_model_fields": true,
-      "pass_one_selected_mode": "answer_with_assumptions",
+      "pass_one_selected_mode": "direct",
       "pass_two_called": true,
       "prompt_shape": "generic"
     },
@@ -96,7 +94,7 @@
     "strategy": "local_expert_two_pass",
     "timeout_seconds": 60.0
   },
-  "mode": "answer_with_assumptions",
+  "mode": "direct",
   "no_hosted_fallback": true,
   "no_provider_keys_required": true,
   "orchestration_mode": "non_production_local_solver_orchestration",
