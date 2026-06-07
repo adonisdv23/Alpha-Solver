@@ -122,11 +122,15 @@ def _repo_relative(path: Path, root: Path = ROOT) -> Path:
 
 
 def _is_source_artifact(path: Path) -> bool:
+    path_parts = path.parts
     path_text = path.as_posix()
-    return any(
+    has_source_artifact_part = any(
         part == "source-artifact" or part.endswith("-source-artifact")
-        for part in path.parts
-    ) or any(marker in path_text for marker in SOURCE_ARTIFACT_MARKERS)
+        for part in path_parts
+    )
+    return has_source_artifact_part or any(
+        marker in path_text for marker in SOURCE_ARTIFACT_MARKERS
+    )
 
 
 def is_packet_dir(path: Path, root: Path = ROOT) -> bool:
