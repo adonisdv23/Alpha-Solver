@@ -51,6 +51,19 @@ BOUNDARY_FILES = (
     "non-actions.md",
 )
 
+AUTHORITATIVE_DECISION_FILES = (
+    "final-decision.md",
+    "accepted-result.md",
+    "final-status.md",
+    "selected-next-lane.md",
+    "selected-next-action.md",
+    "README.md",
+    "closeout-summary.md",
+    "current-state-summary.md",
+    "decision-summary.md",
+    "selected-decision.md",
+)
+
 FINAL_LEVEL_3_CLOSEOUT_DIR = Path(
     "docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/closeout"
 )
@@ -152,6 +165,21 @@ def _packet_text(root: Path, packet_dir: Path) -> str:
     for child in sorted((root / packet_dir).iterdir(), key=lambda item: item.name):
         if child.is_file() and child.suffix.lower() in {".md", ".txt"}:
             parts.append(child.read_text(encoding="utf-8"))
+    return "\n".join(parts)
+
+
+def _authoritative_packet_text(root: Path, packet_dir: Path) -> str:
+    """Return text from files that are authoritative for packet decisions.
+
+    Generated command logs such as checks-run.md, stdout/stderr captures,
+    transcripts, and source-artifact payloads are intentionally excluded so
+    recorded commands or rg output cannot satisfy required decision markers.
+    """
+    parts: list[str] = []
+    for name in AUTHORITATIVE_DECISION_FILES:
+        path = root / packet_dir / name
+        if path.is_file():
+            parts.append(path.read_text(encoding="utf-8"))
     return "\n".join(parts)
 
 
@@ -296,7 +324,7 @@ def check_expected_decisions(root: Path = ROOT) -> list[Finding]:
                     )
                 )
                 continue
-            if phrase not in _packet_text(root, packet_dir):
+            if phrase not in _authoritative_packet_text(root, packet_dir):
                 findings.append(
                     Finding(packet_dir, f"missing expected decision marker {phrase}")
                 )

@@ -10,6 +10,7 @@ from scripts.check_local_llm_packet_consistency import (
     LEVEL_3_ACCEPTED,
     NO_FURTHER_LEVEL_3,
     OPERATOR_GUIDE_SELECTED_NEXT_LANE,
+    check_expected_decisions,
     check_operator_guide,
     check_packet_consistency,
     check_packet_dir,
@@ -40,6 +41,42 @@ def _write_packet(
         )
     if boundary_name:
         (target / boundary_name).write_text("# Evidence boundary\n", encoding="utf-8")
+
+
+def _write_expected_decision_context(root: Path) -> None:
+    packet_markers = {
+        Path(
+            "docs/evals/runs/"
+            "20260607-local-llm-controlled-usage-operator-run-001/"
+            "import-final-decision"
+        ): CONTROLLED_USAGE_ACCEPTED,
+        Path(
+            "docs/evals/runs/"
+            "20260607-local-llm-controlled-usage-operator-run-001/closeout"
+        ): CONTROLLED_USAGE_ACCEPTED,
+        Path(
+            "docs/evals/runs/"
+            "20260607-local-llm-solver-orchestration-level-3-validation-execution-001/"
+            "import-final-decision"
+        ): LEVEL_3_ACCEPTED,
+        Path(
+            "docs/evals/runs/"
+            "20260607-local-llm-solver-orchestration-level-3-validation-execution-001/"
+            "closeout"
+        ): f"{LEVEL_3_ACCEPTED}\n{NO_FURTHER_LEVEL_3}",
+    }
+    for packet_dir, marker_text in packet_markers.items():
+        target = root / packet_dir
+        target.mkdir(parents=True)
+        (target / "accepted-result.md").write_text(marker_text, encoding="utf-8")
+
+    index_dir = root / "docs/evals/runs/local-llm-solver-orchestration-index"
+    index_dir.mkdir(parents=True)
+    (index_dir / "decision-ledger.md").write_text(
+        f"{CONTROLLED_USAGE_ACCEPTED}\n{LEVEL_3_ACCEPTED}\n{NO_FURTHER_LEVEL_3}\n",
+        encoding="utf-8",
+    )
+    (index_dir / "lane-map.md").write_text(f"{NO_FURTHER_LEVEL_3}\n", encoding="utf-8")
 
 
 def test_current_repo_local_llm_packets_pass_packet_consistency_check():
@@ -83,6 +120,48 @@ def test_missing_required_blocker_fallback_fails_when_pattern_requires_one(tmp_p
         "missing required blocker-fallback-lane.md" == finding.message
         for finding in findings
     )
+
+
+def test_required_marker_only_in_checks_run_does_not_satisfy_expected_decisions(tmp_path):
+    _write_expected_decision_context(tmp_path)
+    packet_dir = Path(
+        "docs/evals/runs/"
+        "20260607-local-llm-solver-orchestration-level-3-validation-execution-001/"
+        "closeout"
+    )
+    (tmp_path / packet_dir / "accepted-result.md").write_text(
+        LEVEL_3_ACCEPTED, encoding="utf-8"
+    )
+    (tmp_path / packet_dir / "checks-run.md").write_text(
+        f'`rg "{NO_FURTHER_LEVEL_3}" docs/evals/runs/.../closeout`\n',
+        encoding="utf-8",
+    )
+
+    findings = check_expected_decisions(tmp_path)
+
+    assert any(
+        finding.path == packet_dir
+        and f"missing expected decision marker {NO_FURTHER_LEVEL_3}"
+        == finding.message
+        for finding in findings
+    )
+
+
+def test_required_marker_in_authoritative_status_file_satisfies_expected_decisions(tmp_path):
+    _write_expected_decision_context(tmp_path)
+    packet_dir = Path(
+        "docs/evals/runs/"
+        "20260607-local-llm-solver-orchestration-level-3-validation-execution-001/"
+        "closeout"
+    )
+    (tmp_path / packet_dir / "accepted-result.md").write_text(
+        LEVEL_3_ACCEPTED, encoding="utf-8"
+    )
+    (tmp_path / packet_dir / "final-status.md").write_text(
+        NO_FURTHER_LEVEL_3, encoding="utf-8"
+    )
+
+    assert check_expected_decisions(tmp_path) == []
 
 
 def test_stale_operator_guide_next_lane_state_fails(tmp_path):
