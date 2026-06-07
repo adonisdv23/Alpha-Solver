@@ -1,10 +1,6 @@
 # Checks Run
 
-The following docs-safe checks were run for this lane:
-
-```bash
-git status --short
-```
+The following docs-safe checks were run for this correction:
 
 ```bash
 git diff --name-only
@@ -15,15 +11,15 @@ git diff --check
 ```
 
 ```bash
-find docs/local_llm_solver_orchestration_operator_guide -maxdepth 1 -type f | sort
+git diff --name-only | rg -v '^docs/local_llm_solver_orchestration_operator_guide/' || true
 ```
 
 ```bash
-rg -n "behavior_evidence=false|no_hosted_fallback=true|no_provider_keys_required=true|failed_closed|gate_trace|missing_information_too_broad" docs/local_llm_solver_orchestration_operator_guide
+rg -n --glob "!checks-run.md" "boundary-claim.*(always|should fail closed|should .*block|leading to failed_closed)|always (block|fail closed)|should fail closed or block because" docs/local_llm_solver_orchestration_operator_guide || true
 ```
 
 ```bash
-rg -n "production readiness|MVP readiness|dashboard readiness|/v1/solve readiness|benchmark evidence|provider orchestration evidence|local model quality|Alpha superiority|billing evidence|broad runtime readiness|evidence-model promotion" docs/local_llm_solver_orchestration_operator_guide
+rg -n "positive readiness|benchmark|provider[- ]orchestration|Alpha[- ]superiority|/v1/solve|dashboard|billing|broad[- ]runtime|model[- ]quality|evidence[- ]model[- ]promotion" docs/local_llm_solver_orchestration_operator_guide/examples.md docs/local_llm_solver_orchestration_operator_guide/failure-modes-and-stop-conditions.md docs/local_llm_solver_orchestration_operator_guide/safe-use-boundaries.md docs/local_llm_solver_orchestration_operator_guide/non-claims-and-blocked-uses.md
 ```
 
-No smoke, local model, hosted provider, API, dashboard, billing, Google Sheets, runtime behavior, or test-change command was run.
+No smoke, local model, hosted provider, API, dashboard, billing, Google Sheets, runtime behavior, provider behavior, or test-change command was run.
