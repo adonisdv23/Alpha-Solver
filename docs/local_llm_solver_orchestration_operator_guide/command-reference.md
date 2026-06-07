@@ -2,7 +2,7 @@
 
 ## Stable local-only operator wrapper
 
-The stable Level 2 operator-facing wrapper for the local LLM solver orchestration path is:
+The stable operator-facing wrapper for the local LLM solver orchestration path is local-only, explicit opt-in, loopback-only, finite-timeout, no hosted provider keys required, no hosted fallback, and no provider fallback. The approved command shape is:
 
 ```bash
 python -m alpha.local_llm.operator_cli \
@@ -22,7 +22,8 @@ python -m alpha.local_llm.operator_cli
 This command is non-production, local-only, operator-only, and default-off. It delegates to
 `alpha.local_llm.orchestration_runner.run_local_llm_solver_orchestration` and prints the
 normalized result JSON to stdout. It is not smoke evidence, not model-quality evidence, not
-benchmark evidence, not readiness evidence, and not evidence-model promotion.
+benchmark evidence, not readiness evidence, and not evidence-model promotion. It does not expose
+`/v1/solve` or dashboard routes and does not call hosted providers.
 
 Required local settings:
 
@@ -44,6 +45,40 @@ Required operator checks after the command:
 - Stop if hosted fallback, `/v1/solve` exposure, dashboard exposure, unsafe field exposure, raw diagnostic text, provider fallback, or evidence promotion appears.
 
 The wrapper does not accept hosted-provider-key CLI flags or API-key CLI arguments. If hosted provider keys are present in the environment and the existing local runtime config path rejects them, the wrapper surfaces the normalized fail-closed local result and exits non-zero without printing provider-key values.
+
+## Level 3 closeout boundary
+
+Before citing or preserving output, use the source-of-truth packet paths:
+
+- `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/source-artifact/`
+- `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/import-final-decision/`
+- `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/closeout/`
+
+The final accepted Level 3 decision is:
+
+```text
+LEVEL_3_VALIDATION_EXECUTION_ACCEPTED_AS_ARTIFACT_COMPLETE_NON_PROMOTIONAL_LOCAL_ORCHESTRATION_EVIDENCE
+```
+
+The closeout selected:
+
+```text
+NO_FURTHER_LEVEL_3_VALIDATION_LANES_SELECTED
+```
+
+This operator-docs consolidation selects:
+
+```text
+NO_FURTHER_OPERATOR_DOCS_CONSOLIDATION_LANES_SELECTED
+```
+
+Blocker fallback lane:
+
+```text
+ALPHA-LOCAL-LLM-SOLVER-ORCHESTRATION-POST-LEVEL-3-OPERATOR-DOCS-CONSOLIDATION-FIX-001
+```
+
+Do not use this command reference to start a new validation lane, rerun Level 3, rerun smoke, run benchmarks, expose `/v1/solve`, expose dashboards, call hosted providers, add hosted fallback, add provider fallback, update Google Sheets or backlog workbooks, or promote evidence.
 
 ## Prompt-file form
 
@@ -119,3 +154,14 @@ Inspect the gate trace specifically:
 ```bash
 jq '.metadata.gate_trace' path/to/result.json
 ```
+
+## Troubleshooting and stop conditions
+
+- Missing stdout JSON: stop; do not infer success from stderr, logs, or shell history.
+- Nonzero exit code: stop; review input, timeout, endpoint, parser, or boundary failure without turning it into readiness evidence.
+- Malformed JSON: stop; do not hand-repair JSON for evidence use.
+- Non-loopback endpoint: stop before execution; this wrapper is local-only and loopback-only.
+- Hosted key exposure: stop and redact according to repo policy; this path requires no hosted provider keys.
+- Missing artifact fields: stop packet review; do not fill fields from memory or assumptions.
+
+Any hosted fallback, provider fallback, `/v1/solve` exposure, dashboard exposure, production readiness, MVP readiness, benchmark evidence, local model quality evidence, provider-orchestration evidence, Alpha superiority, billing evidence, dashboard readiness, `/v1/solve` readiness, broad runtime readiness, or evidence-model promotion claim is a stop condition.
