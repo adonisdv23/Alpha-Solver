@@ -18,6 +18,10 @@ The operator prerequisites state that PR #365 is squashed, merged, closed, and r
 
 This packet does not update Google Sheets and does not independently verify or alter external ledger state.
 
+## Completed chain source note
+
+The final completed lane chain starts with `docs/evals/runs/20260606-alpha-local-llm-solver-orchestration-manual-smoke-packet/` because that packet defined the five-prompt manual smoke expectation surface before `docs/evals/runs/20260606-alpha-local-llm-solver-orchestration-diagnostic-router-reset/`.
+
 ## Source files inspected for closeout
 
 - `AGENTS.md`

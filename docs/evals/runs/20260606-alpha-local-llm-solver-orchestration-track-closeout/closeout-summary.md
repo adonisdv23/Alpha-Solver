@@ -22,7 +22,7 @@ The readiness review selected exactly one next lane:
 
 The local LLM solver orchestration track is closed as a docs/evidence/provenance track.
 
-Retry 007 evidence and follow-up decision packets are accounted for under the updated expectation boundary.
+The manual smoke packet expectation surface, retry 007 evidence, and follow-up decision packets are accounted for under the updated expectation boundary.
 
 Remaining downstream use is limited to documentation continuity and future planning.
 

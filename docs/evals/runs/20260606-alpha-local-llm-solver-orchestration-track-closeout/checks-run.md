@@ -27,3 +27,27 @@
 - No runtime behavior change was performed.
 - No test change was performed.
 - No evidence-model promotion was performed.
+
+## PR #367 lane-chain fix checks
+
+- `git diff --name-only`
+  - Result: passed; changed files are limited to `docs/evals/runs/20260606-alpha-local-llm-solver-orchestration-track-closeout/`.
+- `git diff --check`
+  - Result: passed; no whitespace errors reported.
+- `python - <<'PY' ... PY`
+  - Result: passed; confirmed `manual-smoke-packet` appears in `completed-lanes.md` before `diagnostic-router-reset`.
+- `python - <<'PY' ... PY`
+  - Result: passed; confirmed changed files are limited to the final closeout packet path and no source, test, runtime, provider, dashboard, or API files changed.
+
+## PR #367 manual confirmations
+
+- No smoke rerun occurred.
+- No local model call occurred.
+- No hosted provider call occurred.
+- No Google Sheets update occurred.
+- No runtime behavior change occurred.
+- No test change occurred.
+- No provider behavior change occurred.
+- No dashboard or API change occurred.
+- No `/v1/solve` exposure occurred.
+- No evidence-model promotion occurred.

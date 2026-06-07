@@ -6,7 +6,7 @@
 | Closeout-readiness review cited as authorization source. | Complete. |
 | `READY_FOR_TRACK_CLOSEOUT` preserved. | Complete. |
 | `ALPHA-LOCAL-LLM-SOLVER-ORCHESTRATION-TRACK-CLOSEOUT-001` preserved. | Complete. |
-| Completed lane chain preserved. | Complete. |
+| Completed lane chain preserved, including the initial manual-smoke packet before diagnostic-router reset. | Complete. |
 | Retry 007 source artifact boundary preserved. | Complete. |
 | Retry 007 import/final-decision boundary preserved. | Complete. |
 | Prompt 3 `KEEP_CURRENT_RULE` preserved. | Complete. |
