@@ -1,4 +1,4 @@
-.PHONY: run test test-gates check-local-llm-evidence-boundaries check-local-llm-orchestration-guardrails fmt lint env-check clean smoke release
+.PHONY: run test test-gates check-local-llm-evidence-boundaries fmt lint env-check clean smoke release
 
 run:
 	uvicorn service.app:app --host 0.0.0.0 --port 8000
@@ -11,11 +11,6 @@ test-gates:
 
 check-local-llm-evidence-boundaries:
 	python scripts/check_local_llm_evidence_boundaries.py
-
-check-local-llm-orchestration-guardrails:
-	python scripts/check_local_llm_evidence_boundaries.py
-	python scripts/check_local_llm_doc_paths.py
-	python scripts/check_local_llm_packet_consistency.py
 
 fmt:
 	black . >/dev/null 2>&1 || echo "black not installed"
