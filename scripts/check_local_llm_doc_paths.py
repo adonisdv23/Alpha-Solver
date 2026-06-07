@@ -85,9 +85,10 @@ BARE_REPO_PATH_RE = re.compile(
 LOCAL_LANE_RE = re.compile(r"\b(?:ALPHA|NO_FURTHER|STOP-HERE)[A-Z0-9_-]*(?:LOCAL[-_]LLM|LEVEL_3|DOCS_LINK_PATH_CHECKER)[A-Z0-9_-]*\b")
 SELECTED_CONTEXT_RE = re.compile(r"\bselected\s+next\s+(?:action|lane)\b", re.IGNORECASE)
 HISTORICAL_CONTEXT_RE = re.compile(
-    r"\b(?:prior|preserved|historical|previous|remains|closed|level\s*2|level\s*3|blocker|fallback|fix)\b",
+    r"\b(?:prior|preserved|historical|previous|remains|closed)\b",
     re.IGNORECASE,
 )
+FALLBACK_CONTEXT_RE = re.compile(r"\bblocker\s+fallback\s+lane\b", re.IGNORECASE)
 
 
 @dataclass(frozen=True)
@@ -220,17 +221,34 @@ def find_required_source_path_findings(root: Path = ROOT) -> list[Finding]:
     return findings
 
 
-def _selected_context_has_exemption(line: str, window: str) -> bool:
-    return bool(HISTORICAL_CONTEXT_RE.search(line) or HISTORICAL_CONTEXT_RE.search(window))
+def _selected_context_has_exemption(line: str) -> bool:
+    return bool(HISTORICAL_CONTEXT_RE.search(line))
+
+
+def _selected_next_block(lines: list[str], index: int) -> str:
+    block_lines: list[str] = []
+    for block_index in range(index, min(len(lines), index + 5)):
+        line = lines[block_index]
+        if block_index > index and line.lstrip().startswith("#"):
+            break
+        fallback_match = FALLBACK_CONTEXT_RE.search(line)
+        if fallback_match:
+            prefix = line[: fallback_match.start()]
+            if prefix.strip():
+                block_lines.append(prefix)
+            break
+        block_lines.append(line)
+    return "\n".join(block_lines)
 
 
 def find_selected_next_conflict_findings(path: Path, text: str) -> list[Finding]:
     """Find simple stale selected-next conflicts within one document.
 
-    Multiple selected-next statements are allowed when the nearby text clearly
-    marks one as prior/preserved/historical/closed or as a blocker/fallback. A
-    conflict is reported when one doc presents multiple distinct selected-next
-    actions without that context.
+    Multiple selected-next statements are allowed when the selected-next line
+    clearly marks one as prior/preserved/historical/closed. Blocker fallback
+    lane text is parsed separately and never exempts or supplies a selected-next
+    action. A conflict is reported when one doc presents multiple distinct
+    current selected-next actions without that context.
     """
     lines = text.splitlines()
     current_selected: tuple[int, str] | None = None
@@ -238,14 +256,13 @@ def find_selected_next_conflict_findings(path: Path, text: str) -> list[Finding]
     for index, line in enumerate(lines):
         if not SELECTED_CONTEXT_RE.search(line):
             continue
-        window_lines = lines[index : min(len(lines), index + 5)]
-        window = "\n".join(window_lines)
-        lanes = sorted(set(LOCAL_LANE_RE.findall(window)))
+        if _selected_context_has_exemption(line):
+            continue
+        block = _selected_next_block(lines, index)
+        lanes = LOCAL_LANE_RE.findall(block)
         if not lanes:
             continue
-        if _selected_context_has_exemption(line, window):
-            continue
-        selected_value = lanes[-1]
+        selected_value = lanes[0]
         if current_selected and current_selected[1] != selected_value:
             findings.append(
                 Finding(
