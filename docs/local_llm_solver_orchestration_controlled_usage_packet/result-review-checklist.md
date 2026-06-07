@@ -13,11 +13,21 @@ Use this checklist only after a future approved controlled usage operator run.
 - [ ] Exit code is captured.
 - [ ] Redacted normalized JSON output is captured.
 
+## CLI success review
+
+- [ ] Exit code is exactly `0`.
+- [ ] Redacted normalized JSON parses successfully.
+- [ ] Normalized JSON `status` is exactly one of `ok`, `clarify`, or `blocked`.
+- [ ] No `failed_closed` status appears in the accepted artifact review.
+
+A `failed_closed` result may be preserved as a failed attempt artifact only. It must not be accepted as a successful controlled usage review. Malformed JSON, missing status, missing exit code, or any nonzero exit code must stop review and use the blocker fallback lane or a new approved fix lane.
+
 ## Safety flag review
 
 - [ ] Top-level or metadata confirmation shows `behavior_evidence=false`.
 - [ ] Top-level or metadata confirmation shows `no_hosted_fallback=true`.
 - [ ] Top-level or metadata confirmation shows `no_provider_keys_required=true`.
+- [ ] Confirm these safety flags are necessary but not sufficient for acceptance; the CLI success review must also pass.
 - [ ] No hosted provider keys appear in artifacts.
 - [ ] No hosted provider execution appears in artifacts.
 - [ ] No hosted fallback appears in artifacts.

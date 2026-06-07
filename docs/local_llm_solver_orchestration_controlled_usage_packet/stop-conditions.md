@@ -21,7 +21,12 @@ Stop immediately if any condition below appears during a future controlled usage
 - missing stdout artifact;
 - missing stderr artifact;
 - missing exit code artifact;
+- nonzero exit code;
 - missing redacted normalized JSON output;
+- malformed normalized JSON output;
+- missing normalized JSON `status`;
+- normalized JSON `status` other than `ok`, `clarify`, or `blocked`;
+- accepted review attempt for a `failed_closed` result;
 - missing `behavior_evidence=false` confirmation;
 - missing `no_hosted_fallback=true` confirmation;
 - missing `no_provider_keys_required=true` confirmation.
