@@ -1,0 +1,1 @@
+List three bounded considerations for reducing local Python CLI startup latency. Keep the answer concise and preserve local-only assumptions.

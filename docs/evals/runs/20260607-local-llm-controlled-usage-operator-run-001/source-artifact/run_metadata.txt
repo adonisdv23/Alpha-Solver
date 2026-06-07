@@ -1,0 +1,5 @@
+repo_head=4ca569d611ace3b8a682e6a614dbd2c6753fd93d
+repo_status_begin
+repo_status_end
+command_identity=python3 -m alpha.local_llm.operator_cli
+artifact_dir=artifacts/local_llm_controlled_usage_operator_run_001
