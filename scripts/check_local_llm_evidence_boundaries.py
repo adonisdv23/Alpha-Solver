@@ -38,6 +38,14 @@ BLOCKER_FALLBACK_LANE = "ALPHA-LOCAL-LLM-SOLVER-ORCHESTRATION-EVIDENCE-BOUNDARY-
 FINAL_PACKET_DIR = Path(
     "docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/closeout"
 )
+AUTHORITATIVE_FINAL_PACKET_FILES = (
+    "README.md",
+    "accepted-result.md",
+    "final-boundary.md",
+    "final-status.md",
+    "selected-next-action.md",
+    "blocked-claims.md",
+)
 REQUIRED_FINAL_PACKET_PHRASES = (
     "behavior_evidence=False",
     "no_hosted_fallback=True",
@@ -213,8 +221,9 @@ def find_required_final_packet_findings(root: Path = ROOT) -> list[Finding]:
             )
         ]
     combined_parts: list[str] = []
-    for path in sorted(packet_dir.rglob("*")):
-        if path.is_file() and path.suffix.lower() in TEXT_SUFFIXES:
+    for name in AUTHORITATIVE_FINAL_PACKET_FILES:
+        path = packet_dir / name
+        if path.is_file():
             combined_parts.append(path.read_text(encoding="utf-8"))
     combined = "\n".join(combined_parts)
     findings: list[Finding] = []

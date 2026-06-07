@@ -6,6 +6,7 @@ Ollama, hosted providers, benchmarks, dashboard routes, or /v1/solve.
 from pathlib import Path
 
 from scripts.check_local_llm_evidence_boundaries import (
+    AUTHORITATIVE_FINAL_PACKET_FILES,
     FINAL_PACKET_DIR,
     REQUIRED_FINAL_PACKET_PHRASES,
     check_paths,
@@ -49,14 +50,44 @@ def test_promotional_claim_with_boundary_language_is_allowed():
     assert findings == []
 
 
+def _write_authoritative_packet(root: Path, phrases: tuple[str, ...]) -> None:
+    packet_dir = root / FINAL_PACKET_DIR
+    packet_dir.mkdir(parents=True)
+    for name in AUTHORITATIVE_FINAL_PACKET_FILES:
+        (packet_dir / name).write_text("# Placeholder\n", encoding="utf-8")
+    (packet_dir / "accepted-result.md").write_text("\n".join(phrases), encoding="utf-8")
+
+
+def test_required_phrase_only_in_checks_run_does_not_satisfy_enforcement(tmp_path):
+    missing_phrase = REQUIRED_FINAL_PACKET_PHRASES[0]
+    authoritative_phrases = tuple(
+        phrase for phrase in REQUIRED_FINAL_PACKET_PHRASES if phrase != missing_phrase
+    )
+    _write_authoritative_packet(tmp_path, authoritative_phrases)
+    (tmp_path / FINAL_PACKET_DIR / "checks-run.md").write_text(
+        f'`rg "{missing_phrase}" docs/evals/runs/.../closeout`\n',
+        encoding="utf-8",
+    )
+
+    findings = find_required_final_packet_findings(tmp_path)
+
+    assert [finding.phrase for finding in findings] == [missing_phrase]
+
+
+def test_required_phrases_in_authoritative_closeout_files_satisfy_enforcement(tmp_path):
+    _write_authoritative_packet(tmp_path, REQUIRED_FINAL_PACKET_PHRASES)
+
+    assert find_required_final_packet_findings(tmp_path) == []
+
+
 def test_final_packet_contains_required_boundary_phrases():
     findings = find_required_final_packet_findings()
 
     assert findings == []
     packet_text = "\n".join(
-        path.read_text(encoding="utf-8")
-        for path in sorted(FINAL_PACKET_DIR.rglob("*"))
-        if path.is_file() and path.suffix == ".md"
+        (FINAL_PACKET_DIR / name).read_text(encoding="utf-8")
+        for name in AUTHORITATIVE_FINAL_PACKET_FILES
+        if (FINAL_PACKET_DIR / name).is_file()
     )
     for phrase in REQUIRED_FINAL_PACKET_PHRASES:
         assert phrase in packet_text
