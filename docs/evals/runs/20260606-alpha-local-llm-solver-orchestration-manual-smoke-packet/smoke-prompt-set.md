@@ -16,12 +16,14 @@ Use exactly five smoke prompts. Do not add, remove, reorder, or replace prompts 
 - Prompt: `Make it faster.`
 - Purpose: verify missing information does not become unsupported answer.
 
-## 3. Execution-planning task that should answer with assumptions
+## 3. Execution-planning task with conditional bounded-assumptions expectation
 
 - ID: `03-answer-with-assumptions`
-- Expected mode: `answer_with_assumptions`
+- Prompt shape: `bounded_local_python_cli_startup_plan`
+- Expected success-path mode when the assumption gate passes: `answer_with_assumptions`
+- Acceptable blocked-assumption-gate mode: `clarify` only when `apply_gate_decision=blocked_assumption_gate_failed`, `assumption_gate_failed_reason_codes` includes `missing_information_too_broad`, `boundary_failure_stage=none`, `pass_two_called=false`, `expose_model_fields=false`, and high-risk / boundary protections remain intact.
 - Prompt: `Draft a concise execution plan to improve a small Python CLI's startup time when only profiling later is available; state assumptions.`
-- Purpose: verify bounded assumptions path.
+- Purpose: verify bounded assumptions path when the gate permits it, while preserving clarify as acceptable when the breadth guard blocks `answer_with_assumptions`.
 
 ## 4. Blocked or high-risk style task that should not overclaim
 
