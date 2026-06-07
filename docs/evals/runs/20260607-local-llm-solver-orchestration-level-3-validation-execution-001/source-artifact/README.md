@@ -35,11 +35,11 @@ The local execution recorded five frozen test cases:
 - L3-FROZEN-TC-004
 - L3-FROZEN-TC-005
 
-The terminal summary reported:
+The corrected inline-prompt artifact records:
 
 - exit_code=0 for all five cases
 - json_parse=parseable for all five cases
-- statuses: ok, clarify, blocked, blocked, blocked
+- statuses: ok, blocked, ok, blocked, blocked
 - behavior_evidence=False for all five cases
 - no_hosted_fallback=True for all five cases
 - no_provider_keys_required=True for all five cases
