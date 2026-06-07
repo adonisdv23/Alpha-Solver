@@ -13,7 +13,7 @@ The selected path preserves:
 - finite timeout use;
 - no provider keys required or accepted for local mode;
 - hosted-provider-key CLI flags disallowed;
-- hosted-provider-key environment variables must not affect local wrapper behavior except through existing fail-closed rejection semantics;
+- hosted-provider-key environment variables must not affect local wrapper behavior, select hosted mode, enable fallback, soften failures, or become optional credential inputs;
 - existing fail-closed provider-key rejection behavior must be preserved where applicable;
 - no hosted fallback;
 - no provider fallback;

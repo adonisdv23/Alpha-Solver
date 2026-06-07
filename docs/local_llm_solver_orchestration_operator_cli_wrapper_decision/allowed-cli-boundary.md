@@ -33,9 +33,9 @@ A future wrapper may:
 
 ## Provider-key boundary
 
-For local mode, hosted provider keys are not required or accepted. A future wrapper must not add optional hosted-provider-key inputs, must not provide hosted-provider-key CLI flags, and must not read, forward, validate, or depend on hosted provider credentials. Hosted-provider-key environment variables must not change local wrapper behavior, select a hosted path, enable fallback, or soften failures.
+For local mode, hosted provider keys are not required or accepted. A future wrapper must not add optional hosted-provider-key inputs, must not provide hosted-provider-key CLI flags, and must not read, forward, validate, or depend on hosted provider credentials. Hosted-provider-key environment variables must not affect local wrapper behavior, select a hosted path, enable fallback, soften failures, or become optional credential inputs.
 
-If the existing local runtime config path treats hosted-provider-key presence as unsafe, the wrapper must preserve that fail-closed behavior and surface the local failure result rather than bypassing the rejection.
+If the existing local runtime config path treats hosted-provider-key presence as unsafe, the wrapper must preserve that fail-closed behavior and surface the local failure result rather than bypassing the rejection. Preserving that existing fail-closed rejection is the only allowed response to unsafe hosted-provider-key presence; the wrapper must not otherwise use hosted-provider-key environment variables to alter local-mode behavior.
 
 ## Disallowed behavior
 
@@ -46,7 +46,7 @@ A future wrapper must not:
 - add hosted provider fallback;
 - require, accept, read, forward, validate, or depend on hosted provider keys for local mode;
 - expose hosted-provider-key CLI flags or equivalent command arguments for local mode;
-- allow hosted-provider-key environment variables to affect local wrapper behavior except through the existing local runtime config path's fail-closed rejection;
+- allow hosted-provider-key environment variables to affect local wrapper behavior, select hosted mode, enable fallback, soften failures, or become optional credential inputs;
 - bypass, mask, or reinterpret existing fail-closed provider-key rejection behavior when the local runtime config path treats hosted-provider-key presence as unsafe;
 - race, route, or orchestrate across providers;
 - label hosted output as local output;
