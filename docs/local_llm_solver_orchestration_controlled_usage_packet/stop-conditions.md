@@ -21,7 +21,8 @@ Stop immediately if any condition below appears during a future controlled usage
 - missing stdout artifact;
 - missing stderr artifact;
 - missing exit code artifact;
-- nonzero exit code;
+- missing captured `exit_code=0` confirmation;
+- nonzero `exit_code`;
 - missing redacted normalized JSON output;
 - malformed normalized JSON output;
 - missing normalized JSON `status`;

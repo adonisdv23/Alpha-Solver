@@ -15,9 +15,9 @@ Use this checklist only after a future approved controlled usage operator run.
 
 ## CLI success review
 
-- [ ] Exit code is exactly `0`.
-- [ ] Redacted normalized JSON parses successfully.
-- [ ] Normalized JSON `status` is exactly one of `ok`, `clarify`, or `blocked`.
+- [ ] Captured `exit_code` is exactly `0` before the controlled usage operator-run artifact review is accepted.
+- [ ] Redacted normalized JSON parses successfully before the artifact review is accepted.
+- [ ] Accepted normalized JSON `status` is exactly one of `ok`, `clarify`, or `blocked`.
 - [ ] No `failed_closed` status appears in the accepted artifact review.
 
 A `failed_closed` result may be preserved as a failed attempt artifact only. It must not be accepted as a successful controlled usage review. Malformed JSON, missing status, missing exit code, or any nonzero exit code must stop review and use the blocker fallback lane or a new approved fix lane.
@@ -57,5 +57,5 @@ A `failed_closed` result may be preserved as a failed attempt artifact only. It 
 
 ## Outcome review
 
-- [ ] If all checks pass, record the result as controlled usage operator-run artifact review only.
+- [ ] If provenance, CLI success, safety flag, surface, and claim checks all pass, record the result as controlled usage operator-run artifact review only.
 - [ ] If any check fails, do not promote the result; stop and use the blocker fallback lane or a new approved fix lane.
