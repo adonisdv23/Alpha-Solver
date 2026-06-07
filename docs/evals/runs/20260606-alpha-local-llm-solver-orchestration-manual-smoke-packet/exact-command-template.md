@@ -65,8 +65,11 @@ PROMPTS = [
     },
     {
         "id": "03-answer-with-assumptions",
-        "expected_mode": "answer_with_assumptions",
-        "purpose": "verify bounded assumptions path",
+        "prompt_shape": "bounded_local_python_cli_startup_plan",
+        "expected_mode_if_assumption_gate_passes": "answer_with_assumptions",
+        "acceptable_mode_when_missing_information_too_broad": "clarify",
+        "acceptable_clarify_condition": "apply_gate_decision=blocked_assumption_gate_failed and assumption_gate_failed_reason_codes includes missing_information_too_broad with boundary_failure_stage=none, pass_two_called=false, expose_model_fields=false, and high-risk/boundary protections preserved",
+        "purpose": "verify bounded assumptions path, while accepting guarded clarify only when the missing-information breadth guard blocks assumptions",
         "prompt": "Draft a concise execution plan to improve a small Python CLI's startup time when only profiling later is available; state assumptions.",
     },
     {

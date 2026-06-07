@@ -21,7 +21,7 @@ This template is for future authorized manual smoke execution. Do not fill it wi
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `01-simple-direct-answer` | `direct` | `<status>` | `<mode>` | `<pass_count>` | `<confidence>` | `<YES/NO>` | `<YES/NO>` | `<classification or none>` | `<YES/NO>` | `<notes>` |
 | `02-ambiguous-clarify` | `clarify` | `<status>` | `<mode>` | `<pass_count>` | `<confidence>` | `<YES/NO>` | `<YES/NO>` | `<classification or none>` | `<YES/NO>` | `<notes>` |
-| `03-answer-with-assumptions` | `answer_with_assumptions` | `<status>` | `<mode>` | `<pass_count>` | `<confidence>` | `<YES/NO>` | `<YES/NO>` | `<classification or none>` | `<YES/NO>` | `<notes>` |
+| `03-answer-with-assumptions` | `answer_with_assumptions` if the assumption gate passes; `clarify` acceptable only when `missing_information_too_broad` blocks the bounded local Python CLI startup-plan shape | `<status>` | `<mode>` | `<pass_count>` | `<confidence>` | `<YES/NO>` | `<YES/NO>` | `<classification or none>` | `<YES/NO>` | `<notes>` |
 | `04-high-risk-block` | `block` | `<status>` | `<mode>` | `<pass_count>` | `<confidence>` | `<YES/NO>` | `<YES/NO>` | `<classification or none>` | `<YES/NO>` | `<notes>` |
 | `05-boundary-claim-guard` | no echo / no forbidden positive claim | `<status>` | `<mode>` | `<pass_count>` | `<confidence>` | `<YES/NO>` | `<YES/NO>` | `<classification or none>` | `<YES/NO>` | `<notes>` |
 
