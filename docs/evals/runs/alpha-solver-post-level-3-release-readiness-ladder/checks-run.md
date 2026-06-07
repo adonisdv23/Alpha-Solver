@@ -10,6 +10,7 @@ This packet is docs-only. Checks should confirm evidence continuity, packet cont
 - `python scripts/check_local_llm_evidence_boundaries.py`
 - `python scripts/check_local_llm_doc_paths.py`
 - `python scripts/check_local_llm_packet_consistency.py`
+- `python scripts/check_local_llm_packet_consistency.py docs/evals/runs/alpha-solver-post-level-3-release-readiness-ladder`
 - `rg -n "LEVEL_3_VALIDATION_EXECUTION_ACCEPTED_AS_ARTIFACT_COMPLETE_NON_PROMOTIONAL_LOCAL_ORCHESTRATION_EVIDENCE" docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001 docs/evals/runs/local-llm-solver-orchestration-index docs/evals/runs/alpha-solver-post-level-3-release-readiness-ladder`
 - `rg -n "NO_FURTHER_LEVEL_3_VALIDATION_LANES_SELECTED" docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001 docs/evals/runs/local-llm-solver-orchestration-index docs/evals/runs/alpha-solver-post-level-3-release-readiness-ladder`
 - `rg -n "SELECT_RELEASE_READINESS_LADDER_TRACK" docs/evals/runs/local-llm-solver-orchestration-post-level-3-roadmap-decision docs/evals/runs/alpha-solver-post-level-3-release-readiness-ladder`
@@ -27,6 +28,7 @@ This packet is docs-only. Checks should confirm evidence continuity, packet cont
 - PASS: `python scripts/check_local_llm_evidence_boundaries.py` passed.
 - PASS: `python scripts/check_local_llm_doc_paths.py` passed.
 - PASS: `python scripts/check_local_llm_packet_consistency.py` passed.
+- PASS: `python scripts/check_local_llm_packet_consistency.py docs/evals/runs/alpha-solver-post-level-3-release-readiness-ladder` passed and reported `1 packet directories scanned`, confirming the new release-readiness ladder packet was checked explicitly by path.
 - PASS: `rg -n "LEVEL_3_VALIDATION_EXECUTION_ACCEPTED_AS_ARTIFACT_COMPLETE_NON_PROMOTIONAL_LOCAL_ORCHESTRATION_EVIDENCE" docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001 docs/evals/runs/local-llm-solver-orchestration-index docs/evals/runs/alpha-solver-post-level-3-release-readiness-ladder` found the final accepted Level 3 decision.
 - PASS: `rg -n "NO_FURTHER_LEVEL_3_VALIDATION_LANES_SELECTED" docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001 docs/evals/runs/local-llm-solver-orchestration-index docs/evals/runs/alpha-solver-post-level-3-release-readiness-ladder` found the final Level 3 closeout selection.
 - PASS: `rg -n "SELECT_RELEASE_READINESS_LADDER_TRACK" docs/evals/runs/local-llm-solver-orchestration-post-level-3-roadmap-decision docs/evals/runs/alpha-solver-post-level-3-release-readiness-ladder` found the roadmap selection.
