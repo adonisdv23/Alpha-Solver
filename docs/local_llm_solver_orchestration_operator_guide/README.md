@@ -2,20 +2,60 @@
 
 ## Purpose
 
-This guide explains how a Level 2 operator may use the local LLM solver orchestration path as a local-only development capability after final track closeout. It is practical usage guidance for inspecting the existing non-production runner, its normalized result shape, and its diagnostic metadata.
+This guide consolidates the operator documentation for the local LLM solver orchestration path after the Level 3 validation execution closeout. It is docs-only usability guidance for safely finding the approved local-only command, checking its evidence boundary, and avoiding claims or actions that the preserved Level 3 artifact does not authorize.
 
-## Level 2 boundary
+## Approved operator path
 
-Level 2 use means local developer-machine operation only. The path is default-off, requires explicit local opt-in, uses a localhost or loopback Ollama-style endpoint, requires no hosted provider keys, and preserves `behavior_evidence=false`, `no_hosted_fallback=true`, and `no_provider_keys_required=true`.
+The approved operator-facing command identity is:
 
-This guide does not reinterpret the final closeout packet and does not broaden the evidence boundary. The controlling source remains the local LLM solver orchestration closeout/readiness packet and the implementation contracts in `.specs/LOCAL-LLM-RUNTIME-INTEGRATION-001.md` and `.specs/LOCAL-LLM-SOLVER-ORCHESTRATION-001.md`.
+```text
+python -m alpha.local_llm.operator_cli
+```
 
-## Operator guidance, not validation
+Use it only as a non-production, local-only, operator-only wrapper around the existing local orchestration runner. The path is default-off, requires explicit `--enable-local-llm`, requires exactly one prompt source, requires a loopback/local endpoint, requires a local model identifier, requires a finite positive timeout, requires no hosted provider keys, and does not provide hosted or provider fallback.
 
-This guide is not validation, smoke evidence, benchmark evidence, model-quality evidence, provider orchestration evidence, production readiness, MVP readiness, `/v1/solve` readiness, dashboard readiness, billing evidence, broad runtime readiness, Alpha superiority, or evidence-model promotion.
+## Source-of-truth packets
+
+Use these packet paths when verifying or citing Level 3 status:
+
+- `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/source-artifact/`
+- `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/import-final-decision/`
+- `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/closeout/`
+
+The closeout packet preserves the final accepted decision:
+
+```text
+LEVEL_3_VALIDATION_EXECUTION_ACCEPTED_AS_ARTIFACT_COMPLETE_NON_PROMOTIONAL_LOCAL_ORCHESTRATION_EVIDENCE
+```
+
+The closeout selected next action is:
+
+```text
+NO_FURTHER_LEVEL_3_VALIDATION_LANES_SELECTED
+```
+
+This post-closeout operator-docs consolidation selects:
+
+```text
+NO_FURTHER_OPERATOR_DOCS_CONSOLIDATION_LANES_SELECTED
+```
+
+If this docs consolidation is found incomplete or inconsistent, use blocker fallback lane:
+
+```text
+ALPHA-LOCAL-LLM-SOLVER-ORCHESTRATION-POST-LEVEL-3-OPERATOR-DOCS-CONSOLIDATION-FIX-001
+```
+
+## Evidence boundary
+
+The Level 3 artifact is accepted only as artifact-complete, non-promotional, local orchestration evidence. It does not establish production readiness, MVP readiness, benchmark evidence, local model quality evidence, provider-orchestration evidence, Alpha superiority, billing evidence, dashboard readiness, `/v1/solve` readiness, broad runtime readiness, or evidence-model promotion.
+
+This guide does not reopen validation, rerun smoke, run local models, run Ollama, call hosted providers, expose `/v1/solve`, expose dashboard routes, run benchmarks, update Google Sheets or backlog workbooks, add fallback behavior, or promote evidence.
 
 ## Start here
 
-- Use [quick-start.md](quick-start.md) for the shortest safe local sequence.
-- Use [command-reference.md](command-reference.md) for exact command templates and the current operator-command status.
-- Use [safe-use-boundaries.md](safe-use-boundaries.md) and [non-claims-and-blocked-uses.md](non-claims-and-blocked-uses.md) before preserving or sharing any output.
+- Use [command-reference.md](command-reference.md) for exact safe invocation shape and required flags.
+- Use [operator-safe-use-checklist.md](operator-safe-use-checklist.md) immediately before and after any local-only operator command.
+- Use [level-3-validation-artifact-summary.md](level-3-validation-artifact-summary.md) to understand what the accepted Level 3 artifact did and did not establish.
+- Use [evidence-boundary-quick-reference.md](evidence-boundary-quick-reference.md) before sharing, preserving, or summarizing any output.
+- Use [failure-modes-and-stop-conditions.md](failure-modes-and-stop-conditions.md), [safe-use-boundaries.md](safe-use-boundaries.md), and [non-claims-and-blocked-uses.md](non-claims-and-blocked-uses.md) for legacy boundary details that remain in force.
