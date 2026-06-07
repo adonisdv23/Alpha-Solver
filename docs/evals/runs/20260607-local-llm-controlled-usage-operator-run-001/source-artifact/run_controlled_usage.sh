@@ -41,4 +41,4 @@ python3 -m alpha.local_llm.operator_cli \
 rc=$?
 printf '%s\n' "$rc" > "$EXIT_FILE"
 
-exit 0
+exit "$rc"
