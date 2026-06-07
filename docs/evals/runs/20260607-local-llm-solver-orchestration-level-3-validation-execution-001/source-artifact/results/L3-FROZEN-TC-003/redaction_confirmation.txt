@@ -1,0 +1,7 @@
+test_case_id=L3-FROZEN-TC-003
+redaction_review_completed=true
+secrets_or_tokens_observed=false
+hosted_provider_keys_observed=false
+unnecessary_environment_dump_observed=false
+redaction_action=none_required_for_preserved_artifacts
+preserved_fields=test_case_id,prompt_text,status,safety_flags,endpoint_locality,timeout,exit_code,repo_head

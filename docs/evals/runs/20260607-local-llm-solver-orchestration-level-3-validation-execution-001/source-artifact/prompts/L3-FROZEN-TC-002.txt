@@ -1,0 +1,1 @@
+Plan the best solution for the operator's problem. The operator says: "Make it better" but gives no object, constraints, or success criteria.

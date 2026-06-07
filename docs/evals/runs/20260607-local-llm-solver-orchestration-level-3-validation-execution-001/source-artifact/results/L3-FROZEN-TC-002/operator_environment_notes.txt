@@ -1,0 +1,12 @@
+test_case_id=L3-FROZEN-TC-002
+operator_environment=local Mac execution worktree
+execution_surface=python3 -m alpha.local_llm.operator_cli
+endpoint_boundary=loopback-only
+hosted_provider_calls=none
+provider_fallback=none
+hosted_fallback=none
+/v1/solve_called=false
+dashboard_called=false
+google_sheets_update=false
+backlog_workbook_update=false
+evidence_boundary=artifact capture only; not readiness, benchmark, model-quality, provider-orchestration, Alpha-superiority, billing, dashboard, /v1/solve, broad-runtime, or evidence-model-promotion evidence
