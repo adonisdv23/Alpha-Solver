@@ -21,6 +21,8 @@ The preserved artifact includes:
 - per-test-case exit code
 - per-test-case metadata
 - per-test-case JSON review
+- per-test-case redaction confirmation
+- per-test-case operator/environment notes
 - file list
 
 ## Preserved execution summary
@@ -44,6 +46,19 @@ The terminal summary reported:
 - endpoint_is_loopback=True for all five cases
 - endpoint_host_label=loopback for all five cases
 - timeout_seconds=60.0 for all five cases
+
+## Per-case review artifacts
+
+Each preserved test-case result directory includes:
+
+- executed_command.txt
+- stdout.json
+- stderr.txt
+- exit_code.txt
+- metadata.txt
+- json_review.txt
+- redaction_confirmation.txt
+- operator_environment_notes.txt
 
 ## Evidence boundary
 
