@@ -15,10 +15,10 @@ The next lane may implement a narrow, stable operator-facing CLI wrapper that de
 At a high level, the next lane may add:
 
 - a documented CLI command or module invocation for Level 2 local operator use;
-- argument parsing for prompt, local endpoint, local model, finite timeout, and explicit opt-in;
+- argument parsing for prompt, local endpoint, local model, finite timeout, and explicit opt-in, with no hosted-provider-key CLI flags or credential inputs;
 - JSON output formatting for the normalized result;
 - help text and docs that preserve non-production and non-evidence boundaries;
-- focused tests proving boundary preservation and no accidental `/v1/solve` or dashboard exposure.
+- focused tests proving boundary preservation, hosted-provider-key non-acceptance, preservation of existing fail-closed provider-key rejection behavior where applicable, and no accidental `/v1/solve` or dashboard exposure.
 
 ## What this packet does not authorize
 

@@ -11,7 +11,10 @@ The selected path preserves:
 - explicit operator opt-in;
 - localhost or loopback endpoint acceptance only;
 - finite timeout use;
-- no provider keys required for local mode;
+- no provider keys required or accepted for local mode;
+- hosted-provider-key CLI flags disallowed;
+- hosted-provider-key environment variables must not affect local wrapper behavior except through existing fail-closed rejection semantics;
+- existing fail-closed provider-key rejection behavior must be preserved where applicable;
 - no hosted fallback;
 - no provider fallback;
 - local failure visibility as fail-closed local failure;

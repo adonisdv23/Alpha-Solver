@@ -1,10 +1,6 @@
 # Checks Run
 
-The following checks were run for this docs/spec decision packet:
-
-```bash
-git status --short
-```
+The following checks were run for this docs/spec decision packet update:
 
 ```bash
 git diff --name-only
@@ -15,15 +11,27 @@ git diff --check
 ```
 
 ```bash
-find docs/local_llm_solver_orchestration_operator_cli_wrapper_decision -maxdepth 1 -type f | sort
+git diff --name-only | rg -v '^docs/local_llm_solver_orchestration_operator_cli_wrapper_decision/' || true
 ```
 
 ```bash
-rg -n "ADD_STABLE_CLI_WRAPPER|KEEP_MODULE_ENTRYPOINT_ONLY|ADD_OPERATOR_SCRIPT_TEMPLATE_ONLY|BLOCKED_REQUIRES_SPEC_OR_SURFACE_REVIEW" docs/local_llm_solver_orchestration_operator_cli_wrapper_decision
+rg -n "not required or accepted|required or accepted" docs/local_llm_solver_orchestration_operator_cli_wrapper_decision
 ```
 
 ```bash
-rg -n "behavior_evidence=false|no_hosted_fallback=true|no_provider_keys_required=true|/v1/solve|dashboard|provider fallback" docs/local_llm_solver_orchestration_operator_cli_wrapper_decision
+rg -n "hosted-provider-key CLI flags|credential inputs|command arguments" docs/local_llm_solver_orchestration_operator_cli_wrapper_decision
+```
+
+```bash
+rg -n "environment variables must not affect|environment variables must not change|allow hosted-provider-key environment variables" docs/local_llm_solver_orchestration_operator_cli_wrapper_decision
+```
+
+```bash
+rg -n "fail-closed provider-key rejection|fail-closed behavior|fail-closed rejection" docs/local_llm_solver_orchestration_operator_cli_wrapper_decision
+```
+
+```bash
+git diff --name-only | rg '^(alpha/|tests/|api/|dashboard/)' || true
 ```
 
 No smoke, local model, hosted provider, API, dashboard, billing, Google Sheets, or backlog workbook command was run.

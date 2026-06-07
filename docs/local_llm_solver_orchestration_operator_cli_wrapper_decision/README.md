@@ -12,7 +12,7 @@ This packet decides the Level 2 operator surface for the existing local LLM solv
 
 `ADD_STABLE_CLI_WRAPPER`
 
-A stable, local-only, default-off operator CLI wrapper is justified for Level 2 use because the current repository exposes a Python/module function and operator guide templates, but no stable operator-facing command. The future wrapper should reduce copy/paste Python usage while preserving every local-runtime and non-evidence invariant.
+A stable, local-only, default-off operator CLI wrapper is justified for Level 2 use because the current repository exposes a Python/module function and operator guide templates, but no stable operator-facing command. The future wrapper should reduce copy/paste Python usage while preserving every local-runtime and non-evidence invariant, including that hosted provider keys are not required or accepted for local mode.
 
 ## Selected next lane
 

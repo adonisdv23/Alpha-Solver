@@ -14,7 +14,7 @@ The selected path is warranted because:
 
 1. PR #368's operator guide selected this decision lane after recording that the repository has a Python/module entry point but no stable operator-facing CLI wrapper.
 2. The current module function already centralizes the approved non-production local orchestration behavior and preserves fail-closed local runtime boundaries.
-3. Level 2 operators need a repeatable command-oriented surface with stable JSON output and explicit safety configuration.
+3. Level 2 operators need a repeatable command-oriented surface with stable JSON output and explicit safety configuration, while preserving that hosted provider keys are not required or accepted for local mode.
 4. A CLI wrapper can improve usability without broadening exposure if it delegates to the existing module entry point and refuses to add production, dashboard, hosted fallback, or evidence-promotion behavior.
 
 ## Current entrypoint status
