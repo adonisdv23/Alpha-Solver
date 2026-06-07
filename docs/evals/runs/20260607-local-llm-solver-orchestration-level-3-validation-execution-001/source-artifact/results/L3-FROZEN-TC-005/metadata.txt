@@ -1,0 +1,10 @@
+test_case_id=L3-FROZEN-TC-005
+prompt_source=artifacts/level3_validation_execution_001/prompts/L3-FROZEN-TC-005.txt
+repo_head=8543b2270e40f4052ab7ee062d7c50cf2f3a72b5
+model=qwen2.5:3b
+endpoint_url=http://127.0.0.1:11434/api/chat
+endpoint_expected_loopback=true
+timeout_seconds=60
+behavior_evidence_expected=false
+no_hosted_fallback_expected=true
+no_provider_keys_required_expected=true

@@ -1,0 +1,1 @@
+Create a three-step local-only troubleshooting plan for a CLI wrapper when stdout JSON is missing. Assume only that the command was run locally and stderr exists. State any additional assumptions as bounded assumptions.

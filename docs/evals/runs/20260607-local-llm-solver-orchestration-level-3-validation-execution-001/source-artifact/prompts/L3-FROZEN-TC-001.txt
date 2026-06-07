@@ -1,0 +1,1 @@
+Solve this arithmetic task and explain the steps briefly: A local operator has 18 tokens, spends 7, then receives 5 more. How many tokens remain?

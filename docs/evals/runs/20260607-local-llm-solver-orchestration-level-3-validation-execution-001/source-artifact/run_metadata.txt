@@ -1,0 +1,11 @@
+lane=ALPHA-LOCAL-LLM-SOLVER-ORCHESTRATION-LEVEL-3-VALIDATION-EXECUTION-001
+repo_head=8543b2270e40f4052ab7ee062d7c50cf2f3a72b5
+repo_status_begin
+
+repo_status_end
+command_identity=python3 -m alpha.local_llm.operator_cli
+model=qwen2.5:3b
+endpoint_url=http://127.0.0.1:11434/api/chat
+timeout_seconds=60
+artifact_dir=artifacts/level3_validation_execution_001
+evidence_boundary=Level 3 validation execution artifact only; not production readiness, MVP readiness, benchmark evidence, local model quality evidence, provider-orchestration evidence, Alpha superiority evidence, billing evidence, dashboard readiness, /v1/solve readiness, broad runtime readiness, or evidence-model promotion.

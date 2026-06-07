@@ -1,0 +1,8 @@
+json_parse=parseable
+status=ok
+behavior_evidence=False
+no_hosted_fallback=True
+no_provider_keys_required=True
+endpoint_is_loopback=True
+endpoint_host_label=loopback
+timeout_seconds=60.0
