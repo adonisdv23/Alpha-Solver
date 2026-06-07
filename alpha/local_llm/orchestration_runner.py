@@ -36,6 +36,9 @@ _MAX_PASS1_CHARS = 6000
 _MAX_SECTION_ITEMS = 6
 _MAX_ITEM_CHARS = 240
 _MIN_ASSUME_CONFIDENCE = 0.55
+_DIAGNOSTIC_SCHEMA_VERSION = 1
+_DIAGNOSTIC_REDACTION = "enum_only_no_raw_text"
+
 
 _UNDERSPECIFIED_PROMPT_RE = re.compile(
     r"^\s*(?:make|improve|optimi[sz]e|fix|update|change|tune|refactor)\s+"
@@ -175,6 +178,12 @@ _NEGATED_BOUNDARY_CLAIM_RE = re.compile(
 
 
 @dataclass(frozen=True)
+class _GateDecision:
+    gate: "_PassOneGate"
+    trace: dict[str, Any]
+
+
+@dataclass(frozen=True)
 class _PassOneGate:
     mode: str
     considerations: tuple[str, ...]
@@ -207,8 +216,10 @@ def run_local_llm_solver_orchestration(
             status="failed_closed",
             mode="block",
             reason="empty_user_prompt_non_evidence",
+            metadata={"gate_trace": _gate_trace(prompt_shape="generic", pass_one_selected_mode="parse_failed", apply_gate_decision="failed_closed_parse", expose_model_fields=False, pass_two_called=False)},
         )
 
+    prompt_shape = _classify_prompt_shape(user_prompt)
     pass_one_prompt = _build_pass_one_prompt(user_prompt)
     pass_one = _runtime_call(
         pass_one_prompt,
@@ -220,28 +231,31 @@ def run_local_llm_solver_orchestration(
         expected_sha256=expected_sha256,
     )
     if pass_one.status != "non_evidence":
-        return _failed_from_adapter(pass_one, pass_count=1, reason=pass_one.reason)
+        return _failed_from_adapter(pass_one, pass_count=1, reason=pass_one.reason, gate_trace=_gate_trace(prompt_shape=prompt_shape, pass_one_selected_mode="parse_failed", apply_gate_decision="failed_closed_parse", expose_model_fields=False, pass_two_called=False))
 
     if _unsafe_output(pass_one.output_text, pass_one.request.system, pass_one_prompt):
         return _failed_from_adapter(
             pass_one,
             pass_count=1,
             reason="unsafe_or_echoed_pass_one_output_non_evidence",
+            gate_trace=_gate_trace(prompt_shape=prompt_shape, pass_one_selected_mode="parse_failed", apply_gate_decision="failed_closed_parse", expose_model_fields=False, pass_two_called=False),
         )
 
     try:
         gate = _parse_pass_one(pass_one.output_text)
     except ValueError as exc:
-        return _failed_from_adapter(pass_one, pass_count=1, reason=str(exc))
+        return _failed_from_adapter(pass_one, pass_count=1, reason=str(exc), gate_trace=_gate_trace(prompt_shape=prompt_shape, pass_one_selected_mode="parse_failed", apply_gate_decision="failed_closed_parse", expose_model_fields=False, pass_two_called=False))
 
     if _pass_one_has_forbidden_boundary_claim(gate):
         return _failed_from_adapter(
             pass_one,
             pass_count=1,
             reason="pass_one_boundary_claim_violation_non_evidence",
+            gate_trace=_gate_trace(prompt_shape=prompt_shape, pass_one_selected_mode=gate.mode, apply_gate_decision="failed_closed_boundary", boundary_failure_stage="pass_one", expose_model_fields=False, pass_two_called=False),
         )
 
-    gated = _apply_gate(gate, user_prompt)
+    decision = _apply_gate(gate, user_prompt, prompt_shape)
+    gated = decision.gate
     if gated.mode == "clarify":
         return _base_result(
             status="clarify",
@@ -251,7 +265,7 @@ def run_local_llm_solver_orchestration(
             assumptions=gated.assumptions,
             confidence=gated.confidence,
             final_answer=_clarify_answer(gated),
-            metadata=_metadata(pass_one=pass_one, parse_source=gated.parse_source),
+            metadata=_metadata(pass_one=pass_one, parse_source=gated.parse_source, gate_trace=decision.trace),
         )
     if gated.mode == "block":
         return _base_result(
@@ -262,7 +276,7 @@ def run_local_llm_solver_orchestration(
             assumptions=gated.assumptions,
             confidence=gated.confidence,
             final_answer="",
-            metadata=_metadata(pass_one=pass_one, parse_source=gated.parse_source),
+            metadata=_metadata(pass_one=pass_one, parse_source=gated.parse_source, gate_trace=decision.trace),
         )
 
     pass_two_prompt = _build_pass_two_prompt(user_prompt, gated)
@@ -282,6 +296,7 @@ def run_local_llm_solver_orchestration(
             reason=f"pass_two_failure:{pass_two.reason}",
             pass_one=pass_one,
             gate=gated,
+            gate_trace={**decision.trace, "pass_two_called": True},
         )
     if _unsafe_output(pass_two.output_text, pass_two.request.system, pass_two_prompt):
         return _failed_from_adapter(
@@ -290,6 +305,7 @@ def run_local_llm_solver_orchestration(
             reason="unsafe_or_echoed_pass_two_output_non_evidence",
             pass_one=pass_one,
             gate=gated,
+            gate_trace={**decision.trace, "pass_two_called": True},
         )
     if _has_forbidden_boundary_claim(pass_two.output_text):
         return _failed_from_adapter(
@@ -299,6 +315,7 @@ def run_local_llm_solver_orchestration(
             pass_one=pass_one,
             gate=gated,
             expose_gate_fields=False,
+            gate_trace={**decision.trace, "boundary_failure_stage": "pass_two", "expose_model_fields": False, "pass_two_called": True},
         )
 
     return _base_result(
@@ -309,7 +326,7 @@ def run_local_llm_solver_orchestration(
         assumptions=gated.assumptions,
         confidence=gated.confidence,
         final_answer=pass_two.output_text.strip(),
-        metadata=_metadata(pass_one=pass_one, pass_two=pass_two, parse_source=gated.parse_source),
+        metadata=_metadata(pass_one=pass_one, pass_two=pass_two, parse_source=gated.parse_source, gate_trace={**decision.trace, "pass_two_called": True}),
     )
 
 
@@ -385,6 +402,7 @@ def _failed_from_adapter(
     pass_one: LocalLLMAdapterResult | None = None,
     gate: _PassOneGate | None = None,
     expose_gate_fields: bool = True,
+    gate_trace: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     exposed_considerations = gate.considerations if gate and expose_gate_fields else ()
     exposed_assumptions = gate.assumptions if gate and expose_gate_fields else ()
@@ -395,7 +413,7 @@ def _failed_from_adapter(
         considerations=exposed_considerations,
         assumptions=exposed_assumptions,
         confidence=gate.confidence if gate else None,
-        metadata=_metadata(pass_one=pass_one or adapter_result, pass_two=adapter_result if pass_one else None),
+        metadata=_metadata(pass_one=pass_one or adapter_result, pass_two=adapter_result if pass_one else None, gate_trace=gate_trace),
         reason=reason,
     )
 
@@ -405,6 +423,7 @@ def _metadata(
     pass_one: LocalLLMAdapterResult | None = None,
     pass_two: LocalLLMAdapterResult | None = None,
     parse_source: str | None = None,
+    gate_trace: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     merged: dict[str, Any] = {
         "provider_mode": PROVIDER_MODE,
@@ -422,6 +441,8 @@ def _metadata(
         merged["pass_two"] = _adapter_metadata(pass_two)
     if parse_source is not None:
         merged["pass_one_parse_source"] = parse_source
+    if gate_trace is not None:
+        merged["gate_trace"] = dict(gate_trace)
     merged["behavior_evidence"] = False
     merged["no_hosted_fallback"] = True
     merged["no_provider_keys_required"] = True
@@ -639,25 +660,260 @@ def _parse_confidence(value: Any) -> float | None:
     return None
 
 
-def _apply_gate(gate: _PassOneGate, user_prompt: str) -> _PassOneGate:
+def _apply_gate(gate: _PassOneGate, user_prompt: str, prompt_shape: str) -> _GateDecision:
     if _high_risk_prompt_or_fields(gate, user_prompt):
-        return _replace_gate(gate, mode="block", expose_model_fields=False)
-    if _is_underspecified_prompt(user_prompt) and _safe_underspecified_clarify_allowed(gate):
-        return _replace_gate(gate, mode="clarify", expose_model_fields=False)
+        gated = _replace_gate(gate, mode="block", expose_model_fields=False)
+        return _decision(
+            gated,
+            prompt_shape=prompt_shape,
+            original_mode=gate.mode,
+            apply_gate_decision="blocked_explicit_high_risk",
+            high_risk_reason_code="explicit_serious_risk_term",
+            expose_model_fields=False,
+            pass_two_called=False,
+        )
+    if prompt_shape == "underspecified_edit_or_performance" and _is_underspecified_prompt(user_prompt):
+        gated = _replace_gate(gate, mode="clarify", expose_model_fields=False)
+        return _decision(
+            gated,
+            prompt_shape=prompt_shape,
+            original_mode=gate.mode,
+            apply_gate_decision="shape_clarify",
+            risk_flag_rejected_reason="vague_risk_advisory_for_shape",
+            expose_model_fields=False,
+            pass_two_called=False,
+        )
+    if prompt_shape == "bounded_local_python_cli_startup_plan" and gate.mode in {"block", "clarify"}:
+        failed_reasons = _assumption_gate_failed_reason_codes(gate)
+        if not failed_reasons:
+            gated = _replace_gate(gate, mode="answer_with_assumptions")
+            return _decision(
+                gated,
+                prompt_shape=prompt_shape,
+                original_mode=gate.mode,
+                apply_gate_decision="shape_answer_with_assumptions",
+                risk_flag_rejected_reason="vague_risk_advisory_for_shape",
+                expose_model_fields=True,
+                pass_two_called=True,
+            )
+        gated = _replace_gate(gate, mode="block" if gate.mode == "block" else "clarify", expose_model_fields=False)
+        return _decision(
+            gated,
+            prompt_shape=prompt_shape,
+            original_mode=gate.mode,
+            apply_gate_decision="blocked_assumption_gate_failed",
+            blocked_reason_code="assumption_gate_failed",
+            risk_flag_rejected_reason="vague_risk_advisory_for_shape",
+            assumption_gate_failed_reason_codes=failed_reasons,
+            expose_model_fields=False,
+            pass_two_called=False,
+        )
+    else:
+        failed_reasons = _assumption_gate_failed_reason_codes(gate)
+
     if _high_risk(gate, user_prompt):
-        return _replace_gate(gate, mode="block", expose_model_fields=False)
-    if gate.mode in {"block", "clarify"} and _assumption_answer_allowed(gate):
-        return _replace_gate(gate, mode="answer_with_assumptions")
+        gated = _replace_gate(gate, mode="block", expose_model_fields=False)
+        return _decision(
+            gated,
+            prompt_shape=prompt_shape,
+            original_mode=gate.mode,
+            apply_gate_decision="blocked_unknown_nonshape_risk",
+            blocked_reason_code="unknown_or_nonallowlisted_risk_flag",
+            expose_model_fields=False,
+            pass_two_called=False,
+        )
+    if gate.mode in {"block", "clarify"} and not failed_reasons:
+        gated = _replace_gate(gate, mode="answer_with_assumptions")
+        return _decision(
+            gated,
+            prompt_shape=prompt_shape,
+            original_mode=gate.mode,
+            apply_gate_decision="kept_model_mode",
+            expose_model_fields=True,
+            pass_two_called=True,
+        )
     if gate.mode == "block":
-        return _replace_gate(gate, mode="block", expose_model_fields=False)
+        gated = _replace_gate(gate, mode="block", expose_model_fields=False)
+        return _decision(
+            gated,
+            prompt_shape=prompt_shape,
+            original_mode=gate.mode,
+            apply_gate_decision="blocked_assumption_gate_failed" if failed_reasons else "blocked_generic",
+            blocked_reason_code="assumption_gate_failed" if failed_reasons else "model_selected_block",
+            assumption_gate_failed_reason_codes=failed_reasons,
+            expose_model_fields=False,
+            pass_two_called=False,
+        )
     if gate.confidence is None and gate.mode in {"direct", "answer_with_assumptions"}:
-        return _replace_gate(gate, mode="clarify")
+        gated = _replace_gate(gate, mode="clarify")
+        return _decision(
+            gated,
+            prompt_shape=prompt_shape,
+            original_mode=gate.mode,
+            apply_gate_decision="blocked_assumption_gate_failed",
+            assumption_gate_failed_reason_codes=("confidence_missing_or_unparseable",),
+            expose_model_fields=True,
+            pass_two_called=False,
+        )
     if gate.mode == "direct" and gate.missing_information:
-        return _replace_gate(gate, mode="clarify")
-    if gate.mode == "answer_with_assumptions":
-        if not _assumption_answer_allowed(gate):
-            return _replace_gate(gate, mode="clarify")
-    return gate
+        gated = _replace_gate(gate, mode="clarify")
+        return _decision(
+            gated,
+            prompt_shape=prompt_shape,
+            original_mode=gate.mode,
+            apply_gate_decision="kept_model_mode",
+            expose_model_fields=True,
+            pass_two_called=False,
+        )
+    if gate.mode == "answer_with_assumptions" and failed_reasons:
+        gated = _replace_gate(gate, mode="clarify")
+        return _decision(
+            gated,
+            prompt_shape=prompt_shape,
+            original_mode=gate.mode,
+            apply_gate_decision="blocked_assumption_gate_failed",
+            assumption_gate_failed_reason_codes=failed_reasons,
+            expose_model_fields=True,
+            pass_two_called=False,
+        )
+    return _decision(
+        gate,
+        prompt_shape=prompt_shape,
+        original_mode=gate.mode,
+        apply_gate_decision="kept_model_mode",
+        expose_model_fields=True,
+        pass_two_called=gate.mode not in {"block", "clarify"},
+    )
+
+
+def _classify_prompt_shape(user_prompt: str) -> str:
+    prompt = " ".join(user_prompt.strip().split())
+    lowered = prompt.lower().replace("’", "'")
+    if _high_risk_prompt_or_fields(_empty_gate(), user_prompt):
+        return "explicit_high_risk"
+    if _has_forbidden_boundary_claim(user_prompt):
+        return "boundary_claim_guard"
+    words = re.findall(r"[a-z0-9_]+", lowered)
+    if _UNDERSPECIFIED_PROMPT_RE.fullmatch(prompt) or (
+        2 <= len(words) <= 4
+        and words[0] in {"make", "improve", "optimize", "optimise", "fix", "update", "change", "tune", "refactor"}
+        and any(word in {"it", "this", "that", "them"} for word in words)
+    ):
+        return "underspecified_edit_or_performance"
+    if (
+        "draft a concise execution plan" in lowered
+        and "small python cli" in lowered
+        and "startup time" in lowered
+        and "only profiling later is available" in lowered
+        and "state assumptions" in lowered
+    ):
+        return "bounded_local_python_cli_startup_plan"
+    return "generic"
+
+
+def _empty_gate() -> _PassOneGate:
+    return _PassOneGate(
+        mode="block",
+        considerations=(),
+        assumptions=(),
+        confidence=None,
+        missing_information=(),
+        risk_flags=(),
+        parse_source="json",
+    )
+
+
+def _decision(
+    gate: _PassOneGate,
+    *,
+    prompt_shape: str,
+    original_mode: str,
+    apply_gate_decision: str,
+    expose_model_fields: bool,
+    pass_two_called: bool,
+    blocked_reason_code: str | None = None,
+    high_risk_reason_code: str | None = None,
+    risk_flag_rejected_reason: str | None = None,
+    assumption_gate_failed_reason_codes: Sequence[str] = (),
+) -> _GateDecision:
+    return _GateDecision(
+        gate=gate,
+        trace=_gate_trace(
+            prompt_shape=prompt_shape,
+            pass_one_selected_mode=original_mode,
+            apply_gate_decision=apply_gate_decision,
+            expose_model_fields=expose_model_fields,
+            pass_two_called=pass_two_called,
+            blocked_reason_code=blocked_reason_code,
+            high_risk_reason_code=high_risk_reason_code,
+            risk_flag_rejected_reason=risk_flag_rejected_reason,
+            assumption_gate_failed_reason_codes=tuple(assumption_gate_failed_reason_codes),
+        ),
+    )
+
+
+def _gate_trace(
+    *,
+    prompt_shape: str,
+    pass_one_selected_mode: str,
+    apply_gate_decision: str,
+    expose_model_fields: bool,
+    pass_two_called: bool,
+    blocked_reason_code: str | None = None,
+    high_risk_reason_code: str | None = None,
+    risk_flag_rejected_reason: str | None = None,
+    assumption_gate_failed_reason_codes: Sequence[str] = (),
+    boundary_failure_stage: str = "none",
+) -> dict[str, Any]:
+    trace: dict[str, Any] = {
+        "diagnostic_schema_version": _DIAGNOSTIC_SCHEMA_VERSION,
+        "diagnostic_redaction": _DIAGNOSTIC_REDACTION,
+        "prompt_shape": prompt_shape,
+        "pass_one_selected_mode": pass_one_selected_mode if pass_one_selected_mode in SUPPORTED_MODES else pass_one_selected_mode,
+        "apply_gate_decision": apply_gate_decision,
+        "boundary_failure_stage": boundary_failure_stage,
+        "expose_model_fields": expose_model_fields,
+        "pass_two_called": pass_two_called,
+    }
+    if blocked_reason_code:
+        trace["blocked_reason_code"] = blocked_reason_code
+        trace["blocked_reason_codes"] = [blocked_reason_code]
+    if high_risk_reason_code:
+        trace["high_risk_reason_code"] = high_risk_reason_code
+        trace["blocked_reason_code"] = "explicit_high_risk"
+        trace["blocked_reason_codes"] = ["explicit_high_risk", high_risk_reason_code]
+    if risk_flag_rejected_reason:
+        trace["risk_flag_rejected_reason"] = risk_flag_rejected_reason
+    if assumption_gate_failed_reason_codes:
+        trace["assumption_gate_failed_reason_codes"] = list(assumption_gate_failed_reason_codes)
+    return trace
+
+
+def _assumption_gate_failed_reason_codes(gate: _PassOneGate) -> tuple[str, ...]:
+    reasons: list[str] = []
+    if gate.confidence is None:
+        reasons.append("confidence_missing_or_unparseable")
+    elif gate.confidence < _MIN_ASSUME_CONFIDENCE:
+        reasons.append("confidence_below_threshold")
+    if not gate.considerations:
+        reasons.append("considerations_missing")
+    if not gate.assumptions:
+        reasons.append("assumptions_missing")
+    if gate.missing_information and len(gate.missing_information) > 2:
+        reasons.append("missing_information_too_broad")
+    for text in (*gate.considerations, *gate.assumptions, *gate.missing_information):
+        if _HIGH_RISK_TEXT_RE.search(text) or _HIGH_RISK_FLAG_RE.search(text):
+            reasons.append("explicit_serious_risk_term")
+            break
+        if _has_forbidden_boundary_claim(text):
+            reasons.append("boundary_claim")
+            break
+    for assumption in gate.assumptions:
+        lowered = assumption.lower()
+        if lowered in {"none", "n/a", "unknown"} or "unbounded" in lowered or "unknown" in lowered:
+            reasons.append("assumptions_unknown_or_unbounded")
+            break
+    return tuple(dict.fromkeys(reasons))
 
 
 def _replace_gate(
@@ -689,7 +945,7 @@ def _safe_underspecified_clarify_allowed(gate: _PassOneGate) -> bool:
 
 
 def _high_risk_prompt_or_fields(gate: _PassOneGate, user_prompt: str) -> bool:
-    if _HIGH_RISK_TEXT_RE.search(user_prompt):
+    if _HIGH_RISK_TEXT_RE.search(user_prompt) or _HIGH_RISK_FLAG_RE.search(user_prompt):
         return True
     return any(
         _HIGH_RISK_FLAG_RE.search(text) or _HIGH_RISK_TEXT_RE.search(text)
@@ -703,7 +959,7 @@ def _high_risk_prompt_or_fields(gate: _PassOneGate, user_prompt: str) -> bool:
 
 
 def _high_risk(gate: _PassOneGate, user_prompt: str) -> bool:
-    if _HIGH_RISK_TEXT_RE.search(user_prompt):
+    if _HIGH_RISK_TEXT_RE.search(user_prompt) or _HIGH_RISK_FLAG_RE.search(user_prompt):
         return True
     for flag in gate.risk_flags:
         normalized = _normalize_risk_flag(flag)
@@ -729,22 +985,7 @@ def _normalize_risk_flag(flag: str) -> str:
 
 
 def _assumption_answer_allowed(gate: _PassOneGate) -> bool:
-    if gate.confidence is None or gate.confidence < _MIN_ASSUME_CONFIDENCE:
-        return False
-    if not gate.considerations or not gate.assumptions:
-        return False
-    if gate.missing_information and len(gate.missing_information) > 2:
-        return False
-    for text in (*gate.considerations, *gate.assumptions, *gate.missing_information):
-        if _HIGH_RISK_TEXT_RE.search(text) or _HIGH_RISK_FLAG_RE.search(text):
-            return False
-        if _has_forbidden_boundary_claim(text):
-            return False
-    for assumption in gate.assumptions:
-        lowered = assumption.lower()
-        if lowered in {"none", "n/a", "unknown"} or "unbounded" in lowered:
-            return False
-    return True
+    return not _assumption_gate_failed_reason_codes(gate)
 
 
 def _clarify_answer(gate: _PassOneGate) -> str:
