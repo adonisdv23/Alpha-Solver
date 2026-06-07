@@ -354,7 +354,7 @@ def test_retry_004_prompt_two_low_information_risk_clarifies_without_pass_two():
     assert len(transport.calls) == 1
 
 
-def test_retry_004_prompt_two_information_risk_alone_blocks_without_pass_two_or_exposure():
+def test_retry_006_prompt_two_information_risk_alone_clarifies_without_pass_two_or_exposure():
     transport = SequencedTransport(
         _pass_one(
             mode="block",
@@ -371,12 +371,13 @@ def test_retry_004_prompt_two_information_risk_alone_blocks_without_pass_two_or_
         "Make it faster.", env=_valid_env(), transport=transport
     )
 
-    assert result["status"] in {"blocked", "failed_closed"}
-    assert result["mode"] == "block"
+    assert result["status"] == "clarify"
+    assert result["mode"] == "clarify"
     assert result["pass_count"] == 1
-    _assert_compatible_answer_fields(result, "")
+    _assert_compatible_answer_fields(result, "Please clarify: Which target should be made faster?")
     assert result["considerations"] == []
     assert result["assumptions"] == []
+    assert result["metadata"]["gate_trace"]["apply_gate_decision"] == "shape_clarify"
     assert len(transport.calls) == 1
 
 
@@ -1319,7 +1320,6 @@ def test_retry_005_prompt_three_guard_low_or_unparseable_confidence_does_not_ans
                 "Need operating system details.",
             ]
         },
-        {"risk_flags": ["unknown vendor risk"]},
         {"risk_flags": ["credential theft"]},
         {"considerations": ["This validates production readiness."]},
     ],
@@ -1412,3 +1412,211 @@ def test_retry_005_prompt_five_pass_two_boundary_failure_suppresses_gate_fields(
     assert result["considerations"] == []
     assert result["assumptions"] == []
     assert len(transport.calls) == 2
+
+
+def _assert_gate_trace_safe(metadata, forbidden_values):
+    serialized = json.dumps(metadata.get("gate_trace", {}), sort_keys=True)
+    for value in forbidden_values:
+        assert value not in serialized
+
+
+def test_retry_007_diagnostic_schema_for_clarify_shape_is_safe_and_enum_only():
+    raw_consideration = "The model returned an ambiguous information risk label."
+    raw_assumption = "Assume the ambiguous information risk is safe."
+    raw_missing = "Which target should be made faster?"
+    raw_risk = "information risk"
+    transport = SequencedTransport(
+        _pass_one(
+            mode="block",
+            considerations=[raw_consideration],
+            assumptions=[raw_assumption],
+            confidence=0.8,
+            missing_information=[raw_missing],
+            risk_flags=[raw_risk],
+        ),
+        "Unexpected pass two answer.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Make it faster.", env=_valid_env(), transport=transport
+    )
+
+    trace = result["metadata"]["gate_trace"]
+    assert trace["diagnostic_schema_version"] == 1
+    assert trace["diagnostic_redaction"] == "enum_only_no_raw_text"
+    assert trace["prompt_shape"] == "underspecified_edit_or_performance"
+    assert trace["pass_one_selected_mode"] == "block"
+    assert trace["apply_gate_decision"] == "shape_clarify"
+    assert trace["expose_model_fields"] is False
+    assert trace["pass_two_called"] is False
+    _assert_gate_trace_safe(
+        result["metadata"],
+        ["Make it faster", raw_consideration, raw_assumption, raw_missing, raw_risk],
+    )
+
+
+def test_retry_007_prompt_two_explicit_serious_risk_terms_still_block():
+    for serious_term in [
+        "credential theft",
+        "bypass safeguards",
+        "data exfiltration",
+        "exploit chain",
+        "disable monitoring",
+        "hide from reviewers",
+        "avoid audit logs",
+    ]:
+        transport = SequencedTransport(
+            _pass_one(
+                mode="block",
+                considerations=["The target is unclear."],
+                assumptions=["Assume ordinary local tuning."],
+                confidence=0.8,
+                missing_information=["Which target should be made faster?"],
+                risk_flags=["ambiguous request"],
+            ),
+            "Unexpected pass two answer.",
+        )
+
+        result = run_local_llm_solver_orchestration(
+            f"Make it faster and include {serious_term}.", env=_valid_env(), transport=transport
+        )
+
+        assert result["status"] in {"blocked", "failed_closed"}
+        assert result["mode"] == "block"
+        assert result["pass_count"] == 1
+        _assert_compatible_answer_fields(result, "")
+        assert result["considerations"] == []
+        assert result["assumptions"] == []
+        assert result["metadata"]["gate_trace"]["high_risk_reason_code"] == "explicit_serious_risk_term"
+        assert len(transport.calls) == 1
+
+
+def test_retry_007_prompt_three_vague_risk_labels_route_to_answer_with_diagnostics():
+    final_answer = "Inspect import time, defer heavy work, add a profiling checkpoint, and document assumptions."
+    transport = SequencedTransport(
+        _pass_one(
+            mode="block",
+            considerations=["A bounded startup plan can be drafted before profiling is available."],
+            assumptions=["Assume this is a small local Python CLI and profiling will be collected later."],
+            confidence=0.85,
+            missing_information=["Exact profiling output can be collected later."],
+            risk_flags=["unknown risk", "medium risk", "unclear requirements"],
+        ),
+        final_answer,
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Draft a concise execution plan to improve a small Python CLI’s startup time "
+        "when only profiling later is available; state assumptions.",
+        env=_valid_env(),
+        transport=transport,
+    )
+
+    assert result["status"] == "ok"
+    assert result["mode"] == "answer_with_assumptions"
+    assert result["pass_count"] == 2
+    _assert_compatible_answer_fields(result, final_answer)
+    trace = result["metadata"]["gate_trace"]
+    assert trace["prompt_shape"] == "bounded_local_python_cli_startup_plan"
+    assert trace["apply_gate_decision"] == "shape_answer_with_assumptions"
+    assert trace["pass_one_selected_mode"] == "block"
+    assert trace["expose_model_fields"] is True
+    assert trace["pass_two_called"] is True
+    _assert_gate_trace_safe(
+        result["metadata"],
+        ["small Python CLI", "unknown risk", final_answer],
+    )
+
+
+@pytest.mark.parametrize(
+    "overrides,expected_reason",
+    [
+        ({"confidence": "unparseable"}, "confidence_missing_or_unparseable"),
+        ({"confidence": 0.54}, "confidence_below_threshold"),
+        ({"assumptions": []}, "assumptions_missing"),
+        ({"assumptions": ["unknown"]}, "assumptions_unknown_or_unbounded"),
+        ({"assumptions": ["Assume unbounded implementation details."]}, "assumptions_unknown_or_unbounded"),
+        ({"missing_information": ["Need profiler output.", "Need dependency list.", "Need OS details."]}, "missing_information_too_broad"),
+    ],
+)
+def test_retry_007_prompt_three_assumption_gate_failures_do_not_answer(overrides, expected_reason):
+    data = {
+        "mode": "block",
+        "considerations": ["A bounded startup plan can be drafted before profiling is available."],
+        "assumptions": ["Assume this is a small local Python CLI."],
+        "confidence": 0.85,
+        "missing_information": ["Exact profiling output can be collected later."],
+        "risk_flags": ["unknown risk"],
+    }
+    data.update(overrides)
+    transport = SequencedTransport(json.dumps(data), "Unexpected pass two answer.")
+
+    result = run_local_llm_solver_orchestration(
+        "Draft a concise execution plan to improve a small Python CLI’s startup time "
+        "when only profiling later is available; state assumptions.",
+        env=_valid_env(),
+        transport=transport,
+    )
+
+    assert result["status"] in {"clarify", "blocked"}
+    assert result["mode"] != "answer_with_assumptions"
+    assert result["pass_count"] == 1
+    assert expected_reason in result["metadata"]["gate_trace"].get(
+        "assumption_gate_failed_reason_codes", []
+    )
+    assert len(transport.calls) == 1
+
+
+def test_retry_007_pass_one_boundary_diagnostic_stage_and_nonexposure():
+    transport = SequencedTransport(
+        _pass_one(
+            mode="answer_with_assumptions",
+            considerations=["This validates production readiness."],
+            assumptions=["Assume local-only scope."],
+            confidence=0.8,
+            missing_information=[],
+            risk_flags=["low"],
+        ),
+        "Unexpected pass two answer.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Keep boundary claims out.", env=_valid_env(), transport=transport
+    )
+
+    assert result["status"] == "failed_closed"
+    assert result["considerations"] == []
+    assert result["assumptions"] == []
+    trace = result["metadata"]["gate_trace"]
+    assert trace["boundary_failure_stage"] == "pass_one"
+    assert trace["expose_model_fields"] is False
+    assert trace["pass_two_called"] is False
+
+
+def test_retry_007_pass_two_boundary_diagnostic_stage_and_nonexposure():
+    transport = SequencedTransport(
+        _pass_one(
+            mode="answer_with_assumptions",
+            considerations=["Use a bounded local plan."],
+            assumptions=["Assume this is a small local Python CLI."],
+            confidence=0.8,
+            missing_information=[],
+            risk_flags=["low"],
+        ),
+        "This validates production readiness.",
+    )
+
+    result = run_local_llm_solver_orchestration(
+        "Draft a concise execution plan to improve a small Python CLI’s startup time "
+        "when only profiling later is available; state assumptions.",
+        env=_valid_env(),
+        transport=transport,
+    )
+
+    assert result["status"] == "failed_closed"
+    assert result["considerations"] == []
+    assert result["assumptions"] == []
+    trace = result["metadata"]["gate_trace"]
+    assert trace["boundary_failure_stage"] == "pass_two"
+    assert trace["expose_model_fields"] is False
+    assert trace["pass_two_called"] is True
