@@ -118,16 +118,25 @@ def test_default_discovery_excludes_post_level_3_source_artifact_payloads(tmp_pa
     named_source_artifact_dir = Path(
         "docs/evals/runs/alpha-solver-post-level-3-source-artifact-fixture"
     )
+    suffix_source_artifact_dir = Path(
+        "docs/evals/runs/alpha-solver-post-level-3-level-4-source-artifact"
+    )
     _write_packet(tmp_path, packet_dir)
     _write_packet(tmp_path, nested_source_artifact_dir)
     _write_packet(tmp_path, named_source_artifact_dir)
+    _write_packet(tmp_path, suffix_source_artifact_dir)
 
     packet_dirs = iter_packet_dirs(tmp_path)
 
     assert packet_dir in packet_dirs
     assert nested_source_artifact_dir not in packet_dirs
     assert named_source_artifact_dir not in packet_dirs
-    assert not any("source-artifact" in path.parts for path in packet_dirs)
+    assert suffix_source_artifact_dir not in packet_dirs
+    assert not any(
+        part == "source-artifact" or part.endswith("-source-artifact")
+        for path in packet_dirs
+        for part in path.parts
+    )
 
 
 def test_no_further_lanes_with_selected_implementation_lane_fails(tmp_path):
