@@ -1,0 +1,7 @@
+## main...origin/main
+?? ALPHA-LOCAL-LLM-SMOKE-TEST-EXECUTION-001.md
+?? docs/evals/runs/20260605-alpha-local-llm-runtime-smoke-execution-retry/manual-artifacts-attempt-002/
+?? docs/evals/runs/20260605-alpha-local-llm-runtime-smoke-execution-retry/manual-artifacts/
+?? docs/evals/runs/20260605-alpha-local-llm-runtime-smoke-execution/manual-artifacts/
+?? docs/evals/runs/20260606-alpha-local-llm-solver-orchestration-manual-smoke-retry-007-source-artifact-qwen25-3b-after-diagnostic-router-reset/
+?? docs/evals/runs/20260606-alpha-local-llm-solver-orchestration-manual-smoke-source-artifact/
