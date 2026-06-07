@@ -66,7 +66,9 @@ def test_missing_explicit_opt_in_fails_before_runner_use(monkeypatch):
         called["runner"] = True
         return _ok_result()
 
-    monkeypatch.setattr(operator_cli, "run_local_llm_solver_orchestration", forbidden_runner)
+    monkeypatch.setattr(
+        operator_cli, "run_local_llm_solver_orchestration", forbidden_runner
+    )
 
     with pytest.raises(SystemExit) as exc:
         operator_cli.main(
@@ -177,6 +179,41 @@ def test_prompt_file_reads_prompt_text(monkeypatch, tmp_path):
     assert rc == 0
     assert observed["prompt"] == "file prompt\n"
     assert json.loads(stdout.getvalue())["status"] == "clarify"
+
+
+def test_prompt_file_invalid_utf8_fails_cleanly_without_runner_or_content_leak(
+    monkeypatch, tmp_path
+):
+    invalid_bytes = b"valid-prefix-\xff\xfe-invalid-local-prompt"
+    prompt_file = tmp_path / "invalid-prompt.txt"
+    prompt_file.write_bytes(invalid_bytes)
+    called = {"runner": False}
+
+    def forbidden_runner(prompt, *, env):  # type: ignore[no-untyped-def]
+        called["runner"] = True
+        return _ok_result()
+
+    monkeypatch.setattr(
+        operator_cli, "run_local_llm_solver_orchestration", forbidden_runner
+    )
+    stdout = io.StringIO()
+    stderr = io.StringIO()
+
+    rc = operator_cli.main(
+        [*_BASE_ARGS, "--prompt-file", str(prompt_file)],
+        stdout=stdout,
+        stderr=stderr,
+    )
+
+    stderr_text = stderr.getvalue()
+    assert rc == 2
+    assert stdout.getvalue() == ""
+    assert "prompt read failed: UnicodeDecodeError" in stderr_text
+    assert called["runner"] is False
+    assert "valid-prefix" not in stderr_text
+    assert "invalid-local-prompt" not in stderr_text
+    assert "\xff" not in stderr_text
+    assert "\xfe" not in stderr_text
 
 
 def test_prompt_stdin_reads_only_when_explicitly_requested(monkeypatch):

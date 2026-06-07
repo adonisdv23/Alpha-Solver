@@ -134,7 +134,7 @@ def main(
 
     try:
         prompt = _read_prompt(args, stdin=input_stream)
-    except OSError as exc:
+    except (OSError, UnicodeError) as exc:
         print(f"prompt read failed: {exc.__class__.__name__}", file=error_stream)
         return 2
 

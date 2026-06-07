@@ -12,6 +12,22 @@ Selected decision from the prior decision packet:
 ADD_STABLE_CLI_WRAPPER
 ```
 
+## Lane-governance continuity
+
+Selected next lane if this implementation is safe:
+
+```text
+ALPHA-LOCAL-LLM-SOLVER-ORCHESTRATION-CONTROLLED-USAGE-PACKET-001
+```
+
+Blocker fallback lane if this implementation is blocked, incomplete, unsafe, or only partially tested:
+
+```text
+ALPHA-LOCAL-LLM-SOLVER-ORCHESTRATION-OPERATOR-CLI-WRAPPER-BLOCKER-FIX-001
+```
+
+This PR records lane continuity only and does not start either follow-on lane.
+
 ## Command identity
 
 ```text
