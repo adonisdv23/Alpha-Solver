@@ -2,6 +2,8 @@
 
 Lane: `ALPHA-LOCAL-LLM-SOLVER-ORCHESTRATION-MANUAL-SMOKE-RETRY-007-OPERATOR-PACKET-001`
 
+Fix-forward lane: `ALPHA-LOCAL-LLM-SOLVER-ORCHESTRATION-MANUAL-SMOKE-RETRY-007-OPERATOR-PACKET-SAFETY-FIX-001`
+
 Selected retry lane: `ALPHA-LOCAL-LLM-SOLVER-ORCHESTRATION-MANUAL-SMOKE-RETRY-007`
 
 This docs-only packet prepares the exact operator-facing command and inspection checklist for manual smoke retry 007 after the diagnostic-router reset.
@@ -29,6 +31,11 @@ This docs-only packet prepares the exact operator-facing command and inspection 
 5. [evidence-boundary.md](evidence-boundary.md)
 6. [blocked-work.md](blocked-work.md)
 7. [selected-next-lane.md](selected-next-lane.md)
+
+
+## Safety fix-forward note
+
+The exact Mac command now treats artifact inspection as part of command success: it preserves the smoke runner status, runs JSON/artifact/redaction inspection, and exits nonzero if either the runner or inspection fails. The operator-facing inspection no longer prints raw `gate_trace`, runner stdout, or runner stderr to Terminal; it checks redaction first and then prints only an allow-listed safe diagnostic summary.
 
 ## Scope
 
