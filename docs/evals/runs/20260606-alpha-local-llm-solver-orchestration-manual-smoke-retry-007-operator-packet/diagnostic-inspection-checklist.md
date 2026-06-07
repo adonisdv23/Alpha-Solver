@@ -2,6 +2,14 @@
 
 Use this checklist after the exact Mac command finishes and before any later retry 007 source artifact preservation or import/final-decision work.
 
+
+## Terminal safety
+
+- Confirm the generated command prints only the allow-listed `SAFE_DIAGNOSTIC_SUMMARY` after JSON, artifact-structure, and `gate_trace` redaction checks pass.
+- Confirm the generated command does not print raw `metadata.gate_trace`, runner stdout, or runner stderr to Terminal.
+- Confirm the generated command exits nonzero if JSON parsing, artifact-structure validation, or `gate_trace` redaction inspection fails, even when the smoke runner exits 0.
+- Confirm the generated command allows contract-safe assumption-routing enums such as `answer_with_assumptions`, `shape_answer_with_assumptions`, and `assumption_gate_failed_reason_codes` instead of treating those enum tokens as raw assumption leakage.
+
 ## Prompt 2 clarify routing
 
 - Confirm Prompt 2 mode is `clarify`.
