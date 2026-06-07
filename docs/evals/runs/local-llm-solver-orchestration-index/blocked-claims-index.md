@@ -1,0 +1,25 @@
+# Blocked Claims Index
+
+This index consolidates blocked claims and non-authorizations from the Level 2 and Level 3 packets. These claims remain blocked by this index packet.
+
+| Blocked claim or action | Status in this index | Source packets |
+| --- | --- | --- |
+| Production readiness | Not accepted; not authorized. | `docs/evals/runs/20260607-local-llm-controlled-usage-operator-run-001/import-final-decision/blocked-claims.md`; `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/closeout/blocked-claims.md` |
+| MVP readiness | Not accepted; not authorized. | `docs/evals/runs/20260607-local-llm-controlled-usage-operator-run-001/import-final-decision/blocked-claims.md`; `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/import-final-decision/blocked-claims.md` |
+| Benchmark evidence | Not accepted; not authorized. | `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/import-final-decision/evidence-boundary.md`; `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/closeout/final-boundary.md` |
+| Local model quality | Not accepted; not authorized. | `docs/evals/runs/20260607-local-llm-controlled-usage-operator-run-001/import-final-decision/evidence-boundary.md`; `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/import-final-decision/evidence-boundary.md` |
+| Provider-orchestration evidence | Not accepted; not authorized. | `docs/evals/runs/20260607-local-llm-controlled-usage-operator-run-001/closeout/blocked-claims.md`; `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/closeout/blocked-claims.md` |
+| Alpha superiority | Not accepted; not authorized. | `docs/evals/runs/20260607-local-llm-controlled-usage-operator-run-001/import-final-decision/blocked-claims.md`; `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/import-final-decision/blocked-claims.md` |
+| Billing evidence | Not accepted; no billing work performed. | `docs/evals/runs/20260607-local-llm-controlled-usage-operator-run-001/import-final-decision/final-decision.md`; `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/closeout/final-boundary.md` |
+| Dashboard readiness | Not accepted; dashboard routes not exposed or called. | `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-authorization/evidence-boundary.md`; `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/closeout/blocked-claims.md` |
+| `/v1/solve` readiness | Not accepted; `/v1/solve` not exposed or called. | `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-authorization/evidence-boundary.md`; `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/import-final-decision/blocked-claims.md` |
+| Broad runtime readiness | Not accepted; not authorized. | `docs/evals/runs/20260607-local-llm-controlled-usage-operator-run-001/import-final-decision/final-decision.md`; `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/closeout/final-boundary.md` |
+| Evidence-model promotion | Not accepted; not authorized. | `docs/evals/runs/20260607-local-llm-controlled-usage-operator-run-001/closeout/final-boundary.md`; `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/import-final-decision/evidence-boundary.md` |
+| Provider fallback | Not authorized; not added. | `docs/local_llm_solver_orchestration_controlled_usage_packet/blocker-fallback-lane.md`; `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/closeout/blocked-claims.md` |
+| Hosted fallback | Not authorized; not added. | `docs/local_llm_solver_orchestration_controlled_usage_packet/blocker-fallback-lane.md`; `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/closeout/blocked-claims.md` |
+| Dashboard exposure | Not authorized; not exposed or called. | `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/import-final-decision/evidence-boundary.md`; `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/closeout/blocked-claims.md` |
+| `/v1/solve` exposure | Not authorized; not exposed or called. | `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/import-final-decision/evidence-boundary.md`; `docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/closeout/blocked-claims.md` |
+
+## Explicit non-actions preserved
+
+This index did not run local model inference, run Ollama, rerun validation, rerun smoke, call hosted providers, expose or call `/v1/solve`, expose or call dashboard routes, add provider fallback, add hosted fallback, run benchmarks, perform billing work, update Google Sheets, update backlog workbooks, or promote evidence.
