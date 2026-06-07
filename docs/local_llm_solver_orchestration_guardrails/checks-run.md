@@ -25,10 +25,10 @@ These checks are static docs and metadata checks. They do not run local model in
 
 ## Actual results for this runbook lane
 
-- `git status --short` showed only the new guardrail runbook directory before staging.
-- `git diff --name-only` produced no tracked-file names before staging because the runbook files were new and untracked.
+- `git status --short` showed only the Makefile guardrail target sync and guardrail runbook doc updates.
+- `git diff --name-only` showed `Makefile`, `docs/local_llm_solver_orchestration_guardrails/checks-run.md`, and `docs/local_llm_solver_orchestration_guardrails/how-to-run.md`.
 - `git diff --check` passed with no whitespace errors.
-- `make check-local-llm-orchestration-guardrails` was checked; run it when available on the branch because it runs all three guardrail checkers.
+- `make check-local-llm-orchestration-guardrails` passed and ran all three guardrail checkers.
 - `python scripts/check_local_llm_evidence_boundaries.py` passed.
 - `python scripts/check_local_llm_doc_paths.py` passed.
 - `python scripts/check_local_llm_packet_consistency.py` passed.

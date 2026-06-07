@@ -14,7 +14,7 @@ The direct commands are deterministic, offline documentation checks. They should
 
 ## Aggregate Makefile coverage
 
-Use the full local LLM solver orchestration guardrail-suite target when it is available on the branch:
+Use the full local LLM solver orchestration guardrail-suite target:
 
 ```bash
 make check-local-llm-orchestration-guardrails
@@ -28,7 +28,7 @@ python scripts/check_local_llm_doc_paths.py
 python scripts/check_local_llm_packet_consistency.py
 ```
 
-Keep the direct checker commands as fallback or manual alternatives when a branch does not yet contain the aggregate target, when triaging one checker at a time, or when a review asks for direct script evidence. Running the aggregate target or the direct static commands does not start the release-readiness ladder.
+Keep the direct checker commands as fallback or manual alternatives when triaging one checker at a time or when a review asks for direct script evidence. Running the aggregate target or the direct static commands does not start the release-readiness ladder.
 
 ## Suggested focused validation order
 
