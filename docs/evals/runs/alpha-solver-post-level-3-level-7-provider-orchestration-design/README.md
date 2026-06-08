@@ -19,7 +19,7 @@ The accepted prior state carried into this packet is:
 - Level 5 quality evaluation design is accepted.
 - Level 6 product-surface design is accepted.
 - Level 6 selected this Level 7 lane: `ALPHA-SOLVER-POST-LEVEL-3-LEVEL-7-PROVIDER-ORCHESTRATION-DESIGN-PACKET-001`.
-- Level 6 support packets are accepted, including API contract design, dashboard design, operator controls, observability/audit, safety/claim gates, and threat/risk model.
+- Level 6 support packets are present on main as support references, including API contract design, dashboard design, operator controls, observability/audit, safety/claim gates, and threat/risk model; Level 7 may use, revise, reject, or supersede these support references.
 
 ## Evidence boundary
 
