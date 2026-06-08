@@ -12,14 +12,20 @@ This packet is a design artifact only. It does not create a runner, execute task
 
 The future harness design requires:
 
-- No provider calls.
-- No dashboard exposure.
+- no provider calls.
+- no hosted model calls.
+- no local model execution unless a later explicit local-only implementation lane authorizes it.
+- no external API calls.
+- no fallback.
+- no credential use.
+- no billing.
+- no dashboard exposure.
+- no `/v1/solve` exposure.
 - No deployment.
 - No browser control.
-- No credential use.
-- No billing.
 - No evidence promotion.
 - Local-only filesystem artifact capture.
+- The harness may only perform bounded local preflights, local artifact capture, and local docs/checker commands that are explicitly allowed by a future implementation lane.
 - Explicit stop-state handling before, during, and after task execution.
 
 ## Packet files

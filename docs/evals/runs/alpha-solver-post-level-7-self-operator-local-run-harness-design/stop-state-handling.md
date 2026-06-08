@@ -6,7 +6,7 @@ A future local-only harness must treat stop states as first-class outcomes rathe
 
 - `PREFLIGHT_FAILED`: a required local preflight did not pass.
 - `TASK_OUT_OF_SCOPE`: the requested task is not bounded or not local-only.
-- `FORBIDDEN_EXTERNAL_ACTION_REQUESTED`: the task requested provider calls, dashboard exposure, deployment, browser control, credential use, billing, or evidence promotion.
+- `FORBIDDEN_EXTERNAL_ACTION_REQUESTED`: the task requested provider calls, hosted model calls, local model execution without later explicit local-only implementation authorization, external API calls, fallback, dashboard exposure, `/v1/solve` exposure, deployment, browser control, credential use, billing, or evidence promotion.
 - `COMMAND_NOT_ALLOWLISTED`: the requested command is not approved for local execution.
 - `TIMEOUT_EXCEEDED`: the local task exceeded the configured timeout.
 - `OUTPUT_LIMIT_EXCEEDED`: stdout, stderr, or generated artifacts exceeded configured limits.
@@ -23,7 +23,7 @@ For every stop state, the future harness should:
 2. Capture the stop state in the local artifact directory.
 3. Record which requirement triggered the state.
 4. Avoid automatic retries that could expand scope.
-5. Avoid provider calls, deployments, dashboard exposure, browser control, credential access, billing, and evidence promotion.
+5. Avoid provider calls, hosted model calls, local model execution without later explicit local-only implementation authorization, external API calls, fallback, deployments, dashboard exposure, `/v1/solve` exposure, browser control, credential access, billing, and evidence promotion.
 6. Tell the operator which separate authorized lane would be needed for remediation if remediation is outside the local-only boundary.
 
 ## Fail-closed requirement

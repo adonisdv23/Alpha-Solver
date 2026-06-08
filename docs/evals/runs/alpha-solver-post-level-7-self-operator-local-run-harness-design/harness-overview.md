@@ -18,10 +18,10 @@ A future Self Operator MVP local run harness should provide a deterministic, ope
    - Validate that the repository is in an expected state for the operator's intended task.
 
 3. **Execute bounded local task**
-   - Run only an allowlisted local command or script.
+   - Run only bounded local preflights, local artifact capture, and local docs/checker commands explicitly allowed by a future implementation lane.
    - Apply fixed timeout, output-size, and artifact-size limits.
    - Record stdout, stderr, exit status, and elapsed time.
-   - Stop immediately if the task requests provider calls, browser control, deployment, dashboard exposure, credential access, billing activity, or evidence promotion.
+   - Stop immediately if the task requests provider calls, hosted model calls, local model execution without later explicit local-only implementation authorization, external API calls, fallback, browser control, deployment, dashboard exposure, `/v1/solve` exposure, credential access, billing activity, or evidence promotion.
 
 4. **Capture artifacts**
    - Preserve raw local outputs.

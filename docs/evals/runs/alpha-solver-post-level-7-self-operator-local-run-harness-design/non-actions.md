@@ -5,7 +5,15 @@ This packet intentionally does not perform or authorize the following work:
 - No runner is created.
 - No task is executed by a new harness.
 - No model is run.
-- No provider is called.
+- no provider calls.
+- no hosted model calls.
+- no local model execution unless a later explicit local-only implementation lane authorizes it.
+- no external API calls.
+- no fallback.
+- no credential use.
+- no billing.
+- no dashboard exposure.
+- no `/v1/solve` exposure.
 - No dashboard is exposed.
 - No deployment is performed.
 - No browser is controlled.
