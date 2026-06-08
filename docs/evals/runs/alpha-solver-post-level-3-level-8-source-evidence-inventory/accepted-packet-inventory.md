@@ -21,6 +21,7 @@
 | `docs/evals/runs/alpha-solver-post-level-3-level-5-quality-evaluation-design/` | Quality-evaluation design boundary. | Review quality-evidence requirements and blocked quality claims. |
 | `docs/evals/runs/alpha-solver-post-level-3-level-6-product-surface-design/` | Product-surface design boundary. | Review API/dashboard/product-surface exclusions before route or UI assumptions. |
 | `docs/evals/runs/alpha-solver-post-level-3-level-7-provider-orchestration-design/` | Provider-orchestration design boundary. | Review provider safety, fail-closed expectations, and non-execution boundaries. |
+| `docs/evals/runs/alpha-solver-post-level-3-provider-fallback-fail-closed-policy/` | Available docs-only provider fallback/fail-closed policy evidence. | Available for Level 8 review as policy evidence only; do not treat it as runtime evidence or authorization for implementation, fallback, provider calls, hosted fallback, billing, production readiness, MVP readiness, or evidence promotion. |
 
 ## Accepted source evidence separation
 
