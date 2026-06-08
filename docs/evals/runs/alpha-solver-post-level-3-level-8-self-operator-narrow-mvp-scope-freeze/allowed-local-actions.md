@@ -8,13 +8,13 @@ A later implementation may include only the following local actions if Level 8 a
 
 | Action | Frozen boundary |
 | --- | --- |
-| Local task intake | Accept operator-provided local task text, scope constraints, and intended local artifact path. |
+| Local task intake | Accept operator-provided local task text, scope constraints, and intended approved local artifact directory. |
 | Local preflight checks | Inspect local repo state and confirm whether required docs/checker prerequisites are present. |
 | Operator confirmation capture | Record explicit operator confirmation for the immediate local action only. |
 | Allowlisted docs/checker command execution | Run only specifically allowlisted local documentation/checker commands. |
 | Local artifact directory creation | Create only the approved local artifact directory for the operator-confirmed task. |
-| Local stop-state artifacts | Write local stop-state notes when the MVP cannot safely continue. |
-| Local summary generation | Write local summaries of intake, confirmations, commands run, artifacts created, blockers, and stop states. |
+| Local stop-state artifacts | Write local stop-state notes only to the approved local artifact directory or explicitly authorized local metadata files when the MVP cannot safely continue. |
+| Local summary generation | Write local summaries only to the approved local artifact directory or explicitly authorized local metadata files, covering intake, confirmations, commands run, artifacts created, blockers, and stop states. |
 
 ## Required guardrails
 
@@ -22,4 +22,5 @@ A later implementation may include only the following local actions if Level 8 a
 - No command is allowed without current operator confirmation for that specific command.
 - No network or external side effect is allowed.
 - No credential, secret, billing, provider, deployment, merge, or browser action is allowed.
-- No local write is allowed outside the approved artifact directory except where a later accepted implementation lane defines a narrow, test-covered exception.
+- Future implementation may write only to an approved local artifact directory and explicitly authorized local metadata files.
+- File writes outside the future approved local artifact boundary are forbidden for the narrow MVP unless a later separate scope-expansion packet supersedes this freeze. A normal implementation lane must not expand this boundary.

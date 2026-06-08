@@ -11,7 +11,7 @@ The frozen future MVP must never perform the following actions:
 - Billing, payment, metering, invoice, quota, or spend-affecting actions.
 - Deployment, release, merge, PR approval, evidence promotion, tag creation, package publication, or production changes.
 - Runtime, API, dashboard, provider, SAFE-OUT, budget, replay, determinism, observability, or MCP behavior changes.
-- File writes outside the future approved local artifact boundary.
+- File writes outside the future approved local artifact boundary, unless a later separate scope-expansion packet supersedes this freeze. A normal implementation lane must not expand this boundary.
 - Command execution that is not explicitly allowlisted and specifically operator-confirmed.
 - Continuation after missing, ambiguous, stale, conflicting, or overly broad operator confirmation.
 
