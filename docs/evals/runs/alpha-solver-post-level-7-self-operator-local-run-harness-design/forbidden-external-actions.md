@@ -8,7 +8,7 @@ The local run harness design requires:
 
 - no provider calls.
 - no hosted model calls.
-- no local model execution unless a later explicit local-only implementation lane authorizes it.
+- no local model execution unless a later explicit local-only implementation lane authorizes local model execution outside this harness boundary.
 - no external API calls.
 - no fallback.
 - no credential use.
@@ -18,9 +18,11 @@ The local run harness design requires:
 
 The harness must not perform, trigger, or require any of the following actions:
 
-- Provider API calls, hosted model API calls, local-provider API calls, or any other external API calls.
-- Hosted model calls, model download, model warmup, or model execution by default.
-- Local model execution unless a later explicit local-only implementation lane authorizes it.
+- Provider calls to hosted or local-provider APIs.
+- Hosted model calls.
+- Local model execution unless a later explicit local-only implementation lane authorizes local model execution outside this harness boundary.
+- External API calls.
+- Model download, model warmup, or model execution by default.
 - Fallback execution, fallback provider routing, fallback model routing, or fallback remediation.
 - Dashboard exposure, dashboard publishing, dashboard screenshot capture, or `/v1/solve` exposure.
 - Deployment to cloud, container registry, preview environment, production, staging, or any remote host.
@@ -30,6 +32,10 @@ The harness must not perform, trigger, or require any of the following actions:
 - Evidence promotion, registry promotion, score promotion, benchmark claim, or production-readiness claim.
 - External issue creation, pull request creation by the harness, ticket mutation, notification sending, or chat posting.
 - Network-based remediation, package installation, remote fetch, dependency update, or any other external action.
+
+## Provider-boundary clarification
+
+A future lane may create a separate provider-aware implementation design, but this local run harness design must not be read as authorizing provider calls. Provider calls, hosted model calls, local-provider API calls, external API calls, fallback routing, credential use, billing, dashboard exposure, and `/v1/solve` exposure remain outside this local harness boundary.
 
 ## Allowed local-only scope
 
