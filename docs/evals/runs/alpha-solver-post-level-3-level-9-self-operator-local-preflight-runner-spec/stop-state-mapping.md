@@ -1,0 +1,20 @@
+# Stop-state mapping
+
+Future preflight stop states should include:
+
+- `SELF_OPERATOR_SCOPE_UNCLEAR`
+- `SELF_OPERATOR_CHANGED_FILE_SCOPE_BLOCKED`
+- `SELF_OPERATOR_PROVIDER_CALL_BLOCKED`
+- `SELF_OPERATOR_EXTERNAL_API_BLOCKED`
+- `SELF_OPERATOR_CREDENTIAL_RISK_BLOCKED`
+- `SELF_OPERATOR_BROWSER_AUTOMATION_BLOCKED`
+- `SELF_OPERATOR_DEPLOYMENT_BLOCKED`
+- `SELF_OPERATOR_BILLING_BLOCKED`
+- `SELF_OPERATOR_ROUTE_EXPOSURE_BLOCKED`
+- `SELF_OPERATOR_FALLBACK_BLOCKED`
+- `SELF_OPERATOR_HOSTED_FALLBACK_BLOCKED`
+- `SELF_OPERATOR_EVIDENCE_PROMOTION_BLOCKED`
+- `SELF_OPERATOR_SOURCE_ARTIFACT_MUTATION_BLOCKED`
+- `SELF_OPERATOR_ARTIFACT_BOUNDARY_BLOCKED`
+
+The route exposure, hosted fallback, fallback, changed-file-scope, and evidence-promotion stop states intentionally align with the approval stop-state registry and static scaffold gates. Each stop state must fail closed and require operator review.
