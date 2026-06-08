@@ -5,11 +5,24 @@ After any separately authorized first Self Operator runtime code change, the fut
 ## Required post-code static checks
 
 - `git status --short` to show the final modified file set.
-- `git diff --name-only` to prove the change is limited to the separately approved scope.
-- `git diff --check` to prove whitespace correctness.
+- `git diff --name-only` to prove the unstaged changed-file scope is limited to the separately approved scope.
+- `git diff --cached --name-only` to prove the staged changed-file scope is limited to the separately approved scope.
+- `git diff --check` to prove unstaged whitespace correctness.
+- `git diff --cached --check` to prove staged whitespace correctness.
 - `make check-local-llm-orchestration-guardrails` to prove guardrails still pass.
 - The relevant packet consistency check.
 - Focused unit/static tests for any changed module, guardrail, CLI, harness, artifact writer, or dry-run planner.
+
+## Required final scope proof
+
+Before commit and before PR creation, the future implementation lane must prove the final changed-file scope using both unstaged and staged diff forms:
+
+- `git diff --name-only`
+- `git diff --cached --name-only`
+- `git diff --check`
+- `git diff --cached --check`
+
+If either the unstaged or staged diff form shows files outside the separately approved scope, the lane must stop before commit and PR creation.
 
 ## Required post-code local harness tests
 
