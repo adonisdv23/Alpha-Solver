@@ -112,26 +112,76 @@ def test_default_discovery_includes_future_post_level_3_level_4_packet(tmp_path)
     assert iter_packet_dirs(tmp_path) == [packet_dir]
 
 
-def test_default_discovery_excludes_post_level_3_source_artifact_payloads(tmp_path):
-    packet_dir = Path("docs/evals/runs/alpha-solver-post-level-3-fixture")
-    nested_source_artifact_dir = packet_dir / "source-artifact"
+def test_default_discovery_includes_future_post_level_7_self_operator_packet(tmp_path):
+    packet_dir = Path(
+        "docs/evals/runs/"
+        "alpha-solver-post-level-7-self-operator-static-checker-hardening"
+    )
+    _write_packet(
+        tmp_path,
+        packet_dir,
+        selected_text=(
+            "`ALPHA-SOLVER-POST-LEVEL-7-SELF-OPERATOR-"
+            "STATIC-CHECKER-HARDENING-NEXT-001`\n"
+        ),
+    )
+
+    assert iter_packet_dirs(tmp_path) == [packet_dir]
+
+
+def test_future_post_level_7_packet_with_full_boundary_files_validates(tmp_path):
+    packet_dir = Path(
+        "docs/evals/runs/"
+        "alpha-solver-post-level-7-self-operator-validation-fixture"
+    )
+    _write_packet(
+        tmp_path,
+        packet_dir,
+        selected_text=(
+            "`ALPHA-SOLVER-POST-LEVEL-7-SELF-OPERATOR-"
+            "VALIDATION-FOLLOWUP-001`\n"
+        ),
+        boundary_name="non-actions.md",
+    )
+    (tmp_path / packet_dir / "evidence-boundary.md").write_text(
+        "# Evidence boundary\n\nStatic checker fixture only.\n",
+        encoding="utf-8",
+    )
+
+    assert iter_packet_dirs(tmp_path) == [packet_dir]
+    assert check_packet_dir(packet_dir, tmp_path) == []
+
+
+def test_default_discovery_excludes_source_artifact_payloads_for_packet_families(tmp_path):
+    post_level_3_packet_dir = Path("docs/evals/runs/alpha-solver-post-level-3-fixture")
+    post_level_7_packet_dir = Path(
+        "docs/evals/runs/alpha-solver-post-level-7-self-operator-fixture"
+    )
+    nested_source_artifact_dir = post_level_7_packet_dir / "source-artifact"
     named_source_artifact_dir = Path(
-        "docs/evals/runs/alpha-solver-post-level-3-source-artifact-fixture"
+        "docs/evals/runs/alpha-solver-post-level-7-source-artifact-fixture"
     )
     suffix_source_artifact_dir = Path(
-        "docs/evals/runs/alpha-solver-post-level-3-level-4-source-artifact"
+        "docs/evals/runs/alpha-solver-post-level-7-self-operator-source-artifact"
     )
-    _write_packet(tmp_path, packet_dir)
+    existing_marker_source_artifact_dir = Path(
+        "docs/evals/runs/alpha-solver-post-level-7-self-operator-source-artifact-fixture"
+    )
+    _write_packet(tmp_path, post_level_3_packet_dir)
+    _write_packet(tmp_path, post_level_7_packet_dir)
     _write_packet(tmp_path, nested_source_artifact_dir)
     _write_packet(tmp_path, named_source_artifact_dir)
     _write_packet(tmp_path, suffix_source_artifact_dir)
+    _write_packet(tmp_path, existing_marker_source_artifact_dir)
 
     packet_dirs = iter_packet_dirs(tmp_path)
 
-    assert packet_dir in packet_dirs
+    assert post_level_3_packet_dir in packet_dirs
+    assert post_level_7_packet_dir in packet_dirs
     assert nested_source_artifact_dir not in packet_dirs
     assert named_source_artifact_dir not in packet_dirs
     assert suffix_source_artifact_dir not in packet_dirs
+    assert existing_marker_source_artifact_dir not in packet_dirs
     assert not any(
         part == "source-artifact" or part.endswith("-source-artifact")
         for path in packet_dirs

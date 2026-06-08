@@ -70,7 +70,7 @@ python scripts/check_local_llm_packet_consistency.py
 
 What it protects:
 
-- Discovers local LLM solver orchestration packet directories under `docs/evals/runs/`, including post-Level-3 release-readiness packets named `alpha-solver-post-level-3-*`.
+- Discovers local LLM solver orchestration packet directories under `docs/evals/runs/`, including post-Level-3 release-readiness packets named `alpha-solver-post-level-3-*` and post-Level-7 Self Operator packets named `alpha-solver-post-level-7-*`.
 - Requires selected-next state or an explicit closed/no-further state where applicable.
 - Requires blocker fallback lane files when packet patterns indicate they are needed.
 - Requires evidence-boundary, blocked-claims, non-actions, or equivalent boundary files when packet patterns indicate they are needed.
