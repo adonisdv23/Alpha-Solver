@@ -39,6 +39,7 @@ packages = [
     "alpha.adapters",
     "alpha.providers",
     "alpha.local_llm",
+    "alpha.self_operator",
     "alpha.executors",
     "alpha.reasoning",
     "alpha.router",

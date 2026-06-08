@@ -1,0 +1,14 @@
+{
+  "artifact_paths": ["artifact.json"],
+  "created_at": "2026-06-08T00:00:00Z",
+  "evidence_boundary": "local-only",
+  "findings": [],
+  "input_summary": {},
+  "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-11-SELF-OPERATOR-LOCAL-ARTIFACT-PREFLIGHT-FOUNDATION-001",
+  "operator_confirmation": {"explicit": false},
+  "preflight_result": {"allowed": false},
+  "redaction_status": "redacted",
+  "run_id": "fixture-run-002",
+  "schema_version": "self_operator.local_artifact.v1",
+  "stop_state": "blocked"
+}

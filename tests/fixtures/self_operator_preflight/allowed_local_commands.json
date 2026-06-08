@@ -1,0 +1,7 @@
+[
+  "git status --short",
+  "git diff --check",
+  "rg -n local-only docs tests",
+  "python -m pytest -q tests/test_self_operator_preflight.py",
+  "make check-local-llm-orchestration-guardrails"
+]
