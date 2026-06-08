@@ -22,7 +22,7 @@ These planned tests define the first static blocks that should fail before Self 
 
 ## Expected failure format
 
-Fallback and evidence-promotion gates carry forward the earlier static coverage expectations for local-to-provider fallback scans and evidence-promotion scans. Each blocked behavior should produce a deterministic finding shaped like:
+Fallback and evidence-promotion gates carry forward the earlier static coverage expectations for local-to-provider fallback scans and evidence-promotion scans. The first static test layer must fail if Self Operator code introduces fallback configuration, hosted fallback, local-to-provider fallback, evidence-promotion labels, readiness-promotion labels, benchmark-promotion labels, or score-promotion labels. Each blocked behavior should produce a deterministic finding shaped like:
 
 ```text
 <finding_id> path=<repo-relative-path> line=<line-number> behavior=<blocked-behavior> message=<short-remediation>
