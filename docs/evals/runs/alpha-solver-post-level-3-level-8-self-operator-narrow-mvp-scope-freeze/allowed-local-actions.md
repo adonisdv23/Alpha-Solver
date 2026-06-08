@@ -1,0 +1,25 @@
+# Allowed Local Actions
+
+Lane: `ALPHA-SOLVER-POST-LEVEL-3-LEVEL-8-SELF-OPERATOR-NARROW-MVP-SCOPE-FREEZE-PACKET-001`
+
+## Future MVP local action allowlist
+
+A later implementation may include only the following local actions if Level 8 approval and a later accepted implementation lane explicitly authorize them:
+
+| Action | Frozen boundary |
+| --- | --- |
+| Local task intake | Accept operator-provided local task text, scope constraints, and intended local artifact path. |
+| Local preflight checks | Inspect local repo state and confirm whether required docs/checker prerequisites are present. |
+| Operator confirmation capture | Record explicit operator confirmation for the immediate local action only. |
+| Allowlisted docs/checker command execution | Run only specifically allowlisted local documentation/checker commands. |
+| Local artifact directory creation | Create only the approved local artifact directory for the operator-confirmed task. |
+| Local stop-state artifacts | Write local stop-state notes when the MVP cannot safely continue. |
+| Local summary generation | Write local summaries of intake, confirmations, commands run, artifacts created, blockers, and stop states. |
+
+## Required guardrails
+
+- No command is allowed unless it appears on a future explicit allowlist.
+- No command is allowed without current operator confirmation for that specific command.
+- No network or external side effect is allowed.
+- No credential, secret, billing, provider, deployment, merge, or browser action is allowed.
+- No local write is allowed outside the approved artifact directory except where a later accepted implementation lane defines a narrow, test-covered exception.
