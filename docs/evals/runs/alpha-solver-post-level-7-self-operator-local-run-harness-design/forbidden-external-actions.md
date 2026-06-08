@@ -8,7 +8,7 @@ The local run harness design requires:
 
 - no provider calls.
 - no hosted model calls.
-- no local model execution unless a later explicit local-only implementation lane authorizes local model execution outside this harness boundary.
+- no local model execution unless a later explicit local-only implementation lane authorizes local model execution outside this local harness boundary.
 - no external API calls.
 - no fallback.
 - no credential use.
@@ -20,9 +20,8 @@ The harness must not perform, trigger, or require any of the following actions:
 
 - Provider calls to hosted or local-provider APIs.
 - Hosted model calls.
-- Local model execution unless a later explicit local-only implementation lane authorizes local model execution outside this harness boundary.
 - External API calls.
-- Model download, model warmup, or model execution by default.
+- Model execution, model download, or model warmup, unless a later explicit local-only implementation lane authorizes local model execution outside this local harness boundary.
 - Fallback execution, fallback provider routing, fallback model routing, or fallback remediation.
 - Dashboard exposure, dashboard publishing, dashboard screenshot capture, or `/v1/solve` exposure.
 - Deployment to cloud, container registry, preview environment, production, staging, or any remote host.
