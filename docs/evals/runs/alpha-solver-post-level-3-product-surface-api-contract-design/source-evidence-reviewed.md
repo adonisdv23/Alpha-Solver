@@ -29,4 +29,4 @@ This API contract reference is subordinate to accepted Level 6 product-surface d
 
 ## Evidence limits
 
-The reviewed sources support only docs-only contract design subordinate to Level 6. They do not provide evidence that `/v1/solve` should be implemented, that `/v1/solve` should be exposed, that Level 7 is authorized, that provider behavior is ready, that hosted fallback exists, that billing is available, or that Alpha Solver has product-readiness evidence.
+The reviewed sources support only docs-only contract design subordinate to Level 6. They do not provide evidence that `/v1/solve` should be implemented, that `/v1/solve` should be exposed, that runtime, provider, API, dashboard, checker, test, Makefile, or CI files should be modified, that Level 7 is authorized, that provider orchestration is authorized, that fallback or hosted fallback exists, that billing is available, that MVP readiness or production readiness is established, or that evidence may be promoted.

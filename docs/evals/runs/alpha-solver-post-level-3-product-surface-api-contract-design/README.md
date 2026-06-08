@@ -8,7 +8,7 @@ Create a docs-only supporting reference for a possible future Alpha Solver `/v1/
 
 ## Evidence boundary
 
-This is a docs-only API contract design packet. It does not create `/v1/solve`, does not expose `/v1/solve`, does not call `/v1/solve`, does not start `/v1/solve` implementation, does not authorize Level 7, does not modify runtime behavior, does not call providers, does not add fallback behavior, does not run models, does not run benchmarks, does not perform billing work, and does not promote evidence.
+This is a docs-only API contract design packet. It does not create `/v1/solve`, does not expose `/v1/solve`, does not call `/v1/solve`, does not start `/v1/solve` implementation, does not modify runtime, provider, API, dashboard, checker, test, Makefile, or CI files, does not call providers, does not run models, does not run benchmarks, and does not promote evidence.
 
 ## Preflight result
 
@@ -18,7 +18,7 @@ The Level 6 packet records lane `ALPHA-SOLVER-POST-LEVEL-3-LEVEL-6-PRODUCT-SURFA
 
 ## Role of this packet
 
-This packet is subordinate to the accepted Level 6 product-surface design. Level 6 controls whether this API contract reference is used, revised, rejected, or superseded. Nothing in this packet authorizes route creation, `/v1/solve` implementation, runtime integration, provider execution, hosted fallback, billing, public documentation, dashboard work, Level 7, or readiness claims.
+This packet is subordinate to the accepted Level 6 product-surface design. Level 6 controls whether this API contract reference is used, revised, rejected, or superseded. Nothing in this packet authorizes route creation, `/v1/solve` implementation, runtime integration, provider orchestration, provider execution, fallback, hosted fallback, billing, public documentation, dashboard work, Level 7, MVP readiness, production readiness, evidence promotion, or other readiness claims.
 
 ## Packet files
 
