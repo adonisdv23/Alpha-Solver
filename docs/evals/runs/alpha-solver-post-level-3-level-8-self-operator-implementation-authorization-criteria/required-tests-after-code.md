@@ -22,6 +22,8 @@ Before commit and before PR creation, the future implementation lane must prove 
 - `git diff --check`
 - `git diff --cached --check`
 
+Bare `git diff` checks unstaged changes only. `git diff --cached` checks staged changes only. Both forms are required because staged out-of-scope files could otherwise bypass final scope proof when only bare `git diff` commands are reviewed.
+
 If either the unstaged or staged diff form shows files outside the separately approved scope, the lane must stop before commit and PR creation.
 
 ## Required post-code local harness tests
