@@ -1,0 +1,5 @@
+# Inert fixture marker: STATIC_FIXTURE_SURFACE: route_exposure
+# Placeholder-only route/CLI/dashboard exposure text.
+route = "/v1/solve"
+dashboard_route = "SELF_OPERATOR_DASHBOARD_PLACEHOLDER"
+cli_command = "self-operator-run-placeholder"

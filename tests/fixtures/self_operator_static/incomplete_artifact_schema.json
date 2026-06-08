@@ -1,0 +1,10 @@
+{
+  "schema_version": "static-fixture-v1",
+  "run_id": "STATIC_FIXTURE_RUN_WITH_MISSING_FIELDS",
+  "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-10-SELF-OPERATOR-STATIC-TEST-SCAFFOLD-IMPLEMENTATION-001",
+  "operator_confirmation": {
+    "explicit": true,
+    "note": "inert fixture only"
+  },
+  "findings": []
+}

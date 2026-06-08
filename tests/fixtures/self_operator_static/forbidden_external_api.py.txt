@@ -1,0 +1,3 @@
+# Inert fixture marker: STATIC_FIXTURE_SURFACE: external_api_calls
+# Placeholder only; the scanner reads this as text and never executes it.
+response = requests.post("EXTERNAL_API_ENDPOINT_PLACEHOLDER", json={"fixture": True})

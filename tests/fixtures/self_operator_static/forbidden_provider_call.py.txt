@@ -1,0 +1,3 @@
+# Inert fixture marker: STATIC_FIXTURE_SURFACE: provider_calls
+# This text simulates a blocked provider-call surface without real clients.
+result = provider_client.generate("placeholder prompt")
