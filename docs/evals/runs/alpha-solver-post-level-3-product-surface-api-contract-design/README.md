@@ -8,15 +8,17 @@ Create a docs-only supporting reference for a possible future Alpha Solver `/v1/
 
 ## Evidence boundary
 
-This is a docs-only API contract design packet. It does not create `/v1/solve`, does not expose `/v1/solve`, does not call `/v1/solve`, does not modify runtime behavior, does not call providers, does not add fallback behavior, does not run models, does not run benchmarks, does not perform billing work, and does not promote evidence.
+This is a docs-only API contract design packet. It does not create `/v1/solve`, does not expose `/v1/solve`, does not call `/v1/solve`, does not start `/v1/solve` implementation, does not authorize Level 7, does not modify runtime behavior, does not call providers, does not add fallback behavior, does not run models, does not run benchmarks, does not perform billing work, and does not promote evidence.
 
 ## Preflight result
 
-The repository contains the accepted Level 5 quality evaluation design packet at `docs/evals/runs/alpha-solver-post-level-3-level-5-quality-evaluation-design/`. That packet selects `ALPHA-SOLVER-POST-LEVEL-3-LEVEL-6-PRODUCT-SURFACE-DESIGN-PACKET-001` as its next lane.
+The repository now contains the accepted Level 6 product-surface design packet at `docs/evals/runs/alpha-solver-post-level-3-level-6-product-surface-design/`. That Level 6 packet is the controlling product-surface design boundary for this supporting API contract reference.
+
+The Level 6 packet records lane `ALPHA-SOLVER-POST-LEVEL-3-LEVEL-6-PRODUCT-SURFACE-DESIGN-PACKET-001`, states that future product-surface implementation remains blocked until its readiness gates are satisfied by an accepted follow-on lane, and explicitly states that selecting Level 7 does not start Level 7.
 
 ## Role of this packet
 
-This packet is a supporting reference only. Level 6 controls whether this API contract reference is used, revised, rejected, or superseded. Nothing in this packet authorizes route creation, runtime integration, provider execution, hosted fallback, billing, public documentation, dashboard work, or readiness claims.
+This packet is subordinate to the accepted Level 6 product-surface design. Level 6 controls whether this API contract reference is used, revised, rejected, or superseded. Nothing in this packet authorizes route creation, `/v1/solve` implementation, runtime integration, provider execution, hosted fallback, billing, public documentation, dashboard work, Level 7, or readiness claims.
 
 ## Packet files
 
