@@ -25,7 +25,9 @@ A future MVP may only support:
 - Stop-state-first when scope, evidence, confirmation, or allowlist status is unclear.
 - Explicitly allowlisted checker/docs commands only.
 - Operator confirmation required before any future MVP command execution.
-- Future implementation may write only to an approved local artifact directory and explicitly authorized local metadata files.
+- Future implementation may write only to:
+  - The approved local artifact directory.
+  - Explicitly authorized local metadata files inside the approved artifact boundary.
 - Generated artifacts and metadata files must remain local and inspectable.
 - No implementation may infer permission from silence, stale context, previous confirmations, or broad task wording.
 

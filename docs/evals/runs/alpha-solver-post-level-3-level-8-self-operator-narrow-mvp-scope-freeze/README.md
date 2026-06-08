@@ -6,7 +6,7 @@ Lane: `ALPHA-SOLVER-POST-LEVEL-3-LEVEL-8-SELF-OPERATOR-NARROW-MVP-SCOPE-FREEZE-P
 
 This docs-only packet freezes the smallest possible Self Operator MVP scope that could be implemented safely after Level 8 approval.
 
-The frozen MVP is local-only, operator-confirmed, allowlist-bound, artifact-producing, and stopped by default. Future implementation may write only to an approved local artifact directory and explicitly authorized local metadata files. It does not implement Self Operator.
+The frozen MVP is local-only, operator-confirmed, allowlist-bound, artifact-producing, and stopped by default. Future implementation may write only to the approved local artifact directory and explicitly authorized local metadata files inside the approved artifact boundary. It does not implement Self Operator.
 
 ## Frozen MVP summary
 
@@ -17,8 +17,8 @@ A future MVP may only support:
 - Operator confirmation capture.
 - Local docs/checker command execution if explicitly allowlisted.
 - Local artifact directory creation.
-- Local stop-state artifacts written only inside the approved local artifact directory or explicitly authorized local metadata files.
-- Local summary generation written only inside the approved local artifact directory or explicitly authorized local metadata files.
+- Local stop-state artifacts written only inside the approved local artifact directory or explicitly authorized local metadata files inside the approved artifact boundary.
+- Local summary generation written only inside the approved local artifact directory or explicitly authorized local metadata files inside the approved artifact boundary.
 - No external actions.
 
 ## Evidence boundary
