@@ -1,0 +1,7 @@
+# Inert fixture marker: STATIC_FIXTURE_SURFACE: browser_automation
+# Inert fixture marker: STATIC_FIXTURE_SURFACE: deployment
+# Inert fixture marker: STATIC_FIXTURE_SURFACE: billing
+# Placeholder-only tokens; no browser data, deployment output, or billing data.
+page = browser.new_page()
+deploy_job = "DEPLOYMENT_PLACEHOLDER"
+billing_meter = "BILLING_PLACEHOLDER"

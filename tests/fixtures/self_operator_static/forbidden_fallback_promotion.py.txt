@@ -1,0 +1,7 @@
+# Inert fixture marker: STATIC_FIXTURE_SURFACE: fallback
+# Inert fixture marker: STATIC_FIXTURE_SURFACE: hosted_fallback
+# Inert fixture marker: STATIC_FIXTURE_SURFACE: evidence_promotion
+# Placeholder-only fallback/promotion text.
+fallback_to_provider = "DISALLOWED_PLACEHOLDER"
+hosted_fallback = "DISALLOWED_PLACEHOLDER"
+promote_evidence = "DISALLOWED_PLACEHOLDER"

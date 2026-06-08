@@ -1,0 +1,4 @@
+# Inert clean fixture for static scanner tests.
+# This text is never imported or executed.
+def describe_static_plan():
+    return "inspect only; no side effects"
