@@ -15,10 +15,14 @@ These planned tests define the first static blocks that should fail before Self 
 | No deployment | Cloud deploy CLIs, container push, infrastructure clients, release commands. | `SELF_OPERATOR_DEPLOYMENT_BLOCKED` | Test fails and reports deployment command or SDK surface. |
 | No billing | Billing APIs, account APIs, payment clients, spend-limit mutation calls. | `SELF_OPERATOR_BILLING_BLOCKED` | Test fails and reports billing/account mutation surface. |
 | No route exposure | FastAPI/Flask/Django route decorators or router registration exposing Self Operator behavior. | `SELF_OPERATOR_ROUTE_EXPOSURE_BLOCKED` | Test fails and reports route registration location. |
+| No fallback configuration or fallback-enabling code | Fallback flags, fallback provider maps, fallback retry policies, fallback adapters, or configuration keys that enable fallback. | `SELF_OPERATOR_FALLBACK_BLOCKED` | Test fails and reports the fallback-enabling configuration or code path. |
+| No local-to-provider fallback paths | Local model failure branches, local solver fallback maps, provider retry-after-local logic, or local-to-hosted escalation paths. | `SELF_OPERATOR_FALLBACK_BLOCKED` | Test fails and reports the local-to-provider fallback branch. |
+| No hosted fallback paths | Hosted fallback provider labels, hosted fallback routes, hosted fallback clients, or remote fallback endpoint selection. | `SELF_OPERATOR_HOSTED_FALLBACK_BLOCKED` | Test fails and reports the hosted fallback surface. |
+| No evidence/readiness/benchmark/score promotion labels | Labels or enums that mark untrusted output as evidence-promoted, readiness-promoted, benchmark-promoted, score-promoted, accepted, certified, or trusted. | `SELF_OPERATOR_EVIDENCE_PROMOTION_BLOCKED` | Test fails and reports the promotion label category without promoting evidence. |
 
 ## Expected failure format
 
-Each blocked behavior should produce a deterministic finding shaped like:
+Fallback and evidence-promotion gates carry forward the earlier static coverage expectations for local-to-provider fallback scans and evidence-promotion scans. Each blocked behavior should produce a deterministic finding shaped like:
 
 ```text
 <finding_id> path=<repo-relative-path> line=<line-number> behavior=<blocked-behavior> message=<short-remediation>
@@ -26,4 +30,4 @@ Each blocked behavior should produce a deterministic finding shaped like:
 
 ## Expected pass format
 
-A safe fixture should produce no findings and should not require network, credentials, browser drivers, deployment tools, billing accounts, or running services.
+A safe fixture should produce no findings and should not require network, credentials, fallback configuration, promotion labels, browser drivers, deployment tools, billing accounts, or running services.

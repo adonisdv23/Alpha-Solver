@@ -23,6 +23,13 @@ The plan covers static checks for these required trust boundaries:
 - No deployment.
 - No billing.
 - No route exposure.
+- No fallback configuration or fallback-enabling code.
+- No local-to-provider fallback paths.
+- No hosted fallback paths.
+- No evidence-promotion labels.
+- No readiness-promotion labels.
+- No benchmark-promotion labels.
+- No score-promotion labels.
 - Approval required.
 - Artifact persistence.
 - Stop-state behavior.
@@ -44,7 +51,7 @@ The plan covers static checks for these required trust boundaries:
 
 ## Test-plan summary
 
-The first static test layer should prove that a future Self Operator implementation cannot be trusted unless it is inspectable before execution. The planned tests should parse source files, configuration files, schemas, and proposed command adapters to detect forbidden integrations, credentials, route exposure, billing/deployment hooks, missing approval gates, missing artifact persistence, and unsafe stop-state handling.
+The first static test layer should prove that a future Self Operator implementation cannot be trusted unless it is inspectable before execution. The planned tests should parse source files, configuration files, schemas, and proposed command adapters to detect forbidden integrations, credentials, route exposure, fallback-enabling code, local-to-provider fallback paths, hosted fallback paths, evidence/readiness/benchmark/score promotion labels, billing/deployment hooks, missing approval gates, missing artifact persistence, and unsafe stop-state handling.
 
 The planned suite should be deterministic, offline, and runnable without hosted providers, local models, browser drivers, credentials, deployment targets, or billable services.
 

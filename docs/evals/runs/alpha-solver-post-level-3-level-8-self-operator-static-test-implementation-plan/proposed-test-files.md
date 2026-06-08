@@ -15,6 +15,8 @@ This packet does not create those files.
 | `test_self_operator_no_credentials_static.py` | Detect secrets, token reads, credential env var access, and credential persistence. | Fails with `SELF_OPERATOR_CREDENTIAL_ACCESS_BLOCKED`. |
 | `test_self_operator_no_browser_automation_static.py` | Detect Playwright, Selenium, Puppeteer, browser driver, and CDP usage. | Fails with `SELF_OPERATOR_BROWSER_AUTOMATION_BLOCKED`. |
 | `test_self_operator_no_deploy_billing_routes_static.py` | Detect deployment commands, billing/account APIs, and public route registration. | Fails with deploy, billing, or route exposure finding IDs. |
+| `test_self_operator_no_fallback_static.py` | Detect fallback configuration, fallback-enabling code, local-to-provider fallback paths, and hosted fallback paths. | Fails with `SELF_OPERATOR_FALLBACK_BLOCKED` or `SELF_OPERATOR_HOSTED_FALLBACK_BLOCKED`. |
+| `test_self_operator_no_evidence_promotion_static.py` | Detect evidence-promotion, readiness-promotion, benchmark-promotion, and score-promotion labels. | Fails with `SELF_OPERATOR_EVIDENCE_PROMOTION_BLOCKED`. |
 | `test_self_operator_approval_gate_static.py` | Verify every planned side-effect operation requires explicit approval metadata before execution. | Fails with `SELF_OPERATOR_APPROVAL_GATE_REQUIRED`. |
 | `test_self_operator_artifact_schema_static.py` | Verify required artifact fields, redaction fields, and persistence locations are defined. | Fails with `SELF_OPERATOR_ARTIFACT_SCHEMA_INCOMPLETE`. |
 | `test_self_operator_stop_state_static.py` | Verify stop states are explicit, persisted, terminal, and non-promotional. | Fails with `SELF_OPERATOR_STOP_STATE_REQUIRED`. |
@@ -30,6 +32,6 @@ This packet does not create those files.
 ## Minimum test behavior
 
 - Tests should inspect text or AST only.
-- Tests should not import target runtime modules if import side effects could trigger providers, routes, deployments, billing, or browser startup.
+- Tests should not import target runtime modules if import side effects could trigger providers, fallback paths, promotion labeling, routes, deployments, billing, or browser startup.
 - Tests should report all findings in a stable order.
 - Tests should include positive blocked fixtures and negative safe fixtures.

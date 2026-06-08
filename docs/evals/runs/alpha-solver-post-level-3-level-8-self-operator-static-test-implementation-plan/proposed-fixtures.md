@@ -2,7 +2,7 @@
 
 ## Fixture principles
 
-Fixtures should be inert text files or data files. They must not contain real credentials, executable deployment targets, real endpoints, or commands intended to be run.
+Fixtures should be inert text files or data files. They must not contain real credentials, executable deployment targets, real endpoints, fallback endpoints, promotion artifacts, or commands intended to be run.
 
 ## Proposed fixture layout
 
@@ -17,6 +17,11 @@ Fixtures should be inert text files or data files. They must not contain real cr
 | `fixtures/self_operator/blocked/deploy_command.py.txt` | Contains deployment command construction. | Deployment finding. |
 | `fixtures/self_operator/blocked/billing_api.py.txt` | Contains billing or account-management API call pattern. | Billing finding. |
 | `fixtures/self_operator/blocked/route_registration.py.txt` | Registers a public route for Self Operator behavior. | Route exposure finding. |
+| `fixtures/self_operator/blocked/fallback_config_enabled.py.txt` | Contains configuration that enables fallback behavior. | Fallback finding. |
+| `fixtures/self_operator/blocked/local_to_provider_fallback.py.txt` | Contains a local-to-provider fallback path after local failure. | Fallback finding. |
+| `fixtures/self_operator/blocked/hosted_fallback_path.py.txt` | Contains hosted fallback routing or hosted fallback provider labels. | Hosted fallback finding. |
+| `fixtures/self_operator/blocked/evidence_promotion_labels.py.txt` | Contains evidence-promotion or readiness-promotion labels. | Evidence-promotion finding. |
+| `fixtures/self_operator/blocked/benchmark_score_promotion_labels.py.txt` | Contains benchmark-promotion or score-promotion labels. | Evidence-promotion finding. |
 | `fixtures/self_operator/blocked/missing_approval.py.txt` | Performs a side-effect operation without approval metadata. | Approval-gate finding. |
 | `fixtures/self_operator/blocked/missing_artifact_persistence.py.txt` | Emits output without persisting required artifacts. | Artifact persistence finding. |
 | `fixtures/self_operator/blocked/non_terminal_stop_state.py.txt` | Continues after a stop state. | Stop-state finding. |
