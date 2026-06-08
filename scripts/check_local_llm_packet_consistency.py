@@ -34,6 +34,7 @@ PACKET_DIR_MARKERS = (
     "local-llm-solver-orchestration",
     "20260607-local-llm-controlled-usage-operator-run-001",
     "alpha-solver-post-level-3-",
+    "alpha-solver-post-level-7-",
 )
 SOURCE_ARTIFACT_MARKERS = (
     "/source-artifact/",
