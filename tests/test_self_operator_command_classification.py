@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from alpha.self_operator.command_classification import classify_command
 
 
@@ -12,6 +14,9 @@ def assert_blocked(command, reason_code: str) -> None:
 
 def test_allows_safe_local_check_and_read_commands() -> None:
     assert classify_command("git status --short").allowed is True
+    assert classify_command("git diff --name-only").allowed is True
+    assert classify_command("git diff --check").allowed is True
+    assert classify_command("find . -type f -name '*.py'").allowed is True
     assert classify_command(["python", "-m", "pytest", "-q", "tests/test_self_operator_preflight.py"]).allowed is True
     assert classify_command("rg -n local-only docs tests").reason_code == "allowed_local_read_check"
 
@@ -45,6 +50,28 @@ def test_blocks_google_sheets_commands() -> None:
 def test_blocks_source_artifact_mutation_commands() -> None:
     assert_blocked("rm docs/evals/runs/source-artifact.json", "source_artifact_mutation")
     assert_blocked("sed -i s/a/b/ docs/file.md", "source_artifact_mutation")
+
+
+def test_blocks_mutating_find_allowlist_arguments() -> None:
+    assert_blocked("find . -delete", "source_artifact_mutation")
+    assert_blocked(["find", ".", "-exec", "rm", "-rf", "{}", ";"], "source_artifact_mutation")
+
+
+def test_blocks_mutating_git_branch_allowlist_arguments() -> None:
+    assert_blocked("git branch -D main", "source_artifact_mutation")
+    assert_blocked("git branch --delete main", "source_artifact_mutation")
+    assert_blocked("git branch -m old new", "source_artifact_mutation")
+
+
+def test_blocks_git_diff_output_to_file() -> None:
+    assert_blocked("git diff --output=artifact.json", "source_artifact_mutation")
+    assert_blocked(["git", "diff", "--output", "artifact.json"], "source_artifact_mutation")
+
+
+def test_blocked_command_classification_is_json_serializable() -> None:
+    result = classify_command("git diff --output=artifact.json")
+    rendered = json.dumps(result.to_dict(), sort_keys=True)
+    assert "SELF_OPERATOR_SOURCE_ARTIFACT_MUTATION_BLOCKED" in rendered
 
 
 def test_blocks_evidence_promotion_commands() -> None:

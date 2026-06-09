@@ -48,6 +48,13 @@ def test_forbidden_command_blocks(tmp_path: Path) -> None:
     assert result.command_classifications[0].allowed is False
 
 
+def test_mutating_allowlisted_command_blocks_preflight(tmp_path: Path) -> None:
+    result = run_local_preflight(task(tmp_path, proposed_commands=("git diff --output=artifact.json",)))
+    assert result.allowed is False
+    assert "SELF_OPERATOR_SOURCE_ARTIFACT_MUTATION_BLOCKED" in ids(result)
+    assert result.command_classifications[0].reason_code == "source_artifact_mutation"
+
+
 def test_out_of_scope_changed_files_block(tmp_path: Path) -> None:
     result = run_local_preflight(task(tmp_path, candidate_changed_files=("alpha/providers/openai.py",)))
     assert "SELF_OPERATOR_FORBIDDEN_SURFACE_CHANGED_FILE" in ids(result)

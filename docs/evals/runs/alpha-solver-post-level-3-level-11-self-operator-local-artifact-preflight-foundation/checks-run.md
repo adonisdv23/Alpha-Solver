@@ -7,7 +7,11 @@
 | `git diff --check` | Passed | No whitespace errors. |
 | GitHub `tests / test` workflow: `Lint (ruff only)` | Failed before lint fix | The workflow command `pip install ruff==0.5.7` then `ruff check alpha` reported `F401` for unused `typing.Sequence` in `alpha/self_operator/preflight.py`. |
 | `ruff check alpha` | Passed after lint fix | Re-ran with `ruff 0.5.7`; all checks passed after removing the unused import. Evidence boundary unchanged. |
-| `python -m pytest -q tests/test_self_operator_artifact_schema.py tests/test_self_operator_artifact_store.py tests/test_self_operator_preflight.py tests/test_self_operator_command_classification.py` | Passed | 33 passed. |
+| `python -m ruff check alpha` / `ruff check alpha` | Passed after allowlist safety fix | Both alpha-scoped ruff commands passed for the PR #454 changed package scope. |
+| `python -m ruff check .` / `ruff check .` | Failed with pre-existing out-of-scope lint findings | Both repo-wide ruff commands reported existing lint violations in `service/` and `tools/` files outside PR #454 scope; no CI or ruff bypass was added. |
+| PR #454 review thread: command allowlist safety | Addressed | Mutating allowlisted commands such as `find . -delete`, `find . -exec ...`, `git branch -D main`, `git branch --delete main`, `git branch -m old new`, and `git diff --output=artifact.json` now fail closed as `source_artifact_mutation`; safe read/check examples remain allowed. Evidence boundary unchanged. |
+| `python -m pytest -q tests/test_self_operator_command_classification.py tests/test_self_operator_preflight.py` | Passed | 24 passed after adding mutating allowlist regression coverage. |
+| `python -m pytest -q tests/test_self_operator_artifact_schema.py tests/test_self_operator_artifact_store.py tests/test_self_operator_preflight.py tests/test_self_operator_command_classification.py` | Passed | 38 passed. |
 | `python -m pytest -q tests/test_self_operator_static_guardrails.py tests/test_self_operator_approval_stopstate_static.py tests/test_self_operator_artifact_schema_static.py tests/test_self_operator_forbidden_behavior_static.py` | Passed | 16 passed. |
 | `make check-local-llm-orchestration-guardrails` | Passed | Evidence-boundary, doc-path/link, and packet-consistency checks passed. |
 | `python scripts/check_local_llm_packet_consistency.py docs/evals/runs/alpha-solver-post-level-3-level-11-self-operator-local-artifact-preflight-foundation` | Passed | 1 packet directory scanned. |

@@ -62,6 +62,12 @@ ALLOWED_EXACT_PREFIXES: tuple[tuple[str, ...], ...] = (
     ("make", "check-local-llm-orchestration-guardrails"),
 )
 
+FIND_MUTATING_FLAGS = frozenset({"-delete", "-exec", "-execdir", "-ok", "-okdir"})
+GIT_BRANCH_MUTATING_LONG_FLAGS = frozenset({"--delete", "--move", "--copy"})
+GIT_BRANCH_MUTATING_SHORT_FLAGS = frozenset("dDmMcC")
+COMMON_WRITE_OPTIONS = frozenset({"--output", "--output-file", "--outfile", "--out-file"})
+RG_EXECUTION_OPTIONS = frozenset({"--pre"})
+
 _SHELL_META_RE = re.compile(r"[;&|`]")
 _FLAGS = re.IGNORECASE
 
@@ -73,30 +79,14 @@ def classify_command(command: str | Sequence[str]) -> CommandClassification:
     normalized = " ".join(argv)
     if not argv:
         return _unclear(argv, "empty_command", "empty command requires operator review")
-    if isinstance(command, str) and _SHELL_META_RE.search(command):
-        return _unclear(argv, "shell_meta_requires_review", "shell metacharacters require operator review")
     for rule in FORBIDDEN_RULES:
         if any(re.search(pattern, normalized, flags=_FLAGS) for pattern in rule.patterns):
-            finding = ArtifactFinding(
-                id=rule.finding_id,
-                reason_code=rule.reason_code,
-                message=rule.category,
-                surface="command_classification",
-            )
-            return CommandClassification(
-                command=argv,
-                category=rule.category,
-                allowed=False,
-                reason_code=rule.reason_code,
-                findings=(finding,),
-            )
-    if _is_allowed_local(argv):
-        return CommandClassification(
-            command=argv,
-            category="allowed local read/check command",
-            allowed=True,
-            reason_code="allowed_local_read_check",
-        )
+            return _forbidden(rule, argv)
+    allowed_result = _classify_allowed_local(argv)
+    if allowed_result is not None:
+        return allowed_result
+    if isinstance(command, str) and _SHELL_META_RE.search(command):
+        return _unclear(argv, "shell_meta_requires_review", "shell metacharacters require operator review")
     return _unclear(argv, "unclear_requires_operator_review", "unclear command requiring operator review")
 
 
@@ -113,11 +103,88 @@ def _parse_command(command: str | Sequence[str]) -> tuple[str, ...]:
     return tuple(str(part) for part in command)
 
 
-def _is_allowed_local(argv: tuple[str, ...]) -> bool:
+def _classify_allowed_local(argv: tuple[str, ...]) -> CommandClassification | None:
     for prefix in ALLOWED_EXACT_PREFIXES:
-        if argv[: len(prefix)] == prefix:
+        if argv[: len(prefix)] != prefix:
+            continue
+        if _has_common_write_option(argv):
+            return _source_mutation_block(argv, "allowed command includes output/write option")
+        if prefix == ("find",) and _find_has_mutating_action(argv):
+            return _source_mutation_block(argv, "find command includes mutating action")
+        if prefix == ("git", "branch") and _git_branch_has_mutating_option(argv):
+            return _source_mutation_block(argv, "git branch command includes mutating option")
+        if prefix == ("git", "diff") and _git_diff_has_output_option(argv):
+            return _source_mutation_block(argv, "git diff command writes output to a file")
+        if prefix == ("rg",) and _rg_has_execution_option(argv):
+            return _source_mutation_block(argv, "rg command includes execution option")
+        return CommandClassification(
+            command=argv,
+            category="allowed local read/check command",
+            allowed=True,
+            reason_code="allowed_local_read_check",
+        )
+    return None
+
+
+def _has_common_write_option(argv: tuple[str, ...]) -> bool:
+    return any(arg in COMMON_WRITE_OPTIONS or _option_starts_with_equals(arg, COMMON_WRITE_OPTIONS) for arg in argv)
+
+
+def _find_has_mutating_action(argv: tuple[str, ...]) -> bool:
+    return any(arg in FIND_MUTATING_FLAGS for arg in argv[1:])
+
+
+def _git_branch_has_mutating_option(argv: tuple[str, ...]) -> bool:
+    for arg in argv[2:]:
+        if arg in GIT_BRANCH_MUTATING_LONG_FLAGS or _option_starts_with_equals(arg, GIT_BRANCH_MUTATING_LONG_FLAGS):
+            return True
+        if arg.startswith("-") and not arg.startswith("--") and any(flag in arg[1:] for flag in GIT_BRANCH_MUTATING_SHORT_FLAGS):
             return True
     return False
+
+
+def _git_diff_has_output_option(argv: tuple[str, ...]) -> bool:
+    return any(arg == "--output" or arg.startswith("--output=") for arg in argv[2:])
+
+
+def _rg_has_execution_option(argv: tuple[str, ...]) -> bool:
+    return any(arg in RG_EXECUTION_OPTIONS or _option_starts_with_equals(arg, RG_EXECUTION_OPTIONS) for arg in argv[1:])
+
+
+def _option_starts_with_equals(arg: str, options: frozenset[str]) -> bool:
+    return any(arg.startswith(f"{option}=") for option in options)
+
+
+def _forbidden(rule: CommandRule, argv: tuple[str, ...]) -> CommandClassification:
+    finding = ArtifactFinding(
+        id=rule.finding_id,
+        reason_code=rule.reason_code,
+        message=rule.category,
+        surface="command_classification",
+    )
+    return CommandClassification(
+        command=argv,
+        category=rule.category,
+        allowed=False,
+        reason_code=rule.reason_code,
+        findings=(finding,),
+    )
+
+
+def _source_mutation_block(argv: tuple[str, ...], message: str) -> CommandClassification:
+    finding = ArtifactFinding(
+        id="SELF_OPERATOR_SOURCE_ARTIFACT_MUTATION_BLOCKED",
+        reason_code="source_artifact_mutation",
+        message=message,
+        surface="command_classification",
+    )
+    return CommandClassification(
+        command=argv,
+        category="forbidden source-artifact mutation",
+        allowed=False,
+        reason_code="source_artifact_mutation",
+        findings=(finding,),
+    )
 
 
 def _unclear(argv: tuple[str, ...], reason_code: str, message: str) -> CommandClassification:
