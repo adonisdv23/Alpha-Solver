@@ -1,0 +1,19 @@
+{
+  "schema_version": "self_operator.acceptance_import_summary.v1",
+  "evidence_boundary_preserved": true,
+  "non_execution_proof": true,
+  "redaction_safe": true,
+  "source_mutation_absent": true,
+  "task_records": [
+    {"task_id": "MLA-001", "status": "import_ready", "import_ready": true, "observed_outcome": "ready"},
+    {"task_id": "MLA-002", "status": "blocked_as_expected", "import_ready": true, "observed_outcome": "blocked"},
+    {"task_id": "MLA-003", "status": "blocked_as_expected", "import_ready": true, "observed_outcome": "blocked"},
+    {"task_id": "MLA-004", "status": "blocked_as_expected", "import_ready": true, "observed_outcome": "blocked"},
+    {"task_id": "MLA-005", "status": "blocked_as_expected", "import_ready": true, "observed_outcome": "blocked"},
+    {"task_id": "MLA-006", "status": "blocked_as_expected", "import_ready": true, "observed_outcome": "blocked"},
+    {"task_id": "MLA-007", "status": "blocked_as_expected", "import_ready": true, "observed_outcome": "blocked"},
+    {"task_id": "MLA-008", "status": "import_ready", "import_ready": true, "observed_outcome": "ready"},
+    {"task_id": "MLA-009", "status": "import_ready", "import_ready": true, "observed_outcome": "ready"},
+    {"task_id": "MLA-010", "status": "import_ready", "import_ready": true, "observed_outcome": "ready"}
+  ]
+}
