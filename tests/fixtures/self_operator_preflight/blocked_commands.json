@@ -1,0 +1,11 @@
+[
+  "curl https://example.invalid",
+  "openai responses create --model hosted",
+  "playwright test",
+  "kubectl apply -f deployment.yaml",
+  "stripe invoices list",
+  "printenv API_KEY",
+  "python scripts/update_google_sheets.py",
+  "rm docs/evals/runs/source-artifact.json",
+  "python scripts/promote_evidence.py"
+]

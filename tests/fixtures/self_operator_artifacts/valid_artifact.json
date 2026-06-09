@@ -1,0 +1,26 @@
+{
+  "artifact_paths": [
+    "artifact.json"
+  ],
+  "created_at": "2026-06-08T00:00:00Z",
+  "evidence_boundary": "local-only; no source-artifact mutation; no evidence promotion",
+  "findings": [],
+  "input_summary": {
+    "requested_action": "local artifact schema fixture"
+  },
+  "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-11-SELF-OPERATOR-LOCAL-ARTIFACT-PREFLIGHT-FOUNDATION-001",
+  "metadata": {},
+  "operator_confirmation": {
+    "confirmation_text": "stop if explicit operator confirmation is missing",
+    "confirmed_by": "local-operator",
+    "explicit": true
+  },
+  "preflight_result": {
+    "allowed": true,
+    "stop_state": "passed"
+  },
+  "redaction_status": "redacted",
+  "run_id": "fixture-run-001",
+  "schema_version": "self_operator.local_artifact.v1",
+  "stop_state": "passed"
+}
