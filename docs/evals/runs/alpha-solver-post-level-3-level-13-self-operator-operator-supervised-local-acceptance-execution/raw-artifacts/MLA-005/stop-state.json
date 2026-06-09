@@ -1,0 +1,56 @@
+{
+  "approval_result_summary": {
+    "approved": true,
+    "finding_ids": [],
+    "identity_finding_ids": [],
+    "identity_match": true,
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-001",
+    "present": true,
+    "run_id": "mla-005-local-acceptance-001",
+    "valid": true
+  },
+  "artifact_paths": [
+    "dry-run-result.json",
+    "execution-gate-result.json",
+    "stop-state.json"
+  ],
+  "blocked_surfaces": [
+    "command_classification"
+  ],
+  "evidence_boundary": "local-only; operator-supervised; no execution; no source-artifact mutation; no evidence promotion",
+  "findings": [
+    {
+      "id": "SELF_OPERATOR_EXTERNAL_API_BLOCKED",
+      "message": "forbidden network/external API command",
+      "reason_code": "network_external_api",
+      "severity": "error",
+      "stop_state": "blocked",
+      "surface": "command_classification"
+    }
+  ],
+  "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-001",
+  "message": "execution gate blocked: failed_preflight",
+  "metadata": {
+    "created_at": "2026-06-09T00:00:00Z",
+    "local_only": true
+  },
+  "reason_code": "failed_preflight",
+  "redaction_status": "redacted",
+  "run_id": "mla-005-local-acceptance-001",
+  "schema_version": "self_operator.stop_state_record.v1",
+  "source_preflight_result_summary": {
+    "allowed": false,
+    "artifact_paths": [
+      "dry-run-result.json",
+      "execution-gate-result.json",
+      "stop-state.json"
+    ],
+    "evidence_boundary": "local-only; operator-supervised; no execution; no source-artifact mutation; no evidence promotion",
+    "finding_ids": [
+      "SELF_OPERATOR_EXTERNAL_API_BLOCKED"
+    ],
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-001",
+    "stop_state": "blocked"
+  },
+  "stop_state": "blocked"
+}

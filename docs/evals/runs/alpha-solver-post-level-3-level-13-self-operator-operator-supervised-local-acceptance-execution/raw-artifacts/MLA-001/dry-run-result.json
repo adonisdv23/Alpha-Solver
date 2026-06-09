@@ -1,0 +1,84 @@
+{
+  "allowed": true,
+  "approval_summary": {
+    "approved": true,
+    "finding_ids": [],
+    "identity_finding_ids": [],
+    "identity_match": true,
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-001",
+    "present": true,
+    "run_id": "mla-001-local-acceptance-001",
+    "valid": true
+  },
+  "artifact_paths": {
+    "dry_run_result": "dry-run-result.json",
+    "execution_gate_result": "execution-gate-result.json"
+  },
+  "dry_run_status": "ready_for_operator_supervised_local_dry_run",
+  "evidence_boundary": "local-only; operator-supervised; no execution; no source-artifact mutation; no evidence promotion",
+  "execution_gate_summary": {
+    "allowed_for_local_dry_run": true,
+    "finding_ids": [],
+    "gate_status": "allowed_for_local_dry_run_wrapper",
+    "reason_code": "ready_for_local_dry_run_wrapper",
+    "redaction_status": "redacted",
+    "schema_version": "self_operator.execution_gate_result.v1",
+    "stop_state_present": false
+  },
+  "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-001",
+  "metadata": {
+    "acceptance_status": "not_run",
+    "blocker_fallback_lane": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-FIX-001",
+    "created_at": "2026-06-09T00:00:00Z",
+    "evidence_boundary": "local-only; operator-supervised; no execution; no providers or external systems; no acceptance; no source-artifact mutation; no evidence promotion",
+    "mvp_readiness": "unclaimed",
+    "operator_supervision": "required_for_manual_local_acceptance",
+    "provider_external_surface_status": "not_called",
+    "selected_next_lane": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-13-SELF-OPERATOR-MANUAL-LOCAL-ACCEPTANCE-PACKET-001"
+  },
+  "non_execution_confirmation": "wrapper does not execute proposed commands; it only classifies proposed command text",
+  "output_root_summary": {
+    "basename": "MLA-001",
+    "provided_by_caller": true,
+    "raw_path_recorded": false
+  },
+  "preflight_summary": {
+    "allowed": true,
+    "artifact_paths": [
+      "dry-run-result.json",
+      "execution-gate-result.json",
+      "stop-state.json"
+    ],
+    "command_reason_codes": [
+      "allowed_local_read_check"
+    ],
+    "evidence_boundary": "local-only; operator-supervised; no execution; no source-artifact mutation; no evidence promotion",
+    "finding_ids": [],
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-001",
+    "stop_state": "passed"
+  },
+  "proposed_task_summary": {
+    "artifact_path_count": 3,
+    "candidate_changed_files": [
+      "alpha/self_operator/dry_run.py"
+    ],
+    "command_count": 1,
+    "evidence_boundary_present": true,
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-001",
+    "metadata": {
+      "acceptance_status": "not_interpreted",
+      "execution_lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-13-SELF-OPERATOR-OPERATOR-SUPERVISED-LOCAL-ACCEPTANCE-EXECUTION-001",
+      "mla_task_id": "MLA-001",
+      "run_id": "mla-001-local-acceptance-001",
+      "scope_summary": "Operator-supervised local acceptance execution of MLA-001 through MLA-010; raw evidence capture only."
+    },
+    "operator_confirmation_present": true,
+    "requested_action": "Run MLA-001 local-only dry-run wrapper acceptance fixture without executing proposed commands.",
+    "run_id": "mla-001-local-acceptance-001"
+  },
+  "reason_code": "ready_for_local_dry_run_wrapper",
+  "redaction_status": "redacted",
+  "run_id": "mla-001-local-acceptance-001",
+  "schema_version": "self_operator.dry_run_result.v1",
+  "stop_state_summary": null
+}
