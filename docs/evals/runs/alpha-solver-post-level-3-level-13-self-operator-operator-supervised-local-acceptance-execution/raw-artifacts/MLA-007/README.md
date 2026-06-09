@@ -10,3 +10,6 @@
 
 - `dry-run-result.json`: `6681ee4cd065c458f756b32e4056e0a939592c9be4673a32ce0d0e4815baf151`
 - `execution-gate-result.json`: `ea1399695a88465b8b542cc3dcb44eaa7235f594774af1f9c7a9a224c754550e`
+## Packet-consistency marker
+
+This raw-artifact subdirectory is closed for packet-consistency discovery only. No follow-on lane is started from this raw-artifact subdirectory.

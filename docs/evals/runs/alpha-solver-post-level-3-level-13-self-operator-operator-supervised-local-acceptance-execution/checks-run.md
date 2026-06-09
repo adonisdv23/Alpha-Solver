@@ -424,3 +424,84 @@ $ python scripts/check_local_llm_packet_consistency.py docs/evals/runs/alpha-sol
 Local LLM packet consistency check passed (1 packet directories scanned).
 exit=0
 ```
+## PR #461 merge-check repair
+
+- Failing check name: `unit` / `Check local LLM orchestration guardrail suite`; the separate `test` job also failed at `Run python -m pytest -q` after the same packet-consistency test failure was present.
+- Failing command: `make check-local-llm-orchestration-guardrails`, specifically `python scripts/check_local_llm_packet_consistency.py`.
+- Exact failure text: `missing selected-next-lane.md or selected-next-action.md` for each `raw-artifacts/MLA-001` through `raw-artifacts/MLA-010` subdirectory.
+- Failure classification: packet consistency / missing required marker caused by `README.md` files in raw-artifact subdirectories being discovered as packet directories by the local LLM packet consistency checker.
+- Fix made: added a closed/no-follow-on packet-consistency marker to each raw-artifact `README.md`; no MLA task was re-run and no raw JSON artifact was regenerated.
+- Evidence interpretation: not performed.
+- Readiness claim: not made.
+
+Post-fix commands and results are recorded below.
+
+## PR #461 post-fix check results
+
+```text
+$ make check-local-llm-orchestration-guardrails
+Local LLM evidence-boundary static check passed (450 files scanned).
+Local LLM doc path/link check passed (49 files scanned).
+Local LLM packet consistency check passed (109 packet directories scanned).
+exit=0
+```
+
+Note: the guardrail target created/restored transient workspace paths during local execution; `artifacts/.gitkeep`, `artifacts/review_p0p1.json`, and `data/scenarios/decks/smoke.jsonl` were restored/removed before commit so no files outside the execution packet remain changed.
+
+```text
+$ python -m pytest -q tests/test_local_llm_packet_consistency.py
+............                                                             [100%]
+exit=0
+```
+
+```text
+$ git status --short
+$ git status --short
+ M docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution/checks-run.md
+ M docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution/raw-artifacts/MLA-001/README.md
+ M docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution/raw-artifacts/MLA-002/README.md
+ M docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution/raw-artifacts/MLA-003/README.md
+ M docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution/raw-artifacts/MLA-004/README.md
+ M docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution/raw-artifacts/MLA-005/README.md
+ M docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution/raw-artifacts/MLA-006/README.md
+ M docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution/raw-artifacts/MLA-007/README.md
+ M docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution/raw-artifacts/MLA-008/README.md
+ M docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution/raw-artifacts/MLA-009/README.md
+ M docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution/raw-artifacts/MLA-010/README.md
+exit=0
+```
+
+```text
+$ git diff --name-only
+$ git diff --name-only
+docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution/checks-run.md
+docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution/raw-artifacts/MLA-001/README.md
+docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution/raw-artifacts/MLA-002/README.md
+docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution/raw-artifacts/MLA-003/README.md
+docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution/raw-artifacts/MLA-004/README.md
+docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution/raw-artifacts/MLA-005/README.md
+docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution/raw-artifacts/MLA-006/README.md
+docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution/raw-artifacts/MLA-007/README.md
+docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution/raw-artifacts/MLA-008/README.md
+docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution/raw-artifacts/MLA-009/README.md
+docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution/raw-artifacts/MLA-010/README.md
+exit=0
+```
+
+```text
+$ git diff --check
+$ git diff --check
+exit=0
+```
+
+```text
+$ python scripts/check_local_llm_packet_consistency.py docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution
+Local LLM packet consistency check passed (1 packet directories scanned).
+exit=0
+```
+
+```text
+$ rg -n "MLA-001|MLA-010|PASS|FAIL|BLOCKED|NOT RUN|dry-run-result.json|execution-gate-result.json|stop-state.json|non-execution|does not claim MVP readiness|ALPHA-SOLVER-POST-LEVEL-3-LEVEL-13-SELF-OPERATOR-LOCAL-ACCEPTANCE-RESULT-IMPORT-001|stop if explicit operator confirmation is missing" docs/evals/runs/alpha-solver-post-level-3-level-13-self-operator-operator-supervised-local-acceptance-execution
+Marker scan completed with matching packet evidence markers.
+exit=0
+```

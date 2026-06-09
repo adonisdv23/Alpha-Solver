@@ -9,3 +9,6 @@
 ## Checksum list
 
 - None
+## Packet-consistency marker
+
+This raw-artifact subdirectory is closed for packet-consistency discovery only. No follow-on lane is started from this raw-artifact subdirectory.
