@@ -83,11 +83,12 @@ def evaluate_execution_gate(
     preflight = _preflight_from_input(preflight_result) if preflight_result is not None else run_local_preflight(proposed)
     approval = approval_from_mapping(approval_record)
     approval_validation = _validate_approval(approval)
-    findings = list(approval_validation.findings) + list(preflight.findings)
+    identity_validation = _validate_approval_identity(proposed, approval)
+    findings = list(approval_validation.findings) + list(identity_validation.findings) + list(preflight.findings)
 
-    gate_status, reason_code = _gate_status(preflight, approval, approval_validation)
+    gate_status, reason_code = _gate_status(preflight, approval, approval_validation, identity_validation)
     stable_findings = tuple(sorted(set(findings)))
-    approval_summary = _approval_summary(approval, approval_validation)
+    approval_summary = _approval_summary(approval, approval_validation, identity_validation)
     preflight_summary = _preflight_summary(preflight)
     evidence_boundary = approval.evidence_boundary if approval and approval.evidence_boundary.strip() else preflight.evidence_boundary
     artifact_paths = tuple(preflight.artifact_paths)
@@ -164,6 +165,7 @@ def _gate_status(
     preflight: PreflightResult,
     approval: ApprovalRecord | None,
     approval_validation: ValidationResult,
+    identity_validation: ValidationResult,
 ) -> tuple[str, str]:
     if approval is None:
         return "blocked_by_missing_approval", "missing_approval"
@@ -174,6 +176,8 @@ def _gate_status(
         if "missing_evidence_boundary" in reason_codes:
             return "blocked_by_evidence_boundary_issue", "evidence_boundary_issue"
         return "blocked_by_missing_approval", "approval_invalid"
+    if not identity_validation.valid:
+        return "blocked_by_approval_identity_mismatch", "approval_identity_mismatch"
     if not preflight.allowed:
         reason_codes = {finding.reason_code for finding in preflight.findings}
         if "artifact_path_outside_output_root" in reason_codes:
@@ -216,17 +220,66 @@ def _build_stop_state(
     )
 
 
-def _approval_summary(approval: ApprovalRecord | None, validation: ValidationResult) -> dict[str, Any]:
+def _approval_summary(
+    approval: ApprovalRecord | None,
+    validation: ValidationResult,
+    identity_validation: ValidationResult,
+) -> dict[str, Any]:
     if approval is None:
-        return {"present": False, "valid": False, "finding_ids": [item.id for item in validation.findings]}
+        return {
+            "identity_match": False,
+            "identity_finding_ids": [item.id for item in identity_validation.findings],
+            "present": False,
+            "valid": False,
+            "finding_ids": [item.id for item in validation.findings],
+        }
     return {
         "approved": approval.approved,
         "finding_ids": [item.id for item in validation.findings],
+        "identity_finding_ids": [item.id for item in identity_validation.findings],
+        "identity_match": identity_validation.valid,
         "lane_id": approval.lane_id,
         "present": True,
         "run_id": approval.run_id,
         "valid": validation.valid,
     }
+
+
+def _validate_approval_identity(proposed: ProposedTask, approval: ApprovalRecord | None) -> ValidationResult:
+    """Fail closed when an approval record does not match the proposed task identity."""
+
+    if approval is None:
+        return ValidationResult(valid=True)
+
+    mismatches: list[str] = []
+    if approval.lane_id.strip() and proposed.lane_id.strip() and approval.lane_id != proposed.lane_id:
+        mismatches.append("lane_id")
+
+    approval_run_id = approval.run_id.strip()
+    proposed_run_id = _proposed_run_id(proposed).strip()
+    if approval_run_id and proposed_run_id and approval_run_id != proposed_run_id:
+        mismatches.append("run_id")
+
+    approval_scope_identity = _approval_scope_identity(approval)
+    proposed_scope_identity = _proposed_scope_identity(proposed)
+    if approval_scope_identity and proposed_scope_identity and approval_scope_identity != proposed_scope_identity:
+        mismatches.append("scope_identity")
+
+    if not mismatches:
+        return ValidationResult(valid=True)
+
+    mismatch_text = ", ".join(sorted(mismatches))
+    return ValidationResult(
+        valid=False,
+        findings=(
+            ArtifactFinding(
+                id="SELF_OPERATOR_APPROVAL_IDENTITY_MISMATCH",
+                reason_code="approval_identity_mismatch",
+                message=f"approval record does not match proposed task identity: {mismatch_text}",
+                surface="approval_identity",
+            ),
+        ),
+    )
 
 
 def _preflight_summary(preflight: PreflightResult) -> dict[str, Any]:
@@ -274,10 +327,39 @@ def _items(value: Any) -> list[Any]:
     return value if isinstance(value, list) else list(value) if isinstance(value, tuple) else []
 
 
+def _approval_scope_identity(approval: ApprovalRecord) -> str:
+    metadata = approval.metadata if isinstance(approval.metadata, Mapping) else {}
+    for key in ("task_identity", "scope_identity", "scope_summary", "requested_action"):
+        value = metadata.get(key)
+        if value is not None and str(value).strip():
+            return _normalize_identity(value)
+    return _normalize_identity(approval.scope_summary)
+
+
+def _proposed_scope_identity(proposed: ProposedTask) -> str:
+    metadata = proposed.metadata if isinstance(proposed.metadata, Mapping) else {}
+    for key in ("task_identity", "scope_identity", "scope_summary"):
+        value = metadata.get(key)
+        if value is not None and str(value).strip():
+            return _normalize_identity(value)
+    return ""
+
+
+def _normalize_identity(value: Any) -> str:
+    return " ".join(str(value).split())
+
+
+def _proposed_run_id(proposed: ProposedTask) -> str:
+    metadata_run_id = proposed.metadata.get("run_id") if isinstance(proposed.metadata, Mapping) else None
+    return str(metadata_run_id or "")
+
+
 def _run_id(proposed: ProposedTask, approval_record: ApprovalRecord | Mapping[str, Any] | None) -> str:
+    proposed_run_id = _proposed_run_id(proposed).strip()
+    if proposed_run_id:
+        return proposed_run_id
     if isinstance(approval_record, ApprovalRecord) and approval_record.run_id.strip():
         return approval_record.run_id
     if isinstance(approval_record, Mapping) and str(approval_record.get("run_id", "")).strip():
         return str(approval_record["run_id"])
-    metadata_run_id = proposed.metadata.get("run_id") if isinstance(proposed.metadata, Mapping) else None
-    return str(metadata_run_id or "missing-approval-run")
+    return "missing-approval-run"
