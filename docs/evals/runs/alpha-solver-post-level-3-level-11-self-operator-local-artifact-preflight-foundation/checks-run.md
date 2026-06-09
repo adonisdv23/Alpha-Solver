@@ -5,6 +5,8 @@
 | `git status --short` | Passed | Showed only allowed helper, test, fixture, docs packet, and package-registration changes. |
 | `git diff --name-only` | Passed | Before staging, tracked output showed `pyproject.toml`; untracked allowed files were visible in `git status --short`. |
 | `git diff --check` | Passed | No whitespace errors. |
+| GitHub `tests / test` workflow: `Lint (ruff only)` | Failed before lint fix | The workflow command `pip install ruff==0.5.7` then `ruff check alpha` reported `F401` for unused `typing.Sequence` in `alpha/self_operator/preflight.py`. |
+| `ruff check alpha` | Passed after lint fix | Re-ran with `ruff 0.5.7`; all checks passed after removing the unused import. Evidence boundary unchanged. |
 | `python -m pytest -q tests/test_self_operator_artifact_schema.py tests/test_self_operator_artifact_store.py tests/test_self_operator_preflight.py tests/test_self_operator_command_classification.py` | Passed | 33 passed. |
 | `python -m pytest -q tests/test_self_operator_static_guardrails.py tests/test_self_operator_approval_stopstate_static.py tests/test_self_operator_artifact_schema_static.py tests/test_self_operator_forbidden_behavior_static.py` | Passed | 16 passed. |
 | `make check-local-llm-orchestration-guardrails` | Passed | Evidence-boundary, doc-path/link, and packet-consistency checks passed. |

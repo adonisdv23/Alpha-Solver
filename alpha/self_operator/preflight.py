@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping
 
 from alpha.self_operator.artifact_schema import ArtifactFinding
 from alpha.self_operator.artifact_store import ArtifactStoreError, resolve_artifact_path
