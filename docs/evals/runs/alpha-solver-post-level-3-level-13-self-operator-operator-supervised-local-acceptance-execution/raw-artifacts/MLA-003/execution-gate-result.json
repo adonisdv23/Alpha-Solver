@@ -1,0 +1,110 @@
+{
+  "allowed_for_local_dry_run": false,
+  "approval_result_summary": {
+    "approved": false,
+    "finding_ids": [
+      "SELF_OPERATOR_APPROVAL_REQUIRED"
+    ],
+    "identity_finding_ids": [],
+    "identity_match": true,
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-001",
+    "present": true,
+    "run_id": "mla-003-local-acceptance-001",
+    "valid": false
+  },
+  "artifact_paths": [
+    "dry-run-result.json",
+    "execution-gate-result.json",
+    "stop-state.json"
+  ],
+  "evidence_boundary": "local-only; operator-supervised; no execution; no source-artifact mutation; no evidence promotion",
+  "findings": [
+    {
+      "id": "SELF_OPERATOR_APPROVAL_REQUIRED",
+      "message": "approval false or missing",
+      "reason_code": "approval_false_or_missing",
+      "severity": "error",
+      "stop_state": "blocked",
+      "surface": "approval_record"
+    }
+  ],
+  "gate_status": "blocked_by_missing_approval",
+  "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-001",
+  "metadata": {
+    "created_at": "2026-06-09T00:00:00Z",
+    "dry_run_harness_contract": "readiness-only; wrapper remains selected next lane",
+    "non_execution_boundary": "no commands executed; no providers, external APIs, browsers, deployment, billing, credentials, Google Sheets, source-artifact mutation, or evidence promotion"
+  },
+  "preflight_result_summary": {
+    "allowed": true,
+    "artifact_paths": [
+      "dry-run-result.json",
+      "execution-gate-result.json",
+      "stop-state.json"
+    ],
+    "evidence_boundary": "local-only; operator-supervised; no execution; no source-artifact mutation; no evidence promotion",
+    "finding_ids": [],
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-001",
+    "stop_state": "passed"
+  },
+  "reason_code": "approval_invalid",
+  "redaction_status": "redacted",
+  "run_id": "mla-003-local-acceptance-001",
+  "schema_version": "self_operator.execution_gate_result.v1",
+  "stop_state_record": {
+    "approval_result_summary": {
+      "approved": false,
+      "finding_ids": [
+        "SELF_OPERATOR_APPROVAL_REQUIRED"
+      ],
+      "identity_finding_ids": [],
+      "identity_match": true,
+      "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-001",
+      "present": true,
+      "run_id": "mla-003-local-acceptance-001",
+      "valid": false
+    },
+    "artifact_paths": [
+      "dry-run-result.json",
+      "execution-gate-result.json",
+      "stop-state.json"
+    ],
+    "blocked_surfaces": [
+      "approval_record"
+    ],
+    "evidence_boundary": "local-only; operator-supervised; no execution; no source-artifact mutation; no evidence promotion",
+    "findings": [
+      {
+        "id": "SELF_OPERATOR_APPROVAL_REQUIRED",
+        "message": "approval false or missing",
+        "reason_code": "approval_false_or_missing",
+        "severity": "error",
+        "stop_state": "blocked",
+        "surface": "approval_record"
+      }
+    ],
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-001",
+    "message": "execution gate blocked: approval_invalid",
+    "metadata": {
+      "created_at": "2026-06-09T00:00:00Z",
+      "local_only": true
+    },
+    "reason_code": "approval_invalid",
+    "redaction_status": "redacted",
+    "run_id": "mla-003-local-acceptance-001",
+    "schema_version": "self_operator.stop_state_record.v1",
+    "source_preflight_result_summary": {
+      "allowed": true,
+      "artifact_paths": [
+        "dry-run-result.json",
+        "execution-gate-result.json",
+        "stop-state.json"
+      ],
+      "evidence_boundary": "local-only; operator-supervised; no execution; no source-artifact mutation; no evidence promotion",
+      "finding_ids": [],
+      "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-001",
+      "stop_state": "passed"
+    },
+    "stop_state": "blocked"
+  }
+}

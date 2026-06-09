@@ -1,0 +1,100 @@
+{
+  "allowed": false,
+  "approval_summary": {
+    "approved": true,
+    "finding_ids": [],
+    "identity_finding_ids": [],
+    "identity_match": true,
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-001",
+    "present": true,
+    "run_id": "mla-010-local-acceptance-001",
+    "valid": true
+  },
+  "artifact_paths": {
+    "dry_run_result": "dry-run-result.json",
+    "execution_gate_result": "execution-gate-result.json",
+    "stop_state": "stop-state.json"
+  },
+  "dry_run_status": "blocked_by_failed_preflight",
+  "evidence_boundary": "local-only; operator-supervised; no execution; no source-artifact mutation; no evidence promotion",
+  "execution_gate_summary": {
+    "allowed_for_local_dry_run": false,
+    "finding_ids": [
+      "SELF_OPERATOR_SOURCE_ARTIFACT_MUTATION_BLOCKED"
+    ],
+    "gate_status": "blocked_by_failed_preflight",
+    "reason_code": "failed_preflight",
+    "redaction_status": "redacted",
+    "schema_version": "self_operator.execution_gate_result.v1",
+    "stop_state_present": true
+  },
+  "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-001",
+  "metadata": {
+    "acceptance_status": "not_run",
+    "blocker_fallback_lane": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-FIX-001",
+    "created_at": "2026-06-09T00:00:00Z",
+    "evidence_boundary": "local-only; operator-supervised; no execution; no providers or external systems; no acceptance; no source-artifact mutation; no evidence promotion",
+    "mvp_readiness": "unclaimed",
+    "operator_supervision": "required_for_manual_local_acceptance",
+    "provider_external_surface_status": "not_called",
+    "selected_next_lane": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-13-SELF-OPERATOR-MANUAL-LOCAL-ACCEPTANCE-PACKET-001"
+  },
+  "non_execution_confirmation": "wrapper does not execute proposed commands; it only classifies proposed command text",
+  "output_root_summary": {
+    "basename": "MLA-010",
+    "provided_by_caller": true,
+    "raw_path_recorded": false
+  },
+  "preflight_summary": {
+    "allowed": false,
+    "artifact_paths": [
+      "dry-run-result.json",
+      "execution-gate-result.json",
+      "stop-state.json"
+    ],
+    "command_reason_codes": [
+      "source_artifact_mutation"
+    ],
+    "evidence_boundary": "local-only; operator-supervised; no execution; no source-artifact mutation; no evidence promotion",
+    "finding_ids": [
+      "SELF_OPERATOR_SOURCE_ARTIFACT_MUTATION_BLOCKED"
+    ],
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-001",
+    "stop_state": "blocked"
+  },
+  "proposed_task_summary": {
+    "artifact_path_count": 3,
+    "candidate_changed_files": [
+      "alpha/self_operator/dry_run.py"
+    ],
+    "command_count": 1,
+    "evidence_boundary_present": true,
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-001",
+    "metadata": {
+      "acceptance_status": "not_interpreted",
+      "execution_lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-13-SELF-OPERATOR-OPERATOR-SUPERVISED-LOCAL-ACCEPTANCE-EXECUTION-001",
+      "mla_task_id": "MLA-010",
+      "run_id": "mla-010-local-acceptance-001",
+      "scope_summary": "Operator-supervised local acceptance execution of MLA-001 through MLA-010; raw evidence capture only."
+    },
+    "operator_confirmation_present": true,
+    "requested_action": "Run MLA-010 local-only dry-run wrapper acceptance fixture without executing proposed commands.",
+    "run_id": "mla-010-local-acceptance-001"
+  },
+  "reason_code": "failed_preflight",
+  "redaction_status": "redacted",
+  "run_id": "mla-010-local-acceptance-001",
+  "schema_version": "self_operator.dry_run_result.v1",
+  "stop_state_summary": {
+    "blocked_surfaces": [
+      "command_classification"
+    ],
+    "finding_ids": [
+      "SELF_OPERATOR_SOURCE_ARTIFACT_MUTATION_BLOCKED"
+    ],
+    "reason_code": "failed_preflight",
+    "redaction_status": "redacted",
+    "schema_version": "self_operator.stop_state_record.v1",
+    "stop_state": "blocked"
+  }
+}

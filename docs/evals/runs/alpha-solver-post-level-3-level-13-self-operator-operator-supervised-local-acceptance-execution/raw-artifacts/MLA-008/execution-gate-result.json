@@ -1,0 +1,44 @@
+{
+  "allowed_for_local_dry_run": true,
+  "approval_result_summary": {
+    "approved": true,
+    "finding_ids": [],
+    "identity_finding_ids": [],
+    "identity_match": true,
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-001",
+    "present": true,
+    "run_id": "mla-008-local-acceptance-001",
+    "valid": true
+  },
+  "artifact_paths": [
+    "dry-run-result.json",
+    "execution-gate-result.json",
+    "stop-state.json"
+  ],
+  "evidence_boundary": "local-only; operator-supervised; no execution; no source-artifact mutation; no evidence promotion",
+  "findings": [],
+  "gate_status": "allowed_for_local_dry_run_wrapper",
+  "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-001",
+  "metadata": {
+    "created_at": "2026-06-09T00:00:00Z",
+    "dry_run_harness_contract": "readiness-only; wrapper remains selected next lane",
+    "non_execution_boundary": "no commands executed; no providers, external APIs, browsers, deployment, billing, credentials, Google Sheets, source-artifact mutation, or evidence promotion"
+  },
+  "preflight_result_summary": {
+    "allowed": true,
+    "artifact_paths": [
+      "dry-run-result.json",
+      "execution-gate-result.json",
+      "stop-state.json"
+    ],
+    "evidence_boundary": "local-only; operator-supervised; no execution; no source-artifact mutation; no evidence promotion",
+    "finding_ids": [],
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-001",
+    "stop_state": "passed"
+  },
+  "reason_code": "ready_for_local_dry_run_wrapper",
+  "redaction_status": "redacted",
+  "run_id": "mla-008-local-acceptance-001",
+  "schema_version": "self_operator.execution_gate_result.v1",
+  "stop_state_record": null
+}
