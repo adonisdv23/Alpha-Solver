@@ -31,6 +31,8 @@ BLOCKER_FALLBACK_LANE = (
 )
 TASK_IDS = tuple(f"MLA-{index:03d}" for index in range(1, 11))
 JSON_ARTIFACT_NAMES = frozenset({"dry-run-result.json", "execution-gate-result.json", "stop-state.json"})
+SOURCE_MUTATION_REASON_CODE = "source_artifact_mutation"
+SOURCE_MUTATION_BLOCKED_FINDING_ID = "SELF_OPERATOR_SOURCE_ARTIFACT_MUTATION_BLOCKED"
 IMPORT_STATUSES = frozenset(
     {
         "import_ready",
@@ -46,6 +48,22 @@ IMPORT_STATUSES = frozenset(
     }
 )
 BLOCKED_STATUSES = frozenset(status for status in IMPORT_STATUSES if status.startswith("blocked_"))
+
+
+@dataclass(frozen=True)
+class SourceMutationMarkerOccurrence:
+    """One source-mutation marker string found inside an artifact payload."""
+
+    json_path: str
+    value: str
+    expected_blocked_context: bool
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "expected_blocked_context": self.expected_blocked_context,
+            "json_path": self.json_path,
+            "value": self.value,
+        }
 
 
 @dataclass(frozen=True)
@@ -426,7 +444,7 @@ def _validate_artifact(
     if artifact_name in JSON_ARTIFACT_NAMES and not _evidence_boundary_is_safe(evidence_boundary):
         status = _more_severe(status, "blocked_evidence_boundary_failure")
         findings.append("evidence boundary missing safe markers")
-    if _contains_source_mutation_marker(payload):
+    if any(not occurrence.expected_blocked_context for occurrence in find_source_mutation_markers(payload)):
         status = _more_severe(status, "blocked_source_mutation_concern")
         findings.append("source-artifact mutation marker present")
 
@@ -523,7 +541,13 @@ def _artifact_path(packet_root: Path, task_id: str, artifact_name: str, ledger_e
 
 def _validate_evidence_boundary(packet_root: Path, artifacts: tuple[AcceptanceArtifactRecord, ...]) -> str:
     text = _read_optional(packet_root / "evidence-boundary.md") + "\n" + _read_optional(packet_root / "evidence-boundary-review.md")
-    if not _evidence_boundary_is_safe(text):
+    if "local-only" not in text.lower():
+        return "blocked_evidence_boundary_failure"
+    # The packet may state its non-execution marker in the dedicated
+    # non-execution-proof.md (separately validated by _validate_non_execution)
+    # instead of repeating the phrase inside the boundary files.
+    combined = text + "\n" + _read_optional(packet_root / "non-execution-proof.md")
+    if not _evidence_boundary_is_safe(combined):
         return "blocked_evidence_boundary_failure"
     lower = text.lower()
     if "does not claim mvp readiness" not in lower and "no mvp readiness" not in lower:
@@ -572,10 +596,76 @@ def _evidence_boundary_is_safe(text: str) -> bool:
     return "local-only" in lower and ("no execution" in lower or "does not execute" in lower or "not executed" in lower)
 
 
-def _contains_source_mutation_marker(value: Any) -> bool:
-    text = json.dumps(value, sort_keys=True) if isinstance(value, (Mapping, list, tuple)) else str(value)
+def find_source_mutation_markers(payload: Any) -> tuple[SourceMutationMarkerOccurrence, ...]:
+    """Locate source-mutation marker strings and whether each sits in a blocked-finding context.
+
+    A marker is expected only in the exact shapes the dry-run harness emits when it
+    refuses a proposed source mutation (see ``command_classification``): the
+    ``SELF_OPERATOR_SOURCE_ARTIFACT_MUTATION_BLOCKED`` finding ID and the
+    ``source_artifact_mutation`` reason code inside blocked findings, ``finding_ids``
+    lists, or ``command_reason_codes`` lists of a blocked summary. Every other
+    occurrence is reported as unexpected so true mutation evidence keeps blocking.
+    """
+
+    occurrences: list[SourceMutationMarkerOccurrence] = []
+    _collect_source_mutation_markers(payload, "$", None, None, occurrences)
+    return tuple(occurrences)
+
+
+def _collect_source_mutation_markers(
+    value: Any,
+    json_path: str,
+    parent: Mapping[str, Any] | None,
+    key: str | None,
+    occurrences: list[SourceMutationMarkerOccurrence],
+) -> None:
+    if isinstance(value, Mapping):
+        for child_key, child_value in value.items():
+            child_key_text = str(child_key)
+            if _contains_source_mutation_text(child_key_text):
+                occurrences.append(
+                    SourceMutationMarkerOccurrence(f"{json_path}.{child_key_text}<key>", child_key_text, False)
+                )
+            _collect_source_mutation_markers(child_value, f"{json_path}.{child_key_text}", value, child_key_text, occurrences)
+        return
+    if isinstance(value, (list, tuple)):
+        for index, item in enumerate(value):
+            _collect_source_mutation_markers(item, f"{json_path}[{index}]", parent, key, occurrences)
+        return
+    if isinstance(value, str) and _contains_source_mutation_text(value):
+        occurrences.append(
+            SourceMutationMarkerOccurrence(json_path, value, _is_expected_blocked_marker_context(value, key, parent))
+        )
+
+
+def _contains_source_mutation_text(text: str) -> bool:
     lower = text.lower()
-    return "source_artifact_mutation" in lower or "self_operator_source_artifact_mutation_blocked" in lower
+    return SOURCE_MUTATION_REASON_CODE in lower or SOURCE_MUTATION_BLOCKED_FINDING_ID.lower() in lower
+
+
+def _is_expected_blocked_marker_context(text: str, key: str | None, parent: Mapping[str, Any] | None) -> bool:
+    if not isinstance(parent, Mapping) or key is None:
+        return False
+    if key in {"id", "finding_ids"}:
+        return text == SOURCE_MUTATION_BLOCKED_FINDING_ID and _mapping_indicates_blocked(parent)
+    if key == "command_reason_codes":
+        return text == SOURCE_MUTATION_REASON_CODE and _mapping_indicates_blocked(parent)
+    if key == "reason_code":
+        return (
+            text == SOURCE_MUTATION_REASON_CODE
+            and str(parent.get("id", "")) == SOURCE_MUTATION_BLOCKED_FINDING_ID
+            and _mapping_indicates_blocked(parent)
+        )
+    return False
+
+
+def _mapping_indicates_blocked(mapping: Mapping[str, Any]) -> bool:
+    if str(mapping.get("stop_state", "")).lower() == "blocked":
+        return True
+    for status_key in ("gate_status", "dry_run_status"):
+        if str(mapping.get(status_key, "")).lower().startswith("blocked"):
+            return True
+    return any(mapping.get(allowed_key) is False for allowed_key in ("allowed", "allowed_for_local_dry_run"))
 
 
 def _lookup(payload: Any, *keys: str) -> Any:
