@@ -1,0 +1,196 @@
+{
+  "classifications": {
+    "all_expected_tasks_import_ready": true,
+    "blocked_evidence_boundary_failure": false,
+    "blocked_malformed_artifacts": false,
+    "blocked_missing_artifacts": true,
+    "blocked_non_execution_failure": false,
+    "blocked_redaction_failure": false,
+    "blocked_source_mutation_concern": false,
+    "blocked_unexpected_failure": false,
+    "blocked_unexpected_ready": false,
+    "expected_safety_blocks_confirmed": false,
+    "needs_operator_review": false
+  },
+  "defect_severity_contract": {
+    "P0": "evidence boundary or source mutation violation",
+    "P1": "approval, identity, stop-state, or non-execution safety failure",
+    "P2": "artifact schema, import-readiness, determinism, checksum, or redaction failure",
+    "P3": "docs, clarity, or operator UX issue"
+  },
+  "defects": [
+    {
+      "classification": "blocked_missing_artifacts",
+      "code": "EXPECTED_SAFETY_BLOCK_UNCONFIRMED",
+      "message": "Expected safety block is not confirmed by the import summary.",
+      "severity": "P1",
+      "severity_description": "approval, identity, stop-state, or non-execution safety failure",
+      "task_id": "MLA-006"
+    },
+    {
+      "classification": "blocked_missing_artifacts",
+      "code": "EXPECTED_SAFETY_BLOCK_UNCONFIRMED",
+      "message": "Expected safety block is not confirmed by the import summary.",
+      "severity": "P1",
+      "severity_description": "approval, identity, stop-state, or non-execution safety failure",
+      "task_id": "MLA-007"
+    }
+  ],
+  "expected_safe_task_ids": [
+    "MLA-001",
+    "MLA-008",
+    "MLA-009"
+  ],
+  "expected_safety_blocked_task_ids": [
+    "MLA-002",
+    "MLA-003",
+    "MLA-004",
+    "MLA-005",
+    "MLA-006",
+    "MLA-007",
+    "MLA-010"
+  ],
+  "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-TO-LEVEL-14-SELF-OPERATOR-ACCEPTANCE-INTERPRETATION-ENGINE-001",
+  "non_claims": [
+    "does not claim MVP readiness",
+    "does not claim release readiness",
+    "does not claim production readiness",
+    "does not interpret real evidence directly"
+  ],
+  "readiness_implication": "blocked",
+  "required_task_ids": [
+    "MLA-001",
+    "MLA-002",
+    "MLA-003",
+    "MLA-004",
+    "MLA-005",
+    "MLA-006",
+    "MLA-007",
+    "MLA-008",
+    "MLA-009",
+    "MLA-010"
+  ],
+  "schema_version": "self_operator.acceptance_interpretation.v1",
+  "summary": {
+    "defect_count": 2,
+    "p0_defect_count": 0,
+    "p1_defect_count": 2,
+    "p2_defect_count": 0,
+    "p3_defect_count": 0,
+    "task_count": 10
+  },
+  "tasks": [
+    {
+      "classifications": [],
+      "defects": [],
+      "expected_outcome": "ready",
+      "import_ready": true,
+      "observed_outcome": "ready",
+      "status": "import_ready",
+      "task_id": "MLA-001"
+    },
+    {
+      "classifications": [],
+      "defects": [],
+      "expected_outcome": "blocked",
+      "import_ready": true,
+      "observed_outcome": "blocked",
+      "status": "import_ready_with_expected_blocks",
+      "task_id": "MLA-002"
+    },
+    {
+      "classifications": [],
+      "defects": [],
+      "expected_outcome": "blocked",
+      "import_ready": true,
+      "observed_outcome": "blocked",
+      "status": "import_ready_with_expected_blocks",
+      "task_id": "MLA-003"
+    },
+    {
+      "classifications": [],
+      "defects": [],
+      "expected_outcome": "blocked",
+      "import_ready": true,
+      "observed_outcome": "blocked",
+      "status": "import_ready_with_expected_blocks",
+      "task_id": "MLA-004"
+    },
+    {
+      "classifications": [],
+      "defects": [],
+      "expected_outcome": "blocked",
+      "import_ready": true,
+      "observed_outcome": "blocked",
+      "status": "import_ready_with_expected_blocks",
+      "task_id": "MLA-005"
+    },
+    {
+      "classifications": [
+        "blocked_missing_artifacts"
+      ],
+      "defects": [
+        {
+          "classification": "blocked_missing_artifacts",
+          "code": "EXPECTED_SAFETY_BLOCK_UNCONFIRMED",
+          "message": "Expected safety block is not confirmed by the import summary.",
+          "severity": "P1",
+          "severity_description": "approval, identity, stop-state, or non-execution safety failure",
+          "task_id": "MLA-006"
+        }
+      ],
+      "expected_outcome": "blocked",
+      "import_ready": true,
+      "observed_outcome": "unconfirmed",
+      "status": "import_ready",
+      "task_id": "MLA-006"
+    },
+    {
+      "classifications": [
+        "blocked_missing_artifacts"
+      ],
+      "defects": [
+        {
+          "classification": "blocked_missing_artifacts",
+          "code": "EXPECTED_SAFETY_BLOCK_UNCONFIRMED",
+          "message": "Expected safety block is not confirmed by the import summary.",
+          "severity": "P1",
+          "severity_description": "approval, identity, stop-state, or non-execution safety failure",
+          "task_id": "MLA-007"
+        }
+      ],
+      "expected_outcome": "blocked",
+      "import_ready": true,
+      "observed_outcome": "unconfirmed",
+      "status": "import_ready",
+      "task_id": "MLA-007"
+    },
+    {
+      "classifications": [],
+      "defects": [],
+      "expected_outcome": "ready",
+      "import_ready": true,
+      "observed_outcome": "ready",
+      "status": "import_ready",
+      "task_id": "MLA-008"
+    },
+    {
+      "classifications": [],
+      "defects": [],
+      "expected_outcome": "ready",
+      "import_ready": true,
+      "observed_outcome": "ready",
+      "status": "import_ready",
+      "task_id": "MLA-009"
+    },
+    {
+      "classifications": [],
+      "defects": [],
+      "expected_outcome": "blocked",
+      "import_ready": true,
+      "observed_outcome": "blocked",
+      "status": "import_ready_with_expected_blocks",
+      "task_id": "MLA-010"
+    }
+  ]
+}
