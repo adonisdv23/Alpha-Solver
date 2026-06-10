@@ -1,0 +1,21 @@
+{
+  "schema_version": "self_operator.acceptance_import_summary.v1",
+  "lane_id": "SYNTHETIC-IMPORTER-VOCABULARY-FIXTURE",
+  "status": "import_ready_with_expected_blocks",
+  "evidence_boundary_status": "present",
+  "non_execution_status": "present",
+  "redaction_status": "redacted",
+  "source_artifact_mutation_status": "not_present",
+  "task_records": [
+    {"task_id": "MLA-001", "status": "import_ready", "expected_safety_block_confirmed": false, "expected_artifacts": ["dry-run-result.json", "execution-gate-result.json"], "missing_artifacts": [], "findings": []},
+    {"task_id": "MLA-002", "status": "import_ready_with_expected_blocks", "expected_safety_block_confirmed": true, "expected_artifacts": ["dry-run-result.json", "execution-gate-result.json", "stop-state.json"], "missing_artifacts": [], "findings": []},
+    {"task_id": "MLA-003", "status": "import_ready_with_expected_blocks", "expected_safety_block_confirmed": true, "expected_artifacts": ["dry-run-result.json", "execution-gate-result.json", "stop-state.json"], "missing_artifacts": [], "findings": []},
+    {"task_id": "MLA-004", "status": "import_ready_with_expected_blocks", "expected_safety_block_confirmed": true, "expected_artifacts": ["dry-run-result.json", "execution-gate-result.json", "stop-state.json"], "missing_artifacts": [], "findings": []},
+    {"task_id": "MLA-005", "status": "import_ready_with_expected_blocks", "expected_safety_block_confirmed": true, "expected_artifacts": ["dry-run-result.json", "execution-gate-result.json", "stop-state.json"], "missing_artifacts": [], "findings": []},
+    {"task_id": "MLA-006", "status": "import_ready", "expected_safety_block_confirmed": false, "expected_artifacts": [], "missing_artifacts": [], "findings": []},
+    {"task_id": "MLA-007", "status": "import_ready", "expected_safety_block_confirmed": false, "expected_artifacts": ["dry-run-result.json", "execution-gate-result.json"], "missing_artifacts": [], "findings": []},
+    {"task_id": "MLA-008", "status": "import_ready", "expected_safety_block_confirmed": false, "expected_artifacts": ["dry-run-result.json", "execution-gate-result.json"], "missing_artifacts": [], "findings": []},
+    {"task_id": "MLA-009", "status": "import_ready", "expected_safety_block_confirmed": false, "expected_artifacts": ["dry-run-result.json", "execution-gate-result.json"], "missing_artifacts": [], "findings": []},
+    {"task_id": "MLA-010", "status": "import_ready_with_expected_blocks", "expected_safety_block_confirmed": true, "expected_artifacts": ["dry-run-result.json", "execution-gate-result.json", "stop-state.json"], "missing_artifacts": [], "findings": []}
+  ]
+}

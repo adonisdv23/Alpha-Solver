@@ -14,6 +14,6 @@
     {"task_id": "MLA-007", "status": "blocked_as_expected", "import_ready": true, "observed_outcome": "blocked"},
     {"task_id": "MLA-008", "status": "import_ready", "import_ready": true, "observed_outcome": "ready"},
     {"task_id": "MLA-009", "status": "import_ready", "import_ready": true, "observed_outcome": "ready"},
-    {"task_id": "MLA-010", "status": "import_ready", "import_ready": true, "observed_outcome": "ready"}
+    {"task_id": "MLA-010", "status": "blocked_as_expected", "import_ready": true, "observed_outcome": "blocked"}
   ]
 }

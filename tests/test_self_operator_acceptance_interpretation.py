@@ -15,11 +15,18 @@ from alpha.self_operator.acceptance_interpretation import (
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests" / "fixtures" / "self_operator_acceptance_import" / "complete_import_summary.json"
+IMPORTER_FIXTURE = (
+    ROOT / "tests" / "fixtures" / "self_operator_acceptance_import" / "importer_vocabulary_import_summary.json"
+)
 CLI = ROOT / "scripts" / "interpret_self_operator_acceptance.py"
 
 
 def complete_summary() -> dict:
     return json.loads(FIXTURE.read_text(encoding="utf-8"))
+
+
+def importer_summary() -> dict:
+    return json.loads(IMPORTER_FIXTURE.read_text(encoding="utf-8"))
 
 
 def interpret(payload: dict):
@@ -44,7 +51,7 @@ def test_expected_safety_blocks_confirmed_remain_allowed_for_later_review() -> N
     result = interpret(complete_summary())
 
     assert result["classifications"]["expected_safety_blocks_confirmed"] is True
-    blocked_tasks = {"MLA-002", "MLA-003", "MLA-004", "MLA-005", "MLA-006", "MLA-007"}
+    blocked_tasks = {"MLA-002", "MLA-003", "MLA-004", "MLA-005", "MLA-006", "MLA-007", "MLA-010"}
     assert {item["task_id"] for item in result["tasks"] if item["observed_outcome"] == "blocked"} == blocked_tasks
     assert result["readiness_implication"] == READINESS_ELIGIBLE_FOR_LATER_RELEASE_REVIEW
 
@@ -167,6 +174,93 @@ def test_cli_exits_nonzero_for_blocked(tmp_path: Path) -> None:
 
     assert completed.returncode == 1
     assert "interpretation=blocked" in completed.stdout
+
+
+def test_importer_vocabulary_confirmed_blocks_are_not_false_positives() -> None:
+    result = interpret(importer_summary())
+
+    assert not any(defect["code"] == "EXPECTED_SAFETY_BLOCK_ALLOWED" for defect in result["defects"])
+    assert not any(defect["code"] == "IMPORT_SUMMARY_INCOMPLETE" for defect in result["defects"])
+    confirmed = {"MLA-002", "MLA-003", "MLA-004", "MLA-005", "MLA-010"}
+    assert {item["task_id"] for item in result["tasks"] if item["observed_outcome"] == "blocked"} == confirmed
+    assert result["classifications"]["blocked_unexpected_ready"] is False
+    assert result["classifications"]["all_expected_tasks_import_ready"] is True
+    assert "MLA-010" in result["expected_safety_blocked_task_ids"]
+    assert "MLA-010" not in result["expected_safe_task_ids"]
+
+
+def test_importer_vocabulary_unconfirmed_expected_block_still_blocks() -> None:
+    result = interpret(importer_summary())
+
+    unconfirmed = [defect for defect in result["defects"] if defect["code"] == "EXPECTED_SAFETY_BLOCK_UNCONFIRMED"]
+    assert {defect["task_id"] for defect in unconfirmed} == {"MLA-006", "MLA-007"}
+    assert all(defect["severity"] == "P1" for defect in unconfirmed)
+    assert result["classifications"]["expected_safety_blocks_confirmed"] is False
+    assert result["readiness_implication"] == READINESS_BLOCKED
+    assert result["summary"]["p1_defect_count"] == 2
+    assert result["summary"]["defect_count"] == 2
+
+
+def test_importer_vocabulary_fully_confirmed_summary_is_eligible() -> None:
+    payload = importer_summary()
+    for task_id in ("MLA-006", "MLA-007"):
+        record = task(payload, task_id)
+        record["status"] = "import_ready_with_expected_blocks"
+        record["expected_safety_block_confirmed"] = True
+
+    result = interpret(payload)
+
+    assert result["summary"]["defect_count"] == 0
+    assert result["classifications"]["expected_safety_blocks_confirmed"] is True
+    assert result["readiness_implication"] == READINESS_ELIGIBLE_FOR_LATER_RELEASE_REVIEW
+
+
+def test_importer_vocabulary_top_level_status_failure_blocks() -> None:
+    payload = importer_summary()
+    payload["redaction_status"] = "blocked_redaction_failure"
+
+    result = interpret(payload)
+
+    assert result["readiness_implication"] == READINESS_BLOCKED
+    assert result["classifications"]["blocked_redaction_failure"] is True
+    assert any(defect["code"] == "REDACTION_FAILED" for defect in result["defects"])
+
+
+def test_importer_vocabulary_unchecked_top_level_status_is_incomplete() -> None:
+    payload = importer_summary()
+    payload["evidence_boundary_status"] = "not_checked"
+
+    result = interpret(payload)
+
+    assert result["readiness_implication"] == READINESS_BLOCKED
+    incomplete = [defect for defect in result["defects"] if defect["code"] == "IMPORT_SUMMARY_INCOMPLETE"]
+    assert any("evidence_boundary_preserved" in defect["message"] for defect in incomplete)
+
+
+def test_importer_vocabulary_import_failure_status_is_not_a_safety_block() -> None:
+    payload = importer_summary()
+    record = task(payload, "MLA-002")
+    record["status"] = "blocked_checksum_mismatch"
+    record["expected_safety_block_confirmed"] = False
+
+    result = interpret(payload)
+
+    assert result["readiness_implication"] == READINESS_BLOCKED
+    mla_002 = next(item for item in result["tasks"] if item["task_id"] == "MLA-002")
+    assert mla_002["observed_outcome"] == "unknown"
+    assert mla_002["import_ready"] is False
+    assert any(
+        defect["code"] == "TASK_NOT_IMPORT_READY" and defect["task_id"] == "MLA-002" for defect in result["defects"]
+    )
+    assert result["classifications"]["expected_safety_blocks_confirmed"] is False
+
+
+def test_importer_vocabulary_deterministic_output(tmp_path: Path) -> None:
+    interpretation = interpret_acceptance_import_summary(importer_summary())
+    first = write_acceptance_interpretation(interpretation, tmp_path / "first.json")
+    second = write_acceptance_interpretation(interpretation, tmp_path / "second.json")
+
+    assert first.read_text(encoding="utf-8") == second.read_text(encoding="utf-8")
 
 
 def test_cli_does_not_claim_mvp_readiness(tmp_path: Path) -> None:
