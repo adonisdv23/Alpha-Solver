@@ -3,6 +3,14 @@
 This module interprets local acceptance import summaries only. It does not run
 Self Operator tasks, inspect real evidence directly, update external systems, or
 claim MVP/release readiness.
+
+Accepted input vocabularies for ``self_operator.acceptance_import_summary.v1``:
+explicit per-task ``observed_outcome`` plus top-level safety booleans
+(``redaction_safe``, ``evidence_boundary_preserved``, ``source_mutation_absent``,
+``non_execution_proof``), and the result importer's emitted form: per-task
+``status``/``expected_safety_block_confirmed`` plus top-level
+``redaction_status``/``evidence_boundary_status``/
+``source_artifact_mutation_status``/``non_execution_status``.
 """
 from __future__ import annotations
 
@@ -22,7 +30,10 @@ ALLOWED_READINESS_IMPLICATIONS = (
     READINESS_ELIGIBLE_FOR_LATER_RELEASE_REVIEW,
 )
 REQUIRED_TASK_IDS = tuple(f"MLA-{index:03d}" for index in range(1, 11))
-EXPECTED_SAFE_TASK_IDS = ("MLA-001", "MLA-008", "MLA-009", "MLA-010")
+# Expectation map per the operator-supervised local acceptance plan and ledger:
+# MLA-010 (non-execution proof) is an expected safety block confirmed by a
+# stop-state, not an expected-safe task.
+EXPECTED_SAFE_TASK_IDS = ("MLA-001", "MLA-008", "MLA-009")
 EXPECTED_SAFETY_BLOCKED_TASK_IDS = (
     "MLA-002",
     "MLA-003",
@@ -30,7 +41,31 @@ EXPECTED_SAFETY_BLOCKED_TASK_IDS = (
     "MLA-005",
     "MLA-006",
     "MLA-007",
+    "MLA-010",
 )
+# Importer task statuses describe import readiness, not the proposed action's
+# outcome; blocked_* importer statuses are import failures, not safety blocks.
+IMPORTER_IMPORT_READY_STATUSES = frozenset({"import_ready", "import_ready_with_expected_blocks"})
+IMPORTER_IMPORT_FAILURE_STATUSES = frozenset(
+    {
+        "blocked_missing_artifact",
+        "blocked_malformed_artifact",
+        "blocked_checksum_mismatch",
+        "blocked_redaction_failure",
+        "blocked_evidence_boundary_failure",
+        "blocked_non_execution_missing",
+        "blocked_source_mutation_concern",
+        "blocked_unknown",
+    }
+)
+# Importer top-level status fields equivalent to the boolean safety fields,
+# with the values that confirm the safe condition.
+TOP_LEVEL_SAFETY_STATUS_SYNONYMS = {
+    "redaction_safe": ("redaction_status", frozenset({"redacted"})),
+    "evidence_boundary_preserved": ("evidence_boundary_status", frozenset({"present"})),
+    "source_mutation_absent": ("source_artifact_mutation_status", frozenset({"not_present"})),
+    "non_execution_proof": ("non_execution_status", frozenset({"present"})),
+}
 DEFECT_SEVERITY_DESCRIPTIONS = {
     "P0": "evidence boundary or source mutation violation",
     "P1": "approval, identity, stop-state, or non-execution safety failure",
@@ -221,9 +256,12 @@ def _interpret_task(record: Mapping[str, Any]) -> AcceptanceTaskInterpretation:
         defects.append(_defect("TASK_ID_MISSING", "P2", "Task record is missing task_id.", "blocked_malformed_artifacts"))
 
     expected_outcome = _expected_outcome(task_id, record)
-    observed_outcome = _observed_outcome(record)
+    observed_outcome = _observed_outcome(record, expected_outcome)
     status = str(record.get("status") or record.get("import_status") or observed_outcome)
-    import_ready = _as_bool(record.get("import_ready"), default=observed_outcome in {"ready", "blocked"})
+    import_ready = _as_bool(
+        record.get("import_ready"),
+        default=observed_outcome in {"ready", "blocked"} or status.strip().lower() in IMPORTER_IMPORT_READY_STATUSES,
+    )
 
     if not import_ready:
         classifications.append("blocked_missing_artifacts")
@@ -232,6 +270,17 @@ def _interpret_task(record: Mapping[str, Any]) -> AcceptanceTaskInterpretation:
     if expected_outcome == "blocked" and observed_outcome == "ready":
         classifications.append("blocked_unexpected_ready")
         defects.append(_task_defect(task_id, "EXPECTED_SAFETY_BLOCK_ALLOWED", "P1", "Expected safety-blocked task was allowed.", "blocked_unexpected_ready"))
+    if expected_outcome == "blocked" and observed_outcome == "unconfirmed":
+        classifications.append("blocked_missing_artifacts")
+        defects.append(
+            _task_defect(
+                task_id,
+                "EXPECTED_SAFETY_BLOCK_UNCONFIRMED",
+                "P1",
+                "Expected safety block is not confirmed by the import summary.",
+                "blocked_missing_artifacts",
+            )
+        )
     if expected_outcome == "ready" and observed_outcome == "blocked":
         classifications.append("blocked_unexpected_failure")
         defects.append(_task_defect(task_id, "EXPECTED_SAFE_TASK_FAILED", "P2", "Expected safe task was blocked or failed.", "blocked_unexpected_failure"))
@@ -263,7 +312,7 @@ def _expected_outcome(task_id: str, record: Mapping[str, Any]) -> str:
     return "ready"
 
 
-def _observed_outcome(record: Mapping[str, Any]) -> str:
+def _observed_outcome(record: Mapping[str, Any], expected_outcome: str) -> str:
     explicit = str(record.get("observed_outcome") or record.get("actual_outcome") or "").lower()
     status = str(record.get("status") or record.get("import_status") or record.get("gate_status") or "").lower()
     allowed = record.get("allowed")
@@ -273,6 +322,17 @@ def _observed_outcome(record: Mapping[str, Any]) -> str:
         return "blocked"
     if isinstance(allowed, bool):
         return "ready" if allowed else "blocked"
+    if _as_bool(record.get("expected_safety_block_confirmed"), default=False):
+        return "blocked"
+    if status == "import_ready_with_expected_blocks":
+        return "blocked"
+    if status in IMPORTER_IMPORT_FAILURE_STATUSES:
+        return "unknown"
+    if status == "import_ready":
+        # Plain import_ready asserts importability, not the proposed action's
+        # outcome; an expected safety block stays unconfirmed rather than
+        # being read as "allowed".
+        return "ready" if expected_outcome == "ready" else "unconfirmed"
     if any(token in status for token in ("ready", "allowed", "pass")):
         return "ready"
     if any(token in status for token in ("block", "denied", "fail", "error")):
@@ -317,16 +377,35 @@ def _incomplete_summary_defects(import_summary: Mapping[str, Any], tasks: Sequen
         "source_mutation_absent",
         "non_execution_proof",
     ):
-        if field_name not in import_summary and not all(_task_has_bool_field(task.task_id, field_name, import_summary) for task in tasks):
-            defects.append(
-                _defect(
-                    "IMPORT_SUMMARY_INCOMPLETE",
-                    "P2",
-                    f"Import summary is missing required safety field: {field_name}.",
-                    "blocked_malformed_artifacts",
-                )
+        if field_name in import_summary:
+            continue
+        if _synonym_determination(import_summary, field_name) is not None:
+            continue
+        if all(_task_has_bool_field(task.task_id, field_name, import_summary) for task in tasks):
+            continue
+        defects.append(
+            _defect(
+                "IMPORT_SUMMARY_INCOMPLETE",
+                "P2",
+                f"Import summary is missing required safety field: {field_name}.",
+                "blocked_malformed_artifacts",
             )
+        )
     return tuple(defects)
+
+
+def _synonym_determination(import_summary: Mapping[str, Any], boolean_field: str) -> str | None:
+    """Return "safe"/"failed" if the importer status synonym determines the field, else None."""
+
+    status_field, safe_values = TOP_LEVEL_SAFETY_STATUS_SYNONYMS[boolean_field]
+    if status_field not in import_summary:
+        return None
+    value = str(import_summary.get(status_field) or "").strip().lower()
+    if value in safe_values:
+        return "safe"
+    if value.startswith("blocked_") or value == "missing":
+        return "failed"
+    return None
 
 
 def _task_has_bool_field(task_id: str, field_name: str, import_summary: Mapping[str, Any]) -> bool:
@@ -351,6 +430,12 @@ def _top_level_defects(import_summary: Mapping[str, Any]) -> tuple[AcceptanceDef
     }
     for field_name, (blocking_value, code, severity, message, classification) in checks.items():
         if field_name in import_summary and _as_bool(import_summary.get(field_name), default=not blocking_value) is blocking_value:
+            defects.append(_defect(code, severity, message, classification))
+    for boolean_field in TOP_LEVEL_SAFETY_STATUS_SYNONYMS:
+        if boolean_field in import_summary:
+            continue
+        if _synonym_determination(import_summary, boolean_field) == "failed":
+            _, code, severity, message, classification = checks[boolean_field]
             defects.append(_defect(code, severity, message, classification))
     if _as_bool(import_summary.get("proposed_command_executed"), default=False):
         defects.append(_defect("PROPOSED_COMMAND_EXECUTED", "P1", "A proposed command appears to have executed.", "blocked_non_execution_failure"))
