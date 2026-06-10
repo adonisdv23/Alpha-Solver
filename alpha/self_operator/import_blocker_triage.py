@@ -16,7 +16,6 @@ from typing import Any, Mapping
 
 from alpha.self_operator.result_import import (
     JSON_ARTIFACT_NAMES,
-    SOURCE_MUTATION_BLOCKED_FINDING_ID,
     SOURCE_MUTATION_REASON_CODE,
     SourceMutationMarkerOccurrence,
     _artifact_ledger_by_task,
