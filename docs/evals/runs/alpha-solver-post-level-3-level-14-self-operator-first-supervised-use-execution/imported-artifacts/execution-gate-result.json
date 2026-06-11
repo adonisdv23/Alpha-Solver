@@ -1,0 +1,44 @@
+{
+  "allowed_for_local_dry_run": true,
+  "approval_result_summary": {
+    "approved": true,
+    "finding_ids": [],
+    "identity_finding_ids": [],
+    "identity_match": true,
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-FIRST-SUPERVISED-USE-EXECUTION-001",
+    "present": true,
+    "run_id": "self-operator-first-supervised-use-execution-001-run-20260611",
+    "valid": true
+  },
+  "artifact_paths": [
+    "dry-run-result.json",
+    "execution-gate-result.json",
+    "stop-state.json"
+  ],
+  "evidence_boundary": "local-only; operator-supervised; single supervised run; read-only inputs; writes only below the output root; wrapper executes no proposed commands; no readiness claim; no evidence promotion; no source-artifact mutation",
+  "findings": [],
+  "gate_status": "allowed_for_local_dry_run_wrapper",
+  "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-FIRST-SUPERVISED-USE-EXECUTION-001",
+  "metadata": {
+    "created_at": "1970-01-01T00:00:00Z",
+    "dry_run_harness_contract": "readiness-only; wrapper remains selected next lane",
+    "non_execution_boundary": "no commands executed; no providers, external APIs, browsers, deployment, billing, credentials, Google Sheets, source-artifact mutation, or evidence promotion"
+  },
+  "preflight_result_summary": {
+    "allowed": true,
+    "artifact_paths": [
+      "dry-run-result.json",
+      "execution-gate-result.json",
+      "stop-state.json"
+    ],
+    "evidence_boundary": "local-only; operator-supervised; single supervised run; read-only inputs; writes only below the output root; wrapper executes no proposed commands; no readiness claim; no evidence promotion; no source-artifact mutation",
+    "finding_ids": [],
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-FIRST-SUPERVISED-USE-EXECUTION-001",
+    "stop_state": "passed"
+  },
+  "reason_code": "ready_for_local_dry_run_wrapper",
+  "redaction_status": "redacted",
+  "run_id": "self-operator-first-supervised-use-execution-001-run-20260611",
+  "schema_version": "self_operator.execution_gate_result.v1",
+  "stop_state_record": null
+}

@@ -1,0 +1,20 @@
+{
+  "artifact_paths": [
+    "dry-run-result.json",
+    "execution-gate-result.json",
+    "stop-state.json"
+  ],
+  "candidate_changed_files": [],
+  "evidence_boundary": "local-only; operator-supervised; single supervised run; read-only inputs; writes only below the output root; wrapper executes no proposed commands; no readiness claim; no evidence promotion; no source-artifact mutation",
+  "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-FIRST-SUPERVISED-USE-EXECUTION-001",
+  "metadata": {
+    "run_id": "self-operator-first-supervised-use-execution-001-run-20260611",
+    "scope_identity": "first supervised use of the narrow operator-only Self Operator path: existing evidence packet consistency review of the Self Operator evidence chain per use-scope.md of the first-supervised-use packet; local-only; operator-supervised; read-only inputs; writes only below the output root; one approval record, one proposed task, one fresh run ID; wrapper classifies proposed command text and executes nothing; deterministic read-only checkers only; forbidden surfaces remain forbidden"
+  },
+  "operator_confirmation": true,
+  "output_root": "/tmp/alpha-solver-self-operator-first-supervised-use-execution-001",
+  "proposed_commands": [
+    "python scripts/check_local_llm_packet_consistency.py"
+  ],
+  "requested_action": "existing evidence packet consistency review of the Self Operator evidence chain (first supervised use; docs-only; deterministic read-only checker)"
+}
