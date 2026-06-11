@@ -1,0 +1,9 @@
+# Blocker fallback lane
+
+Fallback lane:
+
+`ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-COUNCIL-AUDIT-EVIDENCE-BUNDLE-FALLBACK-001`
+
+If the evidence bundle is blocked before the manual Council run, select:
+
+`ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-COUNCIL-AUDIT-EVIDENCE-BUNDLE-FIX-001`
