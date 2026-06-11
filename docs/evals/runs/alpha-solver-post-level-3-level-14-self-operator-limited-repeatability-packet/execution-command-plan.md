@@ -74,6 +74,10 @@ through the environment and Python reads `os.environ["ROOT"]`.
 ```bash
 python scripts/check_local_llm_packet_consistency.py \
   | tee "$ROOT/checks/consistency-check.stdout.txt"
+
+python scripts/check_local_llm_packet_consistency.py \
+  docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-limited-repeatability-packet \
+  | tee "$ROOT/checks/consistency-check-packet.stdout.txt"
 ```
 
 ## 5. Post-run local verification
