@@ -1,0 +1,18 @@
+{
+  "approval_text": "Operator-supplied approval for the first supervised use of the narrow operator-only Self Operator path, limited to the approved target: existing evidence packet consistency review of the Self Operator evidence chain, as defined in use-target.md of the first-supervised-use packet.",
+  "approved": true,
+  "approved_at": "2026-06-11T18:48:13Z",
+  "approved_by": "repository operator (github: adonisdv23)",
+  "evidence_boundary": "local-only; operator-supervised; single supervised run; read-only inputs; writes only below the output root; wrapper executes no proposed commands; no readiness claim; no evidence promotion; no source-artifact mutation",
+  "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-FIRST-SUPERVISED-USE-EXECUTION-001",
+  "metadata": {
+    "combined_lane": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-FIRST-SUPERVISED-USE-REPAIR-AND-EXECUTION-001",
+    "run_id": "self-operator-first-supervised-use-execution-001-run-20260611",
+    "scope_identity": "first supervised use of the narrow operator-only Self Operator path: existing evidence packet consistency review of the Self Operator evidence chain per use-scope.md of the first-supervised-use packet; local-only; operator-supervised; read-only inputs; writes only below the output root; one approval record, one proposed task, one fresh run ID; wrapper classifies proposed command text and executes nothing; deterministic read-only checkers only; forbidden surfaces remain forbidden"
+  },
+  "operator_confirmation": "OPERATOR_APPROVED_FIRST_USE_TARGET: existing evidence packet consistency review of the Self Operator evidence chain, as defined in use-target.md of the first-supervised-use packet. OPERATOR_CONFIRMATION: I explicitly authorize this local-only, operator-supervised first supervised use, limited to the target named above, for lane ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-FIRST-SUPERVISED-USE-EXECUTION-001 and this run ID only. No providers; no hosted models; no local models unless separately authorized by this lane; no external APIs; no browser automation; no deployment; no billing; no credentials or secrets; no /v1/solve or dashboard exposure; no Google Sheets updates; no production use; no source-artifact mutation; no evidence promotion; no readiness claim; no final status CLI implementation; no autonomous operation, autonomous approval, or autonomous merge. stop if explicit operator confirmation is missing",
+  "redaction_status": "redacted",
+  "run_id": "self-operator-first-supervised-use-execution-001-run-20260611",
+  "schema_version": "self_operator.approval_record.v1",
+  "scope_summary": "first supervised use of the narrow operator-only Self Operator path: existing evidence packet consistency review of the Self Operator evidence chain per use-scope.md of the first-supervised-use packet; local-only; operator-supervised; read-only inputs; writes only below the output root; one approval record, one proposed task, one fresh run ID; wrapper classifies proposed command text and executes nothing; deterministic read-only checkers only; forbidden surfaces remain forbidden"
+}

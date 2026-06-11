@@ -85,3 +85,24 @@ status claim anywhere in this packet.
 
 `pass` — zero `forbidden_claim` classifications remain; this lane is not
 blocked.
+
+### Command-plan repair re-run (2026-06-11)
+
+Lane
+`ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-FIRST-SUPERVISED-USE-REPAIR-AND-EXECUTION-001`
+repaired `execution-command-plan.md` (local-only preconditions replacing the
+remote-fetch step; environment-variable handoff of the output root into the
+step 2 heredoc) and added pre-run abort condition 8 to
+`abort-conditions.md`, on branch `claude/eloquent-tesla-pmct3n` created from
+`main` at `e04d4cc` (#479 merged). Before any execution, the same four
+checks above were re-run, the packet-scoped consistency check passed, and a
+focused unsafe-pattern scan plus the forbidden-claim scan were run over this
+packet with every hit reviewed and classified; zero `forbidden_claim` and
+zero `unsafe_executable_plan_pattern` classifications remain. The repaired
+step 2 heredoc is classified `safe_quoted_heredoc_environment_root`. The
+full classification, the before/after plans, and the pre-execution repair
+verification are recorded in
+`docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-first-supervised-use-packet-repair/`.
+The repair edits introduce no new hits for the scan pattern quoted above,
+so the classification table and totals above remain the final state for
+this packet.
