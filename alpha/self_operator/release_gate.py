@@ -110,6 +110,9 @@ _DEFECT_RE = re.compile(
     re.IGNORECASE,
 )
 _RESOLVED_RE = re.compile(r"\b(no|none|absent|resolved|closed)\b[^\n]{0,80}\b(P0|P1)\b", re.IGNORECASE)
+# Backtick-quoted tokens such as `P0` are severity-vocabulary references
+# (taxonomy/contract definitions), not unresolved defect markers.
+_INLINE_CODE_RE = re.compile(r"`[^`]*`")
 
 
 @dataclass(frozen=True)
@@ -225,7 +228,8 @@ def _p0_p1_gate(root: Path) -> SelfOperatorReleaseGate:
     for path in scanned_paths:
         text = path.read_text(encoding="utf-8", errors="replace")
         for line_no, line in enumerate(text.splitlines(), start=1):
-            if _DEFECT_RE.search(line) and not _RESOLVED_RE.search(line):
+            scannable = _INLINE_CODE_RE.sub(" ", line)
+            if _DEFECT_RE.search(scannable) and not _RESOLVED_RE.search(scannable):
                 rel = _repo_relative(path, root)
                 defect_hits.append(f"{rel.as_posix()}:{line_no}")
     if defect_hits:
