@@ -4,7 +4,7 @@
 
 `consistency_check_result: pass`
 
-The deterministic packet consistency checker was the supervised use. `commands-run.md` records Step 3 as:
+The deterministic packet consistency checker was the supervised use. `commands-run.md` records Step 5 as:
 
 ```text
 python scripts/check_local_llm_packet_consistency.py | tee "$ROOT/checks/consistency-check.stdout.txt"
