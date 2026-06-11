@@ -1,0 +1,35 @@
+{
+  "final_local_status_cli": "deferred; scripts/self_operator_status.py and tests/test_self_operator_status_cli.py absent",
+  "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-LIMITED-REPEATABILITY-EXECUTION-001",
+  "local_history_verification": {
+    "head": "61978bc6af1f40301ec0a2a15d29fcc5fd52fee9",
+    "pr_480": "present in local history",
+    "pr_481": "present in local history",
+    "pr_482": "present in local history",
+    "pr_483": "present in local history",
+    "pr_484": "present at local HEAD"
+  },
+  "reviewed_sources": [
+    {
+      "path": "AGENTS.md",
+      "result": "repo instructions reviewed"
+    },
+    {
+      "path": ".specs/EVAL-ARTIFACT-PRESERVE-001.md",
+      "result": "artifact preservation and claim boundaries reviewed"
+    },
+    {
+      "path": "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-limited-repeatability-packet/",
+      "result": "merged limited repeatability packet present and selected this execution lane"
+    },
+    {
+      "path": "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-first-supervised-use-execution/",
+      "result": "first supervised-use evidence packet used as comparison source"
+    },
+    {
+      "path": "scripts/check_local_llm_packet_consistency.py",
+      "result": "deterministic local consistency checker used for supervised review"
+    }
+  ],
+  "run_id": "self-operator-limited-repeatability-001-run-20260611T220109Z"
+}

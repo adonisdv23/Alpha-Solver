@@ -1,0 +1,62 @@
+[2026-06-11T22:01:09Z] command: git status --short | tee "$ROOT/checks/git-status-before.txt"
+[2026-06-11T22:01:09Z] exit_code: 0
+
+[2026-06-11T22:01:09Z] command: git rev-parse --verify HEAD | tee "$ROOT/checks/head.txt"
+[2026-06-11T22:01:09Z] exit_code: 0
+
+[2026-06-11T22:01:09Z] command: python scripts/check_self_operator_release_gate.py --repo-root . --output "$ROOT/checks/release-gate-check.json"
+[2026-06-11T22:01:09Z] exit_code: 0
+
+[2026-06-11T22:01:24Z] command: python scripts/check_local_llm_packet_consistency.py docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-limited-repeatability-packet > "$ROOT/checks/plan-packet-consistency.stdout.txt"
+[2026-06-11T22:01:24Z] exit_code: 0
+
+[2026-06-11T22:01:25Z] command: rg -n "git fetch|Path\(\"\/tmp/alpha-solver-self-operator-limited-repeatability/self-operator-limited-repeatability-001-run-20260611T220109Z\"\)" docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-limited-repeatability-packet/execution-command-plan.md > "$ROOT/checks/plan-unsafe-pattern-scan.txt"; test ! -s "$ROOT/checks/plan-unsafe-pattern-scan.txt"
+[2026-06-11T22:01:25Z] exit_code: 0
+
+[2026-06-11T22:01:25Z] command: rg -n "consistency-check.stdout.txt|consistency-check-packet.stdout.txt|check_local_llm_packet_consistency.py" docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-limited-repeatability-packet/execution-command-plan.md docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-limited-repeatability-packet/checks-plan.md docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-limited-repeatability-packet/expected-artifacts.md > "$ROOT/checks/plan-consistency-artifact-agreement.txt"
+[2026-06-11T22:01:25Z] exit_code: 0
+
+[2026-06-11T22:02:17Z] command: create plan-verification-before-execution.md and input JSON artifacts (initial attempt without exported ROOT)
+[2026-06-11T22:02:17Z] exit_code: 1
+
+[2026-06-11T22:03:33Z] command: create plan-verification-before-execution.md and input JSON artifacts (exported ROOT/RUN_ID)
+[2026-06-11T22:03:33Z] exit_code: 0
+
+[2026-06-11T22:03:47Z] command: ROOT="$ROOT" python - <<'PY' ... run_local_dry_run_wrapper ... PY
+[2026-06-11T22:03:47Z] exit_code: 0
+
+[2026-06-11T22:03:47Z] command: python scripts/check_local_llm_packet_consistency.py | tee "$ROOT/checks/consistency-check.stdout.txt"
+[2026-06-11T22:03:47Z] exit_code: 0
+
+[2026-06-11T22:03:48Z] command: python scripts/check_local_llm_packet_consistency.py docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-limited-repeatability-packet | tee "$ROOT/checks/consistency-check-packet.stdout.txt"
+[2026-06-11T22:03:48Z] exit_code: 0
+
+[2026-06-11T22:03:48Z] command: git status --short | tee "$ROOT/checks/git-status-after.txt"
+[2026-06-11T22:03:48Z] exit_code: 0
+
+[2026-06-11T22:05:32Z] command: create root review artifacts, import reviewed-safe artifacts, and write execution packet files
+[2026-06-11T22:05:32Z] exit_code: 0
+
+[2026-06-11T22:05:51Z] command: git status --short
+[2026-06-11T22:05:51Z] exit_code: 0
+
+[2026-06-11T22:05:51Z] command: git diff --name-only
+[2026-06-11T22:05:51Z] exit_code: 0
+
+[2026-06-11T22:05:51Z] command: git diff --check
+[2026-06-11T22:05:51Z] exit_code: 0
+
+[2026-06-11T22:05:51Z] command: python scripts/check_local_llm_packet_consistency.py docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-limited-repeatability-packet
+[2026-06-11T22:05:52Z] exit_code: 0
+
+[2026-06-11T22:05:52Z] command: python scripts/check_local_llm_packet_consistency.py docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-limited-repeatability-execution
+[2026-06-11T22:05:52Z] exit_code: 0
+
+[2026-06-11T22:06:07Z] command: rg -n "consistency-check.stdout.txt|consistency-check-packet.stdout.txt|check_local_llm_packet_consistency.py" docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-limited-repeatability-execution docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-limited-repeatability-packet
+[2026-06-11T22:06:07Z] exit_code: 0
+
+[2026-06-11T22:06:07Z] command: rg -n "production ready|runtime ready|provider ready|hosted ready|benchmark superior|benchmark validated|autonomous ready|autonomous|MVP ready|release ready|broad user ready|/v1/solve|deployment|billing|credential|secret|provider call|hosted model|git fetch|Path\(\"\/tmp/alpha-solver-self-operator-limited-repeatability/self-operator-limited-repeatability-001-run-20260611T220109Z\"\)" docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-limited-repeatability-execution docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-limited-repeatability-packet
+[2026-06-11T22:06:07Z] exit_code: 0
+
+[2026-06-11T22:07:30Z] command: record forbidden-claim and unsafe-pattern scan decision and refresh imported commands-run artifact
+[2026-06-11T22:07:30Z] exit_code: 0

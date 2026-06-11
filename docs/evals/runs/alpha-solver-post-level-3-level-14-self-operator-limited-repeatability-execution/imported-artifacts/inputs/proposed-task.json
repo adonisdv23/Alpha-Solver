@@ -1,0 +1,31 @@
+{
+  "allowed_changed_prefixes": [
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-limited-repeatability-execution/"
+  ],
+  "artifact_paths": [
+    "dry-run-result.json",
+    "execution-gate-result.json",
+    "stop-state.json"
+  ],
+  "candidate_changed_files": [
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-limited-repeatability-execution/"
+  ],
+  "evidence_boundary": "local-only; operator-supervised; single repeatability run; fresh run ID; fresh output root; read-only against source evidence; wrapper executes no proposed commands; deterministic read-only consistency checker only; no readiness claim; no evidence promotion; no source-artifact mutation",
+  "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-LIMITED-REPEATABILITY-EXECUTION-001",
+  "metadata": {
+    "packet": "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-limited-repeatability-packet",
+    "repeatability_target": "Repeat the same existing evidence packet consistency review pattern used by the first supervised use, using a fresh run ID and fresh output root.",
+    "run_id": "self-operator-limited-repeatability-001-run-20260611T220109Z",
+    "scope_identity": "Repeat the same existing evidence packet consistency review pattern used by the first supervised use, using a fresh run ID and fresh output root."
+  },
+  "operator_confirmation": true,
+  "output_root": "/tmp/alpha-solver-self-operator-limited-repeatability/self-operator-limited-repeatability-001-run-20260611T220109Z",
+  "proposed_commands": [
+    [
+      "python",
+      "scripts/check_local_llm_packet_consistency.py",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-limited-repeatability-packet"
+    ]
+  ],
+  "requested_action": "Repeat the same existing evidence packet consistency review pattern used by the first supervised use, using deterministic local packet consistency checking only."
+}

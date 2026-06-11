@@ -1,0 +1,69 @@
+{
+  "approval_validation_status": {
+    "comparison": "comparable_pass",
+    "first_supervised_use": true,
+    "repeatability": true
+  },
+  "command_classification_reason_code": {
+    "comparison": "comparable_pass",
+    "first_supervised_use": [
+      "allowed_local_read_check"
+    ],
+    "repeatability": [
+      "allowed_local_read_check"
+    ]
+  },
+  "comparison_outcome": "repeatability_comparable",
+  "forbidden_surface_non_execution_proof": {
+    "result": "pass_boundary_references_only"
+  },
+  "full_packet_consistency_checker_exit": {
+    "output_present": true,
+    "repeatability_exit_code": 0
+  },
+  "gate_status": {
+    "comparison": "comparable_pass",
+    "first_supervised_use": "allowed_for_local_dry_run_wrapper",
+    "repeatability": "allowed_for_local_dry_run_wrapper"
+  },
+  "identity_match": {
+    "comparison": "comparable_pass",
+    "first_supervised_use": true,
+    "repeatability": true
+  },
+  "non_claims": [
+    "No benchmark evidence claim.",
+    "No superiority claim.",
+    "No readiness claim."
+  ],
+  "packet_scoped_consistency_checker_exit": {
+    "output_present": true,
+    "repeatability_exit_code": 0
+  },
+  "raw_artifact_inventory_shape": {
+    "raw_artifact_count": 20,
+    "required_artifacts_present": true
+  },
+  "redaction_review": {
+    "result": "pass_no_redaction_required"
+  },
+  "release_gate_checker_exit": {
+    "final_status": "eligible_for_release_closeout_review",
+    "output_present": true,
+    "repeatability_exit_code": 0
+  },
+  "run_id": "self-operator-limited-repeatability-001-run-20260611T220109Z",
+  "source_artifact_mutation_check": {
+    "result": "pass_no_prior_source_evidence_code_or_test_mutation"
+  },
+  "stop_state": {
+    "comparison": "comparable_pass_no_stop_state",
+    "first_supervised_use": null,
+    "repeatability": null
+  },
+  "wrapper_non_execution_marker": {
+    "comparison": "comparable_pass",
+    "first_supervised_use": "wrapper does not execute proposed commands; it only classifies proposed command text",
+    "repeatability": "wrapper does not execute proposed commands; it only classifies proposed command text"
+  }
+}
