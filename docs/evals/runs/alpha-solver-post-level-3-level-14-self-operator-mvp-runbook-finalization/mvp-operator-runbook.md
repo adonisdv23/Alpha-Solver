@@ -80,17 +80,32 @@ proposal.
 
 ## 5. Approval identity behavior
 
-`alpha/self_operator/execution_gate.py` requires the approval record to match
-the proposed task identity and fails closed on mismatch:
+`alpha/self_operator/execution_gate.py` compares approval identity fields with
+the proposed task identity fields and fails closed on mismatches only when both
+sides provide comparable values for that dimension:
 
-- `lane_id` on the approval must equal the proposed task's `lane_id`.
-- `run_id` on the approval must equal the proposed task's metadata `run_id`.
-- The approval scope identity (metadata `task_identity` / `scope_identity` /
-  `scope_summary` / `requested_action`, else `scope_summary`) must match the
-  proposed task's scope identity after whitespace normalization.
-- Mismatch produces `SELF_OPERATOR_APPROVAL_IDENTITY_MISMATCH`, gate status
-  `blocked_by_approval_identity_mismatch`, and a stop-state record. There is
-  no override; a new matching approval is required.
+- `lane_id` on the approval is compared with the proposed task's `lane_id`
+  when both are present.
+- `run_id` on the approval is compared with the proposed task's metadata
+  `run_id` when both are present. Operators should provide explicit proposed
+  task `metadata.run_id` for every reviewed run so this dimension can be
+  compared.
+- The approval scope identity is derived from approval metadata
+  `task_identity`, `scope_identity`, `scope_summary`, or `requested_action`,
+  falling back to approval `scope_summary`. It is compared with the proposed
+  task's scope identity after whitespace normalization when both are present.
+  Proposed task scope identity is drawn only from proposed task metadata
+  `task_identity`, `scope_identity`, or `scope_summary`; it does not fall back
+  to `requested_action`. Operators should provide explicit proposed task
+  metadata scope identity for every reviewed scope so this dimension can be
+  compared.
+- If proposed metadata identity fields are missing for `run_id` or scope, that
+  dimension cannot be compared by the current gate and will not itself produce
+  an approval identity mismatch finding. Do not treat missing proposed identity
+  fields as an automatic identity mismatch.
+- A comparable mismatch produces `SELF_OPERATOR_APPROVAL_IDENTITY_MISMATCH`,
+  gate status `blocked_by_approval_identity_mismatch`, and a stop-state record.
+  There is no override; a new matching approval is required.
 
 ## 6. Stop-state behavior
 
