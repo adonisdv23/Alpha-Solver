@@ -16,3 +16,21 @@
 | `runbook_approval_identity_wording_corrected` | `runbook-approval-identity-correction.md` | pass |
 
 Closeout eligibility is recorded only after all listed gates pass.
+
+## Deterministic full-root gate proof (recorded after the path repair)
+
+When PR #474 merged this packet, the deterministic checker in
+`alpha/self_operator/release_gate.py` still pointed `CLOSEOUT_PACKET` at the
+old `...-release-closeout/` path, so the full-root checker reported
+`release_closeout_review_complete` as `missing` and the table above was not
+yet backed by a deterministic full-root gate run. The repair lane
+`ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-MERGED-CLOSEOUT-GATE-PATH-REPAIR-001`
+aligned the gate path to this packet and recorded the proof:
+
+- `post-closeout-release-gate-report.json` — full-root checker output, exit `0`.
+- `post-closeout-release-gate-report.md` — command, result, and bounds.
+- Result: all eleven gates `pass`, `release_closeout_review_complete: pass`,
+  final gate status `eligible_for_release_closeout_review`.
+
+The `release_closeout_review_complete` row above is now proven by that
+recorded full-root run, not asserted independently of it.
