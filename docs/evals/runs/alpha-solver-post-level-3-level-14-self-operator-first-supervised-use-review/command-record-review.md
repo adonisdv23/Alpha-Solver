@@ -6,7 +6,7 @@
 
 ## Commands reviewed
 
-`commands-run.md` records exactly these supervised-use commands with UTC timestamps and exits:
+The source execution packet's `commands-run.md` records the supervised-use commands with UTC timestamps and exits, grouped under source execution steps. For normalized review, this file lists the individual command invocations as:
 
 1. `git status --short` — exit 0, empty output.
 2. `git rev-parse --verify HEAD` — exit 0.
@@ -19,7 +19,7 @@
 
 - No network-contacting command ran: pass. The command record contains only local git status/rev-parse and local Python scripts.
 - No provider/model/API/browser/deployment/billing/credential command ran: pass. None appears in the command record.
-- Deterministic packet consistency checker ran: pass. Step 5 ran `python scripts/check_local_llm_packet_consistency.py` and recorded exit 0.
+- Deterministic packet consistency checker ran: pass. The source execution packet's `commands-run.md` records `python scripts/check_local_llm_packet_consistency.py` under Step 3, "supervised consistency review", with exit 0. This review packet's normalized command list records the same command as item 5.
 - Git status was clean before and after: pass. Both `git status --short` records have empty output and exit 0.
 - Command timestamps are present: pass. Each command line has a UTC timestamp.
 - Command exits are recorded: pass. Each command records exit 0.
