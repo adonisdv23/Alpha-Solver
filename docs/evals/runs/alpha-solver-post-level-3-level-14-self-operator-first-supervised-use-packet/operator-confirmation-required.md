@@ -14,21 +14,32 @@ must contain the enforced guard text verbatim:
 stop if explicit operator confirmation is missing
 ```
 
-The recorded confirmation for this first use must take the following form
-(the lane and run identifiers must match the actual run):
+The recorded confirmation for this first use must take the following form,
+with both labeled fields present exactly as shown (the lane and run
+identifiers must match the actual run):
 
 ```text
-OPERATOR CONFIRMATION: I explicitly authorize this local-only
-operator-supervised first supervised use, limited to the existing evidence
-packet consistency review defined in the first-supervised-use packet, for
-lane ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-FIRST-SUPERVISED-USE-EXECUTION-001
-and this run ID only. No providers, hosted/local models, external APIs,
-credentials, secrets, browser automation, deployment, billing, Google
-Sheets, /v1/solve or dashboard exposure, production use, source-artifact
-mutation, evidence promotion, readiness claims, autonomous operation,
-autonomous approval, or autonomous merge are authorized.
+OPERATOR_APPROVED_FIRST_USE_TARGET: existing evidence packet consistency
+review of the Self Operator evidence chain, as defined in use-target.md
+of the first-supervised-use packet.
+OPERATOR_CONFIRMATION: I explicitly authorize this local-only,
+operator-supervised first supervised use, limited to the target named
+above, for lane
+ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-FIRST-SUPERVISED-USE-EXECUTION-001
+and this run ID only. No providers; no hosted models; no local models
+unless separately authorized by the future lane; no external APIs; no
+browser automation; no deployment; no billing; no credentials or secrets;
+no /v1/solve or dashboard exposure; no Google Sheets updates; no
+production use; no source-artifact mutation; no evidence promotion; no
+readiness claim; no final status CLI implementation; no autonomous
+operation, autonomous approval, or autonomous merge.
 stop if explicit operator confirmation is missing
 ```
+
+Both labeled fields are mandatory. A recorded confirmation missing either
+`OPERATOR_APPROVED_FIRST_USE_TARGET:` or `OPERATOR_CONFIRMATION:`, or
+omitting any of the de-authorization statements above, is a partial
+confirmation and a hard stop: do not run.
 
 ## Required approval record
 

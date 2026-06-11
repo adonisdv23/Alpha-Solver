@@ -38,6 +38,18 @@ Result: changed files are exactly the files of this packet directory; no
 whitespace errors; no file outside the allowed file list; consistency check
 passed.
 
+### Amendment re-run (2026-06-11)
+
+The same four checks plus the forbidden-claim scan were re-run on branch
+`claude/self-operator-first-use-packet-46veay` (created from `main` at
+`f1197e4`, #478 merged) after amending `operator-confirmation-required.md`
+to carry the mandatory `OPERATOR_APPROVED_FIRST_USE_TARGET:` and
+`OPERATOR_CONFIRMATION:` labeled fields, the local-models clause, and the
+explicit no-final-status-CLI-implementation statement. Changed files were
+exactly `operator-confirmation-required.md` and this file; all checks
+passed. The classification table and totals below reflect the post-
+amendment final state.
+
 ## Deterministic forbidden-claim scan (this lane)
 
 ```bash
@@ -48,7 +60,7 @@ Every hit was reviewed in place and classified.
 
 ### Classification
 
-Final-state scan over this packet: 31 hit lines in 10 files; the other 7
+Final-state scan over this packet: 32 hit lines in 10 files; the other 7
 packet files produced zero hits. Every hit line was read in place and
 classified.
 
@@ -56,7 +68,7 @@ classified.
 | --- | --- | --- | --- |
 | `use-scope.md` | 9 | `allowed_boundary_reference` | The forbidden-surfaces list; every phrase appears only in order to forbid it. |
 | `redaction-rules.md` | 4 | `allowed_boundary_reference` | A cited prep-packet file name, pre-import review items stating what must be absent, and the conformance statement that none of these values appear. |
-| `operator-confirmation-required.md` | 4 | `allowed_boundary_reference` | Quoted confirmation text that de-authorizes the listed surfaces. |
+| `operator-confirmation-required.md` | 5 | `allowed_boundary_reference` | Quoted confirmation text that de-authorizes the listed surfaces. |
 | `input-artifacts.md` | 3 | `allowed_boundary_reference` | Explicit input exclusions naming values that must be absent. |
 | `evidence-boundary.md` | 3 | `allowed_boundary_reference` | Boundary statements of what this packet does not claim or touch. |
 | `use-target.md` | 2 | `allowed_boundary_reference` | Avoided-surfaces statement. |
@@ -65,7 +77,7 @@ classified.
 | `source-evidence-reviewed.md` | 1 | `allowed_boundary_reference` | A cited prep-packet file name in the sources table. |
 | `checks-plan.md` | 1 | `allowed_boundary_reference` | The quoted scan command itself. |
 
-Totals: `allowed_boundary_reference`: 31; `forbidden_claim`: 0;
+Totals: `allowed_boundary_reference`: 32; `forbidden_claim`: 0;
 `irrelevant_false_positive`: 0. No phrase appears as an affirmative project
 status claim anywhere in this packet.
 
