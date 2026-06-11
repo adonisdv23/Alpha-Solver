@@ -1,0 +1,22 @@
+# Raw artifact inventory
+
+- `checks/commands-run.txt`
+- `checks/consistency-check-packet.stdout.txt`
+- `checks/consistency-check.stdout.txt`
+- `checks/forbidden-surface-proof.md`
+- `checks/git-status-after.txt`
+- `checks/git-status-before.txt`
+- `checks/head.txt`
+- `checks/plan-consistency-artifact-agreement.txt`
+- `checks/plan-packet-consistency.stdout.txt`
+- `checks/plan-unsafe-pattern-scan.txt`
+- `checks/redaction-review.md`
+- `checks/release-gate-check.json`
+- `checks/source-artifact-mutation-check.md`
+- `dry-run-result.json`
+- `execution-gate-result.json`
+- `inputs/approval-record.json`
+- `inputs/proposed-task.json`
+- `inputs/repeatability-plan-verification.json`
+- `inputs/source-evidence-index.json`
+- `notes/operator-log.md`

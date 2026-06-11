@@ -1,0 +1,11 @@
+{
+  "execution_allowed_after_plan_verification": "yes",
+  "git_fetch_absent_from_executable_plan": "yes",
+  "packet": "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-limited-repeatability-packet",
+  "packet_consistency_status": "pass",
+  "plan_status": "pass",
+  "reason": "The merged limited repeatability packet executable plan passed packet-scoped consistency, contains no in-run remote update command, contains no unsafe literal output-root handling pattern, uses environment handoff for the quoted Python heredoc, and aligns command plan/checks plan/expected artifacts on both consistency outputs.",
+  "root_expansion_safe": "yes",
+  "run_id": "self-operator-limited-repeatability-001-run-20260611T220109Z",
+  "unsafe_pattern_scan_status": "pass"
+}

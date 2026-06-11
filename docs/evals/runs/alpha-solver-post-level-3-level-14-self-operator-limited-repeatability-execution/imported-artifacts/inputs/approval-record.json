@@ -1,0 +1,17 @@
+{
+  "approval_text": "OPERATOR_APPROVED_REPEATABILITY_TARGET:\nRepeat the same existing evidence packet consistency review pattern used by the first supervised use, using a fresh run ID and fresh output root.\n\nOPERATOR_CONFIRMATION:\nI confirm this repeatability execution is local-only and operator-supervised. It must use no providers, no hosted models, no local models, no external APIs, no browser automation, no deployment, no billing, no credentials or secrets, no /v1/solve exposure, no dashboard exposure, no source-artifact mutation, no evidence promotion, no readiness claim, no final status CLI implementation, stop if explicit operator confirmation is missing, and a fresh run ID is required.",
+  "approved": true,
+  "approved_at": "2026-06-11T22:01:09Z",
+  "approved_by": "operator-supplied-confirmation",
+  "evidence_boundary": "local-only; operator-supervised; single repeatability run; fresh run ID; fresh output root; read-only against source evidence; writes only below the output root until reviewed-safe artifacts are imported into the execution packet; no readiness claim; no evidence promotion; no source-artifact mutation",
+  "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-LIMITED-REPEATABILITY-EXECUTION-001",
+  "metadata": {
+    "operator_approved_repeatability_target": "Repeat the same existing evidence packet consistency review pattern used by the first supervised use, using a fresh run ID and fresh output root.",
+    "task_identity": "Repeat the same existing evidence packet consistency review pattern used by the first supervised use, using a fresh run ID and fresh output root."
+  },
+  "operator_confirmation": "I confirm this repeatability execution is local-only and operator-supervised. It must use no providers, no hosted models, no local models, no external APIs, no browser automation, no deployment, no billing, no credentials or secrets, no /v1/solve exposure, no dashboard exposure, no source-artifact mutation, no evidence promotion, no readiness claim, no final status CLI implementation, stop if explicit operator confirmation is missing, and a fresh run ID is required.",
+  "redaction_status": "redacted",
+  "run_id": "self-operator-limited-repeatability-001-run-20260611T220109Z",
+  "schema_version": "self_operator.approval_record.v1",
+  "scope_summary": "Repeat the same existing evidence packet consistency review pattern used by the first supervised use, using a fresh run ID and fresh output root."
+}
