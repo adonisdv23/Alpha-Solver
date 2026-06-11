@@ -6,10 +6,16 @@ import sys
 from pathlib import Path
 
 from alpha.self_operator.acceptance_interpretation import (
+    CONFIRMATION_TYPE_MACHINE_READABLE_ARTIFACT,
+    CONFIRMATION_TYPE_OPERATOR_LEDGER_LEVEL_ACCEPTANCE,
+    OPERATOR_DECISION_ACCEPT_LEDGER_LEVEL_CONFIRMATION,
+    OPERATOR_DECISION_LANE_ID,
+    OPERATOR_DECISION_SCHEMA_VERSION,
     READINESS_BLOCKED,
     READINESS_ELIGIBLE_FOR_LATER_RELEASE_REVIEW,
     READINESS_NEEDS_REVIEW,
     interpret_acceptance_import_summary,
+    validate_operator_decision,
     write_acceptance_interpretation,
 )
 
@@ -19,6 +25,14 @@ IMPORTER_FIXTURE = (
     ROOT / "tests" / "fixtures" / "self_operator_acceptance_import" / "importer_vocabulary_import_summary.json"
 )
 CLI = ROOT / "scripts" / "interpret_self_operator_acceptance.py"
+OPERATOR_DECISION_ARTIFACT = (
+    ROOT
+    / "docs"
+    / "evals"
+    / "runs"
+    / "alpha-solver-post-level-3-level-13-to-level-14-self-operator-expected-safety-block-operator-review"
+    / "operator-decision.json"
+)
 
 
 def complete_summary() -> dict:
@@ -29,8 +43,21 @@ def importer_summary() -> dict:
     return json.loads(IMPORTER_FIXTURE.read_text(encoding="utf-8"))
 
 
-def interpret(payload: dict):
-    return interpret_acceptance_import_summary(payload).to_dict()
+def operator_decision() -> dict:
+    return {
+        "schema": OPERATOR_DECISION_SCHEMA_VERSION,
+        "lane_id": OPERATOR_DECISION_LANE_ID,
+        "operator_decision": OPERATOR_DECISION_ACCEPT_LEDGER_LEVEL_CONFIRMATION,
+        "accepted_tasks": ["MLA-006", "MLA-007"],
+        "confirmation_type": CONFIRMATION_TYPE_OPERATOR_LEDGER_LEVEL_ACCEPTANCE,
+        "machine_readable_artifact_confirmation": False,
+        "source_artifacts_mutated": False,
+        "readiness_claimed": False,
+    }
+
+
+def interpret(payload: dict, decision: dict | None = None):
+    return interpret_acceptance_import_summary(payload, operator_decision=decision).to_dict()
 
 
 def task(payload: dict, task_id: str) -> dict:
@@ -279,3 +306,202 @@ def test_cli_does_not_claim_mvp_readiness(tmp_path: Path) -> None:
     assert "MVP ready" not in rendered
     assert "release ready" not in rendered
     assert "ready\"" not in json.loads(output.read_text(encoding="utf-8"))["readiness_implication"]
+
+
+def test_valid_operator_decision_clears_unconfirmed_expected_safety_blocks() -> None:
+    result = interpret(importer_summary(), operator_decision())
+
+    assert not any(defect["code"] == "EXPECTED_SAFETY_BLOCK_UNCONFIRMED" for defect in result["defects"])
+    assert result["summary"]["defect_count"] == 0
+    assert result["summary"]["p1_defect_count"] == 0
+    assert result["readiness_implication"] == READINESS_ELIGIBLE_FOR_LATER_RELEASE_REVIEW
+    assert result["classifications"]["expected_safety_blocks_confirmed"] is True
+    assert result["classifications"]["blocked_missing_artifacts"] is False
+    assert result["classifications"]["operator_ledger_level_acceptance_applied"] is True
+    consumption = result["operator_decision_consumption"]
+    assert consumption["provided"] is True
+    assert consumption["consumed"] is True
+    assert consumption["applied_task_ids"] == ["MLA-006", "MLA-007"]
+    assert consumption["validation_errors"] == []
+
+
+def test_operator_acceptance_is_recorded_distinct_from_machine_readable_confirmation() -> None:
+    result = interpret(importer_summary(), operator_decision())
+
+    by_id = {item["task_id"]: item for item in result["tasks"]}
+    for task_id in ("MLA-006", "MLA-007"):
+        assert by_id[task_id]["expected_block_confirmation"] == CONFIRMATION_TYPE_OPERATOR_LEDGER_LEVEL_ACCEPTANCE
+        assert by_id[task_id]["observed_outcome"] == "unconfirmed"
+    for task_id in ("MLA-002", "MLA-003", "MLA-004", "MLA-005", "MLA-010"):
+        assert by_id[task_id]["expected_block_confirmation"] == CONFIRMATION_TYPE_MACHINE_READABLE_ARTIFACT
+    consumption = result["operator_decision_consumption"]
+    assert consumption["confirmation_type"] == CONFIRMATION_TYPE_OPERATOR_LEDGER_LEVEL_ACCEPTANCE
+    assert consumption["machine_readable_artifact_confirmation"] is False
+    assert (
+        "does not treat operator ledger-level acceptance as machine-readable artifact confirmation"
+        in result["non_claims"]
+    )
+
+
+def test_invalid_operator_decision_schema_does_not_clear_blockers() -> None:
+    decision = operator_decision()
+    decision["schema"] = "self_operator.some_other_schema.v1"
+
+    result = interpret(importer_summary(), decision)
+
+    unconfirmed = [defect for defect in result["defects"] if defect["code"] == "EXPECTED_SAFETY_BLOCK_UNCONFIRMED"]
+    assert {defect["task_id"] for defect in unconfirmed} == {"MLA-006", "MLA-007"}
+    assert result["readiness_implication"] == READINESS_BLOCKED
+    assert result["classifications"]["operator_ledger_level_acceptance_applied"] is False
+    consumption = result["operator_decision_consumption"]
+    assert consumption["provided"] is True
+    assert consumption["consumed"] is False
+    assert consumption["applied_task_ids"] == []
+    assert any("schema" in error for error in consumption["validation_errors"])
+    assert any(defect["code"] == "OPERATOR_DECISION_INVALID" for defect in result["defects"])
+
+
+def test_wrong_accepted_tasks_does_not_clear_blockers() -> None:
+    for wrong_tasks in (["MLA-006"], ["MLA-002", "MLA-007"], ["MLA-006", "MLA-007", "MLA-002"], []):
+        decision = operator_decision()
+        decision["accepted_tasks"] = wrong_tasks
+
+        result = interpret(importer_summary(), decision)
+
+        unconfirmed = [defect for defect in result["defects"] if defect["code"] == "EXPECTED_SAFETY_BLOCK_UNCONFIRMED"]
+        assert {defect["task_id"] for defect in unconfirmed} == {"MLA-006", "MLA-007"}
+        assert result["readiness_implication"] == READINESS_BLOCKED
+        assert result["operator_decision_consumption"]["consumed"] is False
+        assert any("accepted_tasks" in error for error in result["operator_decision_consumption"]["validation_errors"])
+
+
+def test_machine_readable_artifact_confirmation_true_is_rejected() -> None:
+    decision = operator_decision()
+    decision["machine_readable_artifact_confirmation"] = True
+
+    result = interpret(importer_summary(), decision)
+
+    assert result["readiness_implication"] == READINESS_BLOCKED
+    assert result["summary"]["p1_defect_count"] == 2
+    consumption = result["operator_decision_consumption"]
+    assert consumption["consumed"] is False
+    assert any("machine_readable_artifact_confirmation" in error for error in consumption["validation_errors"])
+
+
+def test_operator_decision_safety_flags_must_be_false() -> None:
+    for flag in ("source_artifacts_mutated", "readiness_claimed"):
+        decision = operator_decision()
+        decision[flag] = True
+
+        errors = validate_operator_decision(decision)
+
+        assert any(flag in error for error in errors)
+        result = interpret(importer_summary(), decision)
+        assert result["readiness_implication"] == READINESS_BLOCKED
+        assert result["operator_decision_consumption"]["consumed"] is False
+
+
+def test_operator_decision_affects_only_mla_006_and_mla_007() -> None:
+    payload = importer_summary()
+    record = task(payload, "MLA-002")
+    record["status"] = "import_ready"
+    record["expected_safety_block_confirmed"] = False
+
+    result = interpret(payload, operator_decision())
+
+    unconfirmed = [defect for defect in result["defects"] if defect["code"] == "EXPECTED_SAFETY_BLOCK_UNCONFIRMED"]
+    assert {defect["task_id"] for defect in unconfirmed} == {"MLA-002"}
+    assert result["readiness_implication"] == READINESS_BLOCKED
+    assert result["operator_decision_consumption"]["applied_task_ids"] == ["MLA-006", "MLA-007"]
+
+
+def test_operator_decision_does_not_clear_expected_safety_block_allowed() -> None:
+    payload = importer_summary()
+    record = task(payload, "MLA-006")
+    record["observed_outcome"] = "ready"
+
+    result = interpret(payload, operator_decision())
+
+    allowed = [defect for defect in result["defects"] if defect["code"] == "EXPECTED_SAFETY_BLOCK_ALLOWED"]
+    assert {defect["task_id"] for defect in allowed} == {"MLA-006"}
+    assert result["readiness_implication"] == READINESS_BLOCKED
+    assert result["operator_decision_consumption"]["applied_task_ids"] == ["MLA-007"]
+
+
+def test_missing_operator_decision_leaves_interpretation_blocked_as_before() -> None:
+    result = interpret(importer_summary())
+
+    unconfirmed = [defect for defect in result["defects"] if defect["code"] == "EXPECTED_SAFETY_BLOCK_UNCONFIRMED"]
+    assert {defect["task_id"] for defect in unconfirmed} == {"MLA-006", "MLA-007"}
+    assert result["readiness_implication"] == READINESS_BLOCKED
+    assert result["summary"]["p1_defect_count"] == 2
+    consumption = result["operator_decision_consumption"]
+    assert consumption["provided"] is False
+    assert consumption["consumed"] is False
+    assert consumption["applied_task_ids"] == []
+
+
+def test_operator_decision_interpretation_is_deterministic(tmp_path: Path) -> None:
+    interpretation = interpret_acceptance_import_summary(importer_summary(), operator_decision=operator_decision())
+    first = write_acceptance_interpretation(interpretation, tmp_path / "first.json")
+    second = write_acceptance_interpretation(interpretation, tmp_path / "second.json")
+
+    assert first.read_text(encoding="utf-8") == second.read_text(encoding="utf-8")
+
+
+def test_cli_consumes_repo_operator_decision_artifact(tmp_path: Path) -> None:
+    output = tmp_path / "interpretation.json"
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(CLI),
+            "--import-summary",
+            str(IMPORTER_FIXTURE),
+            "--operator-decision",
+            str(OPERATOR_DECISION_ARTIFACT),
+            "--output",
+            str(output),
+        ],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert completed.returncode == 0
+    assert "operator_decision=consumed" in completed.stdout
+    assert "confirmation_type=operator_ledger_level_acceptance" in completed.stdout
+    assert "machine_readable_artifact_confirmation=false" in completed.stdout
+    payload = json.loads(output.read_text(encoding="utf-8"))
+    assert payload["operator_decision_consumption"]["consumed"] is True
+    assert payload["operator_decision_consumption"]["applied_task_ids"] == ["MLA-006", "MLA-007"]
+
+
+def test_cli_invalid_operator_decision_stays_blocked(tmp_path: Path) -> None:
+    decision = operator_decision()
+    decision["operator_decision"] = "SOMETHING_ELSE"
+    decision_path = tmp_path / "invalid-decision.json"
+    decision_path.write_text(json.dumps(decision), encoding="utf-8")
+    output = tmp_path / "interpretation.json"
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(CLI),
+            "--import-summary",
+            str(IMPORTER_FIXTURE),
+            "--operator-decision",
+            str(decision_path),
+            "--output",
+            str(output),
+        ],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert completed.returncode == 1
+    assert "interpretation=blocked" in completed.stdout
+    assert "operator_decision=invalid" in completed.stdout
+    assert "operator decision not consumed" in completed.stderr

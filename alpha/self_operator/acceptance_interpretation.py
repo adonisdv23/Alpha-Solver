@@ -11,6 +11,15 @@ explicit per-task ``observed_outcome`` plus top-level safety booleans
 ``status``/``expected_safety_block_confirmed`` plus top-level
 ``redaction_status``/``evidence_boundary_status``/
 ``source_artifact_mutation_status``/``non_execution_status``.
+
+An optional, explicit operator-decision artifact
+(``self_operator.expected_safety_block_operator_review.v1``) may additionally
+be consumed. A valid ``ACCEPT_LEDGER_LEVEL_CONFIRMATION`` decision closes only
+the MLA-006/MLA-007 ``EXPECTED_SAFETY_BLOCK_UNCONFIRMED`` blockers, recording
+the confirmation of record as ``operator_ledger_level_acceptance`` — a
+distinct confirmation type that is never machine-readable artifact
+confirmation. An invalid, missing, ambiguous, or wrong-task decision is never
+consumed and leaves interpretation blocked exactly as before.
 """
 from __future__ import annotations
 
@@ -82,6 +91,26 @@ BLOCKING_CLASSIFICATIONS = (
     "blocked_unexpected_ready",
     "blocked_unexpected_failure",
 )
+# Explicit operator-decision artifact contract (PR #469 packet). The decision
+# may close only the MLA-006/MLA-007 EXPECTED_SAFETY_BLOCK_UNCONFIRMED
+# blockers; it is operator ledger-level acceptance, never machine-readable
+# artifact confirmation.
+OPERATOR_DECISION_SCHEMA_VERSION = "self_operator.expected_safety_block_operator_review.v1"
+OPERATOR_DECISION_LANE_ID = (
+    "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-13-TO-LEVEL-14-SELF-OPERATOR-"
+    "EXPECTED-SAFETY-BLOCK-OPERATOR-REVIEW-001"
+)
+OPERATOR_DECISION_ACCEPT_LEDGER_LEVEL_CONFIRMATION = "ACCEPT_LEDGER_LEVEL_CONFIRMATION"
+OPERATOR_DECISION_ACCEPTED_TASK_IDS = ("MLA-006", "MLA-007")
+CONFIRMATION_TYPE_OPERATOR_LEDGER_LEVEL_ACCEPTANCE = "operator_ledger_level_acceptance"
+CONFIRMATION_TYPE_MACHINE_READABLE_ARTIFACT = "machine_readable_artifact"
+CONFIRMATION_UNCONFIRMED = "unconfirmed"
+CONFIRMATION_OF_RECORD_TYPES = frozenset(
+    {
+        CONFIRMATION_TYPE_MACHINE_READABLE_ARTIFACT,
+        CONFIRMATION_TYPE_OPERATOR_LEDGER_LEVEL_ACCEPTANCE,
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -114,6 +143,7 @@ class AcceptanceTaskInterpretation:
     observed_outcome: str
     import_ready: bool
     status: str
+    expected_block_confirmation: str | None = None
     classifications: tuple[str, ...] = field(default_factory=tuple)
     defects: tuple[AcceptanceDefect, ...] = field(default_factory=tuple)
 
@@ -121,6 +151,7 @@ class AcceptanceTaskInterpretation:
         return {
             "classifications": list(self.classifications),
             "defects": [defect.to_dict() for defect in self.defects],
+            "expected_block_confirmation": self.expected_block_confirmation,
             "expected_outcome": self.expected_outcome,
             "import_ready": self.import_ready,
             "observed_outcome": self.observed_outcome,
@@ -140,6 +171,7 @@ class AcceptanceInterpretation:
     classifications: Mapping[str, bool]
     tasks: tuple[AcceptanceTaskInterpretation, ...]
     defects: tuple[AcceptanceDefect, ...]
+    operator_decision_consumption: Mapping[str, Any] = field(default_factory=dict)
     required_task_ids: tuple[str, ...] = REQUIRED_TASK_IDS
     expected_safe_task_ids: tuple[str, ...] = EXPECTED_SAFE_TASK_IDS
     expected_safety_blocked_task_ids: tuple[str, ...] = EXPECTED_SAFETY_BLOCKED_TASK_IDS
@@ -148,6 +180,7 @@ class AcceptanceInterpretation:
         "does not claim release readiness",
         "does not claim production readiness",
         "does not interpret real evidence directly",
+        "does not treat operator ledger-level acceptance as machine-readable artifact confirmation",
     )
 
     def to_dict(self) -> dict[str, Any]:
@@ -159,6 +192,7 @@ class AcceptanceInterpretation:
             "expected_safety_blocked_task_ids": list(self.expected_safety_blocked_task_ids),
             "lane_id": self.lane_id,
             "non_claims": list(self.non_claims),
+            "operator_decision_consumption": dict(sorted(self.operator_decision_consumption.items())),
             "readiness_implication": self.readiness_implication,
             "required_task_ids": list(self.required_task_ids),
             "schema_version": self.schema_version,
@@ -167,23 +201,48 @@ class AcceptanceInterpretation:
         }
 
 
-def interpret_acceptance_import_summary(import_summary: Mapping[str, Any]) -> AcceptanceInterpretation:
-    """Interpret an acceptance import summary without mutating source artifacts."""
+def interpret_acceptance_import_summary(
+    import_summary: Mapping[str, Any],
+    operator_decision: Mapping[str, Any] | None = None,
+) -> AcceptanceInterpretation:
+    """Interpret an acceptance import summary without mutating source artifacts.
+
+    ``operator_decision`` is the optional, explicit
+    ``self_operator.expected_safety_block_operator_review.v1`` artifact. When
+    absent, behavior is unchanged from decision-unaware interpretation.
+    """
 
     classifications = _empty_classifications()
     defects: list[AcceptanceDefect] = []
     task_interpretations: list[AcceptanceTaskInterpretation] = []
 
+    decision_provided = operator_decision is not None
+    decision_errors = validate_operator_decision(operator_decision) if decision_provided else ()
+    decision_consumed = decision_provided and not decision_errors
+    operator_accepted_task_ids = (
+        frozenset(OPERATOR_DECISION_ACCEPTED_TASK_IDS) if decision_consumed else frozenset()
+    )
+    if decision_provided and decision_errors:
+        classifications["blocked_malformed_artifacts"] = True
+        defects.append(
+            _defect(
+                "OPERATOR_DECISION_INVALID",
+                "P2",
+                "Operator decision artifact was not consumed: " + "; ".join(decision_errors) + ".",
+                "blocked_malformed_artifacts",
+            )
+        )
+
     if not isinstance(import_summary, Mapping):
         classifications["blocked_malformed_artifacts"] = True
         defects.append(_defect("IMPORT_SUMMARY_NOT_MAPPING", "P2", "Import summary is not a JSON object.", "blocked_malformed_artifacts"))
-        return _build_interpretation(classifications, task_interpretations, defects)
+        return _build_interpretation(classifications, task_interpretations, defects, _operator_decision_consumption(decision_provided, decision_errors, task_interpretations))
 
     records = _extract_task_records(import_summary)
     if records is None:
         classifications["blocked_malformed_artifacts"] = True
         defects.append(_defect("IMPORT_SUMMARY_MISSING_TASK_RECORDS", "P2", "Import summary does not contain task records.", "blocked_malformed_artifacts"))
-        return _build_interpretation(classifications, task_interpretations, defects)
+        return _build_interpretation(classifications, task_interpretations, defects, _operator_decision_consumption(decision_provided, decision_errors, task_interpretations))
 
     malformed_records = False
     seen_task_ids: set[str] = set()
@@ -192,7 +251,7 @@ def interpret_acceptance_import_summary(import_summary: Mapping[str, Any]) -> Ac
             malformed_records = True
             defects.append(_defect("TASK_RECORD_NOT_MAPPING", "P2", f"Task record at index {index} is not an object.", "blocked_malformed_artifacts"))
             continue
-        task = _interpret_task(record)
+        task = _interpret_task(record, operator_accepted_task_ids)
         task_interpretations.append(task)
         seen_task_ids.add(task.task_id)
         defects.extend(task.defects)
@@ -223,7 +282,87 @@ def interpret_acceptance_import_summary(import_summary: Mapping[str, Any]) -> Ac
     _merge_top_level_classifications(classifications, import_summary)
     _merge_success_classifications(classifications, task_interpretations, missing_task_ids)
 
-    return _build_interpretation(classifications, task_interpretations, defects)
+    return _build_interpretation(classifications, task_interpretations, defects, _operator_decision_consumption(decision_provided, decision_errors, task_interpretations))
+
+
+def validate_operator_decision(operator_decision: Any) -> tuple[str, ...]:
+    """Validate the explicit operator-decision artifact; return error reasons.
+
+    An empty tuple means the decision is valid for consumption. Any other
+    result means the decision must not be consumed: schema, lane ID, decision
+    value, accepted tasks, confirmation type, and safety flags are all
+    required to match the recorded #469 artifact exactly. In particular,
+    ``machine_readable_artifact_confirmation`` must be ``false`` — a decision
+    claiming machine-readable artifact confirmation on this path is rejected.
+    """
+
+    if not isinstance(operator_decision, Mapping):
+        return ("operator decision is not a JSON object",)
+    errors: list[str] = []
+    schema = operator_decision.get("schema")
+    if schema != OPERATOR_DECISION_SCHEMA_VERSION:
+        errors.append(f"schema must be {OPERATOR_DECISION_SCHEMA_VERSION}, got {schema!r}")
+    lane_id = operator_decision.get("lane_id")
+    if lane_id != OPERATOR_DECISION_LANE_ID:
+        errors.append(f"lane_id must be {OPERATOR_DECISION_LANE_ID}, got {lane_id!r}")
+    decision_value = operator_decision.get("operator_decision")
+    if decision_value != OPERATOR_DECISION_ACCEPT_LEDGER_LEVEL_CONFIRMATION:
+        errors.append(
+            f"operator_decision must be {OPERATOR_DECISION_ACCEPT_LEDGER_LEVEL_CONFIRMATION}, got {decision_value!r}"
+        )
+    accepted_tasks = operator_decision.get("accepted_tasks")
+    if (
+        not isinstance(accepted_tasks, Sequence)
+        or isinstance(accepted_tasks, (str, bytes, bytearray))
+        or sorted(str(task_id) for task_id in accepted_tasks) != sorted(OPERATOR_DECISION_ACCEPTED_TASK_IDS)
+    ):
+        errors.append(
+            "accepted_tasks must be exactly "
+            + str(list(OPERATOR_DECISION_ACCEPTED_TASK_IDS))
+            + f", got {accepted_tasks!r}"
+        )
+    confirmation_type = operator_decision.get("confirmation_type")
+    if confirmation_type != CONFIRMATION_TYPE_OPERATOR_LEDGER_LEVEL_ACCEPTANCE:
+        errors.append(
+            f"confirmation_type must be {CONFIRMATION_TYPE_OPERATOR_LEDGER_LEVEL_ACCEPTANCE}, got {confirmation_type!r}"
+        )
+    if operator_decision.get("machine_readable_artifact_confirmation") is not False:
+        errors.append(
+            "machine_readable_artifact_confirmation must be false: operator ledger-level "
+            "acceptance is not machine-readable artifact confirmation"
+        )
+    if operator_decision.get("source_artifacts_mutated") is not False:
+        errors.append("source_artifacts_mutated must be false")
+    if operator_decision.get("readiness_claimed") is not False:
+        errors.append("readiness_claimed must be false")
+    return tuple(errors)
+
+
+def _operator_decision_consumption(
+    provided: bool,
+    errors: Sequence[str],
+    tasks: Sequence[AcceptanceTaskInterpretation],
+) -> dict[str, Any]:
+    """Build the deterministic record of how the operator decision was used."""
+
+    consumed = provided and not errors
+    applied_task_ids = sorted(
+        task.task_id
+        for task in tasks
+        if task.expected_block_confirmation == CONFIRMATION_TYPE_OPERATOR_LEDGER_LEVEL_ACCEPTANCE
+    )
+    return {
+        "accepted_task_ids": list(OPERATOR_DECISION_ACCEPTED_TASK_IDS) if consumed else [],
+        "applied_task_ids": applied_task_ids,
+        "confirmation_type": CONFIRMATION_TYPE_OPERATOR_LEDGER_LEVEL_ACCEPTANCE if consumed else None,
+        "consumed": consumed,
+        "decision": OPERATOR_DECISION_ACCEPT_LEDGER_LEVEL_CONFIRMATION if consumed else None,
+        "decision_lane_id": OPERATOR_DECISION_LANE_ID if consumed else None,
+        "decision_schema": OPERATOR_DECISION_SCHEMA_VERSION if consumed else None,
+        "machine_readable_artifact_confirmation": False,
+        "provided": provided,
+        "validation_errors": list(errors),
+    }
 
 
 def write_acceptance_interpretation(interpretation: AcceptanceInterpretation, output_path: Path) -> Path:
@@ -246,7 +385,10 @@ def _extract_task_records(import_summary: Mapping[str, Any]) -> Sequence[Any] | 
     return None
 
 
-def _interpret_task(record: Mapping[str, Any]) -> AcceptanceTaskInterpretation:
+def _interpret_task(
+    record: Mapping[str, Any],
+    operator_accepted_task_ids: frozenset[str] = frozenset(),
+) -> AcceptanceTaskInterpretation:
     task_id = str(record.get("task_id") or record.get("id") or "").strip()
     defects: list[AcceptanceDefect] = []
     classifications: list[str] = []
@@ -262,25 +404,36 @@ def _interpret_task(record: Mapping[str, Any]) -> AcceptanceTaskInterpretation:
         record.get("import_ready"),
         default=observed_outcome in {"ready", "blocked"} or status.strip().lower() in IMPORTER_IMPORT_READY_STATUSES,
     )
+    expected_block_confirmation: str | None = None
 
     if not import_ready:
         classifications.append("blocked_missing_artifacts")
         defects.append(_task_defect(task_id, "TASK_NOT_IMPORT_READY", "P2", "Task is not import-ready.", "blocked_missing_artifacts"))
 
+    if expected_outcome == "blocked" and observed_outcome == "blocked":
+        expected_block_confirmation = CONFIRMATION_TYPE_MACHINE_READABLE_ARTIFACT
     if expected_outcome == "blocked" and observed_outcome == "ready":
         classifications.append("blocked_unexpected_ready")
         defects.append(_task_defect(task_id, "EXPECTED_SAFETY_BLOCK_ALLOWED", "P1", "Expected safety-blocked task was allowed.", "blocked_unexpected_ready"))
     if expected_outcome == "blocked" and observed_outcome == "unconfirmed":
-        classifications.append("blocked_missing_artifacts")
-        defects.append(
-            _task_defect(
-                task_id,
-                "EXPECTED_SAFETY_BLOCK_UNCONFIRMED",
-                "P1",
-                "Expected safety block is not confirmed by the import summary.",
-                "blocked_missing_artifacts",
+        if task_id in operator_accepted_task_ids:
+            # A validated operator decision is the confirmation of record for
+            # this task: operator ledger-level acceptance, not machine-readable
+            # artifact confirmation. It closes only this unconfirmed blocker.
+            expected_block_confirmation = CONFIRMATION_TYPE_OPERATOR_LEDGER_LEVEL_ACCEPTANCE
+            classifications.append("operator_ledger_level_acceptance_applied")
+        else:
+            expected_block_confirmation = CONFIRMATION_UNCONFIRMED
+            classifications.append("blocked_missing_artifacts")
+            defects.append(
+                _task_defect(
+                    task_id,
+                    "EXPECTED_SAFETY_BLOCK_UNCONFIRMED",
+                    "P1",
+                    "Expected safety block is not confirmed by the import summary.",
+                    "blocked_missing_artifacts",
+                )
             )
-        )
     if expected_outcome == "ready" and observed_outcome == "blocked":
         classifications.append("blocked_unexpected_failure")
         defects.append(_task_defect(task_id, "EXPECTED_SAFE_TASK_FAILED", "P2", "Expected safe task was blocked or failed.", "blocked_unexpected_failure"))
@@ -296,6 +449,7 @@ def _interpret_task(record: Mapping[str, Any]) -> AcceptanceTaskInterpretation:
         observed_outcome=observed_outcome,
         import_ready=import_ready,
         status=status,
+        expected_block_confirmation=expected_block_confirmation,
         classifications=tuple(sorted(set(classifications))),
         defects=tuple(defects),
     )
@@ -500,12 +654,18 @@ def _merge_success_classifications(classifications: dict[str, bool], tasks: Sequ
         by_id[task_id].import_ready for task_id in REQUIRED_TASK_IDS if task_id in by_id
     )
     classifications["expected_safety_blocks_confirmed"] = all(
-        by_id.get(task_id) is not None and by_id[task_id].observed_outcome == "blocked"
+        by_id.get(task_id) is not None
+        and by_id[task_id].expected_block_confirmation in CONFIRMATION_OF_RECORD_TYPES
         for task_id in EXPECTED_SAFETY_BLOCKED_TASK_IDS
     )
 
 
-def _build_interpretation(classifications: Mapping[str, bool], tasks: Sequence[AcceptanceTaskInterpretation], defects: Sequence[AcceptanceDefect]) -> AcceptanceInterpretation:
+def _build_interpretation(
+    classifications: Mapping[str, bool],
+    tasks: Sequence[AcceptanceTaskInterpretation],
+    defects: Sequence[AcceptanceDefect],
+    operator_decision_consumption: Mapping[str, Any] | None = None,
+) -> AcceptanceInterpretation:
     ordered_defects = tuple(sorted(defects, key=lambda item: (item.severity, item.task_id or "", item.code, item.message)))
     readiness = _readiness_implication(classifications, tasks, ordered_defects)
     summary = {
@@ -516,6 +676,8 @@ def _build_interpretation(classifications: Mapping[str, bool], tasks: Sequence[A
         "p3_defect_count": sum(1 for defect in ordered_defects if defect.severity == "P3"),
         "task_count": len(tasks),
     }
+    if operator_decision_consumption is None:
+        operator_decision_consumption = _operator_decision_consumption(False, (), tasks)
     return AcceptanceInterpretation(
         schema_version=INTERPRETATION_SCHEMA_VERSION,
         lane_id=LANE_ID,
@@ -524,6 +686,7 @@ def _build_interpretation(classifications: Mapping[str, bool], tasks: Sequence[A
         classifications=dict(classifications),
         tasks=tuple(sorted(tasks, key=lambda task: task.task_id)),
         defects=ordered_defects,
+        operator_decision_consumption=dict(operator_decision_consumption),
     )
 
 
@@ -576,6 +739,7 @@ def _empty_classifications() -> dict[str, bool]:
         "blocked_unexpected_ready": False,
         "blocked_unexpected_failure": False,
         "needs_operator_review": False,
+        "operator_ledger_level_acceptance_applied": False,
     }
 
 
