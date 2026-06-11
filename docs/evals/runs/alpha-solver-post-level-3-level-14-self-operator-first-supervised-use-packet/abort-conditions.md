@@ -23,6 +23,12 @@ record the abort in the execution lane's packet, and route per
 6. The approval record fails validation for any reason.
 7. The supervising operator is not present for the full run, or anything
    material is unclear (unclear means stop).
+8. The executable command plan still contains a network-contacting command
+   (for example `git fetch`), or still relies on unresolved shell expansion
+   inside a quoted heredoc (for example `Path("$ROOT")` inside a quoted
+   heredoc instead of an environment-variable handoff read via
+   `os.environ["ROOT"]`). Network access and unresolved `$ROOT` expansion
+   are hard stops: do not run.
 
 ## Abort during the run if any of:
 

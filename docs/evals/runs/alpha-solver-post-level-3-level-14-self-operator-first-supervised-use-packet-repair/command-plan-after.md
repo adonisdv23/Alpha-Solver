@@ -1,3 +1,11 @@
+# Command plan after repair
+
+Verbatim content of `execution-command-plan.md` after the repair (the
+plan the execution portion of this lane actually followed). Step 1 is
+local-only; step 2 passes the output root through the shell environment
+(`ROOT="$ROOT"`) and Python reads it via `os.environ["ROOT"]`.
+
+````markdown
 # Execution command plan
 
 The exact commands the execution lane will run, in order, from the
@@ -95,3 +103,4 @@ relying on unexpanded `Path("$ROOT")` text inside a quoted heredoc. The
 defect record, before/after plans, and pre-execution verification live in
 `docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-first-supervised-use-packet-repair/`.
 Nothing was executed against this plan before the repair was verified.
+````
