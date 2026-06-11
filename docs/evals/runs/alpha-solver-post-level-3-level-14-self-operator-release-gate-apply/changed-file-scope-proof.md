@@ -21,14 +21,24 @@ producing a correct result.
 
 ## Fix applied
 
-- `alpha/self_operator/release_gate.py`: the defect scan now strips markdown
-  inline-code spans from each line before matching, so backtick-quoted
-  severity vocabulary is treated as a reference, not a defect marker. Bare
-  defect markers (e.g. "P0 defect: open source mutation violation") still
-  block, as the existing tests assert.
-- `tests/test_self_operator_release_gate.py`: added
-  `test_backticked_severity_vocabulary_does_not_block` reproducing the exact
-  false-positive lines and asserting the gate passes.
+- `alpha/self_operator/release_gate.py`: the defect scan distinguishes
+  severity-vocabulary references from actual defect markers per line. Bare
+  (non-backticked) P0/P1 markers keep the original scan behavior. A
+  backtick-quoted severity token (`P0`/`P1`) is treated as a vocabulary
+  reference unless the line is an actual defect-register entry: a markdown
+  table row pairing the severity with a defect word, or a line with an
+  explicit unresolved/open marker near the severity token. Inline code spans
+  are not stripped globally, so real backticked defect markers (for example
+  "- `P1`: unresolved approval failure" or "| `P0` | source mutation
+  violation |") still block, while taxonomy-only definition lines do not.
+  Resolved references (e.g. "No `P0` or `P1` defects remain open") stay
+  allowed only when clearly marked resolved.
+- `tests/test_self_operator_release_gate.py`: added focused regression tests:
+  `test_backticked_severity_vocabulary_does_not_block`,
+  `test_backticked_unresolved_p0_marker_blocks`,
+  `test_backticked_unresolved_p1_marker_blocks`,
+  `test_table_form_backticked_defect_rows_block`, and
+  `test_resolved_backticked_references_allowed_only_when_marked_resolved`.
 - `scripts/check_self_operator_release_gate.py`: unchanged.
 
 ## Changed files in this PR (complete list)

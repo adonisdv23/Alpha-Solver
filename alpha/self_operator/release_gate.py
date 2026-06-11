@@ -111,8 +111,29 @@ _DEFECT_RE = re.compile(
 )
 _RESOLVED_RE = re.compile(r"\b(no|none|absent|resolved|closed)\b[^\n]{0,80}\b(P0|P1)\b", re.IGNORECASE)
 # Backtick-quoted tokens such as `P0` are severity-vocabulary references
-# (taxonomy/contract definitions), not unresolved defect markers.
+# (taxonomy/contract definitions) unless the line is an actual defect-register
+# entry: a table row pairing the severity with a defect word, or an explicit
+# unresolved/open marker near the severity token.
 _INLINE_CODE_RE = re.compile(r"`[^`]*`")
+_QUOTED_SEVERITY_RE = re.compile(r"`(P0|P1)`", re.IGNORECASE)
+_UNRESOLVED_NEAR_SEVERITY_RE = re.compile(
+    r"\b(P0|P1)\b[^\n]{0,80}\b(unresolved|open)\b"
+    r"|\b(unresolved|open)\b[^\n]{0,80}\b(P0|P1)\b",
+    re.IGNORECASE,
+)
+
+
+def _line_has_unresolved_defect_marker(line: str) -> bool:
+    bare = _INLINE_CODE_RE.sub(" ", line)
+    if _DEFECT_RE.search(bare) and not _RESOLVED_RE.search(bare):
+        return True
+    if not _QUOTED_SEVERITY_RE.search(line):
+        return False
+    if _RESOLVED_RE.search(line):
+        return False
+    if line.lstrip().startswith("|") and _DEFECT_RE.search(line):
+        return True
+    return bool(_UNRESOLVED_NEAR_SEVERITY_RE.search(line))
 
 
 @dataclass(frozen=True)
@@ -228,8 +249,7 @@ def _p0_p1_gate(root: Path) -> SelfOperatorReleaseGate:
     for path in scanned_paths:
         text = path.read_text(encoding="utf-8", errors="replace")
         for line_no, line in enumerate(text.splitlines(), start=1):
-            scannable = _INLINE_CODE_RE.sub(" ", line)
-            if _DEFECT_RE.search(scannable) and not _RESOLVED_RE.search(scannable):
+            if _line_has_unresolved_defect_marker(line):
                 rel = _repo_relative(path, root)
                 defect_hits.append(f"{rel.as_posix()}:{line_no}")
     if defect_hits:

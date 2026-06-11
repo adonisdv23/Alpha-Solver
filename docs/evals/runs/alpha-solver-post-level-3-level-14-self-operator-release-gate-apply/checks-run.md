@@ -24,8 +24,10 @@ python scripts/check_self_operator_release_gate.py \
 python -m pytest -q tests/test_self_operator_release_gate.py
 ```
 
-Result: 13 passed (12 pre-existing + 1 new regression test
-`test_backticked_severity_vocabulary_does_not_block`).
+Result: 17 passed (12 pre-existing + 5 focused regression tests covering
+taxonomy-only backticked severity definitions, unresolved backticked `P0`
+and `P1` markers, table-form defect rows, and resolved-only references; see
+`changed-file-scope-proof.md`).
 
 ## Required git checks
 
