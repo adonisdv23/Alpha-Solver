@@ -80,17 +80,31 @@ proposal.
 
 ## 5. Approval identity behavior
 
-`alpha/self_operator/execution_gate.py` requires the approval record to match
-the proposed task identity and fails closed on mismatch:
+`alpha/self_operator/execution_gate.py` compares the approval record against
+the proposed task identity and fails closed with a mismatch only when both
+sides provide comparable identity values for a dimension:
 
-- `lane_id` on the approval must equal the proposed task's `lane_id`.
-- `run_id` on the approval must equal the proposed task's metadata `run_id`.
-- The approval scope identity (metadata `task_identity` / `scope_identity` /
-  `scope_summary` / `requested_action`, else `scope_summary`) must match the
-  proposed task's scope identity after whitespace normalization.
-- Mismatch produces `SELF_OPERATOR_APPROVAL_IDENTITY_MISMATCH`, gate status
-  `blocked_by_approval_identity_mismatch`, and a stop-state record. There is
-  no override; a new matching approval is required.
+- `lane_id`: compared when both the approval and the proposed task carry a
+  non-empty `lane_id`; unequal values are a mismatch.
+- `run_id`: the proposed-task side is read only from the proposed task's
+  metadata `run_id`. When both the approval `run_id` and the proposed
+  metadata `run_id` are non-empty, unequal values are a mismatch.
+- Scope identity: the approval side is drawn from approval metadata
+  `task_identity` / `scope_identity` / `scope_summary` / `requested_action`,
+  else the approval's top-level `scope_summary`. The proposed-task side is
+  drawn only from proposed metadata `task_identity` / `scope_identity` /
+  `scope_summary`; the current gate has no `requested_action` fallback and
+  no other fallback on the proposed-task side. When both sides are
+  non-empty, values are compared after whitespace normalization.
+- If a proposed-task identity field is missing, that dimension cannot be
+  compared by the current gate, and the missing field is not an automatic
+  identity-mismatch block. Operators must therefore provide an explicit
+  proposed-task `metadata.run_id` and explicit proposed-task scope identity
+  metadata (`task_identity`, `scope_identity`, or `scope_summary`) so the
+  gate can enforce those dimensions.
+- Any detected mismatch produces `SELF_OPERATOR_APPROVAL_IDENTITY_MISMATCH`,
+  gate status `blocked_by_approval_identity_mismatch`, and a stop-state
+  record. There is no override; a new matching approval is required.
 
 ## 6. Stop-state behavior
 
