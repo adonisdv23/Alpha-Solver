@@ -80,17 +80,30 @@ proposal.
 
 ## 5. Approval identity behavior
 
-`alpha/self_operator/execution_gate.py` requires the approval record to match
-the proposed task identity and fails closed on mismatch:
+`alpha/self_operator/execution_gate.py` compares approval identity to proposed
+task identity only when comparable values are present on both sides. The gate
+fails closed on mismatches it can compare; it does not infer missing proposed
+identity fields.
 
-- `lane_id` on the approval must equal the proposed task's `lane_id`.
-- `run_id` on the approval must equal the proposed task's metadata `run_id`.
-- The approval scope identity (metadata `task_identity` / `scope_identity` /
-  `scope_summary` / `requested_action`, else `scope_summary`) must match the
-  proposed task's scope identity after whitespace normalization.
-- Mismatch produces `SELF_OPERATOR_APPROVAL_IDENTITY_MISMATCH`, gate status
-  `blocked_by_approval_identity_mismatch`, and a stop-state record. There is
-  no override; a new matching approval is required.
+- `lane_id` is compared when both the approval and proposed task provide a
+  non-empty `lane_id`; different values produce an identity mismatch.
+- `run_id` is compared when both the approval and the proposed task metadata
+  provide a non-empty run ID. Operators should provide explicit proposed-task
+  `metadata.run_id` so this dimension can be checked.
+- Scope identity is compared when both sides provide a comparable normalized
+  scope value. Approval scope identity is read from approval metadata
+  `task_identity`, `scope_identity`, `scope_summary`, or `requested_action`,
+  falling back to the approval `scope_summary`. Proposed-task scope identity is
+  read only from proposed-task metadata `task_identity`, `scope_identity`, or
+  `scope_summary`. Operators should provide explicit proposed-task metadata
+  scope identity so this dimension can be checked.
+- If proposed metadata identity fields are missing for `run_id` or scope
+  identity, that dimension cannot be compared by the current gate and does not
+  by itself produce `SELF_OPERATOR_APPROVAL_IDENTITY_MISMATCH`.
+- A comparable mismatch produces `SELF_OPERATOR_APPROVAL_IDENTITY_MISMATCH`,
+  gate status `blocked_by_approval_identity_mismatch`, and a stop-state
+  record. There is no override; a new matching approval or corrected proposed
+  metadata is required.
 
 ## 6. Stop-state behavior
 
