@@ -34,6 +34,19 @@ REQUIRED_PACKETS = (
 )
 
 
+def test_closeout_packet_path_matches_closeout_and_final_guardrails_lane() -> None:
+    """The closeout gate must recognize the lane's actual closeout packet path.
+
+    Guards against the #473/#474 mismatch where closeout packets were written
+    under `...-release-closeout-and-final-guardrails/` while the gate checked
+    the old `...-release-closeout/` path.
+    """
+    assert CLOSEOUT_PACKET.as_posix() == (
+        "docs/evals/runs/"
+        "alpha-solver-post-level-3-level-14-self-operator-release-closeout-and-final-guardrails"
+    )
+
+
 def _write_packet(root: Path, packet: Path, text: str = "# fixture\n") -> None:
     target = root / packet
     target.mkdir(parents=True, exist_ok=True)
@@ -105,6 +118,7 @@ def test_missing_release_closeout_blocks(tmp_path: Path) -> None:
 
     assert report.final_status == "blocked_release_closeout_not_reviewed"
     assert report.earliest_missing_gate == "release_closeout_review_complete"
+    assert _gate_statuses(tmp_path)["release_closeout_review_complete"] == "missing"
 
 
 def test_all_synthetic_gates_present_gives_eligible_for_release_closeout_review(tmp_path: Path) -> None:
@@ -115,6 +129,7 @@ def test_all_synthetic_gates_present_gives_eligible_for_release_closeout_review(
     assert report.final_status == "eligible_for_release_closeout_review"
     assert report.ready is True
     assert report.earliest_missing_gate is None
+    assert _gate_statuses(tmp_path)["release_closeout_review_complete"] == "pass"
 
 
 def test_p0_defect_blocks(tmp_path: Path) -> None:
