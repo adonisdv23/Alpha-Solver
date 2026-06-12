@@ -30,7 +30,7 @@
 - Classification: `decision_recorded`
 - Decision record: `../alpha-solver-post-level-3-level-14-self-operator-pre-council-audit-005-decision-and-bundle-routing-fix/audit-005-decision-record.md`
 - Status update: the prior backlog triage status required an operator decision; the pre-Council decision lane now records that decision.
-- Recommended prompt: Future combined tooling/docs or multi-blocker lanes must quote and satisfy the recorded AUDIT-005 decision before proceeding.
+- Recommended prompt: Future combined tooling/docs or multi-blocker lanes, including `ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-CHECKER-SCOPE-EXTENSION-001`, must quote and satisfy the recorded AUDIT-005 decision before proceeding.
 
 ## AUDIT-006
 
