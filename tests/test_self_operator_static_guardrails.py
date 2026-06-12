@@ -122,3 +122,161 @@ def test_finding_id_registry_covers_required_static_level_10_ids() -> None:
 def test_level_10_prompt_pack_contains_operator_confirmation_hard_stop() -> None:
     prompt_text = "\n".join(path.read_text(encoding="utf-8") for path in sorted(PROMPT_PACK.glob("*.md")))
     assert REQUIRED_OPERATOR_CONFIRMATION_STOP in prompt_text
+
+
+def _write_final_packet_fixture(root: Path) -> None:
+    packet_dir = root / "docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/closeout"
+    packet_dir.mkdir(parents=True)
+    (packet_dir / "README.md").write_text(
+        "\n".join(
+            [
+                "behavior_evidence=False",
+                "no_hosted_fallback=True",
+                "no_provider_keys_required=True",
+                "NO_FURTHER_LEVEL_3_VALIDATION_LANES_SELECTED",
+                "LEVEL_3_VALIDATION_EXECUTION_ACCEPTED_AS_ARTIFACT_COMPLETE_NON_PROMOTIONAL_LOCAL_ORCHESTRATION_EVIDENCE",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+
+def test_checker_scope_includes_post_packets_council_bundle_and_legacy_paths() -> None:
+    from scripts import check_local_llm_doc_paths as doc_paths
+    from scripts import check_local_llm_evidence_boundaries as evidence_boundaries
+
+    post_packet = Path(
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-checker-scope-extension/sample.md"
+    )
+    council_bundle = Path(
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-council-audit-evidence-bundle/README.md"
+    )
+    legacy_run_packet = Path(
+        "docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/closeout/README.md"
+    )
+    legacy_operator_doc = Path("docs/local_llm_solver_orchestration_operator_guide/README.md")
+
+    assert evidence_boundaries.is_relevant_doc(post_packet)
+    assert evidence_boundaries.is_relevant_doc(council_bundle)
+    assert evidence_boundaries.is_relevant_doc(legacy_run_packet)
+    assert evidence_boundaries.is_relevant_doc(legacy_operator_doc)
+
+    assert doc_paths.is_scanned_doc(post_packet)
+    assert doc_paths.is_scanned_doc(council_bundle)
+    assert doc_paths.is_scanned_doc(legacy_run_packet)
+    assert doc_paths.is_scanned_doc(legacy_operator_doc)
+    assert doc_paths.COUNCIL_AUDIT_EVIDENCE_BUNDLE_DIR in doc_paths.REQUIRED_SOURCE_OF_TRUTH_PATHS
+
+
+def test_evidence_boundary_checker_catches_forbidden_readiness_term_in_post_packet_fixture(tmp_path: Path) -> None:
+    from scripts import check_local_llm_evidence_boundaries as evidence_boundaries
+
+    _write_final_packet_fixture(tmp_path)
+    rel_path = Path(
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-checker-scope-extension/sample.md"
+    )
+    sample = tmp_path / rel_path
+    sample.parent.mkdir(parents=True)
+    sample.write_text("# Sample\n\nThis packet asserts production readiness for Alpha Solver.\n", encoding="utf-8")
+
+    findings = evidence_boundaries.check_paths([rel_path], root=tmp_path)
+
+    assert any(
+        finding.path == rel_path
+        and finding.phrase == "production readiness"
+        and "lacks nearby boundary language" in finding.message
+        for finding in findings
+    )
+
+
+def test_doc_path_checker_checks_references_in_post_packet_fixture(tmp_path: Path) -> None:
+    from scripts import check_local_llm_doc_paths as doc_paths
+
+    rel_path = Path(
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-checker-scope-extension/sample.md"
+    )
+    missing_reference = (
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-checker-scope-extension/missing.md"
+    )
+    sample = tmp_path / rel_path
+    sample.parent.mkdir(parents=True)
+    sample.write_text(f"# Sample\n\nSee `{missing_reference}`.\n", encoding="utf-8")
+
+    # Required source-of-truth directories are present so this fixture isolates missing reference behavior.
+    for required_path in doc_paths.REQUIRED_SOURCE_OF_TRUTH_PATHS:
+        (tmp_path / required_path).mkdir(parents=True, exist_ok=True)
+
+    findings = doc_paths.check_paths([rel_path], root=tmp_path)
+
+    assert any(
+        finding.path == rel_path
+        and finding.reference == missing_reference
+        and "does not exist" in finding.message
+        for finding in findings
+    )
+
+
+def test_evidence_boundary_checker_does_not_treat_before_as_boundary_language(tmp_path: Path) -> None:
+    from scripts import check_local_llm_evidence_boundaries as evidence_boundaries
+
+    _write_final_packet_fixture(tmp_path)
+    rel_path = Path(
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-checker-scope-extension/before-sample.md"
+    )
+    sample = tmp_path / rel_path
+    sample.parent.mkdir(parents=True)
+    sample.write_text(
+        "# Sample\n\n"
+        "The team will review sequencing before any later work.\n"
+        "This packet asserts production readiness for Alpha Solver.\n",
+        encoding="utf-8",
+    )
+
+    findings = evidence_boundaries.check_paths([rel_path], root=tmp_path)
+
+    assert any(finding.path == rel_path and finding.phrase == "production readiness" for finding in findings)
+
+
+def test_evidence_boundary_checker_ignores_generic_no_or_not_far_from_forbidden_phrase(tmp_path: Path) -> None:
+    from scripts import check_local_llm_evidence_boundaries as evidence_boundaries
+
+    _write_final_packet_fixture(tmp_path)
+    rel_path = Path(
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-checker-scope-extension/generic-no-not.md"
+    )
+    sample = tmp_path / rel_path
+    sample.parent.mkdir(parents=True)
+    sample.write_text(
+        "# Sample\n\n"
+        "No implementation work was performed in this fixture.\n"
+        "This sentence is neutral filler.\n"
+        "This sentence is also neutral filler.\n"
+        "This note is not about claims.\n"
+        "This packet asserts production readiness for Alpha Solver.\n",
+        encoding="utf-8",
+    )
+
+    findings = evidence_boundaries.check_paths([rel_path], root=tmp_path)
+
+    assert any(finding.path == rel_path and finding.phrase == "production readiness" for finding in findings)
+
+
+def test_evidence_boundary_checker_allows_explicit_nearby_readiness_boundary(tmp_path: Path) -> None:
+    from scripts import check_local_llm_evidence_boundaries as evidence_boundaries
+
+    _write_final_packet_fixture(tmp_path)
+    rel_path = Path(
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-checker-scope-extension/explicit-boundary.md"
+    )
+    sample = tmp_path / rel_path
+    sample.parent.mkdir(parents=True)
+    sample.write_text(
+        "# Sample\n\n"
+        "This does not claim production readiness.\n"
+        "No readiness claim is made.\n",
+        encoding="utf-8",
+    )
+
+    findings = evidence_boundaries.check_paths([rel_path], root=tmp_path)
+
+    assert not [finding for finding in findings if finding.path == rel_path]

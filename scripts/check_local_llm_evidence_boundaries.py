@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Static evidence-boundary checker for local LLM solver orchestration docs.
+"""Static evidence-boundary checker for local LLM and post-Level solver docs.
 
 Purpose and limits:
 - This is a deterministic, offline documentation hardening check.
 - It scans local LLM solver orchestration evidence-boundary docs for risky
   promotional claim phrases and requires nearby boundary language.
+- It also scans alpha-solver-post-* Self Operator packet docs, including the Council audit evidence bundle.
 - It also checks that the final Level 3 closeout packet preserves the accepted
   non-promotional boundary phrases.
 - It does not validate behavior, run benchmarks, call models/providers, read
@@ -25,6 +26,10 @@ DOCS_DIR_PREFIXES = (
     "docs/local_llm_solver_orchestration",
 )
 LOCAL_ORCHESTRATION_DIR_MARKER = "local-llm-solver-orchestration"
+POST_PACKET_DIR_PREFIX = "docs/evals/runs/alpha-solver-post-"
+COUNCIL_AUDIT_EVIDENCE_BUNDLE_DIR = Path(
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-council-audit-evidence-bundle"
+)
 SOURCE_ARTIFACT_MARKERS = (
     "/source-artifact/",
     "-source-artifact-",
@@ -79,7 +84,7 @@ BOUNDARY_LANGUAGE_PATTERNS = tuple(
     for pattern in (
         r"\bblocked(?:-|\s)?claims?\b",
         r"\bevidence(?:-|\s)?boundary\b",
-        r"\bboundary\b",
+        r"\bclaim(?:-|\s)?boundar(?:y|ies)\b",
         r"\bdecision boundary\b",
         r"\baccepted boundary\b",
         r"\bexcluded(?: evidence)? categories\b",
@@ -92,17 +97,42 @@ BOUNDARY_LANGUAGE_PATTERNS = tuple(
         r"\bdenied\b",
         r"\bunsafe\b",
         r"\bforbidden\b",
-        r"\bnot\b",
         r"\bdoes not\b",
         r"\bdo not\b",
-        r"\bno\b",
-        r"\bwithout\b",
-        r"\bseparate from\b",
-        r"\bis not\b",
-        r"\bnot prove\b",
-        r"\bnot changed\b",
-        r"\bremains bounded\b",
         r"\bmust not\b",
+        r"\bno [^\n.]*\b(?:readiness|evidence|superiority|promotion|quality|provider-orchestration|provider orchestration|billing|dashboard|/v1/solve)\b",
+        r"\bnot [^\n.]*\b(?:readiness|evidence|superiority|promotion|quality|provider-orchestration|provider orchestration|billing|dashboard|/v1/solve)\b",
+        r"\bnon(?:-|\s)?selections?\b",
+        r"\bincluding upgrading local evidence\b",
+        r"\bblockers? prevent [^\n.]*readiness\b",
+        r"\battempt to claim [^\n.]*readiness\b",
+        r"\bno accepted source [^\n.]* establishes\b",
+        r"\bseparation between [^\n.]* evidence\b",
+        r"\bpreventing [^\n.]* evidence [^\n.]* promoted\b",
+        r"\bblocks [^\n.]*claims?\b",
+        r"\bevidence(?:-|\s)?boundaries\b",
+        r"\bno [^\n.]* may claim\b",
+        r"\bbefore [^\n.]* can be claimed\b",
+        r"\breadiness topics\b",
+        r"\breadiness review\b",
+        r"\breadiness work is started\b",
+        r"\brequired evidence for\b",
+        r"\bdeferred and not started\b",
+        r"\bdistinguish [^\n.]* from [^\n.]*readiness\b",
+        r"\bwithout permitted evidence\b",
+        r"\bremains? blocked\b",
+        r"\bremains? deferred\b",
+        r"\bclaims? remain(?:s)? blocked\b",
+        r"\bclaims? (?:is |are )?(?:made|added|blocked)\b",
+        r"\bwithout claiming\b",
+        r"\bnot evidence\b",
+        r"\bnot proof\b",
+        r"\bnot a readiness claim\b",
+        r"\bdoes not claim readiness\b",
+        r"\bdoes not claim [^\n.]*readiness\b",
+        r"\bno readiness claim\b",
+        r"\bnot benchmark evidence\b",
+        r"\bnot superiority evidence\b",
     )
 )
 
@@ -138,6 +168,8 @@ def is_relevant_doc(path: Path) -> bool:
     if _is_source_artifact(Path(rel)):
         return False
     if rel.startswith(DOCS_DIR_PREFIXES):
+        return True
+    if rel.startswith(POST_PACKET_DIR_PREFIX):
         return True
     return rel.startswith(RUNS_DIR.as_posix()) and LOCAL_ORCHESTRATION_DIR_MARKER in rel
 

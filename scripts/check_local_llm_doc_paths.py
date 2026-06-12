@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Offline path/link checker for local LLM solver orchestration docs.
+"""Offline path/link checker for local LLM and post-Level solver docs.
 
 Purpose and limits:
 - This is a deterministic, offline documentation hardening check.
-- It scans only local LLM solver orchestration operator docs and evidence index
-  / Level 3 packet docs, excluding preserved source-artifact payload files.
-- It verifies repo-relative local LLM doc packet paths and key local LLM source
-  paths referenced by those docs exist in the checkout.
+- It scans local LLM solver orchestration operator docs, evidence index / Level 3 packet docs,
+  and alpha-solver-post-* Self Operator packet docs, excluding preserved source-artifact payload files.
+- It verifies repo-relative local LLM and alpha-solver-post-* doc packet paths and key
+  source paths referenced by those docs exist in the checkout.
 - It detects simple stale selected-next-lane conflicts inside one document.
 - It does not call GitHub, access the network, run models/providers, start
   Ollama, expose routes, run benchmarks, or promote evidence.
@@ -36,11 +36,17 @@ LEVEL_3_SCAN_DIRS = (
 # The source-artifact directory is a key path that may be referenced and must
 # exist, but preserved payload files inside it are intentionally not scanned.
 LEVEL_3_SOURCE_ARTIFACT_DIR = LEVEL_3_PACKET_DIR / "source-artifact"
+POST_PACKET_DIR_PREFIX = "docs/evals/runs/alpha-solver-post-"
+POST_PACKET_PARENT_DIR = Path("docs/evals/runs")
+COUNCIL_AUDIT_EVIDENCE_BUNDLE_DIR = Path(
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-council-audit-evidence-bundle"
+)
 
 SCAN_DIRS = (
     OPERATOR_GUIDE_DIR,
     EVIDENCE_INDEX_DIR,
     *LEVEL_3_SCAN_DIRS,
+    POST_PACKET_PARENT_DIR,
 )
 REQUIRED_SOURCE_OF_TRUTH_PATHS = (
     OPERATOR_GUIDE_DIR,
@@ -48,6 +54,7 @@ REQUIRED_SOURCE_OF_TRUTH_PATHS = (
     LEVEL_3_SCAN_DIRS[0],
     LEVEL_3_SCAN_DIRS[1],
     LEVEL_3_SOURCE_ARTIFACT_DIR,
+    COUNCIL_AUDIT_EVIDENCE_BUNDLE_DIR,
 )
 
 REPO_RELATIVE_PREFIXES = (
@@ -62,6 +69,10 @@ LOCAL_LLM_MARKERS = (
     "local-llm",
     "LOCAL-LLM",
     "local LLM",
+)
+POST_PACKET_MARKERS = (
+    "alpha-solver-post-",
+    "ALPHA-SOLVER-POST-",
 )
 IGNORED_LINK_PREFIXES = (
     "http://",
@@ -82,7 +93,9 @@ BACKTICK_RE = re.compile(r"`([^`]+)`")
 BARE_REPO_PATH_RE = re.compile(
     r"(?<![\w./-])((?:docs|scripts|tests|alpha)/[^\s)\],;:'\"<>]+|\.specs/[^\s)\],;:'\"<>]+)"
 )
-LOCAL_LANE_RE = re.compile(r"\b(?:ALPHA|NO_FURTHER|STOP-HERE)[A-Z0-9_-]*(?:LOCAL[-_]LLM|LEVEL_3|DOCS_LINK_PATH_CHECKER)[A-Z0-9_-]*\b")
+CHECKED_LANE_RE = re.compile(
+    r"\b(?:ALPHA|NO_FURTHER|STOP-HERE)[A-Z0-9_-]*(?:LOCAL[-_]LLM|LEVEL_3|DOCS_LINK_PATH_CHECKER|SELF[-_]OPERATOR)[A-Z0-9_-]*\b"
+)
 SELECTED_CONTEXT_RE = re.compile(r"\bselected\s+next\s+(?:action|lane)\b", re.IGNORECASE)
 HISTORICAL_CONTEXT_RE = re.compile(
     r"\b(?:prior|preserved|historical|previous|remains|closed)\b",
@@ -120,6 +133,7 @@ def _normalize_posix(value: str) -> str:
     value = unquote(value.strip())
     value = value.split("#", 1)[0].split("?", 1)[0]
     value = value.strip().strip("`.,;:")
+    value = re.sub(r":\d+(?:-\d+)?$", "", value)
     return value
 
 
@@ -128,12 +142,28 @@ def _is_ignored_link(value: str) -> bool:
     return not value or any(lowered.startswith(prefix) for prefix in IGNORED_LINK_PREFIXES)
 
 
+def _has_unresolved_glob_or_shell_syntax(value: str) -> bool:
+    return any(marker in value for marker in ("*", "?", "[", "]", "|", "{", "}"))
+
+
+def _is_checkable_reference(value: str, root: Path = ROOT) -> bool:
+    if _has_unresolved_glob_or_shell_syntax(value):
+        return False
+    suffix = Path(value).suffix.lower()
+    if suffix in TEXT_SUFFIXES:
+        return True
+    return (root / value).exists()
+
+
 def _looks_repo_relative(value: str) -> bool:
     return value.startswith(REPO_RELATIVE_PREFIXES)
 
 
-def _looks_local_llm_reference(value: str) -> bool:
-    return _looks_repo_relative(value) and any(marker in value for marker in LOCAL_LLM_MARKERS)
+def _looks_checked_reference(value: str) -> bool:
+    return _looks_repo_relative(value) and (
+        any(marker in value for marker in LOCAL_LLM_MARKERS)
+        or any(marker in value for marker in POST_PACKET_MARKERS)
+    )
 
 
 def _is_source_artifact_payload(path: Path) -> bool:
@@ -149,7 +179,13 @@ def is_scanned_doc(path: Path, root: Path = ROOT) -> bool:
     if _is_source_artifact_payload(rel):
         return False
     rel_text = rel.as_posix()
-    return any(rel_text == base.as_posix() or rel_text.startswith(f"{base.as_posix()}/") for base in SCAN_DIRS)
+    if rel_text.startswith(POST_PACKET_DIR_PREFIX):
+        return True
+    return any(
+        rel_text == base.as_posix() or rel_text.startswith(f"{base.as_posix()}/")
+        for base in SCAN_DIRS
+        if base != POST_PACKET_PARENT_DIR
+    )
 
 
 def iter_scanned_docs(root: Path = ROOT) -> list[Path]:
@@ -176,9 +212,9 @@ def extract_local_references(path: Path, text: str) -> list[Reference]:
     for index, line in enumerate(text.splitlines(), start=1):
         for raw in _iter_candidate_tokens(line):
             target = _normalize_posix(raw)
-            if _is_ignored_link(target):
+            if _is_ignored_link(target) or not _is_checkable_reference(target):
                 continue
-            if _looks_local_llm_reference(target):
+            if _looks_checked_reference(target):
                 references.append(Reference(path=path, line=index, target=target))
     return references
 
@@ -200,7 +236,7 @@ def find_missing_path_findings(paths: Iterable[Path], root: Path = ROOT) -> list
                         path=reference.path,
                         line=reference.line,
                         reference=reference.target,
-                        message="referenced local LLM repo path does not exist",
+                        message="referenced local LLM/post-Level repo path does not exist",
                     )
                 )
     return findings
@@ -259,7 +295,7 @@ def find_selected_next_conflict_findings(path: Path, text: str) -> list[Finding]
         if _selected_context_has_exemption(line):
             continue
         block = _selected_next_block(lines, index)
-        lanes = LOCAL_LANE_RE.findall(block)
+        lanes = CHECKED_LANE_RE.findall(block)
         if not lanes:
             continue
         selected_value = lanes[0]
@@ -293,13 +329,13 @@ def check_paths(paths: Iterable[Path], root: Path = ROOT) -> list[Finding]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Check local LLM solver orchestration docs for stale or broken local repo paths."
+        description="Check local LLM and post-Level solver docs for stale or broken local repo paths."
     )
     parser.add_argument(
         "paths",
         nargs="*",
         type=Path,
-        help="Optional repo-relative docs to scan. Defaults to the local LLM orchestration docs/index packets.",
+        help="Optional repo-relative docs to scan. Defaults to local LLM and alpha-solver-post-* docs/index packets.",
     )
     args = parser.parse_args(argv)
 
@@ -307,12 +343,12 @@ def main(argv: list[str] | None = None) -> int:
     paths = [path for path in paths if is_scanned_doc(path, ROOT)]
     findings = check_paths(paths, ROOT)
     if findings:
-        print("Local LLM doc path/link check failed:", file=sys.stderr)
+        print("Local LLM/post-Level doc path/link check failed:", file=sys.stderr)
         for finding in findings:
             print(f"  {finding.format()}", file=sys.stderr)
         return 1
 
-    print(f"Local LLM doc path/link check passed ({len(paths)} files scanned).")
+    print(f"Local LLM/post-Level doc path/link check passed ({len(paths)} files scanned).")
     return 0
 
 
