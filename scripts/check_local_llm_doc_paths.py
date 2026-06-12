@@ -236,7 +236,7 @@ def find_missing_path_findings(paths: Iterable[Path], root: Path = ROOT) -> list
                         path=reference.path,
                         line=reference.line,
                         reference=reference.target,
-                        message="referenced local LLM repo path does not exist",
+                        message="referenced local LLM/post-Level repo path does not exist",
                     )
                 )
     return findings

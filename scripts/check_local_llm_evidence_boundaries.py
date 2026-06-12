@@ -83,16 +83,9 @@ BOUNDARY_LANGUAGE_PATTERNS = tuple(
     re.compile(pattern, re.IGNORECASE)
     for pattern in (
         r"\bblocked(?:-|\s)?claims?\b",
-        r"\bblocked\b",
-        r"\bblockers?\b",
-        r"\bdeferred\b",
-        r"\bprevent(?:s|ed|ing)?\b",
-        r"\bbefore\b",
         r"\bevidence(?:-|\s)?boundary\b",
-        r"\bboundary\b",
+        r"\bclaim(?:-|\s)?boundar(?:y|ies)\b",
         r"\bdecision boundary\b",
-        r"\bclaim boundaries\b",
-        r"\bfuture gates?\b",
         r"\baccepted boundary\b",
         r"\bexcluded(?: evidence)? categories\b",
         r"\bnon(?:-|\s)?claims?\b",
@@ -104,19 +97,42 @@ BOUNDARY_LANGUAGE_PATTERNS = tuple(
         r"\bdenied\b",
         r"\bunsafe\b",
         r"\bforbidden\b",
-        r"\bnot\b",
         r"\bdoes not\b",
         r"\bdo not\b",
-        r"\bno\b",
-        r"\bwithout\b",
-        r"\bseparate from\b",
-        r"\bis not\b",
-        r"\bnot prove\b",
-        r"\bnot changed\b",
-        r"\bremains bounded\b",
         r"\bmust not\b",
-        r"\bapproval is required\b",
-        r"\brequired approval\b",
+        r"\bno [^\n.]*\b(?:readiness|evidence|superiority|promotion|quality|provider-orchestration|provider orchestration|billing|dashboard|/v1/solve)\b",
+        r"\bnot [^\n.]*\b(?:readiness|evidence|superiority|promotion|quality|provider-orchestration|provider orchestration|billing|dashboard|/v1/solve)\b",
+        r"\bnon(?:-|\s)?selections?\b",
+        r"\bincluding upgrading local evidence\b",
+        r"\bblockers? prevent [^\n.]*readiness\b",
+        r"\battempt to claim [^\n.]*readiness\b",
+        r"\bno accepted source [^\n.]* establishes\b",
+        r"\bseparation between [^\n.]* evidence\b",
+        r"\bpreventing [^\n.]* evidence [^\n.]* promoted\b",
+        r"\bblocks [^\n.]*claims?\b",
+        r"\bevidence(?:-|\s)?boundaries\b",
+        r"\bno [^\n.]* may claim\b",
+        r"\bbefore [^\n.]* can be claimed\b",
+        r"\breadiness topics\b",
+        r"\breadiness review\b",
+        r"\breadiness work is started\b",
+        r"\brequired evidence for\b",
+        r"\bdeferred and not started\b",
+        r"\bdistinguish [^\n.]* from [^\n.]*readiness\b",
+        r"\bwithout permitted evidence\b",
+        r"\bremains? blocked\b",
+        r"\bremains? deferred\b",
+        r"\bclaims? remain(?:s)? blocked\b",
+        r"\bclaims? (?:is |are )?(?:made|added|blocked)\b",
+        r"\bwithout claiming\b",
+        r"\bnot evidence\b",
+        r"\bnot proof\b",
+        r"\bnot a readiness claim\b",
+        r"\bdoes not claim readiness\b",
+        r"\bdoes not claim [^\n.]*readiness\b",
+        r"\bno readiness claim\b",
+        r"\bnot benchmark evidence\b",
+        r"\bnot superiority evidence\b",
     )
 )
 
@@ -215,7 +231,7 @@ def find_promotional_claim_findings(path: Path, text: str) -> list[Finding]:
     for index, line in enumerate(lines):
         for phrase in UNSUPPORTED_CLAIM_PHRASES:
             if re.search(re.escape(phrase), line, re.IGNORECASE):
-                context = "\n".join((_window(lines, index, radius=12), _section_context(lines, index)))
+                context = "\n".join((_window(lines, index, radius=3), _section_context(lines, index)))
                 if not _has_boundary_language(context):
                     findings.append(
                         Finding(

@@ -13,7 +13,7 @@ Lane ID: `ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-CHECKER-SCOPE-EXTENSI
 
 | Checker file | Current packet roots scanned | alpha-solver-post-* included? | Council bundle included? | Gap |
 |---|---|---|---|---|
-| `scripts/check_local_llm_evidence_boundaries.py` | Existing local-LLM docs plus every text doc under `docs/evals/runs/alpha-solver-post-*`, excluding source artifacts. | Yes. | Yes, through the `alpha-solver-post-*` packet prefix and explicit Council bundle constant. | Closed for default evidence-boundary scanning of current and future post-Level packet docs. |
+| `scripts/check_local_llm_evidence_boundaries.py` | Existing local-LLM docs plus every text doc under `docs/evals/runs/alpha-solver-post-*`, excluding source artifacts. Claim-boundary suppression requires explicit boundary wording rather than generic standalone words like `before`, `no`, or `not`. | Yes. | Yes, through the `alpha-solver-post-*` packet prefix and explicit Council bundle constant. | Closed for default evidence-boundary scanning of current and future post-Level packet docs without broad false-negative suppression. |
 | `scripts/check_local_llm_doc_paths.py` | Existing local-LLM doc roots plus every text doc under `docs/evals/runs/alpha-solver-post-*`, excluding source artifacts. | Yes. | Yes, through the `alpha-solver-post-*` packet prefix and required Council bundle source-of-truth path. | Closed for default doc-path scanning of current and future post-Level packet docs. |
 
 ## Notes

@@ -214,3 +214,69 @@ def test_doc_path_checker_checks_references_in_post_packet_fixture(tmp_path: Pat
         and "does not exist" in finding.message
         for finding in findings
     )
+
+
+def test_evidence_boundary_checker_does_not_treat_before_as_boundary_language(tmp_path: Path) -> None:
+    from scripts import check_local_llm_evidence_boundaries as evidence_boundaries
+
+    _write_final_packet_fixture(tmp_path)
+    rel_path = Path(
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-checker-scope-extension/before-sample.md"
+    )
+    sample = tmp_path / rel_path
+    sample.parent.mkdir(parents=True)
+    sample.write_text(
+        "# Sample\n\n"
+        "The team will review sequencing before any later work.\n"
+        "This packet asserts production readiness for Alpha Solver.\n",
+        encoding="utf-8",
+    )
+
+    findings = evidence_boundaries.check_paths([rel_path], root=tmp_path)
+
+    assert any(finding.path == rel_path and finding.phrase == "production readiness" for finding in findings)
+
+
+def test_evidence_boundary_checker_ignores_generic_no_or_not_far_from_forbidden_phrase(tmp_path: Path) -> None:
+    from scripts import check_local_llm_evidence_boundaries as evidence_boundaries
+
+    _write_final_packet_fixture(tmp_path)
+    rel_path = Path(
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-checker-scope-extension/generic-no-not.md"
+    )
+    sample = tmp_path / rel_path
+    sample.parent.mkdir(parents=True)
+    sample.write_text(
+        "# Sample\n\n"
+        "No implementation work was performed in this fixture.\n"
+        "This sentence is neutral filler.\n"
+        "This sentence is also neutral filler.\n"
+        "This note is not about claims.\n"
+        "This packet asserts production readiness for Alpha Solver.\n",
+        encoding="utf-8",
+    )
+
+    findings = evidence_boundaries.check_paths([rel_path], root=tmp_path)
+
+    assert any(finding.path == rel_path and finding.phrase == "production readiness" for finding in findings)
+
+
+def test_evidence_boundary_checker_allows_explicit_nearby_readiness_boundary(tmp_path: Path) -> None:
+    from scripts import check_local_llm_evidence_boundaries as evidence_boundaries
+
+    _write_final_packet_fixture(tmp_path)
+    rel_path = Path(
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-checker-scope-extension/explicit-boundary.md"
+    )
+    sample = tmp_path / rel_path
+    sample.parent.mkdir(parents=True)
+    sample.write_text(
+        "# Sample\n\n"
+        "This does not claim production readiness.\n"
+        "No readiness claim is made.\n",
+        encoding="utf-8",
+    )
+
+    findings = evidence_boundaries.check_paths([rel_path], root=tmp_path)
+
+    assert not [finding for finding in findings if finding.path == rel_path]
