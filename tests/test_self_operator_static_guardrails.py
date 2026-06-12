@@ -216,6 +216,125 @@ def test_doc_path_checker_checks_references_in_post_packet_fixture(tmp_path: Pat
     )
 
 
+def _write_doc(root: Path, rel_path: Path, body: str) -> None:
+    target = root / rel_path
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(body, encoding="utf-8")
+
+
+def test_doc_path_checker_reports_missing_post_packet_directory_reference(tmp_path: Path) -> None:
+    from scripts import check_local_llm_doc_paths as doc_paths
+
+    rel_path = Path(
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-checker-directory-reference-gap-fix/sample.md"
+    )
+    missing_reference = (
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-missing-directory-reference"
+    )
+    _write_doc(tmp_path, rel_path, f"# Sample\n\nSee `{missing_reference}` for the packet.\n")
+
+    findings = doc_paths.find_missing_path_findings([rel_path], root=tmp_path)
+
+    assert any(
+        finding.path == rel_path
+        and finding.reference == missing_reference
+        and "does not exist" in finding.message
+        for finding in findings
+    )
+
+
+def test_doc_path_checker_reports_missing_legacy_local_llm_directory_reference(tmp_path: Path) -> None:
+    from scripts import check_local_llm_doc_paths as doc_paths
+
+    rel_path = Path("docs/local_llm_solver_orchestration_operator_guide/sample.md")
+    missing_reference = "docs/evals/runs/local-llm-solver-orchestration-missing-directory-reference"
+    _write_doc(tmp_path, rel_path, f"# Sample\n\nSee `{missing_reference}` for the packet.\n")
+
+    findings = doc_paths.find_missing_path_findings([rel_path], root=tmp_path)
+
+    assert any(
+        finding.path == rel_path
+        and finding.reference == missing_reference
+        and "does not exist" in finding.message
+        for finding in findings
+    )
+
+
+def test_doc_path_checker_handles_trailing_slash_for_directory_references(tmp_path: Path) -> None:
+    from scripts import check_local_llm_doc_paths as doc_paths
+
+    rel_path = Path(
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-checker-directory-reference-gap-fix/slash.md"
+    )
+    existing_reference = (
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-existing-directory-reference/"
+    )
+    missing_reference = (
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-missing-directory-reference/"
+    )
+    (tmp_path / existing_reference.rstrip("/")).mkdir(parents=True)
+    _write_doc(
+        tmp_path,
+        rel_path,
+        f"# Sample\n\nSee `{existing_reference}`.\n\nSee `{missing_reference}`.\n",
+    )
+
+    findings = doc_paths.find_missing_path_findings([rel_path], root=tmp_path)
+
+    assert not [finding for finding in findings if finding.reference == existing_reference]
+    assert any(finding.reference == missing_reference for finding in findings)
+
+
+def test_doc_path_checker_uses_tmp_root_for_existing_directory_reference(tmp_path: Path) -> None:
+    from scripts import check_local_llm_doc_paths as doc_paths
+
+    rel_path = Path(
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-checker-directory-reference-gap-fix/existing.md"
+    )
+    existing_reference = (
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-existing-directory-reference"
+    )
+    (tmp_path / existing_reference).mkdir(parents=True)
+    _write_doc(tmp_path, rel_path, f"# Sample\n\nSee `{existing_reference}`.\n")
+
+    findings = doc_paths.find_missing_path_findings([rel_path], root=tmp_path)
+
+    assert not [finding for finding in findings if finding.reference == existing_reference]
+
+
+def test_doc_path_checker_ignores_glob_shell_like_unresolved_directory_pattern(tmp_path: Path) -> None:
+    from scripts import check_local_llm_doc_paths as doc_paths
+
+    rel_path = Path(
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-checker-directory-reference-gap-fix/glob.md"
+    )
+    unresolved_reference = "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-{missing,other}"
+    _write_doc(tmp_path, rel_path, f"# Sample\n\nSee `{unresolved_reference}`.\n")
+
+    findings = doc_paths.find_missing_path_findings([rel_path], root=tmp_path)
+
+    assert not [finding for finding in findings if finding.reference == unresolved_reference]
+
+
+def test_doc_path_checker_exempts_intentional_historical_missing_directory_reference(tmp_path: Path) -> None:
+    from scripts import check_local_llm_doc_paths as doc_paths
+
+    rel_path = Path(
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-checker-directory-reference-gap-fix/non-actions.md"
+    )
+    intentional_reference = (
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-final-status-cli/"
+    )
+    _write_doc(
+        tmp_path,
+        rel_path,
+        f"# Non-actions\n\nHistorical non-action: `{intentional_reference}` was not created.\n",
+    )
+
+    findings = doc_paths.find_missing_path_findings([rel_path], root=tmp_path)
+
+    assert not [finding for finding in findings if finding.reference == intentional_reference]
+
 def test_evidence_boundary_checker_does_not_treat_before_as_boundary_language(tmp_path: Path) -> None:
     from scripts import check_local_llm_evidence_boundaries as evidence_boundaries
 
