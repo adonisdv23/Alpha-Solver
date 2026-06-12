@@ -101,7 +101,30 @@ HISTORICAL_CONTEXT_RE = re.compile(
     r"\b(?:prior|preserved|historical|previous|remains|closed)\b",
     re.IGNORECASE,
 )
+INTENTIONAL_MISSING_REFERENCE_CONTEXT_RE = re.compile(
+    r"\b(?:historical|preserved|mistake|wrong path|old path|non-action|not created|"
+    r"were not created|does not exist|intentionally absent|deferred)\b",
+    re.IGNORECASE,
+)
 FALLBACK_CONTEXT_RE = re.compile(r"\bblocker\s+fallback\s+lane\b", re.IGNORECASE)
+KNOWN_INTENTIONAL_MISSING_REFERENCES = {
+    (
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-merged-closeout-gate-path-repair/mistake-summary.md",
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-release-closeout",
+    ),
+    (
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-merged-closeout-gate-path-repair/release-gate-before.md",
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-release-closeout",
+    ),
+    (
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-release-gate-apply/earliest-blocker.md",
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-release-closeout",
+    ),
+    (
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-release-gate-apply/release-gate-input.md",
+        "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-release-closeout",
+    ),
+}
 
 
 @dataclass(frozen=True)
@@ -146,13 +169,20 @@ def _has_unresolved_glob_or_shell_syntax(value: str) -> bool:
     return any(marker in value for marker in ("*", "?", "[", "]", "|", "{", "}"))
 
 
+def _reference_lookup_path(value: str) -> Path:
+    return Path(value.rstrip("/"))
+
+
 def _is_checkable_reference(value: str, root: Path = ROOT) -> bool:
     if _has_unresolved_glob_or_shell_syntax(value):
         return False
-    suffix = Path(value).suffix.lower()
+    lookup_path = _reference_lookup_path(value)
+    suffix = lookup_path.suffix.lower()
     if suffix in TEXT_SUFFIXES:
         return True
-    return (root / value).exists()
+    if _looks_checked_reference(value):
+        return True
+    return (root / lookup_path).exists()
 
 
 def _looks_repo_relative(value: str) -> bool:
@@ -206,17 +236,28 @@ def _iter_candidate_tokens(line: str) -> Iterator[str]:
             yield match.group(1)
 
 
-def extract_local_references(path: Path, text: str) -> list[Reference]:
+def extract_local_references(path: Path, text: str, root: Path = ROOT) -> list[Reference]:
     """Extract repo-relative local LLM references from a markdown/text doc."""
     references: list[Reference] = []
     for index, line in enumerate(text.splitlines(), start=1):
         for raw in _iter_candidate_tokens(line):
             target = _normalize_posix(raw)
-            if _is_ignored_link(target) or not _is_checkable_reference(target):
+            if _is_ignored_link(target) or _has_unresolved_glob_or_shell_syntax(target):
                 continue
-            if _looks_checked_reference(target):
+            if _looks_checked_reference(target) and _is_checkable_reference(target, root):
                 references.append(Reference(path=path, line=index, target=target))
     return references
+
+
+def _has_intentional_missing_reference_context(lines: list[str], line_number: int) -> bool:
+    start = max(0, line_number - 3)
+    end = min(len(lines), line_number + 2)
+    return bool(INTENTIONAL_MISSING_REFERENCE_CONTEXT_RE.search("\n".join(lines[start:end])))
+
+
+def _is_known_intentional_missing_reference(path: Path, target: str) -> bool:
+    normalized_target = _reference_lookup_path(target).as_posix()
+    return (path.as_posix(), normalized_target) in KNOWN_INTENTIONAL_MISSING_REFERENCES
 
 
 def find_missing_path_findings(paths: Iterable[Path], root: Path = ROOT) -> list[Finding]:
@@ -224,13 +265,18 @@ def find_missing_path_findings(paths: Iterable[Path], root: Path = ROOT) -> list
     seen: set[tuple[Path, int, str]] = set()
     for rel_path in paths:
         text = (root / rel_path).read_text(encoding="utf-8")
-        for reference in extract_local_references(rel_path, text):
+        lines = text.splitlines()
+        for reference in extract_local_references(rel_path, text, root):
             key = (reference.path, reference.line, reference.target)
             if key in seen:
                 continue
             seen.add(key)
-            candidate = root / reference.target
-            if not candidate.exists():
+            candidate = root / _reference_lookup_path(reference.target)
+            if (
+                not candidate.exists()
+                and not _has_intentional_missing_reference_context(lines, reference.line)
+                and not _is_known_intentional_missing_reference(reference.path, reference.target)
+            ):
                 findings.append(
                     Finding(
                         path=reference.path,
