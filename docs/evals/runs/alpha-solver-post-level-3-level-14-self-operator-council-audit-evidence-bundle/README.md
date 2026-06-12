@@ -42,3 +42,10 @@ If this bundle remains clean after required preparation-lane checks only, the se
 If the evidence bundle is blocked before the manual Council run, select `ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-COUNCIL-AUDIT-EVIDENCE-BUNDLE-FIX-001`. Reserve `ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-COUNCIL-AUDIT-EVIDENCE-BUNDLE-FALLBACK-001` only for cases where the fix lane cannot proceed or the bundle cannot be safely repaired.
 
 AUDIT-005 is now recorded in `docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-pre-council-audit-005-decision-and-bundle-routing-fix/audit-005-decision-record.md`. F-1 remains open for the future checker-scope extension lane.
+
+
+## Post-#490 verification annex amendment
+
+A post-#490 verification annex has been added at `docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-council-audit-evidence-bundle/verification-annex/` and mirrored by the lane packet at `docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-council-bundle-verification-annex/`. It records the verified #480 through #490 PR chain, #488 AUDIT-005 routing/wording fix, #489 checker-scope extension, #490 directory reference gap fix, current checker coverage, D-1 through D-5 caveats, CI evidence, and self-attestation/review-independence notes.
+
+Council has not run. Manual operator review has not happened. Targeted Fable delta re-audit has not run in this lane. No readiness claim is made by this amendment.
