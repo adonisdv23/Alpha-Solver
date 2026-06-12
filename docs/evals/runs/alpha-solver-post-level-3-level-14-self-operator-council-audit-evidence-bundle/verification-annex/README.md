@@ -10,3 +10,5 @@ Files in this annex:
 - `merged-pr-chain-480-490.md`
 - `ci-evidence.md`
 - `council-reader-notes.md`
+- `selected-next-lane.md`
+- `evidence-boundary.md`
