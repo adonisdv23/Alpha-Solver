@@ -2,6 +2,6 @@
 
 | item_id | priority | decision needed | why operator input is required |
 |---|---|---|---|
-| `AUDIT-005` | A | Select exact approval text required when a lane combines tooling/docs scope or multiple blocker classes. | The repo can record the requirement, but the operator should choose the approval wording that future lanes must quote before proceeding. |
+| `AUDIT-005` | A | Decision recorded in `../alpha-solver-post-level-3-level-14-self-operator-pre-council-audit-005-decision-and-bundle-routing-fix/audit-005-decision-record.md`. | Future combined tooling/docs lanes must quote and satisfy the recorded decision before proceeding. |
 
-No other item currently requires an operator decision before backlog capture is complete.
+AUDIT-005 no longer requires a new operator decision for the future F-1 checker-scope extension lane; the recorded decision supplies the required approval boundary. No other item currently requires an operator decision before backlog capture is complete.

@@ -37,4 +37,8 @@ This is evidence for a narrow local-only operator-supervised Self Operator candi
 
 ## Selected next lane
 
-If this bundle remains clean after checks, the selected next lane is `ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-COUNCIL-AUDIT-MANUAL-RUN-001`.
+If this bundle remains clean after required preparation-lane checks only, the selected next lane is `ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-COUNCIL-AUDIT-MANUAL-RUN-001`. Council has not run, and this wording does not mean Council has found no defects.
+
+If the evidence bundle is blocked before the manual Council run, select `ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-COUNCIL-AUDIT-EVIDENCE-BUNDLE-FIX-001`. Reserve `ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-COUNCIL-AUDIT-EVIDENCE-BUNDLE-FALLBACK-001` only for cases where the fix lane cannot proceed or the bundle cannot be safely repaired.
+
+AUDIT-005 is now recorded in `docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-pre-council-audit-005-decision-and-bundle-routing-fix/audit-005-decision-record.md`. F-1 remains open for the future checker-scope extension lane.
