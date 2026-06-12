@@ -22,6 +22,15 @@ The read-only repo search for a committed final independent read-only audit repo
 - F-6 Low/P3 was used as the AUDIT-005 decision basis: the final independent read-only Fable audit reported that `AUDIT-005` remained open and gated combined tooling/docs lanes, including the future F-1 checker-scope extension lane.
 - AUDIT-005 was reviewed as the open operator-decision item requiring exact approval text before combined tooling/docs or multi-blocker work proceeds.
 
+## Finding source and repo verification boundary
+
+| Finding | Source used in this lane | Repo-verifiable now? | Verification status |
+|---|---|---|---|
+| F-1 | Same-thread Fable audit source. | Partially; this lane can verify that F-1 is not resolved by this docs-only patch, but does not verify or fix checker coverage. | Not fully resolved or verified in this lane; deferred to `ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-CHECKER-SCOPE-EXTENSION-001`. |
+| F-2 | Same-thread Fable audit source plus current Council bundle files. | Yes for the derivative routing/wording files edited in this lane. | Routing and wording repaired in this lane; Council has not run. |
+| F-6 | Same-thread Fable audit source plus auditor backlog triage files. | Yes for AUDIT-005 triage status and the new decision record. | AUDIT-005 decision recorded in this lane and synchronized across the triage packet summaries. |
+| AUDIT-005 | Operator-provided decision text. | Yes for exact text recorded in `audit-005-decision-record.md`. | Operator decision recorded exactly; this does not make the Fable audit source repo-native. |
+
 ## Boundary
 
 This file records the findings reviewed for this lane. It does not turn the external chat audit source into raw repo execution evidence, does not run Council, and does not resolve F-1.

@@ -10,7 +10,7 @@ This is a docs-only governance and routing lane. It does not implement the check
 
 | PR | expected state | live state | merged? | default-main visibility impact |
 |---|---|---|---|---|
-| #487 | merged into default main | Local current branch HEAD is `f0f0e44414bc51a91640f6c29b141cdc2eb88d09 docs(self-operator): prepare Council audit evidence bundle (#487)`; no remote named `origin` is configured in this checkout. | yes, verified from current live repo history for this checkout | Council audit evidence bundle is visible in the current default-main-equivalent checkout used for this lane. |
+| #487 | merged into default main | Codex checkout evidence: current branch history includes PR #487 merge commit `f0f0e44414bc51a91640f6c29b141cdc2eb88d09 docs(self-operator): prepare Council audit evidence bundle (#487)` and Council bundle files. Live remote verification: not available from this checkout because no remote named origin is configured. | not remotely verified from this checkout | Operator/PR reviewer should verify GitHub PR #487 is merged before merging this PR. Decision impact: local checkout evidence is sufficient for this docs lane, but live GitHub verification remains an external reviewer/operator check. |
 
 ## Packet contents
 
