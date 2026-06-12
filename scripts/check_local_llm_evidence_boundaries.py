@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Static evidence-boundary checker for local LLM solver orchestration docs.
+"""Static evidence-boundary checker for local LLM and post-Level solver docs.
 
 Purpose and limits:
 - This is a deterministic, offline documentation hardening check.
 - It scans local LLM solver orchestration evidence-boundary docs for risky
   promotional claim phrases and requires nearby boundary language.
+- It also scans alpha-solver-post-* Self Operator packet docs, including the Council audit evidence bundle.
 - It also checks that the final Level 3 closeout packet preserves the accepted
   non-promotional boundary phrases.
 - It does not validate behavior, run benchmarks, call models/providers, read
@@ -25,6 +26,10 @@ DOCS_DIR_PREFIXES = (
     "docs/local_llm_solver_orchestration",
 )
 LOCAL_ORCHESTRATION_DIR_MARKER = "local-llm-solver-orchestration"
+POST_PACKET_DIR_PREFIX = "docs/evals/runs/alpha-solver-post-"
+COUNCIL_AUDIT_EVIDENCE_BUNDLE_DIR = Path(
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-council-audit-evidence-bundle"
+)
 SOURCE_ARTIFACT_MARKERS = (
     "/source-artifact/",
     "-source-artifact-",
@@ -78,9 +83,16 @@ BOUNDARY_LANGUAGE_PATTERNS = tuple(
     re.compile(pattern, re.IGNORECASE)
     for pattern in (
         r"\bblocked(?:-|\s)?claims?\b",
+        r"\bblocked\b",
+        r"\bblockers?\b",
+        r"\bdeferred\b",
+        r"\bprevent(?:s|ed|ing)?\b",
+        r"\bbefore\b",
         r"\bevidence(?:-|\s)?boundary\b",
         r"\bboundary\b",
         r"\bdecision boundary\b",
+        r"\bclaim boundaries\b",
+        r"\bfuture gates?\b",
         r"\baccepted boundary\b",
         r"\bexcluded(?: evidence)? categories\b",
         r"\bnon(?:-|\s)?claims?\b",
@@ -103,6 +115,8 @@ BOUNDARY_LANGUAGE_PATTERNS = tuple(
         r"\bnot changed\b",
         r"\bremains bounded\b",
         r"\bmust not\b",
+        r"\bapproval is required\b",
+        r"\brequired approval\b",
     )
 )
 
@@ -138,6 +152,8 @@ def is_relevant_doc(path: Path) -> bool:
     if _is_source_artifact(Path(rel)):
         return False
     if rel.startswith(DOCS_DIR_PREFIXES):
+        return True
+    if rel.startswith(POST_PACKET_DIR_PREFIX):
         return True
     return rel.startswith(RUNS_DIR.as_posix()) and LOCAL_ORCHESTRATION_DIR_MARKER in rel
 
@@ -199,7 +215,7 @@ def find_promotional_claim_findings(path: Path, text: str) -> list[Finding]:
     for index, line in enumerate(lines):
         for phrase in UNSUPPORTED_CLAIM_PHRASES:
             if re.search(re.escape(phrase), line, re.IGNORECASE):
-                context = "\n".join((_window(lines, index, radius=3), _section_context(lines, index)))
+                context = "\n".join((_window(lines, index, radius=12), _section_context(lines, index)))
                 if not _has_boundary_language(context):
                     findings.append(
                         Finding(
