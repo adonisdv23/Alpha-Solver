@@ -25,5 +25,6 @@ Inputs the gap-closure lane should consume from this packet:
 - `def-002-verdict.md` — the closure-gating preconditions.
 
 Suggested gap-closure ordering (High first): RR-02 (plaintext secrets-at-rest),
-RR-03 (default credentials), then RR-01 (CORS), RR-05 (classification
-registries), RR-07/RR-08 (supply-chain), RR-06 (dependency-declaration drift).
+RR-03 (default credentials), then RR-01 (CORS), RR-09 (confirm/wire the
+`/v1/solve` auth/tenancy model), RR-05 (classification registries), RR-07/RR-08
+(supply-chain), RR-06 (dependency-declaration drift).

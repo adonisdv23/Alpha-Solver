@@ -23,10 +23,12 @@
    local-vs-provider boundary. The review was therefore **not** blocked by
    missing evidence.
 
-2. **Open gaps remain.** `risk-register.md` records seven gap-closure findings
-   (RR-01, RR-02, RR-03, RR-05, RR-06, RR-07, RR-08), including High-severity
-   plaintext secrets-at-rest (RR-02) and insecure default credentials (RR-03).
-   These require code/config remediation, not mere operator acceptance.
+2. **Open gaps remain.** `risk-register.md` records eight gap-closure findings
+   (RR-01, RR-02, RR-03, RR-05, RR-06, RR-07, RR-08, RR-09), including
+   High-severity plaintext secrets-at-rest (RR-02) and insecure default
+   credentials (RR-03), and the unconfirmed/unmounted JWT-and-tenancy model for
+   `/v1/solve` (RR-09). These require code/config remediation, not mere operator
+   acceptance.
 
 3. **Acceptance is not yet appropriate.** Because gap-closure items are open,
    the packet is not `READY_FOR_OPERATOR_RISK_ACCEPTANCE`. Residual-risk
@@ -49,6 +51,8 @@ To reach closure in a future lane, at minimum:
 - RR-05 data-classification registries reconciled to one authoritative policy;
 - RR-06/RR-07/RR-08 dependency/supply-chain tracking established (single source
   of truth, lockfile/hash pinning, vendored-lib inventory);
+- RR-09 intended `/v1/solve` auth/tenancy model explicitly confirmed or wired
+  (JWT/tenant middleware mounted, or API-key-only model documented as intended);
 - residual risks (RR-04, RR-A1) formally accepted by an operator.
 
 ## Validation status

@@ -17,6 +17,7 @@ them; it does not remediate them (docs-only).
 | RR-06 | Dependencies | Dependency declarations duplicated and potentially drifting between `requirements.txt` and `pyproject.toml`. | `requirements.txt`; `pyproject.toml:17-26` | Low | Gap-closure |
 | RR-07 | Supply chain | No lockfile and no hash pinning; range-only runtime dependencies. | `requirements.txt`; `pyproject.toml` | Medium | Gap-closure |
 | RR-08 | Supply chain | In-tree vendored/shimmed third-party libs with untracked provenance/patch status. | repo root: `slowapi/`, `prometheus_client/`, `prometheus_fastapi_instrumentator/`, `jsonschema/`, `jsonlines_compat.py` | Medium | Gap-closure |
+| RR-09 | `/v1/solve` exposure auth model | Bundled `/v1/solve` relies on API-key auth + rate limiting; JWT and tenant middleware exist in-repo but are not mounted on the bundled app. Intended auth/tenancy model for `/v1/solve` must be explicitly confirmed or wired before public/runtime exposure. | `service/app.py:149-166`, `:884`, `:927`, `:943`; `service/security.py:19-27`; unmounted: `service/middleware/jwt_middleware.py`, `service/middleware/auth_middleware.py`, `service/middleware/tenant_middleware.py` | Medium | Gap-closure |
 
 ## Strong controls observed (not gaps — recorded for balance)
 
@@ -35,7 +36,7 @@ them; it does not remediate them (docs-only).
 
 ## Disposition summary
 
-- **Gap-closure required:** RR-01, RR-02, RR-03, RR-05, RR-06, RR-07, RR-08.
+- **Gap-closure required:** RR-01, RR-02, RR-03, RR-05, RR-06, RR-07, RR-08, RR-09.
 - **Operator residual-risk candidates:** RR-04 (and the inherent redaction-coverage
   limitation RR-A1 in `accepted-residual-risks.md`).
 
