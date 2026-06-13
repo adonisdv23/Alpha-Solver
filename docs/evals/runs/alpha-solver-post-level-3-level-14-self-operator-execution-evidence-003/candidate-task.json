@@ -1,0 +1,43 @@
+{
+  "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-EXECUTION-EVIDENCE-003",
+  "requested_action": "Create a local-only evidence packet for Self Operator Execution Evidence 003 using the real operator approval artifact supplied in the prompt, then stop unless the local gate accepts the approval and the code supports only safe deterministic repository-local artifact actions.",
+  "candidate_changed_files": [
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/README.md",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/repo-state-verification.md",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/candidate-task-selection.md",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/operator-approval-artifact.json",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/operator-decision-record.md",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/execution-plan.md",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/commands-run.md",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/execution-results.md",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/artifacts-index.md",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/failure-analysis.md",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/blocked-after-approval.md",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/evidence-boundary.md",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/forbidden-claims.md",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/selected-next-lane.md",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/non-actions.md",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/artifacts/execution-gate-result.json",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/artifacts/dry-run-result.json",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/artifacts/stop-state.json"
+  ],
+  "proposed_commands": [
+    "git status --short --branch",
+    "git diff -- docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003"
+  ],
+  "operator_confirmation": true,
+  "output_root": "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/artifacts",
+  "evidence_boundary": "local-only offline documentation/evidence packet; no providers, models, tokens, external APIs, browser automation, deployment, credentials, Google Sheets, runtime behavior changes, provider routing changes, prior evidence mutation, or readiness claims",
+  "artifact_paths": [
+    "execution-gate-result.json",
+    "dry-run-result.json",
+    "stop-state.json"
+  ],
+  "allowed_changed_prefixes": [
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/"
+  ],
+  "metadata": {
+    "run_id": "execution-evidence-003-operator-local-001",
+    "scope_summary": "Operator-supervised local-only Execution Evidence 003 run for the representative Self Operator candidate task."
+  }
+}

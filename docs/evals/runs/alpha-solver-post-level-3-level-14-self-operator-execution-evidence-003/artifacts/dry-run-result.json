@@ -1,0 +1,115 @@
+{
+  "allowed": false,
+  "approval_summary": {
+    "approved": true,
+    "finding_ids": [
+      "SELF_OPERATOR_APPROVAL_HARD_STOP_TEXT_REQUIRED"
+    ],
+    "identity_finding_ids": [],
+    "identity_match": true,
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-EXECUTION-EVIDENCE-003",
+    "present": true,
+    "run_id": "execution-evidence-003-operator-local-001",
+    "valid": false
+  },
+  "artifact_paths": {
+    "dry_run_result": "dry-run-result.json",
+    "execution_gate_result": "execution-gate-result.json",
+    "stop_state": "stop-state.json"
+  },
+  "dry_run_status": "blocked_by_missing_approval",
+  "evidence_boundary": "local-only offline evidence; no providers, models, tokens, external APIs, browser automation, deployment, credentials, Google Sheets, runtime/provider changes, prior evidence mutation, or readiness claims",
+  "execution_gate_summary": {
+    "allowed_for_local_dry_run": false,
+    "finding_ids": [
+      "SELF_OPERATOR_APPROVAL_HARD_STOP_TEXT_REQUIRED"
+    ],
+    "gate_status": "blocked_by_missing_approval",
+    "reason_code": "approval_invalid",
+    "redaction_status": "redacted",
+    "schema_version": "self_operator.execution_gate_result.v1",
+    "stop_state_present": true
+  },
+  "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-001",
+  "metadata": {
+    "acceptance_status": "not_run",
+    "blocker_fallback_lane": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-FIX-001",
+    "created_at": "2026-06-13T00:00:00Z",
+    "evidence_boundary": "local-only; operator-supervised; no execution; no providers or external systems; no acceptance; no source-artifact mutation; no evidence promotion",
+    "mvp_readiness": "unclaimed",
+    "operator_supervision": "required_for_manual_local_acceptance",
+    "provider_external_surface_status": "not_called",
+    "selected_next_lane": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-13-SELF-OPERATOR-MANUAL-LOCAL-ACCEPTANCE-PACKET-001"
+  },
+  "non_execution_confirmation": "wrapper does not execute proposed commands; it only classifies proposed command text",
+  "output_root_summary": {
+    "basename": "artifacts",
+    "provided_by_caller": true,
+    "raw_path_recorded": false
+  },
+  "preflight_summary": {
+    "allowed": true,
+    "artifact_paths": [
+      "execution-gate-result.json",
+      "dry-run-result.json",
+      "stop-state.json"
+    ],
+    "command_reason_codes": [
+      "allowed_local_read_check",
+      "allowed_local_read_check"
+    ],
+    "evidence_boundary": "local-only offline documentation/evidence packet; no providers, models, tokens, external APIs, browser automation, deployment, credentials, Google Sheets, runtime behavior changes, provider routing changes, prior evidence mutation, or readiness claims",
+    "finding_ids": [],
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-EXECUTION-EVIDENCE-003",
+    "stop_state": "passed"
+  },
+  "proposed_task_summary": {
+    "artifact_path_count": 3,
+    "candidate_changed_files": [
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/README.md",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/repo-state-verification.md",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/candidate-task-selection.md",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/operator-approval-artifact.json",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/operator-decision-record.md",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/execution-plan.md",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/commands-run.md",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/execution-results.md",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/artifacts-index.md",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/failure-analysis.md",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/blocked-after-approval.md",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/evidence-boundary.md",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/forbidden-claims.md",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/selected-next-lane.md",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/non-actions.md",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/artifacts/execution-gate-result.json",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/artifacts/dry-run-result.json",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/artifacts/stop-state.json"
+    ],
+    "command_count": 2,
+    "evidence_boundary_present": true,
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-EXECUTION-EVIDENCE-003",
+    "metadata": {
+      "run_id": "execution-evidence-003-operator-local-001",
+      "scope_summary": "Operator-supervised local-only Execution Evidence 003 run for the representative Self Operator candidate task."
+    },
+    "operator_confirmation_present": true,
+    "requested_action": "Create a local-only evidence packet for Self Operator Execution Evidence 003 using the real operator approval artifact supplied in the prompt, then stop unless the local gate accepts the approval and the code supports only safe deterministic repository-local artifact actions.",
+    "run_id": "execution-evidence-003-operator-local-001"
+  },
+  "reason_code": "approval_invalid",
+  "redaction_status": "redacted",
+  "run_id": "execution-evidence-003-operator-local-001",
+  "schema_version": "self_operator.dry_run_result.v1",
+  "stop_state_summary": {
+    "blocked_surfaces": [
+      "approval_record"
+    ],
+    "finding_ids": [
+      "SELF_OPERATOR_APPROVAL_HARD_STOP_TEXT_REQUIRED"
+    ],
+    "reason_code": "approval_invalid",
+    "redaction_status": "redacted",
+    "schema_version": "self_operator.stop_state_record.v1",
+    "stop_state": "blocked"
+  }
+}

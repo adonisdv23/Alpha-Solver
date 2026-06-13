@@ -1,0 +1,110 @@
+{
+  "allowed_for_local_dry_run": false,
+  "approval_result_summary": {
+    "approved": true,
+    "finding_ids": [
+      "SELF_OPERATOR_APPROVAL_HARD_STOP_TEXT_REQUIRED"
+    ],
+    "identity_finding_ids": [],
+    "identity_match": true,
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-EXECUTION-EVIDENCE-003",
+    "present": true,
+    "run_id": "execution-evidence-003-operator-local-001",
+    "valid": false
+  },
+  "artifact_paths": [
+    "execution-gate-result.json",
+    "dry-run-result.json",
+    "stop-state.json"
+  ],
+  "evidence_boundary": "local-only offline evidence; no providers, models, tokens, external APIs, browser automation, deployment, credentials, Google Sheets, runtime/provider changes, prior evidence mutation, or readiness claims",
+  "findings": [
+    {
+      "id": "SELF_OPERATOR_APPROVAL_HARD_STOP_TEXT_REQUIRED",
+      "message": "stop if explicit operator confirmation is missing",
+      "reason_code": "missing_hard_stop_text",
+      "severity": "error",
+      "stop_state": "blocked",
+      "surface": "approval_record"
+    }
+  ],
+  "gate_status": "blocked_by_missing_approval",
+  "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-EXECUTION-EVIDENCE-003",
+  "metadata": {
+    "created_at": "2026-06-13T00:00:00Z",
+    "dry_run_harness_contract": "readiness-only; wrapper remains selected next lane",
+    "non_execution_boundary": "no commands executed; no providers, external APIs, browsers, deployment, billing, credentials, Google Sheets, source-artifact mutation, or evidence promotion"
+  },
+  "preflight_result_summary": {
+    "allowed": true,
+    "artifact_paths": [
+      "execution-gate-result.json",
+      "dry-run-result.json",
+      "stop-state.json"
+    ],
+    "evidence_boundary": "local-only offline documentation/evidence packet; no providers, models, tokens, external APIs, browser automation, deployment, credentials, Google Sheets, runtime behavior changes, provider routing changes, prior evidence mutation, or readiness claims",
+    "finding_ids": [],
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-EXECUTION-EVIDENCE-003",
+    "stop_state": "passed"
+  },
+  "reason_code": "approval_invalid",
+  "redaction_status": "redacted",
+  "run_id": "execution-evidence-003-operator-local-001",
+  "schema_version": "self_operator.execution_gate_result.v1",
+  "stop_state_record": {
+    "approval_result_summary": {
+      "approved": true,
+      "finding_ids": [
+        "SELF_OPERATOR_APPROVAL_HARD_STOP_TEXT_REQUIRED"
+      ],
+      "identity_finding_ids": [],
+      "identity_match": true,
+      "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-EXECUTION-EVIDENCE-003",
+      "present": true,
+      "run_id": "execution-evidence-003-operator-local-001",
+      "valid": false
+    },
+    "artifact_paths": [
+      "execution-gate-result.json",
+      "dry-run-result.json",
+      "stop-state.json"
+    ],
+    "blocked_surfaces": [
+      "approval_record"
+    ],
+    "evidence_boundary": "local-only offline evidence; no providers, models, tokens, external APIs, browser automation, deployment, credentials, Google Sheets, runtime/provider changes, prior evidence mutation, or readiness claims",
+    "findings": [
+      {
+        "id": "SELF_OPERATOR_APPROVAL_HARD_STOP_TEXT_REQUIRED",
+        "message": "stop if explicit operator confirmation is missing",
+        "reason_code": "missing_hard_stop_text",
+        "severity": "error",
+        "stop_state": "blocked",
+        "surface": "approval_record"
+      }
+    ],
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-EXECUTION-EVIDENCE-003",
+    "message": "execution gate blocked: approval_invalid",
+    "metadata": {
+      "created_at": "2026-06-13T00:00:00Z",
+      "local_only": true
+    },
+    "reason_code": "approval_invalid",
+    "redaction_status": "redacted",
+    "run_id": "execution-evidence-003-operator-local-001",
+    "schema_version": "self_operator.stop_state_record.v1",
+    "source_preflight_result_summary": {
+      "allowed": true,
+      "artifact_paths": [
+        "execution-gate-result.json",
+        "dry-run-result.json",
+        "stop-state.json"
+      ],
+      "evidence_boundary": "local-only offline documentation/evidence packet; no providers, models, tokens, external APIs, browser automation, deployment, credentials, Google Sheets, runtime behavior changes, provider routing changes, prior evidence mutation, or readiness claims",
+      "finding_ids": [],
+      "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-EXECUTION-EVIDENCE-003",
+      "stop_state": "passed"
+    },
+    "stop_state": "blocked"
+  }
+}
