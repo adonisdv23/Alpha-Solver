@@ -23,7 +23,7 @@
 | --- | --- | --- |
 | Masked dashboard display/audit | Pass now for existing settings behavior | Settings service masks stored keys for display and audit entries. |
 | Restrictive file modes | Pass now for current file backend behavior | Settings storage code creates private parent/file modes on POSIX. |
-| Plaintext storage | Fail now | DEF-002 RR-02 identifies plaintext provider key storage as the first gap-closure remediation target. |
+| RR-02 credential storage hardening | Pass now for the narrow accepted RR-02 evidence boundary | PR #521 merged `ALPHA-SOLVER-DEF-002-CREDENTIAL-STORAGE-HARDENING-001`, which hardens file/directory permission behavior for the existing file-backed dashboard credential path; DEF-002 remains open. |
 | Default credential hardening | Fail now | DEF-002 RR-03 remains open. |
 | Provider default-off | Pass now | `/v1/solve` provider branch requires explicit OpenAI provider opt-in. |
 | Public cost caps | Fail now | Public traffic cost caps, tenant quotas, alerts, and shutdown are not proven. |
@@ -31,4 +31,4 @@
 
 ## Gate result
 
-Secrets and provider-cost controls are no-go blockers until DEF-002 credential/default-credential lanes and public cost-cap evidence are complete.
+Secrets and provider-cost controls remain no-go blockers until RR-03 default credential hardening, remaining DEF-002 lanes, residual-risk decisions, and public cost-cap evidence are complete. RR-02 credential storage hardening alone does not authorize exposure.

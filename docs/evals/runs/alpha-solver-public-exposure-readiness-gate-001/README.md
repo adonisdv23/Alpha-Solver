@@ -38,7 +38,7 @@ This docs-only packet defines the conditions that must be satisfied before any p
 
 ## Decision
 
-Public exposure is **NO-GO**. The gate is captured, but it is not passed. The expected next lane remains a DEF-002 gap-closure lane, normally `ALPHA-SOLVER-DEF-002-CREDENTIAL-STORAGE-HARDENING-001`, not an exposure lane.
+Public exposure is **NO-GO**. The gate is captured, but it is not passed. PR #521 merged the accepted credential-storage hardening evidence packet for `ALPHA-SOLVER-DEF-002-CREDENTIAL-STORAGE-HARDENING-001`, so this packet no longer routes operators back to that completed RR-02 lane. The expected public-exposure-readiness/security remediation track is now DEF-002-local RR-03 default credential hardening: `ALPHA-SOLVER-DEF-002-DEFAULT-CREDENTIALS-HARDENING-001`, not an exposure lane.
 
 ## Boundary
 

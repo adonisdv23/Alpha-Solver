@@ -3,7 +3,7 @@
 Public exposure must not proceed while any of these blockers remain open.
 
 1. DEF-002 is open and not closed by operator-approved evidence.
-2. RR-02 plaintext provider-secret storage is not remediated or explicitly blocked by a no-persistence design.
+2. RR-02 credential storage was hardened by the accepted credential-storage hardening evidence packet, but DEF-002 remains open and RR-02 residual limitations still require operator awareness before exposure.
 3. RR-03 known/default dashboard/API credential semantics are not hardened.
 4. RR-01 CORS defaults are not hardened and tested for public exposure.
 5. RR-09 `/v1/solve` auth/tenancy decision is not closed with tests.
