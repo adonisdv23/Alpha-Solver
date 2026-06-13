@@ -31,3 +31,11 @@ Council has not run. Manual operator review has not happened. Targeted Fable del
 The earlier F-1-open wording reflected the post-#488, pre-#489, and pre-#490 state. After #489 and #490, F-1/N-1 are recorded as resolved pending targeted Fable delta re-audit confirmation. Council has not run. Manual operator review has not happened. Targeted Fable delta re-audit has not run in this correction lane. No readiness claim is made.
 
 The post-#490 verification annex routing is preserved: the selected validation path remains targeted Fable delta re-audit confirmation before any broader Council-facing readiness interpretation.
+
+## Post-Council-run P2 hardening amendment
+
+The manual Council audit run for `ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-COUNCIL-AUDIT-MANUAL-RUN-001` has completed raw capture with 16 usable raw audit responses plus 1 documented failed platform slot (Venice - Auto, Security / Privacy Auditor lens, `PLATFORM_FAILED_NO_USABLE_OUTPUT`). A read-only synthesis (`ALPHA-SOLVER-COUNCIL-SYNTHESIS-REPORT-001`, operator-held outside this repository) recorded zero P0 and zero P1 findings reported across the 16 usable seats and selected a P2 hardening lane.
+
+The P2 hardening packet is at `docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-council-audit-p2-fix/`. It records the D-1 through D-5 source-text excerpts, the #492 / F-1 correction primary evidence, release-gate acceptance criteria, a fresh read-only repo-state verification, and the deferral register.
+
+The earlier "Whether Council has run: no" and "Council has not run" wording in this file reflected the pre-run state and is superseded by this amendment. Manual operator review of the synthesis and the P2 hardening packet has not happened. The prior targeted Fable delta audit is cited only as having reported no P0/P1 blockers. No readiness claim is made by this amendment.
