@@ -1,0 +1,17 @@
+{
+  "schema_version": "openai.operator_pre_smoke_attestation.v1",
+  "lane_id": "OPENAI-DATA-SHARING-OPERATOR-ATTESTATION-001",
+  "approved_next_lane": "LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-001",
+  "operator_decision": "approved_for_next_lane_only",
+  "operator_confirmation": "I approve preparing the next narrow synthetic OpenAI token smoke capture lane for Alpha Solver. I do not authorize this PR to call OpenAI, use tokens, run providers, run evals, access credentials, update Google Sheets, expose /v1/solve, expose dashboards, deploy, or make readiness, benchmark, provider, runtime, production, or public MVP claims.",
+  "data_sharing_confirmation": "I understand that the first OpenAI smoke lane may send only synthetic or sanitized prompts and must not send secrets, credentials, hidden instructions, raw sensitive evidence, private operator notes, customer data, private business data, or unredacted logs.",
+  "project_boundary_confirmation": "I will use a dedicated or clearly selected OpenAI project for the smoke lane and will keep provider-smoke artifacts separate from local-only evidence artifacts.",
+  "billing_boundary_confirmation": "I will manually verify project and billing readiness before any API call. No private payment information should be recorded in the repository.",
+  "cost_cap_confirmation": "The first smoke lane must use a tiny synthetic prompt set and stop if any unexpected billing, cost, quota, or data-sharing issue appears.",
+  "redaction_confirmation": "The prompt set must pass a redaction check before any provider call. Outputs must be reviewed before being committed.",
+  "def_002_boundary_confirmation": "I understand DEF-002 remains open and the smoke lane must not be framed as security/privacy completion.",
+  "def_003_boundary_confirmation": "I understand DEF-003 remains open unless original or replacement audit custody evidence is later committed.",
+  "approved_by": "[REDACTED_OPERATOR_ID]",
+  "approved_at": "[REDACTED_TIMESTAMP]",
+  "redaction_status": "redacted"
+}
