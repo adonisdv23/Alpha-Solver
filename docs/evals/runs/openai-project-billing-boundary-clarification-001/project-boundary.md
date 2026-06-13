@@ -8,4 +8,4 @@ Required operator verification before a tiny synthetic retry:
 - Confirm that the key intended for the retry belongs only to that selected boundary.
 - Confirm that no broad provider validation, evals, benchmarks, production traffic, or public MVP activity is authorized.
 
-Status: pending operator confirmation.
+Status: `BLOCKED_PROJECT_BILLING_OPERATOR_CONFIRMATION_MISSING`.

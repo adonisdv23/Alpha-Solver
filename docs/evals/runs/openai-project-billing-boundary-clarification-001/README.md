@@ -21,3 +21,7 @@ This docs-only packet clarifies the OpenAI project, billing, cost-control, and d
 ## Boundary
 
 This packet documents what the operator must verify manually outside the repository. It does not inspect credentials, billing pages, payment methods, project identifiers, private billing data, or provider account details.
+
+## Operator confirmation artifact schema note
+
+The `operator-confirmation-artifact.json` field `private_billing_data_recorded` is a JSON boolean. It is `false` because this packet records no private billing details; it must not be encoded as a string or used to store payment, invoice, quota, balance, or billing-account data.
