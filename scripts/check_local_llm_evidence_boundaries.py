@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Static evidence-boundary checker for local LLM, post-Level, and OpenAI evidence packet docs.
+"""Static evidence-boundary checker for local LLM, post-Level, OpenAI, and DEF evidence packet docs.
 
 Purpose and limits:
 - This is a deterministic, offline documentation hardening check.
 - It scans local LLM solver orchestration evidence-boundary docs for risky
   promotional claim phrases and requires nearby boundary language.
-- It also scans alpha-solver-post-* Self Operator packet docs, including the Council audit evidence bundle, plus OpenAI evidence packet docs.
+- It also scans alpha-solver-post-* Self Operator packet docs, including the
+  Council audit evidence bundle, OpenAI evidence packet docs, and alpha-solver-def-* custody packet docs.
 - It also checks that the final Level 3 closeout packet preserves the accepted
   non-promotional boundary phrases.
 - It does not validate behavior, run benchmarks, call models/providers, read
@@ -27,6 +28,7 @@ DOCS_DIR_PREFIXES = (
 )
 LOCAL_ORCHESTRATION_DIR_MARKER = "local-llm-solver-orchestration"
 POST_PACKET_DIR_PREFIX = "docs/evals/runs/alpha-solver-post-"
+DEF_PACKET_DIR_PREFIX = "docs/evals/runs/alpha-solver-def-"
 OPENAI_PACKET_DIR_PREFIXES = (
     "docs/evals/runs/openai-",
     "docs/evals/runs/local-openai-",
@@ -177,6 +179,8 @@ def is_relevant_doc(path: Path) -> bool:
     if rel.startswith(DOCS_DIR_PREFIXES):
         return True
     if rel.startswith(POST_PACKET_DIR_PREFIX):
+        return True
+    if rel.startswith(DEF_PACKET_DIR_PREFIX):
         return True
     if rel.startswith(OPENAI_PACKET_DIR_PREFIXES):
         return True

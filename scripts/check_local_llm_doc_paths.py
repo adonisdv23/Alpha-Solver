@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Offline path/link checker for local LLM, post-Level, and OpenAI evidence packet docs.
+"""Offline path/link checker for local LLM, post-Level, OpenAI, and DEF evidence packet docs.
 
 Purpose and limits:
 - This is a deterministic, offline documentation hardening check.
 - It scans local LLM solver orchestration operator docs, evidence index / Level 3 packet docs,
-  alpha-solver-post-* Self Operator packet docs, and OpenAI evidence packet docs, excluding preserved source-artifact payload files.
-- It verifies repo-relative local LLM, alpha-solver-post-*, and OpenAI doc packet paths and key
+  alpha-solver-post-* Self Operator packet docs, OpenAI evidence packet docs,
+  and alpha-solver-def-* custody packet docs, excluding preserved source-artifact payload files.
+- It verifies repo-relative local LLM, alpha-solver-post-*, OpenAI, and DEF doc packet paths and key
   source paths referenced by those docs exist in the checkout.
 - It detects simple stale selected-next-lane conflicts inside one document.
 - It does not call GitHub, access the network, run models/providers, start
@@ -37,6 +38,7 @@ LEVEL_3_SCAN_DIRS = (
 # exist, but preserved payload files inside it are intentionally not scanned.
 LEVEL_3_SOURCE_ARTIFACT_DIR = LEVEL_3_PACKET_DIR / "source-artifact"
 POST_PACKET_DIR_PREFIX = "docs/evals/runs/alpha-solver-post-"
+DEF_PACKET_DIR_PREFIX = "docs/evals/runs/alpha-solver-def-"
 OPENAI_PACKET_DIR_PREFIXES = (
     "docs/evals/runs/openai-",
     "docs/evals/runs/local-openai-",
@@ -78,6 +80,10 @@ LOCAL_LLM_MARKERS = (
 POST_PACKET_MARKERS = (
     "alpha-solver-post-",
     "ALPHA-SOLVER-POST-",
+)
+DEF_PACKET_MARKERS = (
+    "alpha-solver-def-",
+    "ALPHA-SOLVER-DEF-",
 )
 OPENAI_PACKET_MARKERS = (
     "openai-",
@@ -206,6 +212,7 @@ def _looks_checked_reference(value: str) -> bool:
     return _looks_repo_relative(value) and (
         any(marker in value for marker in LOCAL_LLM_MARKERS)
         or any(marker in value for marker in POST_PACKET_MARKERS)
+        or any(marker in value for marker in DEF_PACKET_MARKERS)
         or any(marker in value for marker in OPENAI_PACKET_MARKERS)
     )
 
@@ -224,6 +231,8 @@ def is_scanned_doc(path: Path, root: Path = ROOT) -> bool:
         return False
     rel_text = rel.as_posix()
     if rel_text.startswith(POST_PACKET_DIR_PREFIX):
+        return True
+    if rel_text.startswith(DEF_PACKET_DIR_PREFIX):
         return True
     if rel_text.startswith(OPENAI_PACKET_DIR_PREFIXES):
         return True

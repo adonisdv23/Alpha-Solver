@@ -19,7 +19,7 @@ The original full text is not verified as committed repository evidence unless `
 
 ## Packet files
 
-- [`NON_CLAIMS.md`](NON_CLAIMS.md) — prohibited claims and non-claims boundary.
+- [`non-claims-and-boundaries.md`](non-claims-and-boundaries.md) — prohibited claims and non-claims boundary.
 - [`intake_template.md`](intake_template.md) — blank operator intake template for paths A or B, or load-bearing check for C/D.
 - [`replacement_audit_boundary.md`](replacement_audit_boundary.md) — Path C boundary specification; not executed here.
 - [`repo_inspection.md`](repo_inspection.md) — repository search method and custody finding.

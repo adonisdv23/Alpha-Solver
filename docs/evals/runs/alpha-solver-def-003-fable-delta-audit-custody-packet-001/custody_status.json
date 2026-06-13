@@ -22,6 +22,6 @@
   "audit_reconstructed": false,
   "audit_findings_recorded": false,
   "evidence_track": "custody_record_only",
-  "claims_prohibited_ref": "NON_CLAIMS.md",
+  "claims_prohibited_ref": "non-claims-and-boundaries.md",
   "selected_next_lane": "DEF-003-OPERATOR-CUSTODY-INTAKE-001"
 }
