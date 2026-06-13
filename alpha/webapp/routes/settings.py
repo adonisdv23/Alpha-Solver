@@ -25,10 +25,23 @@ __all__ = [
 
 
 def _ensure_private_parent(path: Path) -> None:
-    """Create and tighten the storage parent directory for private artifacts."""
+    """Create or verify the storage parent directory for private artifacts.
 
-    path.parent.mkdir(parents=True, mode=_PRIVATE_DIR_MODE, exist_ok=True)
-    if os.name == "posix":
+    App-created directories are created with restrictive permissions. Existing
+    caller-supplied directories are never chmodded because they may be shared
+    with unrelated files; on POSIX they must already be private enough.
+    """
+
+    created = not path.parent.exists()
+    if created:
+        path.parent.mkdir(parents=True, mode=_PRIVATE_DIR_MODE)
+    if os.name != "posix":
+        return
+    if path.parent.stat().st_mode & 0o077:
+        raise PermissionError(
+            f"Refusing to store dashboard private artifact under non-private directory: {path.parent}"
+        )
+    if created:
         os.chmod(path.parent, _PRIVATE_DIR_MODE)
 
 

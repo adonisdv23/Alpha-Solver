@@ -7,7 +7,7 @@ must-fix or accepted-residual decisions from the accepted closure sequence.
 
 ## Remaining RR-02 limitations
 
-- This lane hardens file and directory permissions; it does not implement
+- This lane hardens file and directory permission handling; it does not implement
   encryption-at-rest, OS-keyring storage, cloud secret-manager integration, or
   envelope encryption.
 - POSIX permission evidence is not portable to every operating system.
@@ -15,7 +15,11 @@ must-fix or accepted-residual decisions from the accepted closure sequence.
   require operator handling outside this lane.
 - The dashboard-managed credential file still contains plaintext from the
   perspective of the owning OS account; this lane reduces cross-user filesystem
-  exposure but does not protect against compromise of that account.
+  exposure and fails closed for unsafe existing parent directories, but it does
+  not protect against compromise of that account.
+- Operators who intentionally configure storage inside shared directories must
+  move those files into a private directory rather than relying on the app to
+  mutate shared parent permissions.
 
 ## Other DEF-002 risks not addressed
 

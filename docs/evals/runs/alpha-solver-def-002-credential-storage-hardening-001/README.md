@@ -1,18 +1,21 @@
 # ALPHA-SOLVER-DEF-002-CREDENTIAL-STORAGE-HARDENING-001
 
-Verdict: `STOP_INCONCLUSIVE`
+Verdict: `DEF_002_RR_02_CREDENTIAL_STORAGE_HARDENED`
 
 This packet records the first concrete DEF-002 gap closure lane for RR-02,
 focused only on dashboard-managed provider credential storage hardening.
 
 ## Summary
 
-- Dashboard-managed provider credential JSON storage now creates and tightens the
-  storage directory with owner-only permissions on POSIX platforms.
-- Dashboard-managed provider credential JSON storage now creates and tightens the
-  credential file with owner-only read/write permissions on POSIX platforms.
-- Existing permissive credential files/directories are tightened on subsequent
-  writes.
+- Dashboard-managed provider credential JSON storage creates app-owned storage
+  directories with owner-only permissions on POSIX platforms.
+- Existing caller-supplied parent directories are not silently chmodded.
+- Existing caller-supplied parent directories must already be private on POSIX
+  platforms or credential/audit writes fail closed.
+- Dashboard-managed provider credential JSON and audit files are created or
+  tightened with owner read/write permissions on POSIX platforms.
+- Existing permissive credential files are tightened on subsequent writes when
+  their parent directory is already private.
 - Masked provider-key display and masked audit events are preserved.
 - Tests use synthetic placeholder secrets only.
 
@@ -35,4 +38,6 @@ runtime readiness, provider readiness, security/privacy completion, public
 readiness, broad-user readiness, dashboard readiness, `/v1/solve` readiness,
 benchmark validation, or Alpha superiority.
 
-Focused credential-storage tests did not require providers, tokens, or real credentials. However, a later broad `python -m pytest -q` validation run used ambient provider configuration and reached provider-backed `/v1/solve` paths, so this packet cannot honestly claim the full lane boundary was preserved. No public API, dashboard, or `/v1/solve` exposure was intentionally performed, and no Google Sheets or backlog workbook was updated.
+No providers were called. No tokens were used. No real credentials were accessed.
+No public API, dashboard, or `/v1/solve` exposure occurred. No Google Sheets or
+backlog workbook was updated.

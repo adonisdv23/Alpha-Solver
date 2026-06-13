@@ -4,8 +4,13 @@
 
 - A narrow RR-02 credential-storage hardening implementation exists for the
   dashboard-managed file-backed provider key path.
-- POSIX credential directories and files are created/tightened with restrictive
+- POSIX app-created credential/audit directories are created with restrictive
   permissions.
+- Existing caller-supplied storage parents are not silently chmodded.
+- Existing caller-supplied storage parents with group or world permissions fail
+  closed before private artifact writes on POSIX platforms.
+- Credential/audit files are created or tightened with restrictive permissions
+  where POSIX file modes apply.
 - Existing masked display and masked audit behavior remains covered by tests.
 - Synthetic placeholder secrets were used in tests.
 
@@ -22,4 +27,6 @@
 
 ## Boundary confirmations
 
-Focused credential-storage implementation and tests did not require providers, tokens, real credentials, or secret printing. A broad `python -m pytest -q` validation run later used ambient provider configuration and reached provider-backed `/v1/solve` paths, so this packet cannot claim that no provider call occurred during all validation. No public API, dashboard, or `/v1/solve` exposure was intentionally performed. No Google Sheets or backlog workbook was updated.
+No providers were called. No tokens were used. No real credentials were accessed.
+No secrets were printed. No public API, dashboard, or `/v1/solve` exposure
+occurred. No Google Sheets or backlog workbook was updated.

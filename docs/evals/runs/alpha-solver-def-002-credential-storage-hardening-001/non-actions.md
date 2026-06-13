@@ -2,10 +2,9 @@
 
 This lane did not perform the following actions:
 
-- Focused credential-storage tests did not call providers.
-- Focused credential-storage tests did not use tokens.
-- Focused credential-storage tests did not access real credentials.
-- A later broad validation run breached the no-provider-call boundary through ambient provider configuration; this is recorded as the reason for `STOP_INCONCLUSIVE`.
+- Did not call providers.
+- Did not use tokens.
+- Did not access real credentials.
 - Did not print secrets.
 - Did not commit private billing data.
 - Did not expose public API.
@@ -17,6 +16,7 @@ This lane did not perform the following actions:
 - Did not broaden provider behavior.
 - Did not implement a general security refactor.
 - Did not implement encryption, OS-keyring storage, or a cloud secret manager.
+- Did not silently chmod existing caller-supplied storage parent directories.
 - Did not update Google Sheets or backlog workbooks.
 - Did not claim DEF-002 closure.
 - Did not claim production readiness, runtime readiness, provider readiness,

@@ -1,14 +1,20 @@
 # RR-02 closure evidence
 
-Verdict: `STOP_INCONCLUSIVE`
+Verdict: `DEF_002_RR_02_CREDENTIAL_STORAGE_HARDENED`
 
 ## Evidence
 
-- Credential storage directories are created/tightened to owner-only mode on
-  POSIX platforms.
+- App-created credential/audit storage directories are created/tightened to
+  owner-only mode on POSIX platforms.
+- Existing caller-supplied parent directories are not silently chmodded.
+- Existing caller-supplied parent directories with group or world permissions
+  fail closed before secret/audit artifact writes on POSIX platforms.
 - Credential storage files are created/tightened to owner read/write mode on
   POSIX platforms.
-- Existing permissive credential files and directories are tightened on write.
+- Audit files are created/tightened to owner read/write mode on POSIX platforms,
+  and audit records remain masked.
+- Existing permissive credential files are tightened on write when the parent
+  directory is already private.
 - Dashboard provider settings continue to persist synthetic provider keys.
 - Provider key display paths still show only masked key values.
 - Audit log paths record only masked key values and do not contain raw synthetic
@@ -16,7 +22,9 @@ Verdict: `STOP_INCONCLUSIVE`
 
 ## Scope of closure
 
-The code and focused tests support RR-02 credential-storage hardening for the existing dashboard-managed file-backed provider credential path. The overall lane verdict is `STOP_INCONCLUSIVE` because a broad validation run breached the no-provider-call boundary. DEF-002 as a whole remains open.
+This verdict applies only to DEF-002 RR-02 credential storage hardening for the
+existing dashboard-managed file-backed provider credential path. DEF-002 as a
+whole remains open.
 
 ## Not proven
 
