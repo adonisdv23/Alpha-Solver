@@ -29,6 +29,8 @@ The synthesis selected a P2 hardening lane with this required item set:
 - VER-002: check for no-go-list enforcement artifacts before deciding on hardening.
 - DOC-001, DOC-002, DOC-003: wording, consensus-interpretation, and capture-integrity process corrections.
 
+The single `STOP-INCONCLUSIVE` vote was preserved as a high-signal minority warning, but it did not trigger a blocker lane because it was driven by evidence incompleteness rather than an identified P0/P1 — no seat among the 16 usable raw audit responses plus 1 documented failed platform slot reported a P0 or P1 finding. The selected P2 hardening lane directly addresses the same evidence gaps that motivated that vote, by supplying or formally deferring the missing D-1 through D-5 source text, the primary #492 / F-1 correction evidence, the release-gate acceptance criteria, the execution-evidence deferral, the security/privacy review deferral, and the fresh repo-state verification.
+
 ## Interpretation limits
 
 Council agreement in this run is agreement over one shared evidence packet. It is replication of that packet's assertions, not independent corroboration of repository, runtime, or product state. The zero-P0/P1 result certifies that no seat found a blocker in the provided evidence; it does not certify the project state. The prior targeted Fable delta audit reported no P0/P1 blockers; that is a summarized model/auditor judgment and is cited only as such.
