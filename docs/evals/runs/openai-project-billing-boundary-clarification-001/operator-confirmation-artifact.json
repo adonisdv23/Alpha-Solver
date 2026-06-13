@@ -1,0 +1,16 @@
+{
+  "schema_version": "openai.project_billing_boundary_confirmation.v1",
+  "lane_id": "OPENAI-PROJECT-BILLING-BOUNDARY-CLARIFICATION-001",
+  "operator_decision": "pending_operator_confirmation",
+  "selected_openai_project_boundary": "[PENDING_OPERATOR_SUPPLIED_PROJECT_ALIAS]",
+  "data_sharing_settings_checked": "pending_operator_attestation",
+  "billing_readiness_checked": "pending_operator_attestation",
+  "cost_cap_checked": "pending_operator_attestation",
+  "private_billing_data_recorded": false,
+  "operator_confirmation": "PENDING: no completed operator confirmation was supplied in the prompt for this lane.",
+  "approved_by": "[PENDING_OPERATOR_ID]",
+  "approved_at": "[PENDING_TIMESTAMP]",
+  "redaction_status": "redacted_pending",
+  "verdict": "BLOCKED_PROJECT_BILLING_OPERATOR_CONFIRMATION_MISSING",
+  "selected_next_lane": "OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001"
+}
