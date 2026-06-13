@@ -1,0 +1,16 @@
+{
+  "schema_version": "openai.project_billing_boundary_confirmation.v1",
+  "lane_id": "OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001",
+  "operator_decision": "approved_for_next_smoke_retry_only",
+  "selected_openai_project_boundary": "[REDACTED_OR_OPERATOR_SUPPLIED_PROJECT_ALIAS]",
+  "data_sharing_settings_checked": "operator_attested",
+  "billing_readiness_checked": "operator_attested",
+  "cost_cap_checked": "operator_attested",
+  "private_billing_data_recorded": false,
+  "operator_confirmation": "I have manually verified the selected OpenAI project, billing readiness, cost boundary, and data-sharing settings for the next tiny synthetic smoke retry. No private billing data should be committed. This does not authorize broad provider validation, evals, benchmarks, production, public MVP, runtime readiness, or security/privacy completion claims.",
+  "approved_by": "[REDACTED_OPERATOR_ID]",
+  "approved_at": "[REDACTED_TIMESTAMP]",
+  "redaction_status": "redacted",
+  "verdict": "OPENAI_PROJECT_BILLING_BOUNDARY_CONFIRMED",
+  "selected_next_lane": "LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002"
+}
