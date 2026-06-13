@@ -21,3 +21,7 @@ The generated artifacts are local JSON/Markdown evidence only. They do not conta
 ## Selected-next-lane disambiguation
 
 `artifacts/dry-run-result.json` preserves the dry-run wrapper metadata value `selected_next_lane=ALPHA-SOLVER-POST-LEVEL-3-LEVEL-13-SELF-OPERATOR-MANUAL-LOCAL-ACCEPTANCE-PACKET-001`, which is the wrapper's internal handoff/fallback lane from the reusable dry-run harness. The controlling packet-level next lane for this PR remains `ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-EXECUTION-EVIDENCE-004` as recorded in `selected-next-lane.md`.
+
+## Result-import lane-field disambiguation
+
+`artifacts/result-import-summary.json` includes import-tool provenance fields such as `selected_next_lane=ALPHA-SOLVER-POST-LEVEL-3-TO-LEVEL-14-SELF-OPERATOR-ACCEPTANCE-INTERPRETATION-ENGINE-001` and `blocker_fallback_lane=ALPHA-SOLVER-POST-LEVEL-3-LEVEL-13-SELF-OPERATOR-LOCAL-ACCEPTANCE-RESULT-IMPORT-TOOLING-FIX-001`. These are internal result-import tooling fallback/provenance fields. They are not the controlling project next lane for this packet. The controlling packet-level selected next lane is `ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-EXECUTION-EVIDENCE-004`.
