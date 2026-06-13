@@ -26,7 +26,7 @@
 
 | Lane | Blocked by | Unblock condition |
 |------|-----------|-------------------|
-| `ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001` | No real provider smoke yet; protocol not designed | After a successful tiny smoke; highest strategic value |
+| `ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001` | No real provider smoke yet; protocol designed/canonical packet exists but not executed | After a successful tiny smoke and protocol preconditions, including substantive Alpha generation / no-echo gate and appropriate smoke/provider boundary; highest strategic value |
 | `DEF-002` security/privacy review lane | Review not scoped/executed | Operator-scoped security/privacy assessment |
 | `DEF-003` audit custody lane | Audit text not committed | Committed audit text or accepted replacement custody |
 
@@ -84,7 +84,7 @@ OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001 ← PR #512 current contro
 LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002          ← selected next tiny smoke lane
         │  (proves plumbing only, never value)
         ▼
-ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001          ← highest strategic value
+ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001          ← protocol designed; highest strategic value, not executed
 ```
 
 This registry does not authorize any provider call, runtime exposure, or

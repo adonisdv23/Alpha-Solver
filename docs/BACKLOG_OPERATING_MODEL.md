@@ -33,7 +33,7 @@
 | `OPENAI-PROJECT-BILLING-BOUNDARY-CLARIFICATION-001` | 6 Evidence packets / 5 Provider setup | BLOCKED evidence superseded by PR #512 (`BLOCKED_PROJECT_BILLING_OPERATOR_CONFIRMATION_MISSING`) | superseded by `OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001` | Yes | No |
 | `OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001` | 1 Current lane / 5 Provider setup | CONFIRMED (`OPENAI_PROJECT_BILLING_BOUNDARY_CONFIRMED`) | `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` | No | No |
 | `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` | 2 Next ready / 8 OpenAI smoke | **NEXT (selected)** | one tiny synthetic smoke retry only | Yes | No |
-| `ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001` | 12 Value experiment | BLOCKED (after smoke) | after a successful tiny smoke | No | — |
+| `ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001` | 12 Value experiment | PROTOCOL DESIGNED / BLOCKED FOR EXECUTION (after smoke) | after a successful tiny smoke and protocol preconditions, including substantive Alpha generation / no-echo gate and appropriate smoke/provider boundary | No | — |
 | DEF-002 security/privacy review | 7 Deferrals / 9 Security | OPEN | DEF-002 review lane | No | Yes |
 | DEF-003 audit custody or replacement | 7 Deferrals | OPEN (custody) | DEF-003 custody lane | No | No |
 | docs/current-state cleanup | 13 Specs/docs integrity | DONE (this lane) | maintain `CURRENT_STATE.md` | No | No |

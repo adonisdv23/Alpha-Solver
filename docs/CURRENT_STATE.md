@@ -24,7 +24,7 @@
   docs-only and records a redacted operator confirmation, with verdict
   `OPENAI_PROJECT_BILLING_BOUNDARY_CONFIRMED`.
 
-No OpenAI/provider call has been executed. No token has been used by PR #512. No value experiment has been run.
+No OpenAI/provider call has been executed. No token has been used by PR #512. The value experiment protocol is designed, but no value experiment has been run and no value evidence exists.
 
 ## At a glance
 
@@ -34,7 +34,7 @@ No OpenAI/provider call has been executed. No token has been used by PR #512. No
 | Current controlling lane | `OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001` (PR #512, `OPENAI_PROJECT_BILLING_BOUNDARY_CONFIRMED`) |
 | Next selected lane | **`LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002`** (one tiny synthetic OpenAI smoke retry; provider-call lane remains bounded) |
 | Prior blocked control | `OPENAI-PROJECT-BILLING-BOUNDARY-CLARIFICATION-001` (PR #511, superseded by PR #512 attestation) |
-| Highest-value strategic lane after smoke | `ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001` |
+| Highest-value strategic lane after smoke | `ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001` (protocol designed/canonical packet exists; not executed; no value evidence) |
 | Open PRs | none |
 
 ## Completed recent lanes (merged, kept as evidence)
@@ -74,6 +74,8 @@ See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for full per-PR detail and
   `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` after PR #512 recorded the
   redacted operator attestation. The next lane is still limited to one tiny
   synthetic smoke retry and does not authorize broad provider validation.
+
+- **Value experiment protocol** — `ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001` now has a canonical protocol packet, but execution remains blocked until the selected smoke/provider boundary has passed and the protocol preconditions are met, including the substantive Alpha-generation / no-echo gate. It is not the selected next lane and contains no results or value evidence.
 - **DEF-002 closure** — blocked pending security/privacy review (assessment of
   existing machinery, not build-from-scratch).
 - **DEF-003 closure** — blocked pending committed audit text or an accepted
