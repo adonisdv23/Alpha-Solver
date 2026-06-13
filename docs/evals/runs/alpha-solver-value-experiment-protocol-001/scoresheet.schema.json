@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Alpha Solver value experiment score record",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "task_id": { "type": "string" },
+    "judge_id": { "type": "string" },
+    "answer_a_scores": { "type": "object" },
+    "answer_b_scores": { "type": "object" },
+    "composite_a": { "type": "number" },
+    "composite_b": { "type": "number" },
+    "winner": { "type": "string", "enum": ["A", "B", "tie", "undetermined"] },
+    "tie": { "type": "boolean" },
+    "hallucination_flag_a": { "type": "boolean" },
+    "hallucination_flag_b": { "type": "boolean" },
+    "unsafe_compliance_flag_a": { "type": "boolean" },
+    "unsafe_compliance_flag_b": { "type": "boolean" },
+    "correct_abstention_flag_a": { "type": "boolean" },
+    "correct_abstention_flag_b": { "type": "boolean" },
+    "notes": { "type": "string" }
+  },
+  "required": ["task_id", "judge_id", "answer_a_scores", "answer_b_scores", "composite_a", "composite_b", "winner", "tie"]
+}
