@@ -9,20 +9,20 @@ This review does not fabricate operator acceptance. A deferral is treated as ope
 ## Per-deferral status
 
 | Deferral | Subject | Open? | Operator sign-off evidence in repository | Gate status |
-|---|---:|---:|---|---|
+|---|---|---|---|---|
 | DEF-001 | Self Operator execution evidence | Yes | Missing. The deferral is recorded, but no per-deferral operator sign-off is present. | Required before gate can pass. |
 | DEF-002 | Product-level security/privacy review | Yes | Missing. The deferral is recorded, but no per-deferral operator sign-off is present. | Required before gate can pass. |
 | DEF-003 | Prior targeted Fable delta audit full text | Yes | Missing. The deferral is recorded, but no per-deferral operator sign-off is present. | Required before gate can pass. |
-| DEF-004 | Custody note: Council raw capture and synthesis report | Yes / custody note | Missing. The custody note is recorded, but no per-deferral operator sign-off is present. | Required or explicitly waived before gate can pass. |
+| DEF-004 | Custody note: Council raw capture and synthesis report | Custody note | Missing in repository. The custody note is recorded, but the operator-held documents are not in repo and are not marked produced for this gate. | Not blocking for this gate if the operator can produce the documents on request; remains a custody traceability note. |
 
 ## Finding
 
-The P2 deferral register says that operator acceptance of the packet constitutes acceptance of the deferrals as recorded. That statement is not a per-deferral sign-off record. The repository does not currently include a signed or otherwise explicit operator acceptance table for DEF-001 through DEF-004.
+The P2 deferral register says that operator acceptance of the packet constitutes acceptance of the deferrals as recorded. That statement is not a per-deferral sign-off record. The repository does not currently include a signed or otherwise explicit operator acceptance table for DEF-001, DEF-002, or DEF-003. DEF-004 is different: the source deferral register records it as a custody note that is not required for the release-gate review lane if the operator can produce the documents on request.
 
 ## Gate effect
 
-Because open-deferral operator sign-off is required by the release-gate acceptance criteria and is not recorded in repository evidence, the gate outcome is:
+Because open-deferral operator sign-off is required by the release-gate acceptance criteria for DEF-001, DEF-002, and DEF-003, and that sign-off is not recorded in repository evidence, the gate outcome is:
 
 `BLOCKED_PENDING_OPERATOR_SIGNOFF`
 
-This block does not assert a P0/P1 product defect. It only records that the release-gate evidence cannot be passed until operator sign-off is explicitly recorded or the operator directs a different bounded evidence treatment.
+This block does not assert a P0/P1 product defect. It only records that the release-gate evidence cannot be passed until operator sign-off for the hard deferrals is explicitly recorded or the operator directs a different bounded evidence treatment.

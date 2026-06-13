@@ -24,7 +24,7 @@ Required gate inputs were checked from that packet and from the current reposito
 
 `BLOCKED_PENDING_OPERATOR_SIGNOFF`
 
-The gate is blocked because the P2 acceptance criteria require the deferral register to carry operator sign-off for each open deferral, but the current repository evidence does not record per-deferral operator sign-off. The P2 deferral register states that operator acceptance of the packet constitutes acceptance of the deferrals; however, this review found no explicit operator sign-off table or per-deferral recording mechanism in the repository. This packet does not fabricate acceptance.
+The gate is blocked because the P2 acceptance criteria require the deferral register to carry operator sign-off for open hard deferrals, but the current repository evidence does not record per-deferral operator sign-off for DEF-001, DEF-002, or DEF-003. The P2 deferral register states that operator acceptance of the packet constitutes acceptance of the deferrals; however, this review found no explicit operator sign-off table or per-deferral recording mechanism in the repository. This packet does not fabricate acceptance. DEF-004 remains a custody traceability note and is not treated as a hard gate blocker if the operator can produce the operator-held documents on request.
 
 No P0/P1 escalation is raised by this review. The block is traceability-related and limited to operator sign-off for open deferrals.
 
@@ -32,7 +32,7 @@ No P0/P1 escalation is raised by this review. The block is traceability-related 
 
 `ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-COUNCIL-RELEASE-GATE-OPERATOR-SIGNOFF-001`
 
-This selected next lane is documentation/operator-review only: record explicit operator sign-off status for each open deferral or record that sign-off is withheld. It must not execute product behavior, call providers, call hosted or local models, deploy, expose `/v1/solve`, expose dashboards, access billing, access credentials, update Google Sheets, or make readiness claims.
+This selected next lane is documentation/operator-review only: record explicit operator sign-off status for DEF-001, DEF-002, and DEF-003, or record that sign-off is withheld, while preserving DEF-004 as a custody traceability note unless new evidence changes its status. It must not execute product behavior, call providers, call hosted or local models, deploy, expose `/v1/solve`, expose dashboards, access billing, access credentials, update Google Sheets, or make readiness claims.
 
 ## File index
 
@@ -41,3 +41,4 @@ This selected next lane is documentation/operator-review only: record explicit o
 - `gate-review.md` — answers to the required release-gate questions and evidence table.
 - `operator-deferral-signoff.md` — explicit per-deferral sign-off traceability review.
 - `non-actions.md` — actions explicitly not performed in this lane.
+- `selected-next-lane.md` — selected next documentation/operator-review lane after this blocked gate outcome.

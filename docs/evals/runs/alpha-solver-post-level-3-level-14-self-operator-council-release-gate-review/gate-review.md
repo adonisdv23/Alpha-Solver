@@ -41,7 +41,9 @@ Yes, with one gate-blocking traceability qualification:
 - VER-001 and VER-002 are recorded in the P2 packet.
 - DOC-001, DOC-002, and DOC-003 are recorded in the P2 packet.
 
-The qualification is that the open deferrals do not have explicit per-deferral operator sign-off recorded, so deferral acceptance cannot be relied on to pass the gate.
+DEF-003 and DEF-004 are documentation-traceability / custody deferrals rather than direct numbered P2 implementation blockers. DEF-003 preserves the evidence-chain limitation that the prior targeted Fable delta audit full text is operator-held, so the gate cannot treat that summarized audit result as independent proof. DEF-004 preserves custody traceability for the raw Council capture and synthesis report; the source register says it is not required for the release-gate review lane if the operator can produce those documents on request.
+
+The qualification is that DEF-001, DEF-002, and DEF-003 do not have explicit per-deferral operator sign-off recorded, so deferral acceptance cannot be relied on to pass the gate.
 
 ### 3. Are D-1 through D-5 visible and non-blocking for the narrow package scope?
 
@@ -61,7 +63,7 @@ Yes. DEF-001 remains deferred and no execution evidence was produced in this lan
 
 ### 7. Is operator sign-off for open deferrals recorded, pending, or missing?
 
-Missing in repository evidence. The P2 deferral register contains a general statement that operator acceptance of the packet constitutes acceptance of the deferrals, but this gate review found no per-deferral sign-off table or explicit operator acceptance record for DEF-001 through DEF-004.
+Missing in repository evidence for DEF-001, DEF-002, and DEF-003. The P2 deferral register contains a general statement that operator acceptance of the packet constitutes acceptance of the deferrals, but this gate review found no per-deferral sign-off table or explicit operator acceptance record for those hard deferrals. DEF-004 remains a custody traceability note rather than a hard gate blocker if the operator can produce the operator-held documents on request; this review does not claim those documents were produced.
 
 ### 8. Does the gate pass, fail, or block?
 
@@ -77,11 +79,11 @@ No P0/P1 escalation is raised by this review. The gate does not pass because ope
 
 `ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-COUNCIL-RELEASE-GATE-OPERATOR-SIGNOFF-001`
 
-The next lane should record explicit operator sign-off status for DEF-001 through DEF-004, or record that sign-off is withheld. It remains documentation/operator-review only.
+The next lane should record explicit operator sign-off status for DEF-001, DEF-002, and DEF-003, or record that sign-off is withheld. It should also preserve DEF-004 custody traceability without converting it into a hard blocker unless the operator cannot produce the operator-held documents on request. It remains documentation/operator-review only.
 
 ## Blocked conditions
 
-- Open deferral sign-off is not explicitly recorded for DEF-001, DEF-002, DEF-003, or DEF-004.
+- Open deferral sign-off is not explicitly recorded for DEF-001, DEF-002, or DEF-003.
 
 ## Evidence-boundary notes
 
