@@ -1,4 +1,4 @@
-# Evidence Index — PRs #497–#509
+# Evidence Index — PRs #497–#511
 
 > Created by lane `ALPHA-SOLVER-CURRENT-STATE-DOCS-BACKLOG-ARCHIVE-ISSUE-REGISTER-001`.
 > Verification date **2026-06-13**. Merge status verified read-only via GitHub
@@ -30,7 +30,8 @@ made.
 | #506 | openai: synthetic smoke prompt fixture | ✅ | `openai-synthetic-smoke-prompt-fixture-001` | `OPENAI_SYNTHETIC_SMOKE_PROMPT_FIXTURE_CAPTURED` | WAIT_FOR_OPENAI_OPERATOR_PRE_SMOKE_ATTESTATION | Synthetic SMOKE-001 fixture; not sent | No call; synthetic data only | completed |
 | #507 | openai: operator pre-smoke attestation | ✅ | `openai-data-sharing-operator-attestation-001` | `OPENAI_OPERATOR_PRE_SMOKE_ATTESTATION_CAPTURED` | LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-001 | Operator go/no-go attestation (redacted) | No call; attestation ≠ project/billing proof | completed |
 | #508 | openai: extend static checks to OpenAI packets | ✅ | `openai-packet-checker-scope-001` | `OPENAI_PACKET_CHECKER_SCOPE_EXTENDED` | LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-001 | Checker scope hardening (docs-only packet; checker code changed in same PR) | No provider/runtime; tooling only | completed |
-| #509 | openai: local token smoke retry capture | ✅ | `local-openai-token-smoke-capture-retry-001` | `BLOCKED_OPENAI_PROJECT_OR_BILLING_NOT_VERIFIED` | OPENAI-PROJECT-BILLING-BOUNDARY-CLARIFICATION-001 | Retry halted before provider call | No call; key-presence ≠ project/billing readiness | **current-control** |
+| #509 | openai: local token smoke retry capture | ✅ | `local-openai-token-smoke-capture-retry-001` | `BLOCKED_OPENAI_PROJECT_OR_BILLING_NOT_VERIFIED` | OPENAI-PROJECT-BILLING-BOUNDARY-CLARIFICATION-001 | Retry halted before provider call | No call; key-presence ≠ project/billing readiness | completed |
+| #511 | openai: project billing boundary clarification | ✅ | `openai-project-billing-boundary-clarification-001` | `BLOCKED_PROJECT_BILLING_OPERATOR_CONFIRMATION_MISSING` | OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001 | Clarification lane blocked pending operator confirmation | No call; no token; no private billing data; no readiness | **current-control** |
 
 ## Notes
 
@@ -47,4 +48,4 @@ made.
 
 ## Later merged PRs
 
-None after #509 at verification time. Append rows here as new evidence merges.
+PR #511 is now the current-control packet. Append rows here as new evidence merges.
