@@ -1,0 +1,22 @@
+{
+  "lane": "LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-001",
+  "executed": false,
+  "prompt": "<synthetic prompt only>",
+  "model_project_boundary": "<sanitized project/model label>",
+  "request_timestamp_utc": "<timestamp>",
+  "response": "<sanitized response>",
+  "token_cost_metadata_if_available": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "estimated_cost": null,
+    "request_id": null
+  },
+  "redaction_check": "pending",
+  "evidence_boundary": "tiny synthetic smoke only; no readiness claims",
+  "non_claims": [
+    "no OpenAI validation",
+    "no provider readiness",
+    "no benchmark validation",
+    "no production readiness"
+  ]
+}
