@@ -1,0 +1,15 @@
+{
+  "schema": "self_operator.expected_safety_block_operator_review.v1",
+  "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-13-TO-LEVEL-14-SELF-OPERATOR-EXPECTED-SAFETY-BLOCK-OPERATOR-REVIEW-001",
+  "operator_decision": "ACCEPT_LEDGER_LEVEL_CONFIRMATION",
+  "accepted_tasks": [
+    "MLA-006",
+    "MLA-007"
+  ],
+  "confirmation_type": "operator_ledger_level_acceptance",
+  "machine_readable_artifact_confirmation": false,
+  "source_artifacts_mutated": false,
+  "readiness_claimed": false,
+  "operator_review_boundary": "I approve local-only interpretation of expected safety-block evidence for this lane. This does not authorize providers, models, tokens, external APIs except read-only GitHub repo-state verification, runtime changes, provider routing changes, deployment, dashboards, /v1/solve, credentials, Google Sheets, benchmark claims, readiness claims, or autonomous operation.",
+  "redaction_status": "redacted"
+}
