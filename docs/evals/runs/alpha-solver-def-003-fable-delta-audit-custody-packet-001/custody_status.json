@@ -1,0 +1,27 @@
+{
+  "schema_version": "alpha_solver.def_003_custody.v1",
+  "def_id": "DEF-003",
+  "title": "Fable delta audit custody",
+  "lane_id": "ALPHA-SOLVER-DEF-003-FABLE-DELTA-AUDIT-CUSTODY-PACKET-001",
+  "custody_state": "D_OPEN_WITH_CAVEAT",
+  "original_full_text": {
+    "present_in_repo_evidence": false,
+    "location": "operator-held-unconfirmed",
+    "repo_paths": [],
+    "verification_status": "not_verified"
+  },
+  "decision": "committed as D open with caveat plus operator intake gate",
+  "promotion_paths": {
+    "A": "operator verbatim full text plus provenance plus redaction map",
+    "B": "operator attested partial extract plus incompleteness boundary",
+    "C": "independent replacement audit, separate packet, gated and capped, labeled replacement evidence",
+    "D": "remain open with caveat"
+  },
+  "providers_called": false,
+  "tokens_spent": false,
+  "audit_reconstructed": false,
+  "audit_findings_recorded": false,
+  "evidence_track": "custody_record_only",
+  "claims_prohibited_ref": "non-claims-and-boundaries.md",
+  "selected_next_lane": "DEF-003-OPERATOR-CUSTODY-INTAKE-001"
+}

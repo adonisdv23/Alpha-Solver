@@ -1,0 +1,33 @@
+{
+  "schema_version": "alpha_solver.packet_manifest.v1",
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "55e609e4ea61349a1ff56cf402cc58a4a820f7452e7bbc456d0dffd2bd0b6700"
+    },
+    {
+      "path": "custody_status.json",
+      "sha256": "8814ce0e07afb7c462b8674ac1c6981b23ad94f4319552b898c76def4df93768"
+    },
+    {
+      "path": "intake_template.md",
+      "sha256": "3e2d21e47f44c1d01b2ab28780fad70a8150d11a2a9af9cac399819786caee6a"
+    },
+    {
+      "path": "non-claims-and-boundaries.md",
+      "sha256": "0245ba7bb3c6d3eff1718e1988e58f7f2fd2dd1939ba9717d95dce916764c581"
+    },
+    {
+      "path": "replacement_audit_boundary.md",
+      "sha256": "bf839af034a35d97efc2ecc91379dc7c7f11ce290befd40d91d142f0112dce1d"
+    },
+    {
+      "path": "repo_inspection.md",
+      "sha256": "a7e9092c4fbdde5fd184e7141efd33247b2458f47af55657a25239f5d2d7d8d2"
+    },
+    {
+      "path": "selected-next-lane.md",
+      "sha256": "34423d0efdb0796cf7b4bfe722f59c2f03aaa4d9a174bc27c5f953f5a786dbf9"
+    }
+  ]
+}

@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Static packet-consistency checker for local LLM solver orchestration and OpenAI evidence packet docs.
+"""Static packet-consistency checker for local LLM solver orchestration, OpenAI, and DEF evidence packet docs.
 
 Purpose and limits:
 - This is a deterministic, offline documentation hardening check.
-- It scans local LLM solver orchestration packet directories, OpenAI evidence packet directories,
-  and the local LLM solver orchestration operator guide selected-next-lane state.
+- It scans local LLM solver orchestration packet directories, OpenAI evidence
+  packet directories, alpha-solver-def-* custody packet directories, and the
+  local LLM solver orchestration operator guide selected-next-lane state.
 - It validates lane packet continuity files, blocker fallbacks, evidence
   boundary or blocked-claims files, final decision markers, and contradictory
   selected-next state.
@@ -35,6 +36,7 @@ PACKET_DIR_MARKERS = (
     "20260607-local-llm-controlled-usage-operator-run-001",
     "alpha-solver-post-level-3-",
     "alpha-solver-post-level-7-",
+    "alpha-solver-def-",
     "openai-",
     "local-openai-",
     "alpha-solver-openai-",
