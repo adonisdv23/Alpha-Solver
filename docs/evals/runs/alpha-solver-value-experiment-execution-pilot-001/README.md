@@ -22,6 +22,7 @@ No provider calls were made. No tokens were used. No prompts were sent. No answe
 | `docs/evals/runs/alpha-solver-value-experiment-protocol-001/` exists | PASS | Canonical protocol packet exists. |
 | `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` complete and no prompt echo | MISSING | Current repo state still identifies this as the selected next lane, not completed evidence. |
 | Alpha path can produce substantive answers rather than prompt echoes | MISSING | Protocol docs name this as a future hard precondition; no completed gate evidence was found for this pilot. |
+| Canonical protocol preregistration completed and frozen | MISSING | The accepted protocol preregistration file must be completed, frozen, and linked before execution. |
 | Explicit operator authorization with provider/model, cost cap, token cap, run count, and judge method | MISSING | The prompt required prep by default and did not provide all execution caps. |
 
 ## Boundary
