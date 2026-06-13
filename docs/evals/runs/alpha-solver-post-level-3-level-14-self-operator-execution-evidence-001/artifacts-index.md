@@ -6,21 +6,21 @@ and PR #496's predecessor packet is likewise markdown-only.
 
 ## Artifact 1 — Self Operator suite result (JUnit XML, summarized)
 
-- Producer: `python -m pytest tests/test_self_operator_*.py -q --junit-xml=<artifacts/self-operator-pytest-junit.xml>`
+- Producer: `python -m pytest tests/test_self_operator_*.py -q --junit-xml=artifacts/self-operator-pytest-junit.xml`
 - Summary: `collected=213 passed=213 failed=0 errors=0 skipped=0 time=1.429s`
 - Storage boundary: only aggregate counts and failing-test identifiers are recorded; no environment dump,
   no secrets, no provider payloads.
 
 ## Artifact 2 — Full-suite validation result (JUnit XML, summarized)
 
-- Producer: `env -u MODEL_PROVIDER -u MODEL_SET -u OPENAI_API_KEY -u OPENAI_BASE_URL python -m pytest -q --junit-xml=<artifacts/provider-env-unset-full-suite-junit.xml>`
+- Producer: `env -u MODEL_PROVIDER -u MODEL_SET -u OPENAI_API_KEY -u OPENAI_BASE_URL python -m pytest -q --junit-xml=artifacts/provider-env-unset-full-suite-junit.xml`
 - Summary: `collected=1216 passed=1211 failed=2 errors=0 skipped=3 time=37.751s`
 - Failing tests: `tests/test_smoke_quickstart.py::test_release_script`, `tests/test_tag_release.py::test_tag_release`
   (see `failure-analysis.md`).
 
 ## Artifact 3 — Release-gate JSON report (embedded verbatim)
 
-- Producer: `python scripts/check_self_operator_release_gate.py --repo-root . --output <artifacts/self-operator-release-gate-report.json>`
+- Producer: `python scripts/check_self_operator_release_gate.py --repo-root . --output artifacts/self-operator-release-gate-report.json`
 - Schema: `self_operator.release_gate_report.v1`; size 4549 bytes; exit code `0`.
 - Storage boundary: the report contains only in-repo evidence-directory paths and gate statuses; no
   secrets, credentials, provider payloads, or private data.
