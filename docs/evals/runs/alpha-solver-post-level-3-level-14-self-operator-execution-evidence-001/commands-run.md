@@ -25,7 +25,7 @@ The OpenAI SDK is **not** in these requirements and was not installed.
 ## 2. Self Operator release-gate checker CLI (local file inspection only)
 
 ```
-python scripts/check_self_operator_release_gate.py --repo-root .
+python scripts/check_self_operator_release_gate.py --repo-root . --output <artifacts/self-operator-release-gate-report.json>
 ```
 Exit code: `0`. `final_status: eligible_for_release_closeout_review`; `ready: true (does not claim MVP
 readiness)`; 11/11 gates `pass`. Full output and JSON in `execution-results.md` / `artifacts-index.md`.
@@ -65,17 +65,17 @@ tests/test_self_operator_stop_state.py
 Then run the suite over exactly those files:
 
 ```
-python -m pytest tests/test_self_operator_*.py -q
+python -m pytest tests/test_self_operator_*.py -q --junit-xml=<artifacts/self-operator-pytest-junit.xml>
 ```
-Exit code: `0`. Exact counts captured via JUnit XML (`--junit-xml`): **213 collected, 213 passed, 0
+Exit code: `0`. Exact counts captured via JUnit XML (`--junit-xml=<artifacts/self-operator-pytest-junit.xml>`): **213 collected, 213 passed, 0
 failed, 0 errors, 0 skipped** (1.43s).
 
 ## 4. Authoritative full-suite validation (provider env unset)
 
 ```
-env -u MODEL_PROVIDER -u MODEL_SET -u OPENAI_API_KEY -u OPENAI_BASE_URL python -m pytest -q
+env -u MODEL_PROVIDER -u MODEL_SET -u OPENAI_API_KEY -u OPENAI_BASE_URL python -m pytest -q --junit-xml=<artifacts/provider-env-unset-full-suite-junit.xml>
 ```
-Exit code: `1`. Exact counts via JUnit XML: **1216 collected, 1211 passed, 2 failed, 0 errors, 3
+Exit code: `1`. Exact counts via JUnit XML (`--junit-xml=<artifacts/provider-env-unset-full-suite-junit.xml>`): **1216 collected, 1211 passed, 2 failed, 0 errors, 3
 skipped** (37.75s). Consistent with the PR #496 recorded full-suite behavior, the provider-env-unset full
 suite still reports the same two unrelated failures (see `failure-analysis.md`).
 
@@ -92,6 +92,6 @@ Results are recorded in `execution-results.md` (Validation section).
 
 - No command called OpenAI, Anthropic, any hosted provider, any local model, or any external API.
 - No `/v1/solve` call, no dashboard, no browser automation, no Google Sheets, no deployment, no billing.
-- The release-gate CLI's default `--output` (a JSON file) was directed into an `artifacts/` path that the
+- The release-gate CLI's `--output <artifacts/self-operator-release-gate-report.json>` path was directed into an `artifacts/` path that the
   repo `.gitignore` excludes; the report content is therefore embedded in `artifacts-index.md` instead of
   committed as a separate file, keeping this packet markdown-only (consistent with PR #496).
