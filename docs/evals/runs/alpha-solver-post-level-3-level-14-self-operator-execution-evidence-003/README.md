@@ -10,7 +10,7 @@ This packet records the next local-only, offline Self Operator evidence lane aft
 
 The local gate did **not** accept the approval artifact because the approval text did not contain the gate's exact case-sensitive hard-stop phrase and therefore returned `SELF_OPERATOR_APPROVAL_HARD_STOP_TEXT_REQUIRED`. Because the gate failed closed, no approved post-gate execution action was performed. Result import and acceptance interpretation were exercised only as deterministic local artifact operations under this new packet directory.
 
-No provider, OpenAI, hosted model, local model, token, browser automation, deployment, dashboard, `/v1/solve`, credential, Google Sheets, product runtime, provider routing, model/provider code, tests/CI, or prior-evidence mutation was used for this packet. The only external network call recorded for this packet was a read-only GitHub API repo-state verification call; it was used only to verify PR/main state and was not a provider/model/token/API execution path.
+No provider, OpenAI, hosted model, local model, token, browser automation, deployment, dashboard, `/v1/solve`, credential, Google Sheets, product runtime, provider routing, model/provider code, tests/CI, or prior-evidence mutation was used for this packet. The only external network operations recorded for this packet were read-only GitHub repo-state verification calls: one GitHub REST API query and one git ls-remote query. These were used only to verify PR/main state and were not provider, model, token, runtime, deployment, dashboard, /v1/solve, credential, Google Sheets, or product execution paths.
 
 ## Required evidence answers
 
