@@ -1,0 +1,146 @@
+{
+  "allowed_for_local_dry_run": false,
+  "approval_result_summary": {
+    "finding_ids": [
+      "SELF_OPERATOR_APPROVAL_MISSING"
+    ],
+    "identity_finding_ids": [],
+    "identity_match": false,
+    "present": false,
+    "valid": false
+  },
+  "artifact_paths": [
+    "execution-gate-result.json",
+    "dry-run-result.json",
+    "stop-state.json"
+  ],
+  "evidence_boundary": "local-only offline documentation/evidence packet; no providers, models, tokens, external APIs, browser automation, deployment, credentials, Google Sheets, runtime behavior changes, provider routing changes, prior evidence mutation, or readiness claims",
+  "findings": [
+    {
+      "id": "SELF_OPERATOR_APPROVAL_GATE_REQUIRED",
+      "message": "stop if explicit operator confirmation is missing",
+      "reason_code": "missing_operator_confirmation",
+      "severity": "error",
+      "stop_state": "blocked",
+      "surface": "approval_gate"
+    },
+    {
+      "id": "SELF_OPERATOR_APPROVAL_MISSING",
+      "message": "approval record is missing",
+      "reason_code": "missing_approval",
+      "severity": "error",
+      "stop_state": "blocked",
+      "surface": "approval_record"
+    },
+    {
+      "id": "SELF_OPERATOR_COMMAND_REQUIRES_OPERATOR_REVIEW",
+      "message": "unclear command requiring operator review",
+      "reason_code": "unclear_requires_operator_review",
+      "severity": "warning",
+      "stop_state": "review_required",
+      "surface": "command_classification"
+    }
+  ],
+  "gate_status": "blocked_by_missing_approval",
+  "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-EXECUTION-EVIDENCE-002",
+  "metadata": {
+    "created_at": "2026-06-13T00:00:00Z",
+    "dry_run_harness_contract": "readiness-only; wrapper remains selected next lane",
+    "non_execution_boundary": "no commands executed; no providers, external APIs, browsers, deployment, billing, credentials, Google Sheets, source-artifact mutation, or evidence promotion"
+  },
+  "preflight_result_summary": {
+    "allowed": false,
+    "artifact_paths": [
+      "execution-gate-result.json",
+      "dry-run-result.json",
+      "stop-state.json"
+    ],
+    "evidence_boundary": "local-only offline documentation/evidence packet; no providers, models, tokens, external APIs, browser automation, deployment, credentials, Google Sheets, runtime behavior changes, provider routing changes, prior evidence mutation, or readiness claims",
+    "finding_ids": [
+      "SELF_OPERATOR_APPROVAL_GATE_REQUIRED",
+      "SELF_OPERATOR_COMMAND_REQUIRES_OPERATOR_REVIEW",
+      "SELF_OPERATOR_COMMAND_REQUIRES_OPERATOR_REVIEW"
+    ],
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-EXECUTION-EVIDENCE-002",
+    "stop_state": "blocked"
+  },
+  "reason_code": "missing_approval",
+  "redaction_status": "redacted",
+  "run_id": "execution-evidence-002-codex-local-001",
+  "schema_version": "self_operator.execution_gate_result.v1",
+  "stop_state_record": {
+    "approval_result_summary": {
+      "finding_ids": [
+        "SELF_OPERATOR_APPROVAL_MISSING"
+      ],
+      "identity_finding_ids": [],
+      "identity_match": false,
+      "present": false,
+      "valid": false
+    },
+    "artifact_paths": [
+      "execution-gate-result.json",
+      "dry-run-result.json",
+      "stop-state.json"
+    ],
+    "blocked_surfaces": [
+      "approval_gate",
+      "approval_record",
+      "command_classification"
+    ],
+    "evidence_boundary": "local-only offline documentation/evidence packet; no providers, models, tokens, external APIs, browser automation, deployment, credentials, Google Sheets, runtime behavior changes, provider routing changes, prior evidence mutation, or readiness claims",
+    "findings": [
+      {
+        "id": "SELF_OPERATOR_APPROVAL_GATE_REQUIRED",
+        "message": "stop if explicit operator confirmation is missing",
+        "reason_code": "missing_operator_confirmation",
+        "severity": "error",
+        "stop_state": "blocked",
+        "surface": "approval_gate"
+      },
+      {
+        "id": "SELF_OPERATOR_APPROVAL_MISSING",
+        "message": "approval record is missing",
+        "reason_code": "missing_approval",
+        "severity": "error",
+        "stop_state": "blocked",
+        "surface": "approval_record"
+      },
+      {
+        "id": "SELF_OPERATOR_COMMAND_REQUIRES_OPERATOR_REVIEW",
+        "message": "unclear command requiring operator review",
+        "reason_code": "unclear_requires_operator_review",
+        "severity": "warning",
+        "stop_state": "review_required",
+        "surface": "command_classification"
+      }
+    ],
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-EXECUTION-EVIDENCE-002",
+    "message": "execution gate blocked: missing_approval",
+    "metadata": {
+      "created_at": "2026-06-13T00:00:00Z",
+      "local_only": true
+    },
+    "reason_code": "missing_approval",
+    "redaction_status": "redacted",
+    "run_id": "execution-evidence-002-codex-local-001",
+    "schema_version": "self_operator.stop_state_record.v1",
+    "source_preflight_result_summary": {
+      "allowed": false,
+      "artifact_paths": [
+        "execution-gate-result.json",
+        "dry-run-result.json",
+        "stop-state.json"
+      ],
+      "evidence_boundary": "local-only offline documentation/evidence packet; no providers, models, tokens, external APIs, browser automation, deployment, credentials, Google Sheets, runtime behavior changes, provider routing changes, prior evidence mutation, or readiness claims",
+      "finding_ids": [
+        "SELF_OPERATOR_APPROVAL_GATE_REQUIRED",
+        "SELF_OPERATOR_COMMAND_REQUIRES_OPERATOR_REVIEW",
+        "SELF_OPERATOR_COMMAND_REQUIRES_OPERATOR_REVIEW"
+      ],
+      "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-EXECUTION-EVIDENCE-002",
+      "stop_state": "blocked"
+    },
+    "stop_state": "blocked"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-EXECUTION-EVIDENCE-002",
+  "requested_action": "Create a local-only evidence packet for Self Operator Execution Evidence 002 and stop at the execution gate unless real operator approval is recorded.",
+  "candidate_changed_files": [
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-002/README.md",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-002/candidate-task-selection.md",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-002/operator-decision-record.md",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-002/operator-input-required.md",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-002/artifacts/execution-gate-result.json",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-002/artifacts/dry-run-result.json",
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-002/artifacts/stop-state.json"
+  ],
+  "proposed_commands": [
+    "python scripts/check_local_llm_doc_paths.py",
+    "python scripts/check_local_llm_evidence_boundaries.py",
+    "python scripts/check_local_llm_packet_consistency.py"
+  ],
+  "operator_confirmation": false,
+  "output_root": "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-002/artifacts",
+  "evidence_boundary": "local-only offline documentation/evidence packet; no providers, models, tokens, external APIs, browser automation, deployment, credentials, Google Sheets, runtime behavior changes, provider routing changes, prior evidence mutation, or readiness claims",
+  "artifact_paths": [
+    "execution-gate-result.json",
+    "dry-run-result.json",
+    "stop-state.json"
+  ],
+  "allowed_changed_prefixes": [
+    "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-002/"
+  ],
+  "metadata": {
+    "run_id": "execution-evidence-002-codex-local-001",
+    "scope_summary": "Operator-supervision evidence boundary packet; stop before approved execution if real operator input is unavailable."
+  }
+}

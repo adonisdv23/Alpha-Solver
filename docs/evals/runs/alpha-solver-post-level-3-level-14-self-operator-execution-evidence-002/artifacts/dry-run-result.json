@@ -1,0 +1,112 @@
+{
+  "allowed": false,
+  "approval_summary": {
+    "finding_ids": [
+      "SELF_OPERATOR_APPROVAL_MISSING"
+    ],
+    "identity_finding_ids": [],
+    "identity_match": false,
+    "present": false,
+    "valid": false
+  },
+  "artifact_paths": {
+    "dry_run_result": "dry-run-result.json",
+    "execution_gate_result": "execution-gate-result.json",
+    "stop_state": "stop-state.json"
+  },
+  "dry_run_status": "blocked_by_missing_approval",
+  "evidence_boundary": "local-only offline documentation/evidence packet; no providers, models, tokens, external APIs, browser automation, deployment, credentials, Google Sheets, runtime behavior changes, provider routing changes, prior evidence mutation, or readiness claims",
+  "execution_gate_summary": {
+    "allowed_for_local_dry_run": false,
+    "finding_ids": [
+      "SELF_OPERATOR_APPROVAL_GATE_REQUIRED",
+      "SELF_OPERATOR_APPROVAL_MISSING",
+      "SELF_OPERATOR_COMMAND_REQUIRES_OPERATOR_REVIEW"
+    ],
+    "gate_status": "blocked_by_missing_approval",
+    "reason_code": "missing_approval",
+    "redaction_status": "redacted",
+    "schema_version": "self_operator.execution_gate_result.v1",
+    "stop_state_present": true
+  },
+  "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-001",
+  "metadata": {
+    "acceptance_status": "not_run",
+    "blocker_fallback_lane": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-12-SELF-OPERATOR-LOCAL-HARNESS-DRY-RUN-WRAPPER-FIX-001",
+    "created_at": "2026-06-13T00:00:00Z",
+    "evidence_boundary": "local-only; operator-supervised; no execution; no providers or external systems; no acceptance; no source-artifact mutation; no evidence promotion",
+    "mvp_readiness": "unclaimed",
+    "operator_supervision": "required_for_manual_local_acceptance",
+    "provider_external_surface_status": "not_called",
+    "selected_next_lane": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-13-SELF-OPERATOR-MANUAL-LOCAL-ACCEPTANCE-PACKET-001"
+  },
+  "non_execution_confirmation": "wrapper does not execute proposed commands; it only classifies proposed command text",
+  "output_root_summary": {
+    "basename": "artifacts",
+    "provided_by_caller": true,
+    "raw_path_recorded": false
+  },
+  "preflight_summary": {
+    "allowed": false,
+    "artifact_paths": [
+      "execution-gate-result.json",
+      "dry-run-result.json",
+      "stop-state.json"
+    ],
+    "command_reason_codes": [
+      "unclear_requires_operator_review",
+      "unclear_requires_operator_review",
+      "allowed_local_read_check"
+    ],
+    "evidence_boundary": "local-only offline documentation/evidence packet; no providers, models, tokens, external APIs, browser automation, deployment, credentials, Google Sheets, runtime behavior changes, provider routing changes, prior evidence mutation, or readiness claims",
+    "finding_ids": [
+      "SELF_OPERATOR_APPROVAL_GATE_REQUIRED",
+      "SELF_OPERATOR_COMMAND_REQUIRES_OPERATOR_REVIEW",
+      "SELF_OPERATOR_COMMAND_REQUIRES_OPERATOR_REVIEW"
+    ],
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-EXECUTION-EVIDENCE-002",
+    "stop_state": "blocked"
+  },
+  "proposed_task_summary": {
+    "artifact_path_count": 3,
+    "candidate_changed_files": [
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-002/README.md",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-002/candidate-task-selection.md",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-002/operator-decision-record.md",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-002/operator-input-required.md",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-002/artifacts/execution-gate-result.json",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-002/artifacts/dry-run-result.json",
+      "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-002/artifacts/stop-state.json"
+    ],
+    "command_count": 3,
+    "evidence_boundary_present": true,
+    "lane_id": "ALPHA-SOLVER-POST-LEVEL-3-LEVEL-14-SELF-OPERATOR-EXECUTION-EVIDENCE-002",
+    "metadata": {
+      "run_id": "execution-evidence-002-codex-local-001",
+      "scope_summary": "Operator-supervision evidence boundary packet; stop before approved execution if real operator input is unavailable."
+    },
+    "operator_confirmation_present": false,
+    "requested_action": "Create a local-only evidence packet for Self Operator Execution Evidence 002 and stop at the execution gate unless real operator approval is recorded.",
+    "run_id": "execution-evidence-002-codex-local-001"
+  },
+  "reason_code": "missing_approval",
+  "redaction_status": "redacted",
+  "run_id": "execution-evidence-002-codex-local-001",
+  "schema_version": "self_operator.dry_run_result.v1",
+  "stop_state_summary": {
+    "blocked_surfaces": [
+      "approval_gate",
+      "approval_record",
+      "command_classification"
+    ],
+    "finding_ids": [
+      "SELF_OPERATOR_APPROVAL_GATE_REQUIRED",
+      "SELF_OPERATOR_APPROVAL_MISSING",
+      "SELF_OPERATOR_COMMAND_REQUIRES_OPERATOR_REVIEW"
+    ],
+    "reason_code": "missing_approval",
+    "redaction_status": "redacted",
+    "schema_version": "self_operator.stop_state_record.v1",
+    "stop_state": "blocked"
+  }
+}
