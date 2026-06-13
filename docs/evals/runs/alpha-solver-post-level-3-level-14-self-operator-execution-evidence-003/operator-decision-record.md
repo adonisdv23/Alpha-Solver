@@ -2,13 +2,13 @@
 
 ## Artifact intake
 
-A real operator approval artifact was supplied in the prompt and preserved as:
+A real operator approval artifact was supplied in the prompt and preserved with `approved_by` and `approved_at` explicitly redacted as:
 
 ```text
 docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-execution-evidence-003/operator-approval-artifact.json
 ```
 
-The JSON parsed successfully and contained the expected `self_operator.approval_record.v1` schema marker, lane ID, run ID, `approved=true`, operator confirmation text, approval text, scope summary, evidence boundary, and `redaction_status=redacted`.
+The JSON parsed successfully and contained the expected `self_operator.approval_record.v1` schema marker, lane ID, run ID, `approved=true`, operator confirmation text, approval text, scope summary, evidence boundary, and `redaction_status=redacted`. The provenance fields were supplied as prompt placeholders, so the committed evidence normalizes them to `[REDACTED_OPERATOR_ID]` and `[REDACTED_TIMESTAMP]` rather than treating placeholders as real provenance.
 
 ## Local gate result
 

@@ -9,7 +9,7 @@ It records:
 - local dry-run wrapper execution;
 - local execution-gate rejection of the supplied approval artifact;
 - local stop-state generation;
-- deterministic local result import from an existing packet;
+- deterministic local result import from an existing packet, with committed import-summary paths normalized to repo-relative paths for portability;
 - deterministic local acceptance interpretation that remained blocked;
 - explicit forbidden-claim boundaries.
 

@@ -68,3 +68,7 @@ Interpretation: acceptance interpretation was exercised locally and correctly re
 Verdict: `APPROVAL_CAPTURED_EXECUTION_BLOCKED_BY_LOCAL_SAFETY_GATE`
 
 DEF-001 status: `DEF-001_FURTHER_PARTIALLY_RETIRED`
+
+## Path portability correction
+
+The committed `artifacts/result-import-summary.json` uses repo-relative path strings instead of machine-specific absolute `/workspace/Alpha-Solver/...` paths. This keeps the evidence portable while preserving the local import summary structure.

@@ -5,8 +5,8 @@
   "approved": true,
   "operator_confirmation": "I approve this local-only operator-supervised Self Operator evidence lane. Stop if explicit operator confirmation is missing. Do not call providers, models, tokens, external APIs, browser automation, deployments, dashboards, /v1/solve, credentials, Google Sheets, or modify runtime/provider behavior.",
   "approval_text": "I approve this local-only Execution Evidence 003 run for Alpha Solver. This approval is limited to offline repository-local Self Operator evidence capture only. It does not authorize provider calls, OpenAI calls, token usage, hosted model calls, local model calls, external API calls, browser automation, deployment, dashboard exposure, /v1/solve exposure, credential access, Google Sheets updates, runtime behavior changes, provider routing changes, prior evidence mutation, production readiness claims, public MVP readiness claims, benchmark claims, or autonomous operation claims.",
-  "approved_by": "<YOUR_NAME_OR_OPERATOR_ID>",
-  "approved_at": "<DATE_TIME>",
+  "approved_by": "[REDACTED_OPERATOR_ID]",
+  "approved_at": "[REDACTED_TIMESTAMP]",
   "scope_summary": "Operator-supervised local-only Execution Evidence 003 run for the representative Self Operator candidate task.",
   "evidence_boundary": "local-only offline evidence; no providers, models, tokens, external APIs, browser automation, deployment, credentials, Google Sheets, runtime/provider changes, prior evidence mutation, or readiness claims",
   "redaction_status": "redacted"

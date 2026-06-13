@@ -6,7 +6,7 @@ Verdict: **`APPROVAL_CAPTURED_EXECUTION_BLOCKED_BY_LOCAL_SAFETY_GATE`**
 
 DEF-001 status after this lane: **`DEF-001_FURTHER_PARTIALLY_RETIRED`**
 
-This packet records the next local-only, offline Self Operator evidence lane after merged PR #499 / Execution Evidence 002. A real operator approval artifact was supplied in the prompt and preserved exactly as `operator-approval-artifact.json`; it was ingested by the local dry-run wrapper and execution gate.
+This packet records the next local-only, offline Self Operator evidence lane after merged PR #499 / Execution Evidence 002. A real operator approval artifact was supplied in the prompt and preserved as `operator-approval-artifact.json` with operator provenance fields explicitly redacted; it was ingested by the local dry-run wrapper and execution gate.
 
 The local gate did **not** accept the approval artifact because the approval text did not contain the gate's exact case-sensitive hard-stop phrase and therefore returned `SELF_OPERATOR_APPROVAL_HARD_STOP_TEXT_REQUIRED`. Because the gate failed closed, no approved post-gate execution action was performed. Result import and acceptance interpretation were exercised only as deterministic local artifact operations under this new packet directory.
 
@@ -19,7 +19,7 @@ No provider, OpenAI, hosted model, local model, token, external API, browser aut
 | 1 | Exact commands run | Recorded in `commands-run.md`. |
 | 2 | Exit codes | Recorded in `commands-run.md`. |
 | 3 | Exact local files used as representative candidate task or fixture | `candidate-task.json`, `operator-approval-artifact.json`, this packet's `artifacts/`, and the existing Level 13 acceptance packet named in `candidate-task-selection.md`. |
-| 4 | The real operator approval artifact | Preserved as `operator-approval-artifact.json`. |
+| 4 | The real operator approval artifact | Preserved as `operator-approval-artifact.json` with `approved_by` and `approved_at` explicitly redacted instead of left as template placeholders. |
 | 5 | Whether approval was accepted by the local gate | No. The artifact was present and approved, but local validation rejected it with `SELF_OPERATOR_APPROVAL_HARD_STOP_TEXT_REQUIRED`. |
 | 6 | What executed after approval | Only deterministic local wrapper/gate artifact generation, result import from an existing local packet, and acceptance interpretation. No proposed task commands were executed by the wrapper. |
 | 7 | What did not execute after approval | No provider/model/token/API/browser/deploy/dashboard/`/v1/solve`/credential/Google Sheets/runtime/provider/prior-evidence mutation action; no approved local task command execution. |
@@ -33,7 +33,7 @@ No provider, OpenAI, hosted model, local model, token, external API, browser aut
 
 - `repo-state-verification.md` — live precondition verification.
 - `candidate-task-selection.md` — representative local task selection and scope.
-- `operator-approval-artifact.json` — real operator approval artifact from the prompt.
+- `operator-approval-artifact.json` — real operator approval artifact from the prompt with provenance fields redacted.
 - `operator-decision-record.md` — approval intake and local-gate consumption result.
 - `execution-plan.md` — intended lifecycle coverage.
 - `commands-run.md` — exact commands and exit codes.
