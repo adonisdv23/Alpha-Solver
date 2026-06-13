@@ -27,17 +27,27 @@ answered: **`MCP-002` and `NEW-010` both carry the MCP-005 body** under their ow
 
 ### Method (reproducible, read-only)
 
-For every `.specs/*.md`, the body was normalized by removing the H1 title line and the
-`## Code Targets` section, then SHA-1 hashed and clustered. Result: **exactly one**
-multi-file body cluster — the MCP-005 Error Taxonomy body, shared by 21 files
-byte-for-byte; 2 further files (`MCP-001`, `NEW-016`) carry the same body plus a prior
-hygiene note. **No other duplicate or near-duplicate body cluster exists** among the
-remaining specs, so cross-contamination is limited to the Error-Taxonomy body.
-Reproduce with:
+For every `.specs/*.md`, the body was normalized by removing (a) the H1 title line,
+(b) a leading blockquote block before the first `## ` header — i.e. the
+non-authoritative banner or any prior hygiene note — and (c) the `## Code Targets`
+section, then SHA-1 hashed and clustered. Excluding the title, banner/note, and
+targets isolates the *copied body*, so the hash is stable before and after the
+banners were added. Result: **exactly one** multi-file body cluster — the MCP-005
+Error Taxonomy body. Under this rule **all 23 taxonomy-bearing specs (canonical
+`MCP-005` + 22 contaminated) hash to `a7c9ca95240e`** in the committed state
+(`MCP-001` and `NEW-016` included). **No other duplicate or near-duplicate body
+cluster exists** among the remaining specs, so cross-contamination is limited to
+the Error-Taxonomy body. Reproduce with:
 
 ```bash
 grep -rl "Create a stable MCP error taxonomy" .specs/   # -> 23 files (MCP-005 + 22)
+python docs/evals/runs/alpha-solver-spec-contamination-reconciliation-001/reproduce-body-hash.py
+# -> all 23 share normalized body hash a7c9ca95240e; RESULT: PASS
 ```
+
+The exact normalization rule and a runnable implementation live in the evidence
+packet: [`contamination-evidence.md`](evals/runs/alpha-solver-spec-contamination-reconciliation-001/contamination-evidence.md)
+and [`reproduce-body-hash.py`](evals/runs/alpha-solver-spec-contamination-reconciliation-001/reproduce-body-hash.py).
 
 ### Decisive finding for remediation: the titled features exist in committed code
 
