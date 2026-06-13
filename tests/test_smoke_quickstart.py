@@ -12,6 +12,7 @@ from fastapi.testclient import TestClient
 from alpha.executors.math_exec import evaluate
 from cli.alpha_solver_cli import ObsResult, solve
 from service.app import app
+from tests.helpers.git_repo import init_unsigned_git_repo
 
 SMOKE_DECK_PATH = Path("data/scenarios/decks/smoke.jsonl")
 SMOKE_RECORDS = [
@@ -139,9 +140,7 @@ def test_smoke_deck_pass_rate_and_obs_card():
 def test_release_script(tmp_path: Path):
     repo = tmp_path / "repo"
     repo.mkdir()
-    subprocess.run(["git", "init"], cwd=repo, check=True)
-    subprocess.run(["git", "config", "user.email", "ci@example.com"], cwd=repo, check=True)
-    subprocess.run(["git", "config", "user.name", "CI"], cwd=repo, check=True)
+    init_unsigned_git_repo(repo, user_email="ci@example.com", user_name="CI")
 
     docs_dir = repo / "docs"
     scripts_dir = repo / "scripts"
