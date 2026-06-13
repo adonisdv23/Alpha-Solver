@@ -86,6 +86,26 @@ def test_current_repo_local_llm_packets_pass_packet_consistency_check():
     assert check_packet_consistency(packet_dirs) == []
 
 
+def test_default_discovery_includes_openai_packet_families(tmp_path):
+    packet_dirs = [
+        Path("docs/evals/runs/openai-fixture"),
+        Path("docs/evals/runs/local-openai-fixture"),
+        Path("docs/evals/runs/alpha-solver-openai-fixture"),
+    ]
+    for packet_dir in packet_dirs:
+        _write_packet(
+            tmp_path,
+            packet_dir,
+            selected_text="`OPENAI-FIXTURE-NEXT-001`\n",
+            boundary_name="non-actions.md",
+        )
+
+    discovered = iter_packet_dirs(tmp_path)
+
+    for packet_dir in packet_dirs:
+        assert packet_dir in discovered
+
+
 def test_default_discovery_includes_release_readiness_ladder_packet():
     packet_dirs = iter_packet_dirs()
 
