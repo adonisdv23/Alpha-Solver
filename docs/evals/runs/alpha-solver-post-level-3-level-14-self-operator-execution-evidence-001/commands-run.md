@@ -30,7 +30,39 @@ python scripts/check_self_operator_release_gate.py --repo-root .
 Exit code: `0`. `final_status: eligible_for_release_closeout_review`; `ready: true (does not claim MVP
 readiness)`; 11/11 gates `pass`. Full output and JSON in `execution-results.md` / `artifacts-index.md`.
 
-## 3. Self Operator test suite (offline/deterministic)
+## 3. Enumerate Self Operator test files, then run the suite (offline/deterministic)
+
+First enumerate the exact files the glob resolves to (so the suite target is explicit and auditable):
+
+```
+python - <<'PY'
+from pathlib import Path
+for p in sorted(Path("tests").glob("test_self_operator_*.py")):
+    print(p)
+PY
+```
+Output (17 files):
+```
+tests/test_self_operator_acceptance_interpretation.py
+tests/test_self_operator_approval.py
+tests/test_self_operator_approval_stopstate_static.py
+tests/test_self_operator_artifact_schema.py
+tests/test_self_operator_artifact_schema_static.py
+tests/test_self_operator_artifact_store.py
+tests/test_self_operator_closeout_guardrails.py
+tests/test_self_operator_command_classification.py
+tests/test_self_operator_dry_run.py
+tests/test_self_operator_execution_gate.py
+tests/test_self_operator_forbidden_behavior_static.py
+tests/test_self_operator_import_blocker_triage.py
+tests/test_self_operator_preflight.py
+tests/test_self_operator_release_gate.py
+tests/test_self_operator_result_import.py
+tests/test_self_operator_static_guardrails.py
+tests/test_self_operator_stop_state.py
+```
+
+Then run the suite over exactly those files:
 
 ```
 python -m pytest tests/test_self_operator_*.py -q
@@ -44,7 +76,8 @@ failed, 0 errors, 0 skipped** (1.43s).
 env -u MODEL_PROVIDER -u MODEL_SET -u OPENAI_API_KEY -u OPENAI_BASE_URL python -m pytest -q
 ```
 Exit code: `1`. Exact counts via JUnit XML: **1216 collected, 1211 passed, 2 failed, 0 errors, 3
-skipped** (37.75s). The 2 failures are pre-existing and unrelated to this lane (see `failure-analysis.md`).
+skipped** (37.75s). Consistent with the PR #496 recorded full-suite behavior, the provider-env-unset full
+suite still reports the same two unrelated failures (see `failure-analysis.md`).
 
 ## 5. Static guardrail checkers (run after this packet was created)
 

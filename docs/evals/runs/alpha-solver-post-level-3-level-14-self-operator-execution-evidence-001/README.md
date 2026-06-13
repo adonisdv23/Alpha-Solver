@@ -29,8 +29,8 @@ any kind (see `forbidden-claims.md`, `evidence-boundary.md`).
 | 4 | What commands were run? | See `commands-run.md` (verbatim, with exit codes). |
 | 5 | What inputs/fixtures were used? | In-repo deterministic test fixtures; the release-gate CLI inspects live in-repo evidence directories. See `execution-results.md`. |
 | 6 | What outputs/logs/artifacts were produced? | pytest counts (via JUnit XML), release-gate JSON report (embedded in `artifacts-index.md`), exit codes. |
-| 7 | Did execution succeed, fail, or stop? | The selected Self Operator targets **succeeded** (213/213 passed; release-gate exit 0, 11/11 gates pass). The separate full-suite validation has 2 pre-existing unrelated failures. See `execution-results.md`. |
-| 8 | If it failed, what failed and why? | Only 2 pre-existing, environment-level failures (`test_release_script`, `test_tag_release`) caused by the container's commit-signing server returning HTTP 400 in throwaway `git init` repos. Not Self Operator code. See `failure-analysis.md`. |
+| 7 | Did execution succeed, fail, or stop? | The selected Self Operator targets **succeeded** (213/213 passed; release-gate exit 0, 11/11 gates pass). Consistent with the PR #496 recorded full-suite behavior, the separate provider-env-unset full suite still reports the same two unrelated failures. See `execution-results.md`. |
+| 8 | If it failed, what failed and why? | Consistent with the PR #496 recorded full-suite behavior, the provider-env-unset full suite still reports the same two unrelated failures (`test_release_script`, `test_tag_release`); in this run each is caused by the container's commit-signing server returning HTTP 400 in throwaway `git init` repos. Not Self Operator code. See `failure-analysis.md`. |
 | 9 | Did any command require provider/model/token/API access? | No. `OPENAI_API_KEY` is present in the environment but was not used; the authoritative full-suite run unsets provider env vars. No provider/model/hosted/API call was made. |
 | 10 | Does this evidence partially retire DEF-001, fully retire it, or leave it open? | **Partially** (`DEF-001_PARTIALLY_RETIRED`). See `evidence-boundary.md`. |
 | 11 | What remains blocked? | Full operator-supervised end-to-end DEF-001 run; DEF-002 (security/privacy); DEF-003 (Fable audit text); all provider/token/hosted/runtime/benchmark work. See `evidence-boundary.md`. |
@@ -46,7 +46,7 @@ any kind (see `forbidden-claims.md`, `evidence-boundary.md`).
 | `commands-run.md` | Exact commands run, with exit codes. |
 | `execution-results.md` | Captured results: pytest counts and release-gate output. |
 | `artifacts-index.md` | Index of produced artifacts, including the embedded release-gate JSON report. |
-| `failure-analysis.md` | Analysis of the 2 pre-existing full-suite failures (isolated from this lane). |
+| `failure-analysis.md` | Analysis of the 2 unrelated full-suite failures (isolated from this lane). |
 | `evidence-boundary.md` | What this packet proves and explicitly does not prove. |
 | `forbidden-claims.md` | Claims this packet explicitly does not make. |
 | `selected-next-lane.md` | Exactly one selected next lane. |

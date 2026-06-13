@@ -8,8 +8,9 @@ This packet may prove only what was actually run locally and offline.
   full test suite runs green (213/213), and its release-gate checker CLI runs to completion (exit 0,
   11/11 gates pass) against live in-repo evidence.
 - This execution required **no provider, no model, no token, no hosted service, and no external API**.
-- The full test suite, run with provider env vars unset, passes 1211/1216 with only 2 pre-existing,
-  environment-level (commit-signing) failures and 3 expected skips.
+- The full test suite, run with provider env vars unset, passes 1211/1216; consistent with the PR #496
+  recorded full-suite behavior, it still reports the same two unrelated environment-level (commit-signing)
+  failures, plus 3 expected skips.
 
 ## What this packet does NOT prove
 

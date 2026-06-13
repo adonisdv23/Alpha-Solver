@@ -5,8 +5,9 @@
 The two selected Self Operator execution targets did **not** fail: the Self Operator suite passed
 213/213, and the release-gate CLI exited `0` with 11/11 gates passing.
 
-The only failures observed were in the **separate full-suite validation run**, and they are pre-existing
-and unrelated to this lane.
+The only failures observed were in the **separate full-suite validation run**. Consistent with the PR #496
+recorded full-suite behavior, the provider-env-unset full suite still reports the same two unrelated
+failures.
 
 ## The 2 full-suite failures
 
@@ -29,9 +30,11 @@ fatal: failed to write commit object
 - **Environmental, not product logic.** The failure originates in the container's commit-signing
   infrastructure returning HTTP 400 for throwaway `git init` repos, not in any Self Operator or product
   code path.
-- **Pre-existing and unchanged.** PR #496 recorded the identical result ("2 failed, 1211 passed, 3
-  skipped") on `main` before this lane. This packet adds documentation only; it changes no test, product,
-  or CI code, so the counts are unchanged.
+- **Consistent with the PR #496 record.** PR #496 recorded the same full-suite shape ("2 failed, 1211
+  passed, 3 skipped"), and this provider-env-unset run reports the same two unrelated failures. This
+  packet adds documentation only and changes no test, product, or CI code. No independent clean-`main`
+  baseline was run in this environment, so this is stated as consistency with the PR #496 record, not as
+  a separately verified pre-existing/unchanged claim.
 - **Disjoint from the execution target.** Neither failing test is part of `alpha/self_operator/` or the
   Self Operator suite. The Self Operator targets are fully green.
 
@@ -45,5 +48,5 @@ fatal: failed to write commit object
 ## Disposition
 
 No action taken. Per the code-change policy for this lane, tests and CI were **not** modified to make
-checks pass. The pre-existing signing-related failures are recorded honestly and isolated from the Self
-Operator execution evidence.
+checks pass. The two signing-related failures are recorded honestly, framed as consistent with the PR #496
+record, and isolated from the Self Operator execution evidence.

@@ -6,12 +6,35 @@
 | --- | --- | --- | --- |
 | Self Operator suite | `pytest tests/test_self_operator_*.py` | `0` | **213/213 passed**, 0 failed, 0 skipped (1.43s) |
 | Release-gate CLI | `check_self_operator_release_gate.py --repo-root .` | `0` | `eligible_for_release_closeout_review`, **11/11 gates pass** |
-| Full suite (env unset) | `env -u … pytest -q` | `1` | 1211 passed, **2 pre-existing failures**, 3 skipped (1216 collected) |
+| Full suite (env unset) | `env -u … pytest -q` | `1` | 1211 passed, **2 unrelated failures**, 3 skipped (1216 collected) |
 
 The two selected Self Operator execution targets **succeeded**. The full-suite validation is recorded for
-completeness; its only failures are pre-existing and unrelated (see `failure-analysis.md`).
+completeness; consistent with the PR #496 recorded full-suite behavior, it still reports the same two
+unrelated failures (see `failure-analysis.md`).
 
 ## 1. Self Operator suite (authoritative counts via JUnit XML)
+
+The glob `tests/test_self_operator_*.py` was enumerated before running; it resolves to these 17 files:
+
+```
+tests/test_self_operator_acceptance_interpretation.py
+tests/test_self_operator_approval.py
+tests/test_self_operator_approval_stopstate_static.py
+tests/test_self_operator_artifact_schema.py
+tests/test_self_operator_artifact_schema_static.py
+tests/test_self_operator_artifact_store.py
+tests/test_self_operator_closeout_guardrails.py
+tests/test_self_operator_command_classification.py
+tests/test_self_operator_dry_run.py
+tests/test_self_operator_execution_gate.py
+tests/test_self_operator_forbidden_behavior_static.py
+tests/test_self_operator_import_blocker_triage.py
+tests/test_self_operator_preflight.py
+tests/test_self_operator_release_gate.py
+tests/test_self_operator_result_import.py
+tests/test_self_operator_static_guardrails.py
+tests/test_self_operator_stop_state.py
+```
 
 ```
 self_operator_suite: collected=213 passed=213 failed=0 errors=0 skipped=0 time=1.429s
