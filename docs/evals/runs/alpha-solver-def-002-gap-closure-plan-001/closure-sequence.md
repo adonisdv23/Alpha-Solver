@@ -1,7 +1,10 @@
 # Safe closure sequence
 
-This sequence is ordered by risk, blast radius, and dependency. Each lane remains
-narrow and must produce evidence before the next risk category is considered.
+This DEF-002-local remediation sequence is ordered by risk, blast radius, and
+dependency. Each lane remains narrow and must produce evidence before the next
+risk category is considered. This sequence does not change the repo-global
+selected next lane; repo-global lane selection remains controlled by
+`docs/CURRENT_STATE.md` and `docs/LANE_REGISTRY.md`.
 
 1. `ALPHA-SOLVER-DEF-002-CREDENTIAL-STORAGE-HARDENING-001`
    - Close or materially reduce RR-02.
@@ -35,6 +38,8 @@ narrow and must produce evidence before the next risk category is considered.
 
 - Do not combine public exposure, provider validation, or readiness claims with
   these remediation lanes.
+- Do not run these DEF-002 remediation lanes in parallel with the repo-global
+  selected next lane unless the operator explicitly chooses the DEF-002 track.
 - Do not use real credentials in tests; use synthetic placeholders.
 - Do not print environment variables or secret values.
 - Do not mount or expose dashboard or `/v1/solve` outside isolated tests.

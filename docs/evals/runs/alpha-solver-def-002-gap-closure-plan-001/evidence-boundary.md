@@ -6,7 +6,7 @@
 - Must-fix items were separated from accepted residual candidates and not-now
   items.
 - A safe lane sequence was created.
-- Exactly one next implementation lane was selected.
+- Exactly one DEF-002-local recommended next remediation lane was identified, without changing the repo-global selected next lane.
 
 ## What this packet is not evidence for
 

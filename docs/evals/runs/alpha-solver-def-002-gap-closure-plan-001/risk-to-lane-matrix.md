@@ -1,5 +1,10 @@
 # Risk-to-lane matrix
 
+This matrix maps DEF-002 findings to local remediation/acceptance lanes only. It
+does not change the repo-global selected next lane, which remains controlled by
+`docs/CURRENT_STATE.md` and `docs/LANE_REGISTRY.md`.
+
+
 | Finding | Lane assignment | Lane type | Priority | Rationale |
 | --- | --- | --- | --- | --- |
 | RR-02 | `ALPHA-SOLVER-DEF-002-CREDENTIAL-STORAGE-HARDENING-001` | Implementation | P0 | High-severity plaintext provider API keys at rest. |

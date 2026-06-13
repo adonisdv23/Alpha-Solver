@@ -1,7 +1,7 @@
 # Not-now items
 
 The following are intentionally out of scope for this gap-closure planning lane
-and for the selected next implementation lane.
+and for the DEF-002-local recommended next remediation lane.
 
 | Item | Reason |
 | --- | --- |
