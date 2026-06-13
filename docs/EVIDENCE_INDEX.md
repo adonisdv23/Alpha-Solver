@@ -49,4 +49,4 @@ made.
 
 ## Later merged PRs
 
-PR #512 is now the current-control packet. `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` is the single selected next lane. Append rows here as new evidence merges.
+PR #512 is now the current-control packet. `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` is the single selected next lane. `ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001` has a canonical protocol packet on its branch, but it is not executed, contains no results or value evidence, and remains gated by the selected smoke/provider boundary and protocol preconditions. Append rows here as new evidence merges.

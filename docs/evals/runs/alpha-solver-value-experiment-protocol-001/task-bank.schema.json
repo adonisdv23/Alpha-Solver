@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Alpha Solver value experiment task entry",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string" },
+    "category": { "type": "string" },
+    "prompt": { "type": "string" },
+    "provenance": { "type": "string" },
+    "reference_notes": { "type": "string" },
+    "ideal_behavior": { "type": "string" },
+    "is_example": { "type": "boolean" },
+    "frozen_at": { "type": "string", "format": "date-time" }
+  },
+  "required": ["id", "category", "prompt", "provenance", "is_example"]
+}
