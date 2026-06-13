@@ -13,12 +13,43 @@ from typing import Dict, Iterable, Optional
 from fastapi import APIRouter, HTTPException, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 
+_PRIVATE_DIR_MODE = 0o700
+_PRIVATE_FILE_MODE = 0o600
+
 __all__ = [
     "router",
     "FileSecretsBackend",
     "AuditLogger",
     "mask_secret",
 ]
+
+
+def _ensure_private_parent(path: Path) -> None:
+    """Create or verify the storage parent directory for private artifacts.
+
+    App-created directories are created with restrictive permissions. Existing
+    caller-supplied directories are never chmodded because they may be shared
+    with unrelated files; on POSIX they must already be private enough.
+    """
+
+    created = not path.parent.exists()
+    if created:
+        path.parent.mkdir(parents=True, mode=_PRIVATE_DIR_MODE)
+    if os.name != "posix":
+        return
+    if path.parent.stat().st_mode & 0o077:
+        raise PermissionError(
+            f"Refusing to store dashboard private artifact under non-private directory: {path.parent}"
+        )
+    if created:
+        os.chmod(path.parent, _PRIVATE_DIR_MODE)
+
+
+def _ensure_private_file(path: Path) -> None:
+    """Tighten a private artifact path after creation or append."""
+
+    if os.name == "posix" and path.exists():
+        os.chmod(path, _PRIVATE_FILE_MODE)
 
 
 def _resolve_path(env_var: str, default_name: str) -> Path:
@@ -95,9 +126,15 @@ class FileSecretsBackend(SecretsBackend):
         return {str(key): str(value) for key, value in payload.items()}
 
     def _write(self, data: Dict[str, str]) -> None:
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        with self.path.open("w", encoding="utf-8") as file:
+        _ensure_private_parent(self.path)
+        fd = os.open(
+            self.path,
+            os.O_WRONLY | os.O_CREAT | os.O_TRUNC,
+            _PRIVATE_FILE_MODE,
+        )
+        with os.fdopen(fd, "w", encoding="utf-8") as file:
             json.dump(data, file, indent=2, sort_keys=True)
+        _ensure_private_file(self.path)
 
 
 class AuditLogger:
@@ -109,9 +146,15 @@ class AuditLogger:
     def log(self, action: str, provider: str, masked_key: str) -> None:
         timestamp = datetime.now(timezone.utc).isoformat()
         line = f"{timestamp} | {action.upper()} | {provider} | {masked_key}\n"
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        with self.path.open("a", encoding="utf-8") as file:
+        _ensure_private_parent(self.path)
+        fd = os.open(
+            self.path,
+            os.O_WRONLY | os.O_CREAT | os.O_APPEND,
+            _PRIVATE_FILE_MODE,
+        )
+        with os.fdopen(fd, "a", encoding="utf-8") as file:
             file.write(line)
+        _ensure_private_file(self.path)
 
 
 def mask_secret(raw_key: Optional[str]) -> str:

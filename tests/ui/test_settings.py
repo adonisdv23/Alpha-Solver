@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -18,8 +19,8 @@ from alpha.webapp.routes import settings
 
 @pytest.fixture()
 def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    secrets_path = tmp_path / "secrets.json"
-    audit_path = tmp_path / "audit.log"
+    secrets_path = tmp_path / "dashboard-private" / "secrets.json"
+    audit_path = tmp_path / "dashboard-private" / "audit.log"
     monkeypatch.setenv("ALPHA_DASHBOARD_SECRETS_PATH", str(secrets_path))
     monkeypatch.setenv("ALPHA_DASHBOARD_AUDIT_LOG", str(audit_path))
 
@@ -56,6 +57,10 @@ def _read_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _mode(path: Path) -> int:
+    return path.stat().st_mode & 0o777
+
+
 def test_create_key_persists_and_masks_display(client):
     client_app, secrets_path, audit_path = client
 
@@ -73,6 +78,79 @@ def test_create_key_persists_and_masks_display(client):
     assert len(log_lines) == 1
     assert "CREATED" in log_lines[0]
     assert "****5678" in log_lines[0]
+
+
+@pytest.mark.skipif(os.name != "posix", reason="POSIX file mode assertions are not portable")
+def test_key_storage_uses_restrictive_file_and_directory_modes(client):
+    client_app, secrets_path, audit_path = client
+
+    _post_key(client_app, "openai", "sk-synthetic-permissions-1234")
+
+    assert _mode(secrets_path.parent) == 0o700
+    assert _mode(secrets_path) == 0o600
+    assert _mode(audit_path.parent) == 0o700
+    assert _mode(audit_path) == 0o600
+
+
+@pytest.mark.skipif(os.name != "posix", reason="POSIX file mode assertions are not portable")
+def test_existing_permissive_secret_file_is_tightened_on_write(tmp_path: Path):
+    secrets_path = tmp_path / "nested" / "secrets.json"
+    secrets_path.parent.mkdir(parents=True, mode=0o700)
+    secrets_path.write_text('{"openai": "sk-synthetic-old-value"}', encoding="utf-8")
+    os.chmod(secrets_path.parent, 0o700)
+    os.chmod(secrets_path, 0o666)
+
+    backend = settings.FileSecretsBackend(secrets_path)
+    backend.set("openai", "sk-synthetic-new-value")
+
+    assert _read_json(secrets_path) == {"openai": "sk-synthetic-new-value"}
+    assert _mode(secrets_path.parent) == 0o700
+    assert _mode(secrets_path) == 0o600
+
+
+@pytest.mark.skipif(os.name != "posix", reason="POSIX file mode assertions are not portable")
+def test_existing_private_parent_is_not_chmodded(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    secrets_path = tmp_path / "operator-owned" / "secrets.json"
+    secrets_path.parent.mkdir(parents=True, mode=0o700)
+    os.chmod(secrets_path.parent, 0o700)
+    chmod_calls: list[tuple[Path, int]] = []
+    real_chmod = os.chmod
+
+    def recording_chmod(path: str | os.PathLike[str], mode: int) -> None:
+        chmod_calls.append((Path(path), mode))
+        real_chmod(path, mode)
+
+    monkeypatch.setattr(settings.os, "chmod", recording_chmod)
+
+    backend = settings.FileSecretsBackend(secrets_path)
+    backend.set("openai", "sk-synthetic-private-parent")
+
+    assert (secrets_path.parent, 0o700) not in chmod_calls
+    assert _mode(secrets_path.parent) == 0o700
+    assert _mode(secrets_path) == 0o600
+
+
+@pytest.mark.skipif(os.name != "posix", reason="POSIX file mode assertions are not portable")
+def test_existing_unsafe_parent_fails_closed_without_chmod_or_secret_write(tmp_path: Path):
+    secrets_path = tmp_path / "shared" / "secrets.json"
+    audit_path = tmp_path / "shared-audit" / "audit.log"
+    secrets_path.parent.mkdir(parents=True, mode=0o755)
+    audit_path.parent.mkdir(parents=True, mode=0o750)
+    os.chmod(secrets_path.parent, 0o755)
+    os.chmod(audit_path.parent, 0o750)
+
+    backend = settings.FileSecretsBackend(secrets_path)
+    audit_logger = settings.AuditLogger(audit_path)
+
+    with pytest.raises(PermissionError, match="non-private directory"):
+        backend.set("openai", "sk-synthetic-unsafe-parent")
+    with pytest.raises(PermissionError, match="non-private directory"):
+        audit_logger.log("CREATED", "openai", "****rent")
+
+    assert _mode(secrets_path.parent) == 0o755
+    assert _mode(audit_path.parent) == 0o750
+    assert not secrets_path.exists()
+    assert not audit_path.exists()
 
 
 def test_update_key_overwrites_value_and_audits(client):
