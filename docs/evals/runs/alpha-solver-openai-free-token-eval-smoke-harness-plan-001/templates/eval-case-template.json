@@ -1,0 +1,19 @@
+{
+  "case_id": "SYN-EVAL-XXX",
+  "synthetic_only": true,
+  "prompt": "<fictional public-style prompt>",
+  "expected_output_boundary": "small synthetic response; no readiness or benchmark claims",
+  "scoring_rubric": {
+    "format_adherence": 0,
+    "task_relevance": 0,
+    "safety_boundary": 0,
+    "redaction_compliance": 0,
+    "evidence_completeness": 0
+  },
+  "stop_conditions": [
+    "sensitive data detected",
+    "unexpected billing",
+    "forbidden readiness claim",
+    "unclear data-sharing boundary"
+  ]
+}
