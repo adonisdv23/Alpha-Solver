@@ -7,8 +7,7 @@
 
 ## Current verified phase
 
-**Post-local Self Operator evidence; pre-first real OpenAI smoke; blocked on
-OpenAI project/billing attestation retry after PR #511.**
+**Post-local Self Operator evidence; pre-first real OpenAI smoke; OpenAI project/billing boundary attestation confirmed in PR #512 and next tiny smoke retry selected.**
 
 - The Self Operator has a multi-PR local/offline execution-evidence chain
   (PRs #497, #499, #500, #501) that runs its test suite and release-gate CLI
@@ -21,17 +20,20 @@ OpenAI project/billing attestation retry after PR #511.**
 - The project/billing boundary clarification lane (PR #511) remained docs-only
   and blocked because operator confirmation was missing, with verdict
   `BLOCKED_PROJECT_BILLING_OPERATOR_CONFIRMATION_MISSING`.
+- The project/billing boundary attestation retry lane (PR #512) remains
+  docs-only and records a redacted operator confirmation, with verdict
+  `OPENAI_PROJECT_BILLING_BOUNDARY_CONFIRMED`.
 
-No OpenAI/provider call has been executed. No value experiment has been run.
+No OpenAI/provider call has been executed. No token has been used by PR #512. No value experiment has been run.
 
 ## At a glance
 
 | Field | Value |
 |-------|-------|
-| Last merged PR | **#511** — `docs(openai): add project billing boundary clarification packet` |
-| Current controlling lane | `OPENAI-PROJECT-BILLING-BOUNDARY-CLARIFICATION-001` (PR #511, **blocked: operator confirmation missing**) |
-| Next selected lane | **`OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001`** (operator attestation retry, no provider call) |
-| Next provider-call attempt (only after attestation) | `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` |
+| Latest merged PR in this chain | **#512** — `docs(openai): add project billing boundary attestation retry packet` |
+| Current controlling lane | `OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001` (PR #512, `OPENAI_PROJECT_BILLING_BOUNDARY_CONFIRMED`) |
+| Next selected lane | **`LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002`** (one tiny synthetic OpenAI smoke retry; provider-call lane remains bounded) |
+| Prior blocked control | `OPENAI-PROJECT-BILLING-BOUNDARY-CLARIFICATION-001` (PR #511, superseded by PR #512 attestation) |
 | Highest-value strategic lane after smoke | `ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001` |
 | Open PRs | none |
 
@@ -52,6 +54,7 @@ No OpenAI/provider call has been executed. No value experiment has been run.
 | #508 | OpenAI packet checker-scope hardening | `OPENAI_PACKET_CHECKER_SCOPE_EXTENDED` |
 | #509 | Local OpenAI token smoke retry 001 | `BLOCKED_OPENAI_PROJECT_OR_BILLING_NOT_VERIFIED` |
 | #511 | OpenAI project/billing boundary clarification 001 | `BLOCKED_PROJECT_BILLING_OPERATOR_CONFIRMATION_MISSING` |
+| #512 | OpenAI project/billing boundary attestation retry 001 | `OPENAI_PROJECT_BILLING_BOUNDARY_CONFIRMED` |
 
 See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for full per-PR detail and
 [`LANE_REGISTRY.md`](LANE_REGISTRY.md) for lane lifecycle classification.
@@ -67,9 +70,10 @@ See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for full per-PR detail and
 
 ## What is blocked
 
-- **First real OpenAI token smoke** — blocked on OpenAI project/billing
-  operator confirmation after PR #511. No provider call until the attestation
-  retry supplies the required confirmation.
+- **First real OpenAI token smoke** — selected next as
+  `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` after PR #512 recorded the
+  redacted operator attestation. The next lane is still limited to one tiny
+  synthetic smoke retry and does not authorize broad provider validation.
 - **DEF-002 closure** — blocked pending security/privacy review (assessment of
   existing machinery, not build-from-scratch).
 - **DEF-003 closure** — blocked pending committed audit text or an accepted

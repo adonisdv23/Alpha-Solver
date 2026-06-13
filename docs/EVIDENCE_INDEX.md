@@ -1,4 +1,4 @@
-# Evidence Index — PRs #497–#511
+# Evidence Index — PRs #497–#512
 
 > Created by lane `ALPHA-SOLVER-CURRENT-STATE-DOCS-BACKLOG-ARCHIVE-ISSUE-REGISTER-001`.
 > Verification date **2026-06-13**. Merge status verified read-only via GitHub
@@ -31,7 +31,8 @@ made.
 | #507 | openai: operator pre-smoke attestation | ✅ | `openai-data-sharing-operator-attestation-001` | `OPENAI_OPERATOR_PRE_SMOKE_ATTESTATION_CAPTURED` | LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-001 | Operator go/no-go attestation (redacted) | No call; attestation ≠ project/billing proof | completed |
 | #508 | openai: extend static checks to OpenAI packets | ✅ | `openai-packet-checker-scope-001` | `OPENAI_PACKET_CHECKER_SCOPE_EXTENDED` | LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-001 | Checker scope hardening (docs-only packet; checker code changed in same PR) | No provider/runtime; tooling only | completed |
 | #509 | openai: local token smoke retry capture | ✅ | `local-openai-token-smoke-capture-retry-001` | `BLOCKED_OPENAI_PROJECT_OR_BILLING_NOT_VERIFIED` | OPENAI-PROJECT-BILLING-BOUNDARY-CLARIFICATION-001 | Retry halted before provider call | No call; key-presence ≠ project/billing readiness | completed |
-| #511 | openai: project billing boundary clarification | ✅ | `openai-project-billing-boundary-clarification-001` | `BLOCKED_PROJECT_BILLING_OPERATOR_CONFIRMATION_MISSING` | OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001 | Clarification lane blocked pending operator confirmation | No call; no token; no private billing data; no readiness | **current-control** |
+| #511 | openai: project billing boundary clarification | ✅ | `openai-project-billing-boundary-clarification-001` | `BLOCKED_PROJECT_BILLING_OPERATOR_CONFIRMATION_MISSING` | OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001 | Clarification lane blocked pending operator confirmation | No call; no token; no private billing data; no readiness | superseded by #512 |
+| #512 | openai: project billing boundary attestation retry | ✅ | `openai-project-billing-boundary-attestation-retry-001` | `OPENAI_PROJECT_BILLING_BOUNDARY_CONFIRMED` | LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002 | Redacted operator confirmation for project, billing, cost, and data-sharing boundary | No call; no token; no provider validation; no private billing data; no readiness | **current-control** |
 
 ## Notes
 
@@ -48,4 +49,4 @@ made.
 
 ## Later merged PRs
 
-PR #511 is now the current-control packet. Append rows here as new evidence merges.
+PR #512 is now the current-control packet. `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` is the single selected next lane. Append rows here as new evidence merges.
