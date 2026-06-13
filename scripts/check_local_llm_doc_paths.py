@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Offline path/link checker for local LLM and post-Level solver docs.
+"""Offline path/link checker for local LLM, post-Level, and OpenAI evidence packet docs.
 
 Purpose and limits:
 - This is a deterministic, offline documentation hardening check.
 - It scans local LLM solver orchestration operator docs, evidence index / Level 3 packet docs,
-  and alpha-solver-post-* Self Operator packet docs, excluding preserved source-artifact payload files.
-- It verifies repo-relative local LLM and alpha-solver-post-* doc packet paths and key
+  alpha-solver-post-* Self Operator packet docs, and OpenAI evidence packet docs, excluding preserved source-artifact payload files.
+- It verifies repo-relative local LLM, alpha-solver-post-*, and OpenAI doc packet paths and key
   source paths referenced by those docs exist in the checkout.
 - It detects simple stale selected-next-lane conflicts inside one document.
 - It does not call GitHub, access the network, run models/providers, start
@@ -37,6 +37,11 @@ LEVEL_3_SCAN_DIRS = (
 # exist, but preserved payload files inside it are intentionally not scanned.
 LEVEL_3_SOURCE_ARTIFACT_DIR = LEVEL_3_PACKET_DIR / "source-artifact"
 POST_PACKET_DIR_PREFIX = "docs/evals/runs/alpha-solver-post-"
+OPENAI_PACKET_DIR_PREFIXES = (
+    "docs/evals/runs/openai-",
+    "docs/evals/runs/local-openai-",
+    "docs/evals/runs/alpha-solver-openai-",
+)
 POST_PACKET_PARENT_DIR = Path("docs/evals/runs")
 COUNCIL_AUDIT_EVIDENCE_BUNDLE_DIR = Path(
     "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-council-audit-evidence-bundle"
@@ -73,6 +78,14 @@ LOCAL_LLM_MARKERS = (
 POST_PACKET_MARKERS = (
     "alpha-solver-post-",
     "ALPHA-SOLVER-POST-",
+)
+OPENAI_PACKET_MARKERS = (
+    "openai-",
+    "OPENAI-",
+    "local-openai-",
+    "LOCAL-OPENAI-",
+    "alpha-solver-openai-",
+    "ALPHA-SOLVER-OPENAI-",
 )
 IGNORED_LINK_PREFIXES = (
     "http://",
@@ -193,6 +206,7 @@ def _looks_checked_reference(value: str) -> bool:
     return _looks_repo_relative(value) and (
         any(marker in value for marker in LOCAL_LLM_MARKERS)
         or any(marker in value for marker in POST_PACKET_MARKERS)
+        or any(marker in value for marker in OPENAI_PACKET_MARKERS)
     )
 
 
@@ -210,6 +224,8 @@ def is_scanned_doc(path: Path, root: Path = ROOT) -> bool:
         return False
     rel_text = rel.as_posix()
     if rel_text.startswith(POST_PACKET_DIR_PREFIX):
+        return True
+    if rel_text.startswith(OPENAI_PACKET_DIR_PREFIXES):
         return True
     return any(
         rel_text == base.as_posix() or rel_text.startswith(f"{base.as_posix()}/")
@@ -389,12 +405,12 @@ def main(argv: list[str] | None = None) -> int:
     paths = [path for path in paths if is_scanned_doc(path, ROOT)]
     findings = check_paths(paths, ROOT)
     if findings:
-        print("Local LLM/post-Level doc path/link check failed:", file=sys.stderr)
+        print("Local LLM/post-Level/OpenAI doc path/link check failed:", file=sys.stderr)
         for finding in findings:
             print(f"  {finding.format()}", file=sys.stderr)
         return 1
 
-    print(f"Local LLM/post-Level doc path/link check passed ({len(paths)} files scanned).")
+    print(f"Local LLM/post-Level/OpenAI doc path/link check passed ({len(paths)} files scanned).")
     return 0
 
 

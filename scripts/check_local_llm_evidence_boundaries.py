@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Static evidence-boundary checker for local LLM and post-Level solver docs.
+"""Static evidence-boundary checker for local LLM, post-Level, and OpenAI evidence packet docs.
 
 Purpose and limits:
 - This is a deterministic, offline documentation hardening check.
 - It scans local LLM solver orchestration evidence-boundary docs for risky
   promotional claim phrases and requires nearby boundary language.
-- It also scans alpha-solver-post-* Self Operator packet docs, including the Council audit evidence bundle.
+- It also scans alpha-solver-post-* Self Operator packet docs, including the Council audit evidence bundle, plus OpenAI evidence packet docs.
 - It also checks that the final Level 3 closeout packet preserves the accepted
   non-promotional boundary phrases.
 - It does not validate behavior, run benchmarks, call models/providers, read
@@ -27,6 +27,11 @@ DOCS_DIR_PREFIXES = (
 )
 LOCAL_ORCHESTRATION_DIR_MARKER = "local-llm-solver-orchestration"
 POST_PACKET_DIR_PREFIX = "docs/evals/runs/alpha-solver-post-"
+OPENAI_PACKET_DIR_PREFIXES = (
+    "docs/evals/runs/openai-",
+    "docs/evals/runs/local-openai-",
+    "docs/evals/runs/alpha-solver-openai-",
+)
 COUNCIL_AUDIT_EVIDENCE_BUNDLE_DIR = Path(
     "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-council-audit-evidence-bundle"
 )
@@ -89,7 +94,9 @@ BOUNDARY_LANGUAGE_PATTERNS = tuple(
         r"\baccepted boundary\b",
         r"\bexcluded(?: evidence)? categories\b",
         r"\bnon(?:-|\s)?claims?\b",
+        r"\bnon[_-]claims?\b",
         r"\bnon(?:-|\s)?actions?\b",
+        r"\bnon[_-]actions?\b",
         r"\bnon(?:-|\s)?decision\b",
         r"\bnon(?:-|\s)?execution\b",
         r"\bnon(?:-|\s)?promotional\b",
@@ -170,6 +177,8 @@ def is_relevant_doc(path: Path) -> bool:
     if rel.startswith(DOCS_DIR_PREFIXES):
         return True
     if rel.startswith(POST_PACKET_DIR_PREFIX):
+        return True
+    if rel.startswith(OPENAI_PACKET_DIR_PREFIXES):
         return True
     return rel.startswith(RUNS_DIR.as_posix()) and LOCAL_ORCHESTRATION_DIR_MARKER in rel
 

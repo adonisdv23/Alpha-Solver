@@ -28,6 +28,9 @@ def test_relevant_docs_include_closeout_and_skip_source_artifacts():
             "docs/evals/runs/20260607-local-llm-solver-orchestration-level-3-validation-execution-001/source-artifact/run_level3_validation.sh"
         )
     )
+    assert is_relevant_doc(Path("docs/evals/runs/openai-fixture/README.md"))
+    assert is_relevant_doc(Path("docs/evals/runs/local-openai-fixture/README.md"))
+    assert is_relevant_doc(Path("docs/evals/runs/alpha-solver-openai-fixture/README.md"))
     assert not is_relevant_doc(Path("docs/RUNTIME_READINESS.md"))
 
 
@@ -39,6 +42,15 @@ def test_promotional_claim_without_boundary_language_is_flagged():
 
     assert len(findings) == 1
     assert findings[0].phrase == "production readiness"
+
+
+def test_yaml_non_claims_boundary_language_is_allowed():
+    findings = find_promotional_claim_findings(
+        Path("docs/evals/runs/openai-fixture/template.md"),
+        "```yaml\nnon_claims:\n  - production readiness\n```\n",
+    )
+
+    assert findings == []
 
 
 def test_promotional_claim_with_boundary_language_is_allowed():

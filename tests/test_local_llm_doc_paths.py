@@ -130,6 +130,34 @@ def test_prior_preserved_selected_next_reference_remains_allowed(tmp_path: Path)
     assert findings == []
 
 
+def test_default_discovery_includes_openai_packet_docs(tmp_path: Path) -> None:
+    packet_dirs = [
+        Path("docs/evals/runs/openai-fixture"),
+        Path("docs/evals/runs/local-openai-fixture"),
+        Path("docs/evals/runs/alpha-solver-openai-fixture"),
+    ]
+    for packet_dir in packet_dirs:
+        _write(tmp_path / packet_dir / "README.md", "# Fixture\n")
+
+    docs = checker.iter_scanned_docs(tmp_path)
+
+    for packet_dir in packet_dirs:
+        assert packet_dir / "README.md" in docs
+
+
+def test_openai_packet_references_are_checked(tmp_path: Path) -> None:
+    _make_required_tree(tmp_path)
+    doc = _write(
+        tmp_path / "docs/evals/runs/openai-fixture/README.md",
+        "Broken OpenAI packet: `docs/evals/runs/openai-missing-packet/README.md`.\n",
+    )
+
+    findings = checker.check_paths([doc.relative_to(tmp_path)], tmp_path)
+
+    assert len(findings) == 1
+    assert "openai-missing-packet" in findings[0].reference
+
+
 def test_current_repo_local_llm_docs_still_pass() -> None:
     findings = checker.check_paths(checker.iter_scanned_docs())
 
