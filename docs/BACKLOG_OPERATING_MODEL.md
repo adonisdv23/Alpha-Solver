@@ -29,9 +29,9 @@
 | item | group | state | next lane / owner | blocks smoke | blocks public |
 |------|-------|-------|-------------------|--------------|---------------|
 | PR #508 checker-scope hardening | 6 Evidence packets / 11 Checker hardening | DONE (merged) | — | No | No |
-| PR #509 OpenAI smoke retry — blocked by project/billing verification | 6 Evidence packets / 5 Provider setup | BLOCKED (merged evidence) | superseded by PR #511 clarification packet | Yes | n/a |
+| PR #509 OpenAI smoke retry — blocked by project/billing verification | 6 Evidence packets / 5 Provider setup | BLOCKED (merged evidence) | superseded by PR #511/#512 project-billing boundary chain | Yes | n/a |
 | `OPENAI-PROJECT-BILLING-BOUNDARY-CLARIFICATION-001` | 6 Evidence packets / 5 Provider setup | BLOCKED evidence superseded by PR #512 (`BLOCKED_PROJECT_BILLING_OPERATOR_CONFIRMATION_MISSING`) | superseded by `OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001` | Yes | No |
-| `OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001` | 1 Current lane / 5 Provider setup | CONFIRMED (`OPENAI_PROJECT_BILLING_BOUNDARY_CONFIRMED`) | `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` | Yes | No |
+| `OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001` | 1 Current lane / 5 Provider setup | CONFIRMED (`OPENAI_PROJECT_BILLING_BOUNDARY_CONFIRMED`) | `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` | No | No |
 | `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` | 2 Next ready / 8 OpenAI smoke | **NEXT (selected)** | one tiny synthetic smoke retry only | Yes | No |
 | `ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001` | 12 Value experiment | BLOCKED (after smoke) | after a successful tiny smoke | No | — |
 | DEF-002 security/privacy review | 7 Deferrals / 9 Security | OPEN | DEF-002 review lane | No | Yes |

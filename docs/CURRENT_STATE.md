@@ -7,8 +7,7 @@
 
 ## Current verified phase
 
-**Post-local Self Operator evidence; pre-first real OpenAI smoke; blocked on
-OpenAI project/billing boundary attestation confirmed in PR #512; next tiny smoke retry selected.**
+**Post-local Self Operator evidence; pre-first real OpenAI smoke; OpenAI project/billing boundary attestation confirmed in PR #512 and next tiny smoke retry selected.**
 
 - The Self Operator has a multi-PR local/offline execution-evidence chain
   (PRs #497, #499, #500, #501) that runs its test suite and release-gate CLI
@@ -31,7 +30,7 @@ No OpenAI/provider call has been executed. No token has been used by PR #512. No
 
 | Field | Value |
 |-------|-------|
-| Latest PR in this chain | **#512** — `docs(openai): add project billing boundary attestation retry packet` |
+| Latest merged PR in this chain | **#512** — `docs(openai): add project billing boundary attestation retry packet` |
 | Current controlling lane | `OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001` (PR #512, `OPENAI_PROJECT_BILLING_BOUNDARY_CONFIRMED`) |
 | Next selected lane | **`LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002`** (one tiny synthetic OpenAI smoke retry; provider-call lane remains bounded) |
 | Prior blocked control | `OPENAI-PROJECT-BILLING-BOUNDARY-CLARIFICATION-001` (PR #511, superseded by PR #512 attestation) |
