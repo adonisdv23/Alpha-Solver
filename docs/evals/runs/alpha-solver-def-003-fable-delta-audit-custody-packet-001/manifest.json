@@ -1,0 +1,33 @@
+{
+  "schema_version": "alpha_solver.packet_manifest.v1",
+  "files": [
+    {
+      "path": "NON_CLAIMS.md",
+      "sha256": "0245ba7bb3c6d3eff1718e1988e58f7f2fd2dd1939ba9717d95dce916764c581"
+    },
+    {
+      "path": "README.md",
+      "sha256": "c201078fb083e7f9eb0a5367c1ab2b5cbf27e5ba22744f10c8712e9bcbeeb9bc"
+    },
+    {
+      "path": "custody_status.json",
+      "sha256": "c63ae74d1bc24fadf2d3de239061393e45ab6aa3d7e88ca81ced8f55c695d414"
+    },
+    {
+      "path": "intake_template.md",
+      "sha256": "3e2d21e47f44c1d01b2ab28780fad70a8150d11a2a9af9cac399819786caee6a"
+    },
+    {
+      "path": "replacement_audit_boundary.md",
+      "sha256": "bf839af034a35d97efc2ecc91379dc7c7f11ce290befd40d91d142f0112dce1d"
+    },
+    {
+      "path": "repo_inspection.md",
+      "sha256": "a7e9092c4fbdde5fd184e7141efd33247b2458f47af55657a25239f5d2d7d8d2"
+    },
+    {
+      "path": "selected-next-lane.md",
+      "sha256": "34423d0efdb0796cf7b4bfe722f59c2f03aaa4d9a174bc27c5f953f5a786dbf9"
+    }
+  ]
+}
