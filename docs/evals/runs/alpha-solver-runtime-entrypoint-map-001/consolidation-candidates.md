@@ -1,6 +1,6 @@
 # Consolidation Candidates
 
-These are staged strategy candidates only. They are not implementation tasks in this PR.
+These are staged strategy candidates only. They are not implementation tasks in this PR and do not alter the repo-global selected next lane controlled by `docs/CURRENT_STATE.md` and `docs/LANE_REGISTRY.md`.
 
 ## Stage 0 — Keep mapping authoritative
 
@@ -10,7 +10,7 @@ These are staged strategy candidates only. They are not implementation tasks in 
 ## Stage 1 — Documentation-only alignment
 
 - Add a concise public/non-public entrypoint table to `docs/ENTRYPOINTS.md` or a successor architecture doc.
-- Cross-link the DEF-002 security/privacy packet and this runtime map.
+- Cross-link the DEF-002 security/privacy packet and this runtime map only through a runtime-map-local recommended follow-up candidate; do not present that candidate as the repo-global selected next lane.
 - Document that bundled `/v1/solve` currently uses API-key/rate-limit controls, not the separate JWT/tenant middleware stack.
 
 ## Stage 2 — Low-risk config clarification
