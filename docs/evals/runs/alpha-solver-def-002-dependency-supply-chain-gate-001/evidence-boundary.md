@@ -2,7 +2,7 @@
 
 ## What this packet proves
 
-- Dependency declaration sources were inventoried from Python manifests, constraints, Dockerfiles, compose files, workflows, SDK metadata, and prior DEF-002 review context.
+- Dependency declaration sources were inventoried from Python manifests, constraints, Dockerfiles, compose files, workflows, SDK metadata, and prior DEF-002 review context, with compose `build: ..` API services classified as resolving to the root Dockerfile absent a `dockerfile:` override.
 - The current `constraints.txt` pin artifact was identified and classified as a constraints file, not a complete lockfile.
 - An update cadence and dependency review boundary were documented.
 - Residual risks for lock/hash/SBOM, unconstrained install paths, source drift, vendored/shimmed modules, base images, actions, and SDK dependencies were recorded.
@@ -16,6 +16,7 @@
 - It does not prove SBOM completeness.
 - It does not prove vendored/shimmed module provenance.
 - It does not prove Docker image reproducibility.
+- It does not prove that no provider call occurred during validation; `validation-evidence.md` records the observed ambient full-suite provider-call exception.
 - It does not prove production readiness, public readiness, or release readiness.
 - It does not close DEF-002.
 

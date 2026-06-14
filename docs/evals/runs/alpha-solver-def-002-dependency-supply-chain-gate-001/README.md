@@ -45,4 +45,4 @@ The smallest safe provenance artifact for this lane is this evidence packet plus
 
 ## Boundary
 
-This packet captures supply-chain provenance and update policy only. It does not claim complete dependency assurance, production readiness, public readiness, DEF-002 closure, SBOM completeness, vulnerability absence, or transitive hash verification.
+This packet captures supply-chain provenance and update policy only. It does not claim complete dependency assurance, production readiness, public readiness, DEF-002 closure, SBOM completeness, vulnerability absence, transitive hash verification, or that no provider call occurred during validation. Validation evidence records an ambient full-suite provider-call exception from the prior `python -m pytest -q` run; it was not an intended lane action.

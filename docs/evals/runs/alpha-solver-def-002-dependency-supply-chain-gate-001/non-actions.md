@@ -14,7 +14,7 @@ This docs-only lane did not perform these actions:
 - Did not change runtime behavior.
 - Did not change Dockerfiles, workflows, package metadata, or dependency manifests.
 - Did not deploy.
-- Did not call providers.
+- Did not perform intentional provider calls as a docs-only lane action; validation evidence records one ambient full-suite provider-call exception from the prior `python -m pytest -q` run.
 - Did not use tokens.
 - Did not access credentials.
 - Did not claim production readiness, public readiness, complete dependency assurance, vulnerability absence, release readiness, or DEF-002 closure.

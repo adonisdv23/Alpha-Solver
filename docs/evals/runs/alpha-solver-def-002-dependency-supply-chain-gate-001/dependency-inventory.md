@@ -24,8 +24,8 @@
 | --- | --- | --- |
 | `Dockerfile` | `python:3.12-slim`; upgrades pip; installs `-r requirements.txt` without constraints | Runtime image can resolve newer in-range releases than constrained CI/release jobs. |
 | `infrastructure/Dockerfile` | `python:3.11-slim`; installs `-r requirements.txt` without constraints | Placeholder/generic image path; also unconstrained at install time. |
-| `infrastructure/docker-compose.yml` | Builds `infrastructure/Dockerfile` and runs `python -m alpha.cli ...` | Inherits `infrastructure/Dockerfile` dependency resolution. |
-| `infrastructure/docker-compose.prod.yml` | Builds `infrastructure/Dockerfile` and runs `uvicorn service.app:app` | Inherits `infrastructure/Dockerfile` dependency resolution. |
+| `infrastructure/docker-compose.yml` | `api.build: ..` is a string build context from the `infrastructure/` directory, so Compose resolves the context to the repository root and uses the root `Dockerfile` unless overridden; this file does not set a `dockerfile:` override. Auxiliary services use `otel/opentelemetry-collector:latest`, `prom/prometheus:latest`, and `grafana/grafana-oss:latest`. | The API service inherits the root `Dockerfile` dependency resolution (`python:3.12-slim`, `requirements.txt` without constraints), not `infrastructure/Dockerfile`. Auxiliary image tags are not digest pinned. |
+| `infrastructure/docker-compose.prod.yml` | `api.build: ..` is a string build context from the `infrastructure/` directory, so Compose resolves the context to the repository root and uses the root `Dockerfile` unless overridden; this file does not set a `dockerfile:` override. Auxiliary services use `otel/opentelemetry-collector:latest`, `prom/prometheus:latest`, and `grafana/grafana-oss:latest`. | The API service inherits the root `Dockerfile` dependency resolution (`python:3.12-slim`, `requirements.txt` without constraints), not `infrastructure/Dockerfile`. Auxiliary image tags are not digest pinned. |
 
 ## Workflow dependency sources
 
