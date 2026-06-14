@@ -181,13 +181,8 @@ app.add_middleware(
 # settings, run, or jobs routes. Successful login therefore lands on the mounted
 # expert-preview page instead of the shared dashboard default.
 def _dashboard_enabled() -> bool:
-    password = os.getenv(dashboard_auth.PASSWORD_ENV_VAR)
     secret_key = os.getenv(dashboard_auth.SECRET_ENV_VAR)
-    return (
-        bool(password)
-        and password != dashboard_auth.DEFAULT_DASHBOARD_PASSWORD
-        and bool(secret_key)
-    )
+    return dashboard_auth.is_dashboard_password_configured() and bool(secret_key)
 
 
 def _mount_dashboard(target: FastAPI) -> None:
