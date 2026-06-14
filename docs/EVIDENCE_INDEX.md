@@ -1,4 +1,4 @@
-# Evidence Index — PRs #497–#512
+# Evidence Index — PRs #497–#512 plus PR #527
 
 > Created by lane `ALPHA-SOLVER-CURRENT-STATE-DOCS-BACKLOG-ARCHIVE-ISSUE-REGISTER-001`.
 > Verification date **2026-06-13**. Merge status verified read-only via GitHub
@@ -12,8 +12,7 @@
 Every packet below is **plumbing / process / governance / boundary evidence**.
 None is provider validation, value/quality proof, benchmark evidence, or
 readiness evidence. The local-execution chain proves only offline determinism;
-the OpenAI chain proves only planning/governance and that no provider call was
-made.
+the OpenAI chain proves only planning/governance and blocked preflights; no provider call has been made.
 
 ## PR table
 
@@ -32,7 +31,8 @@ made.
 | #508 | openai: extend static checks to OpenAI packets | ✅ | `openai-packet-checker-scope-001` | `OPENAI_PACKET_CHECKER_SCOPE_EXTENDED` | LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-001 | Checker scope hardening (docs-only packet; checker code changed in same PR) | No provider/runtime; tooling only | completed |
 | #509 | openai: local token smoke retry capture | ✅ | `local-openai-token-smoke-capture-retry-001` | `BLOCKED_OPENAI_PROJECT_OR_BILLING_NOT_VERIFIED` | OPENAI-PROJECT-BILLING-BOUNDARY-CLARIFICATION-001 | Retry halted before provider call | No call; key-presence ≠ project/billing readiness | completed |
 | #511 | openai: project billing boundary clarification | ✅ | `openai-project-billing-boundary-clarification-001` | `BLOCKED_PROJECT_BILLING_OPERATOR_CONFIRMATION_MISSING` | OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001 | Clarification lane blocked pending operator confirmation | No call; no token; no private billing data; no readiness | superseded by #512 |
-| #512 | openai: project billing boundary attestation retry | ✅ | `openai-project-billing-boundary-attestation-retry-001` | `OPENAI_PROJECT_BILLING_BOUNDARY_CONFIRMED` | LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002 | Redacted operator confirmation for project, billing, cost, and data-sharing boundary | No call; no token; no provider validation; no private billing data; no readiness | **current-control** |
+| #512 | openai: project billing boundary attestation retry | ✅ | `openai-project-billing-boundary-attestation-retry-001` | `OPENAI_PROJECT_BILLING_BOUNDARY_CONFIRMED` | LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002 | Redacted operator confirmation for project, billing, cost, and data-sharing boundary | No call; no token; no provider validation; no private billing data; no readiness | completed |
+| #527 | openai: local token smoke retry 002 blocked packet | PR open | `local-openai-token-smoke-capture-retry-002` | `BLOCKED_OPERATOR_AUTHORIZATION_MISSING` | LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002-AUTHORIZATION-REFRESH | Consumes retry 002 as blocked before provider call because explicit operator authorization fields were missing; provider calls `0`, tokens `0`, cost `$0.00` | No provider validation; no provider call; no token; no readiness; no value/no-echo evidence | **current-control** |
 
 ## Notes
 
@@ -49,4 +49,4 @@ made.
 
 ## Later merged PRs
 
-PR #512 is now the current-control packet. `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` is the single selected next lane. `ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001` has a canonical protocol packet on its branch, but it is not executed, contains no results or value evidence, and remains gated by the selected smoke/provider boundary and protocol preconditions. Append rows here as new evidence merges.
+PR #527 is now the current-control packet for this branch. `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` is attempted/consumed but blocked with `BLOCKED_OPERATOR_AUTHORIZATION_MISSING`, provider calls `0`, tokens `0`, and cost `$0.00`. `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002-AUTHORIZATION-REFRESH` is the single selected next lane. `ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001` has a canonical protocol packet, but it is not executed, contains no results or value evidence, and remains gated by a successful smoke/provider boundary and substantive no-echo preconditions. Append rows here as new evidence merges.

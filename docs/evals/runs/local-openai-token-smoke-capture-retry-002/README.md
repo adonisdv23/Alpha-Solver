@@ -4,18 +4,19 @@ Verdict: `BLOCKED_OPERATOR_AUTHORIZATION_MISSING`
 
 Selected next lane: `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002-AUTHORIZATION-REFRESH`
 
-This packet records the preflight decision for the selected tiny synthetic OpenAI smoke retry lane. The lane did **not** call OpenAI or any other provider because this run prompt did not supply all required operator execution parameters for the live call.
+This packet records the preflight decision for the previously repo-global selected tiny synthetic OpenAI smoke retry lane. The lane is now attempted/consumed as blocked. It did **not** call OpenAI or any other provider because this run prompt did not supply all required operator execution parameters for the live call.
 
 ## Summary
 
 | Field | Value |
 | --- | --- |
 | Lane | `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` |
-| Mode | Preflight-only blocked packet |
+| Mode | Preflight-only blocked/consumed packet |
 | Provider calls | `0` |
 | Tokens used | `0` |
 | Cost incurred | `$0.00` |
 | Verdict | `BLOCKED_OPERATOR_AUTHORIZATION_MISSING` |
+| Repo-global selected next lane | `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002-AUTHORIZATION-REFRESH` |
 
 ## Required files
 
