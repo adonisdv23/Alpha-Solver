@@ -11,4 +11,4 @@ This backlog synchronization packet did not:
 - deploy or expose `/v1/solve`, dashboard, or any public API surface;
 - delete evidence packets;
 - rewrite historical evidence content;
-- claim DEF-002, DEF-003, value, provider validation, runtime readiness, public readiness, production readiness, dashboard readiness, or `/v1/solve` readiness.
+- claim DEF-002, DEF-003, value proof, provider validation, runtime readiness, public readiness, production readiness, MVP readiness, dashboard readiness, benchmark validation, Alpha superiority, or `/v1/solve` readiness.
