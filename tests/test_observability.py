@@ -67,6 +67,54 @@ def test_policy_fields_passthrough_when_present(tmp_path):
     assert event["payload"]["keep"] == 1
 
 
+def test_jsonl_logger_redacts_prompt_provider_secret_and_billing_like_fields(tmp_path):
+    log_path = tmp_path / "redacted.log"
+    logger = JsonlLogger(str(log_path))
+    logger.event(
+        name="provider-boundary",
+        route_explain=BASE_ROUTE,
+        payload={
+            "query": "canonical query marker must not leak",
+            "prompt": "raw prompt marker must not leak",
+            "provider_response": "raw provider answer must not leak",
+            "OPENAI_API_KEY": "sk-ABCDEF1234567890",
+            "billing_account": "card 4242 4242 4242 4242",
+            "input_tokens": 7,
+            "output_tokens": 9,
+            "total_tokens": 16,
+            "prompt_tokens": 7,
+            "completion_tokens": 9,
+            "safe_metric": 3,
+        },
+        meta={
+            "query": "meta query marker must not leak",
+            "Authorization": "Bearer abcdef1234567890",
+            "request_id": "req-1",
+            "total_tokens": 16,
+        },
+    )
+    logger.close()
+
+    text = log_path.read_text(encoding="utf-8")
+    event = json.loads(text)
+
+    assert event["payload"]["safe_metric"] == 3
+    assert event["payload"]["input_tokens"] == 7
+    assert event["payload"]["output_tokens"] == 9
+    assert event["payload"]["total_tokens"] == 16
+    assert event["payload"]["prompt_tokens"] == 7
+    assert event["payload"]["completion_tokens"] == 9
+    assert event["meta"]["request_id"] == "req-1"
+    assert event["meta"]["total_tokens"] == 16
+    assert "canonical query marker" not in text
+    assert "meta query marker" not in text
+    assert "raw prompt marker" not in text
+    assert "raw provider answer" not in text
+    assert "sk-ABCDEF1234567890" not in text
+    assert "4242 4242 4242 4242" not in text
+    assert "Bearer abcdef1234567890" not in text
+
+
 def test_replay_iter_and_filter(tmp_path):
     log_path = tmp_path / "r.log"
     logger = JsonlLogger(str(log_path))

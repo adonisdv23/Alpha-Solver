@@ -11,7 +11,7 @@
 
 | topic | finding | evidence path | status |
 |-------|---------|---------------|--------|
-| **CORS** | Default origins `"*"` with `allow_credentials=True`, `allow_methods=["*"]`; docstring says "lock down in production" | `alpha/core/config.py` (`ServiceCorsConfig.origins`), `service/app.py` (`CORSMiddleware`) | CONFIRMED — lock down before exposure (ISS-003) |
+| **CORS** | Default CORS origins are now local-only and wildcard origins are rejected when credentials are enabled; external origins require explicit allowlist configuration | `alpha/core/config.py` (`ServiceCorsConfig.origins`), `service/app.py` (`CORSMiddleware`) | RR-01 hardened locally by `alpha-solver-def-002-cors-boundary-fix-001`; public exposure still blocked by remaining DEF-002 items |
 | **Secrets at rest** | `FileSecretsBackend` stores raw provider keys as plaintext JSON; masking only on display/audit | `alpha/webapp/routes/settings.py` | CONFIRMED — plaintext-at-rest (ISS-004). Path is gitignored / not committed |
 | **Provider telemetry / prompt content** | Telemetry is **allowlist-based** and "never inspects provider request/response payloads"; no prompt-content field | `alpha/providers/telemetry.py` | PARTIALLY_CONFIRMED — **default path is safe**; verify no opt-in verbose/debug path logs prompts (ISS-005) |
 | **Data sharing** | Operator data-sharing verification captured but all items `pending_operator_verification` | `docs/evals/runs/openai-data-sharing-operator-verification-001/` (PR #504) | OPEN — operator must verify before any call |
