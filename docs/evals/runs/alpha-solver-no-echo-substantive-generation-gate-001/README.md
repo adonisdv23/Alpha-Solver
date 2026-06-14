@@ -30,3 +30,8 @@ The value/no-echo-local blocking next lane is `ALPHA-SOLVER-PROMPT-CONSUMPTION-W
 - [selected-next-lane.md](selected-next-lane.md)
 - [evidence-boundary.md](evidence-boundary.md)
 - [non-actions.md](non-actions.md)
+
+
+## POST-551 update
+
+A successor local-only wiring fix is recorded in [post-551-fix-verdict.md](post-551-fix-verdict.md). The original blocked output record is retained as reproduction evidence; the successor verdict is limited to controlled local synthetic no-echo fixtures and makes no value, provider, production, benchmark, or superiority claims.
