@@ -41,6 +41,17 @@ _DETECTORS: Dict[str, bool] = {
 }
 _DETECTORS.update(_CONFIG.get("detectors", {}))
 
+_SENSITIVE_KEY_RE = re.compile(
+    r"(?:"
+    r"prompt|query_text|user_input|input_text|messages|system_message|"
+    r"response|completion|raw|payload|body|headers?|authorization|"
+    r"api[_-]?key|token|secret|password|credential|billing|invoice|"
+    r"card|cc|payment"
+    r")",
+    re.IGNORECASE,
+)
+_KEY_REDACTION = "***REDACTED***"
+
 # Regular expressions ------------------------------------------------------
 EMAIL_RE = re.compile(r"(?P<local>[A-Za-z0-9._%+-]+)@(?P<domain>[A-Za-z0-9.-]+\.[A-Za-z]{2,})")
 PHONE_RE = re.compile(r"\+?\d[\d\s\-()]{8,}\d")
@@ -146,6 +157,8 @@ def _redact(obj: Any, allow: Set[str]) -> Any:
         for k, v in obj.items():
             if isinstance(k, str) and k in allow:
                 out[k] = v
+            elif isinstance(k, str) and _SENSITIVE_KEY_RE.search(k):
+                out[k] = _KEY_REDACTION
             else:
                 out[k] = _redact(v, allow)
         return out

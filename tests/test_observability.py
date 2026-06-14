@@ -67,6 +67,35 @@ def test_policy_fields_passthrough_when_present(tmp_path):
     assert event["payload"]["keep"] == 1
 
 
+def test_jsonl_logger_redacts_prompt_provider_secret_and_billing_like_fields(tmp_path):
+    log_path = tmp_path / "redacted.log"
+    logger = JsonlLogger(str(log_path))
+    logger.event(
+        name="provider-boundary",
+        route_explain=BASE_ROUTE,
+        payload={
+            "prompt": "raw prompt marker must not leak",
+            "provider_response": "raw provider answer must not leak",
+            "OPENAI_API_KEY": "sk-ABCDEF1234567890",
+            "billing_account": "card 4242 4242 4242 4242",
+            "safe_metric": 3,
+        },
+        meta={"Authorization": "Bearer abcdef1234567890", "request_id": "req-1"},
+    )
+    logger.close()
+
+    text = log_path.read_text(encoding="utf-8")
+    event = json.loads(text)
+
+    assert event["payload"]["safe_metric"] == 3
+    assert event["meta"]["request_id"] == "req-1"
+    assert "raw prompt marker" not in text
+    assert "raw provider answer" not in text
+    assert "sk-ABCDEF1234567890" not in text
+    assert "4242 4242 4242 4242" not in text
+    assert "Bearer abcdef1234567890" not in text
+
+
 def test_replay_iter_and_filter(tmp_path):
     log_path = tmp_path / "r.log"
     logger = JsonlLogger(str(log_path))

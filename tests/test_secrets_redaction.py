@@ -57,6 +57,40 @@ def test_allowlist():
     assert out["other"] == "***REDACTED***"
 
 
+def test_prompt_provider_billing_and_user_sensitive_keys_are_redacted():
+    raw = {
+        "prompt": "user prompt marker must not leak",
+        "messages": [{"role": "user", "content": "nested prompt marker must not leak"}],
+        "provider_response": "provider answer marker must not leak",
+        "headers": {"Authorization": "Bearer abcdef1234567890"},
+        "OPENAI_API_KEY": "sk-ABCDEF1234567890",
+        "billing_account": "card 4242 4242 4242 4242 invoice inv-123",
+        "user_input": "alice@example.com +1-415-555-2671 private question",
+        "safe_metric": 7,
+    }
+
+    out = redactor.redact(raw)
+    text = str(out)
+
+    assert out["safe_metric"] == 7
+    for key in (
+        "prompt",
+        "messages",
+        "provider_response",
+        "headers",
+        "OPENAI_API_KEY",
+        "billing_account",
+        "user_input",
+    ):
+        assert out[key] == "***REDACTED***"
+    assert "user prompt marker" not in text
+    assert "nested prompt marker" not in text
+    assert "provider answer marker" not in text
+    assert "sk-ABCDEF1234567890" not in text
+    assert "4242 4242 4242 4242" not in text
+    assert "alice@example.com" not in text
+
+
 def test_structured_logs(logger):
     log, stream = logger
     log.info(
