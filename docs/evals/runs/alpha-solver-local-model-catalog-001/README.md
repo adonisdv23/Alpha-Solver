@@ -6,7 +6,7 @@ Verdict: `LOCAL_MODEL_CATALOG_CAPTURED`
 
 ## TLDR
 
-This packet inventories Ollama-hosted local model families that operators may consider for free local testing before any paid-provider testing. It is documentation only: no models were installed, no Ollama endpoint was called, no hosted providers were called, and no routing behavior was exercised.
+This packet inventories Ollama-hosted local model families that operators may consider for free local testing before any paid-provider testing. It is documentation only: no models were installed, no Ollama endpoint was called, no default urllib loopback transport was exercised, no hosted providers were called, and no routing behavior was exercised.
 
 ## Source context inspected
 

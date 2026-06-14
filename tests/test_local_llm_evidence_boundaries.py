@@ -31,6 +31,12 @@ def test_relevant_docs_include_closeout_and_skip_source_artifacts():
     assert is_relevant_doc(Path("docs/evals/runs/openai-fixture/README.md"))
     assert is_relevant_doc(Path("docs/evals/runs/local-openai-fixture/README.md"))
     assert is_relevant_doc(Path("docs/evals/runs/alpha-solver-openai-fixture/README.md"))
+    assert is_relevant_doc(
+        Path("docs/evals/runs/alpha-solver-local-model-catalog-001/README.md")
+    )
+    assert is_relevant_doc(
+        Path("docs/evals/runs/alpha-solver-local-multi-model-smoke-harness-001/README.md")
+    )
     assert not is_relevant_doc(Path("docs/RUNTIME_READINESS.md"))
 
 
@@ -113,4 +119,7 @@ def test_current_relevant_docs_pass_static_check():
     docs = iter_relevant_docs()
 
     assert docs, "expected local LLM solver orchestration docs to be discovered"
+    assert (
+        Path("docs/evals/runs/alpha-solver-local-model-catalog-001/README.md") in docs
+    )
     assert check_paths(docs) == []

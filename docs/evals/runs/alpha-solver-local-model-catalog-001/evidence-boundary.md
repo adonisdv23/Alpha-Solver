@@ -2,7 +2,7 @@
 
 ## Allowed evidence
 
-This lane may be cited only as evidence that a documentation catalog of local Ollama model family candidates was captured against the existing default-off local LLM adapter context.
+This lane may be cited only as evidence that a documentation catalog of local Ollama model family candidates was captured against the existing default-off local LLM adapter context. It is not evidence that the default urllib loopback transport or an injected fake transport was exercised.
 
 ## Required evidence before behavior use
 
