@@ -2,29 +2,32 @@
 
 ## Verdict
 
-`MVP_SCORECARD_CAPTURED_OPERATOR_DECISION_REQUIRED`
+`MVP_SCORECARD_UPDATED_VALUE_READ_BLOCKED`
 
-## Why this verdict
+## Required decision list result
 
-The scorecard can be captured from committed repository evidence, but the result is not a go decision. The operator must decide whether to:
+Selected decision: **Fix no-echo / derivation first**.
 
-1. complete the authorization-refresh lane for the blocked tiny smoke;
-2. continue DEF-002 closure / risk-acceptance work before any exposure;
-3. refine the value task bank and scoring contract without claiming value; or
-4. reconsider the wedge if future evidence remains within noise.
+## Why this decision
 
-## Allowed verdicts considered
+The actual manual discrimination Value Read did not produce simulation or runtime scores. Its runtime/provider track is blocked by the no-echo/substantive-generation dependency and missing provider authorization, and its simulation track was not run. The blocker to remove first is therefore the Alpha prompt-consumption/derivation path that causes prompt echo instead of substantive output.
 
-| Verdict | Selected? | Rationale |
+## Required decision options considered
+
+| Required option | Selected? | Rationale |
 | --- | --- | --- |
-| `MVP_SCORECARD_CAPTURED_NOT_READY` | Not selected | Accurate on readiness, but insufficient because the packet also needs an operator next-lane decision. |
-| `MVP_SCORECARD_CAPTURED_OPERATOR_DECISION_REQUIRED` | **Selected** | Captures the scorecard and highlights that the next executable path depends on operator authorization and sequencing. |
-| `STOP_INCONCLUSIVE` | Not selected | Evidence is sufficient to score the state conservatively; it is not sufficient to claim readiness. |
+| Continue value-read refinement | No | Refinement can preserve rubric/task-bank work, but it does not remove the immediate no-echo blocker. |
+| Fix no-echo / derivation first | **Yes** | This is the prerequisite for meaningful value-read execution and any later provider work. |
+| Open next release candidate | No | A blocked Value Read and no-echo failure do not support an RC. |
+| Keep docs-only and stop | No | The next useful lane is a narrow fix/rerun path, not only documentation. |
+| Block paid/provider work | No as the single selected next lane; yes as a boundary until no-echo passes and explicit authorization exists. |
+| Block public exposure | No as the single selected next lane; yes as a continuing boundary because readiness and DEF-002/public gates are not claimably closed. |
 
 ## Decision constraints
 
 - No provider calls are authorized by this packet.
-- No runtime code changes are authorized by this packet.
+- No runtime/provider readiness claim is authorized by this packet.
+- No public exposure is authorized by this packet.
 - No Google Sheets update is authorized by this packet.
-- Productization lanes must not open while the value read is within noise.
-- If future output evidence still cannot discriminate Alpha from a plain baseline, select task-bank refinement, contract refinement, or wedge reconsideration rather than public/product lanes.
+- Simulation evidence, if later generated, must remain separate from runtime/provider evidence.
+- Productization lanes must not open while no-echo/substantive generation remains blocked.

@@ -8,8 +8,8 @@
 - Provider calls, tokens, and provider cost for PR #527 were all `0`.
 - DEF-002 security/privacy review work has identified and routed gaps, but the current scorecard does not claim closure.
 - Runtime entrypoints and public-exposure risks have been mapped at documentation level.
-- The value experiment protocol exists, but has not been executed and contains no value evidence.
-- The discrimination-value wedge is worth preserving as a future candidate only after prerequisite evidence exists; current signal is within noise.
+- The manual discrimination Value Read exists as a design packet, but Track S simulation was not run and Track R runtime/provider execution is blocked.
+- The actual Value Read blocked verdict supports fixing no-echo / derivation first; it does not support value, runtime, provider, or readiness claims.
 
 ## Forbidden claims
 
@@ -24,6 +24,7 @@ Do not claim:
 - Token usage evidence.
 - Benchmark validation.
 - Core product value proof.
+- Value Read simulation or runtime result success.
 - No-echo substantive generation success.
 - Operator preference versus a plain baseline.
 - Security/privacy completion or DEF-002 closure.

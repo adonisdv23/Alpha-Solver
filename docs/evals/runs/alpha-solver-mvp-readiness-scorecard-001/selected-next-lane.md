@@ -1,18 +1,23 @@
 # Selected next lane
 
-Selected next lane: `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002-AUTHORIZATION-REFRESH`
+Selected next lane: `ALPHA-SOLVER-PROMPT-CONSUMPTION-WIRING-FIX-001`
+
+Decision label from required list: **Fix no-echo / derivation first**.
 
 ## Rationale
 
-The current controlling blocker is explicit operator authorization for the already-selected tiny synthetic OpenAI smoke retry. Without this authorization, there is no provider response, no token/cost record, no no-echo artifact, and no basis to execute the value experiment.
+The actual manual discrimination Value Read result is blocked, not scored. Track S simulation was not run. Track R runtime/provider execution stopped because the no-echo/substantive-generation dependency reports prompt echo and provider authorization is missing.
+
+The next lane must therefore fix the prompt-consumption/derivation path and then rerun a no-echo/substantive-generation gate before any value-read execution, provider smoke, release-candidate, paid/provider, or public-exposure lane is considered.
 
 ## Not selected
 
-- `ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001` execution — not selected because smoke/no-echo prerequisites are missing.
-- Productization lane — not selected because the value read is within noise.
-- Public exposure lane — not selected because DEF-002/public-exposure gates are not claimably closed.
-- Runtime consolidation lane — not selected because entrypoint overlap is mapped but not safe to refactor or expose without operator decisions.
+- `Continue value-read refinement` — not selected as the immediate lane because refinement alone does not resolve prompt echo.
+- `Open next release candidate` — not supported by a blocked Value Read.
+- `Keep docs-only and stop` — not selected because there is an actionable narrow blocker fix.
+- `Block paid/provider work` — enforced as a boundary until no-echo passes and explicit operator authorization exists, but not selected as the next implementation lane.
+- `Block public exposure` — enforced as a boundary until security/public/readiness gates are closed or explicitly risk-accepted, but not selected as the next implementation lane.
 
-## Future candidate after prerequisites
+## Future route after fix
 
-After a successful tiny smoke and no-echo substantive output evidence, the operator may choose a narrow task-bank/contract-refinement lane for the discrimination-value scorecard before any broad value experiment or productization lane.
+After a prompt-consumption/derivation fix, rerun the no-echo/substantive-generation gate. If it passes, the operator may choose a narrow value-read simulation or an explicitly authorized runtime/provider Value Read. Simulation results must remain labeled as simulation and must not be promoted to runtime evidence.
