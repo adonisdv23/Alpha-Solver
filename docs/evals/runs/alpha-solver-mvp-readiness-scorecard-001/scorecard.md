@@ -1,10 +1,10 @@
 # MVP readiness scorecard
 
-Verdict: `MVP_SCORECARD_UPDATED_VALUE_READ_BLOCKED`
+Verdict: `MVP_SCORECARD_UPDATED_POST_552_VALUE_READ_BLOCKED`
 
 ## 1. TLDR
 
-The MVP scorecard is updated with the actual manual discrimination Value Read status: **blocked, not executed**. Track R runtime/provider execution is blocked by the no-echo/substantive-generation dependency because the available no-echo gate reports prompt echo in `solution` and `final_answer`; provider authorization is also missing. Track S simulation was not run. Therefore the evidence supports **Fix no-echo / derivation first** and does not support MVP readiness, public exposure, provider work, runtime readiness, dashboard readiness, benchmark claims, or Alpha superiority claims.
+The MVP scorecard is updated with the actual manual discrimination Value Read status and the post-#552 evidence state: **blocked, not executed**. #552 provides partial local exact-echo remediation for controlled fixtures and unsupported SAFE-OUT-style clarification. It does not prove broad no-echo behavior, general answer quality, provider behavior, runtime readiness, benchmark success, value, public readiness, production readiness, or Alpha superiority. Track S simulation was not run, and Track R runtime/provider execution remains blocked. Therefore the immediate next evidence lane is a post-#552 successor no-echo/substantive-generation gate or derivation check, not the already-landed prompt-consumption wiring fix.
 
 ## 2. Readiness judgment
 
@@ -16,9 +16,9 @@ The actual Value Read result is a blocked verdict, not a simulation result and n
 - Track S simulation result: `not run / no scores`.
 - Track R runtime/provider result: `not run / blocked`.
 - Runtime blocked verdicts preserved by the Value Read packet: `BLOCKED_NO_ECHO_PROOF_MISSING` and `BLOCKED_OPERATOR_AUTHORIZATION_MISSING`.
-- Blocking dependency: the no-echo gate reports `BLOCKED_ALPHA_PATH_ECHOES_PROMPT` with local fixtures echoing the prompt in generated fields.
+- Post-#552 evidence state: partial local exact-echo remediation landed for controlled fixtures and unsupported SAFE-OUT-style clarification, but broad no-echo/substantive-generation behavior remains unproven.
 
-This scorecard treats the blocked Value Read as evidence of a prerequisite failure only. It does not convert the blocked run, prompt-contract templates, or local documentation into value, runtime, provider, or readiness evidence.
+This scorecard treats the blocked Value Read and #552 as bounded local evidence only. It does not convert the blocked run, #552 partial remediation, prompt-contract templates, or local documentation into value, runtime, provider, benchmark, public, production, or readiness evidence.
 
 ## 3. Scorecard table
 
@@ -36,21 +36,22 @@ Scale:
 | Discrimination signal | 0 | Blocked; no Alpha-vs-baseline outputs exist. | Manual Value Read task bank and rubric exist, but Track S and Track R did not run. | No value, superiority, or wedge claim. |
 | False-premise catch behavior | 0 | Unmeasured. | False-premise tasks are present in the task bank, but no outputs or scores exist. | Cannot claim false-premise reliability. |
 | Hidden-constraint surfacing | 0 | Unmeasured. | Hidden-constraint tasks are present in the task bank, but no outputs or scores exist. | Cannot claim hidden-constraint handling. |
-| Near-echo avoidance | 0 | Failed prerequisite / blocked. | The Value Read runtime record cites the no-echo gate verdict `BLOCKED_ALPHA_PATH_ECHOES_PROMPT`. | Fix no-echo / derivation before value or provider lanes. |
+| Near-echo avoidance | 1 | Partial local exact-echo remediation landed in #552, but broad no-echo/substantive-generation behavior remains unproven. | #552 is local fixture evidence only; the Value Read has no post-#552 scores or runtime/provider outputs. | Rerun or create a post-#552 successor gate before value or provider lanes. |
 | Confidence usefulness | 1 | Designed only. | Alpha-side envelope requires `confidence_level`, assumptions, missing evidence, and boundary fields, but no scored answers exist. | Keep as rubric requirement; do not claim usefulness. |
 | Escalation usefulness | 1 | Designed only. | Task bank and scoring dimensions include needs-human escalation, but no scored answers exist. | Keep as rubric requirement; do not claim user-visible escalation quality. |
 | Operator decision quality | 2 | Conservative decision quality is present in documentation only. | The scorecard and Value Read correctly stop on no-echo and authorization blockers. | Supports internal governance, not MVP readiness. |
 | Claim boundary discipline | 3 | Strong documentation discipline; answer-quality boundary untested. | Existing packets repeatedly forbid readiness, superiority, runtime, provider, public, and benchmark claims. | Permits conservative internal statements only. |
 | Runtime/provider/local readiness boundaries | 2 | Boundaries are explicit; runtime/provider evidence is absent. | Track separation is documented: simulation must not be mixed with runtime/provider evidence; Track R is blocked. | Blocks paid/provider work until prerequisites and authorization exist. |
-| Next-lane clarity | 4 | Clear. | The actual blocked Value Read selects `ALPHA-SOLVER-PROMPT-CONSUMPTION-WIRING-FIX-001` as the track-local next lane. | Selected scorecard decision: **Fix no-echo / derivation first**. |
+| Next-lane clarity | 4 | Clear after correction. | The selected lane is `ALPHA-SOLVER-NO-ECHO-SUBSTANTIVE-GENERATION-GATE-POST-552-SUCCESSOR-001`, a post-#552 successor gate, not the already-landed wiring fix. | Rerun/check post-#552 no-echo/substantive generation before any Value Read/provider/public lane. |
 
 ## 4. Permitted claims
 
 - The MVP scorecard has been updated with the actual Value Read blocked verdict.
 - The manual discrimination Value Read was designed but not executed.
 - Track S simulation produced no results.
-- Track R runtime/provider testing did not run because the no-echo/substantive-generation dependency is blocked and provider authorization is missing.
-- The next evidence-bound lane is fixing prompt consumption / derivation so Alpha produces substantive, non-echo output before any value or provider lane.
+- Track R runtime/provider testing did not run and produced no runtime/provider outputs.
+- #552 provides partial local exact-echo remediation for controlled fixtures and unsupported SAFE-OUT-style clarification only.
+- The next evidence-bound lane is a post-#552 no-echo/substantive-generation successor gate before any value or provider lane.
 - Current documentation shows conservative evidence-boundary discipline and correctly prevents readiness overclaiming.
 
 ## 5. Forbidden claims
@@ -71,22 +72,24 @@ Do not claim any of the following:
 - Confidence or escalation fields are useful in practice.
 - Simulation evidence exists for this Value Read.
 - Runtime evidence exists for this Value Read.
-- The blocked Value Read authorizes paid/provider work.
+- Provider outputs exist for this Value Read.
+- #552 proves broad no-echo closure, general answer quality, provider behavior, runtime readiness, benchmark success, value, public readiness, production readiness, or Alpha superiority.
+- The blocked Value Read or #552 authorizes paid/provider work.
 - Google Sheets or backlog ledgers were updated.
 
 ## 6. Recommended next lane
 
-Decision from the required decision list: **Fix no-echo / derivation first**.
+Selected next lane: `ALPHA-SOLVER-NO-ECHO-SUBSTANTIVE-GENERATION-GATE-POST-552-SUCCESSOR-001`.
 
-Rationale: the most direct blocker is not scoring, not public exposure, and not provider spend. The first prerequisite is to fix the prompt-consumption/derivation path so Alpha produces substantive non-echo output. After that fix, rerun the no-echo/substantive-generation gate. Only a passing no-echo gate can reopen the question of a narrow simulation or runtime Value Read. Provider work remains blocked unless explicit operator authorization is supplied with model, project/billing boundary, cost cap, token cap, max run count, and exact synthetic fixture.
+Rationale: #552 should be treated as partial local exact-echo remediation, not broad no-echo closure. The immediate next evidence step is to rerun or create a successor no-echo/substantive-generation gate using the post-#552 state before any Value Read execution, provider work, release-candidate, paid/provider, or public-exposure lane. Provider work remains blocked unless explicit operator authorization is supplied with model, project/billing boundary, cost cap, token cap, max request count, exact synthetic fixture, redaction/data-sharing boundary, and stop conditions.
 
 ## 7. Stop conditions
 
 Stop and do not proceed to value, provider, public, or release-candidate lanes if any condition applies:
 
-- Alpha output still echoes the prompt or lacks substantive derivation.
-- No-echo/substantive-generation gate remains blocked or absent.
-- Provider authorization is missing or incomplete.
+- Post-#552 Alpha output still echoes the prompt or lacks substantive derivation.
+- Post-#552 no-echo/substantive-generation successor gate remains blocked or absent.
+- Provider authorization is missing or incomplete, including model, project/billing boundary, cost cap, token cap, max request count, exact synthetic fixture, redaction/data-sharing boundary, and stop conditions.
 - Track S simulation outputs are mislabeled as runtime/provider evidence.
 - Any answer or packet claims MVP, public, production, provider, runtime, dashboard, benchmark, or Alpha-superiority readiness from this blocked Value Read.
 - DEF-002/public exposure blockers are used as if closed without explicit closure or operator risk acceptance.
@@ -100,7 +103,7 @@ The previous scorecard categories remain conservatively interpreted as follows:
 | --- | --- |
 | Core product value evidence | Blocked; no executed Value Read result. |
 | Provider smoke and billing boundary | Provider work remains blocked without explicit authorization. |
-| No-echo substantive generation gate | Blocking prerequisite; fix first. |
+| No-echo substantive generation gate | #552 partially remediated local exact echo; successor gate still required. |
 | Security and privacy closure | Not claimably closed; public exposure remains blocked. |
 | Runtime entrypoint clarity | Mapped only; no runtime readiness claim. |
 | Public exposure gate | Blocked. |

@@ -1,12 +1,12 @@
 # ALPHA-SOLVER-MVP-READINESS-SCORECARD-001
 
-Verdict: `MVP_SCORECARD_UPDATED_VALUE_READ_BLOCKED`
+Verdict: `MVP_SCORECARD_UPDATED_POST_552_VALUE_READ_BLOCKED`
 
 This packet is an internal MVP readiness evidence and non-claims scorecard. It is not an MVP readiness claim, public-readiness claim, production-readiness claim, provider-validation claim, runtime-readiness claim, dashboard-readiness claim, benchmark claim, value-evidence claim, or Alpha-superiority claim.
 
 ## Purpose
 
-Update the MVP scorecard using the actual manual discrimination Value Read status. The Value Read did not produce simulation or runtime scores; it produced a blocked verdict for runtime/provider execution and no simulation run.
+Update the MVP scorecard using the actual manual discrimination Value Read status and the post-#552 evidence state. The Value Read did not produce simulation or runtime scores; it produced a blocked verdict for runtime/provider execution and no simulation run. #552 provides partial local exact-echo remediation only, so the next lane must be a post-#552 successor no-echo/substantive-generation gate rather than the already-landed prompt-consumption wiring fix.
 
 ## Source context inspected
 
@@ -17,6 +17,7 @@ Update the MVP scorecard using the actual manual discrimination Value Read statu
 - `docs/evals/runs/alpha-solver-manual-discrimination-value-read-001/selected-next-lane.md`
 - `docs/evals/runs/alpha-solver-manual-discrimination-value-read-001/evidence-boundary.md`
 - Existing MVP scorecard packet files in this directory.
+- Post-#552 repository state represented by merged PR #552 partial local exact-echo remediation.
 
 ## Required outputs
 
@@ -32,6 +33,6 @@ Update the MVP scorecard using the actual manual discrimination Value Read statu
 
 ## Decision summary
 
-Selected decision from the required list: **Fix no-echo / derivation first**.
+Selected next lane: `ALPHA-SOLVER-NO-ECHO-SUBSTANTIVE-GENERATION-GATE-POST-552-SUCCESSOR-001`.
 
-The manual discrimination Value Read is blocked because the no-echo/substantive-generation dependency reports prompt echo and provider authorization is missing. Simulation was not run. This supports a narrow no-echo/derivation fix and rerun path only. It does not support MVP readiness, public exposure, production readiness, provider work, runtime readiness, dashboard readiness, benchmark claims, or Alpha superiority claims.
+#552 provides partial local exact-echo remediation for controlled fixtures and unsupported SAFE-OUT-style clarification. It does not prove broad no-echo behavior, general answer quality, provider behavior, runtime readiness, benchmark success, value, public readiness, production readiness, or Alpha superiority. Therefore the immediate next evidence lane is a post-#552 successor no-echo/substantive-generation gate or derivation check, not the already-landed prompt-consumption wiring fix.
