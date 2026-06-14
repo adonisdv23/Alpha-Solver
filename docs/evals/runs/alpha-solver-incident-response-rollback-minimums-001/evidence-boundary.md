@@ -10,6 +10,8 @@
 
 ## What this packet does not prove
 
+- It does not replace the repo-global selected next lane; repo-global selected-next control remains in `docs/CURRENT_STATE.md` and `docs/LANE_REGISTRY.md`.
+- It does not authorize public exposure, provider calls, deployments, production readiness, public readiness, security/privacy completion, or DEF-002 closeout.
 - It does not prove public readiness.
 - It does not prove production readiness.
 - It does not prove runtime readiness.

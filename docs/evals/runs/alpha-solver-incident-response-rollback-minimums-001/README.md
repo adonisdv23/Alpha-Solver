@@ -27,7 +27,7 @@ This docs-only packet defines minimum operator actions for leaked keys, runaway 
 | `credential-leak-response.md` | Immediate stop actions for leaked credentials and key compromise. |
 | `data-exposure-response.md` | Unsafe output, dashboard exposure, public abuse, and data disclosure response. |
 | `operator-communications.md` | Operator communication templates for incident start, updates, rollback, and closeout. |
-| `selected-next-lane.md` | Recommended next lane after this packet. |
+| `selected-next-lane.md` | Incident-response/public-exposure-local recommended follow-up after this packet; not the repo-global selected next lane. |
 | `evidence-boundary.md` | What this packet proves and does not prove. |
 | `non-actions.md` | Explicit non-actions and forbidden claims. |
 
@@ -46,4 +46,4 @@ The incident-response and rollback minimums are captured as an operator runbook 
 
 ## Boundary
 
-This packet may be used as an incident-response minimums reference. It must not be used as evidence of production readiness, public readiness, provider readiness, runtime readiness, dashboard readiness, `/v1/solve` readiness, DEF-002 closure, security/privacy completion, or operator approval for exposure.
+This packet may be used as an incident-response minimums reference. Its recommended follow-up is incident-response/public-exposure-local only and does not replace the repo-global selected next lane, which remains controlled by `docs/CURRENT_STATE.md` and `docs/LANE_REGISTRY.md`. It must not be used as evidence of production readiness, public readiness, provider readiness, runtime readiness, dashboard readiness, `/v1/solve` readiness, DEF-002 closure, security/privacy completion, provider-call authorization, deployment authorization, or operator approval for exposure.

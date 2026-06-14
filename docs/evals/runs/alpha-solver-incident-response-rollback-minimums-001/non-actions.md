@@ -17,6 +17,8 @@ This docs-only lane did not perform the following actions:
 - Did not change auth, CORS, tenancy, provider, model, dashboard, SAFE-OUT, logging, or API behavior.
 - Did not rotate or revoke any real credentials.
 - Did not update Google Sheets or backlog workbooks.
+- Did not replace the repo-global selected next lane controlled by `docs/CURRENT_STATE.md` and `docs/LANE_REGISTRY.md`.
+- Did not authorize public exposure, provider calls, deployments, production readiness, public readiness, security/privacy completion, or DEF-002 closeout.
 - Did not run incident drills.
 - Did not claim public readiness.
 - Did not claim production readiness.
