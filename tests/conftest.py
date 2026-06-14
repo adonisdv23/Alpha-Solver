@@ -13,3 +13,4 @@ import os
 
 os.environ.setdefault("ALPHA_DASHBOARD_PASSWORD", "ci-dashboard-secret")
 os.environ.setdefault("ALPHA_DASHBOARD_SECRET_KEY", "ci-dashboard-signing-key")
+os.environ["MODEL_PROVIDER"] = "local"

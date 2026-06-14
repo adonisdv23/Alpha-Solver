@@ -5,12 +5,13 @@ from __future__ import annotations
 import csv
 import json
 import logging
+import math
 import os
 import time
 import re
 import uuid
 from collections import defaultdict, deque
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Deque, DefaultDict, Dict, Optional
 from enum import Enum
@@ -206,6 +207,88 @@ else:
 def _is_openai_provider_enabled() -> bool:
     """Return True only for explicit OpenAI provider opt-in."""
     return os.getenv("MODEL_PROVIDER", "local").strip().lower() == "openai"
+
+
+@dataclass(frozen=True)
+class ProviderCostCaps:
+    """Explicit fail-closed provider execution boundaries."""
+
+    max_cost_usd: float
+    max_input_tokens: int
+    max_output_tokens: int
+    max_requests: int
+
+
+def _provider_stop_enabled() -> bool:
+    return os.getenv("ALPHA_PROVIDER_EMERGENCY_STOP", "0").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+
+def _required_provider_caps() -> ProviderCostCaps:
+    names = (
+        "ALPHA_PROVIDER_MAX_COST_USD",
+        "ALPHA_PROVIDER_MAX_INPUT_TOKENS",
+        "ALPHA_PROVIDER_MAX_OUTPUT_TOKENS",
+        "ALPHA_PROVIDER_MAX_REQUESTS",
+    )
+    if any(not os.getenv(name, "").strip() for name in names):
+        raise ProviderError(
+            provider="openai",
+            category="invalid_request",
+            retryable=False,
+            safe_message="Provider execution disabled: explicit provider cost caps are required.",
+        )
+    try:
+        caps = ProviderCostCaps(
+            max_cost_usd=float(os.environ["ALPHA_PROVIDER_MAX_COST_USD"]),
+            max_input_tokens=int(os.environ["ALPHA_PROVIDER_MAX_INPUT_TOKENS"]),
+            max_output_tokens=int(os.environ["ALPHA_PROVIDER_MAX_OUTPUT_TOKENS"]),
+            max_requests=int(os.environ["ALPHA_PROVIDER_MAX_REQUESTS"]),
+        )
+    except ValueError as exc:
+        raise ProviderError(
+            provider="openai",
+            category="invalid_request",
+            retryable=False,
+            safe_message="Provider execution disabled: provider cost caps must be numeric.",
+        ) from exc
+    if (
+        not math.isfinite(caps.max_cost_usd)
+        or caps.max_cost_usd <= 0
+        or caps.max_input_tokens <= 0
+        or caps.max_output_tokens <= 0
+        or caps.max_requests <= 0
+    ):
+        raise ProviderError(
+            provider="openai",
+            category="invalid_request",
+            retryable=False,
+            safe_message="Provider execution disabled: provider cost caps must be positive.",
+        )
+    return caps
+
+
+def _enforce_provider_preflight_caps(provider_request: ProviderRequest, caps: ProviderCostCaps) -> None:
+    if _provider_stop_enabled():
+        raise ProviderError(
+            provider="openai",
+            category="invalid_request",
+            retryable=False,
+            safe_message="Provider execution disabled: emergency stop is active.",
+            request_id=provider_request.request_id,
+        )
+    if provider_request.max_tokens > caps.max_output_tokens:
+        raise ProviderError(
+            provider="openai",
+            category="invalid_request",
+            retryable=False,
+            safe_message="Provider execution disabled: requested output token cap exceeds operator cap.",
+            request_id=provider_request.request_id,
+        )
 
 
 def _get_model_set(request: Request, params: Dict[str, Any]) -> ModelSet:
@@ -840,9 +923,56 @@ def _execute_provider_call(
     request: Request,
     provider_client: Any,
     provider_request: ProviderRequest,
+    caps: ProviderCostCaps,
 ) -> ProviderResult:
+    _enforce_provider_preflight_caps(provider_request, caps)
     _emit_provider_telemetry(request, _provider_request_started_event(provider_request))
     result = provider_client.execute(provider_request)
+    if result.usage.input_tokens is None:
+        raise ProviderError(
+            provider=result.provider,
+            category="invalid_request",
+            retryable=False,
+            safe_message="Provider result missing input token usage.",
+            request_id=provider_request.request_id,
+            retry_count=result.retry_count,
+        )
+    if result.usage.input_tokens > caps.max_input_tokens:
+        raise ProviderError(
+            provider=result.provider,
+            category="invalid_request",
+            retryable=False,
+            safe_message="Provider result exceeded input token cap.",
+            request_id=provider_request.request_id,
+            retry_count=result.retry_count,
+        )
+    if result.usage.output_tokens is None:
+        raise ProviderError(
+            provider=result.provider,
+            category="invalid_request",
+            retryable=False,
+            safe_message="Provider result missing output token usage.",
+            request_id=provider_request.request_id,
+            retry_count=result.retry_count,
+        )
+    if result.usage.output_tokens > caps.max_output_tokens:
+        raise ProviderError(
+            provider=result.provider,
+            category="invalid_request",
+            retryable=False,
+            safe_message="Provider result exceeded output token cap.",
+            request_id=provider_request.request_id,
+            retry_count=result.retry_count,
+        )
+    if result.cost.estimated_usd is None or result.cost.estimated_usd > caps.max_cost_usd:
+        raise ProviderError(
+            provider=result.provider,
+            category="invalid_request",
+            retryable=False,
+            safe_message="Provider result missing or exceeded cost cap.",
+            request_id=provider_request.request_id,
+            retry_count=result.retry_count,
+        )
     _emit_provider_telemetry(
         request, _provider_request_completed_event(provider_request, result)
     )
@@ -952,14 +1082,25 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
             model_set=model_set,
         )
         try:
+            caps = _required_provider_caps()
             provider_client = _get_provider_client(request, model_set)
             if _is_expert_route(params):
                 complexity = _expert_complexity(query)
+                required_requests = 1 if complexity == "trivial" else 2
+                if caps.max_requests < required_requests:
+                    raise ProviderError(
+                        provider="openai",
+                        category="invalid_request",
+                        retryable=False,
+                        safe_message="Provider execution disabled: request count cap is below route requirement.",
+                        request_id=provider_request.request_id,
+                    )
                 if complexity == "trivial":
                     provider_result = _execute_provider_call(
                         request=request,
                         provider_client=provider_client,
                         provider_request=provider_request,
+                        caps=caps,
                     )
                     if not provider_result.text.strip():
                         return _provider_empty_final_answer_response(request, provider_result)
@@ -985,6 +1126,7 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
                     request=request,
                     provider_client=provider_client,
                     provider_request=preview_request,
+                    caps=caps,
                 )
                 preview = _parse_expert_preview(preview_result.text)
                 preview["assumptions"] = _default_actionable_execution_plan_assumptions(
@@ -1000,6 +1142,7 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
                     request=request,
                     provider_client=provider_client,
                     provider_request=answer_request,
+                    caps=caps,
                 )
                 if preview.get("confidence_available") is False:
                     mode = _mode_for_unavailable_expert_confidence(query)
@@ -1063,6 +1206,7 @@ async def solve(req: SolveRequest, request: Request) -> JSONResponse:
                 request=request,
                 provider_client=provider_client,
                 provider_request=provider_request,
+                caps=caps,
             )
         except ProviderError as exc:
             _emit_provider_telemetry(
