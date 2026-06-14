@@ -34,6 +34,7 @@ OPENAI_PACKET_DIR_PREFIXES = (
     "docs/evals/runs/local-openai-",
     "docs/evals/runs/alpha-solver-openai-",
 )
+LOCAL_MODEL_PACKET_DIR_PREFIX = "docs/evals/runs/alpha-solver-local-"
 COUNCIL_AUDIT_EVIDENCE_BUNDLE_DIR = Path(
     "docs/evals/runs/alpha-solver-post-level-3-level-14-self-operator-council-audit-evidence-bundle"
 )
@@ -183,6 +184,8 @@ def is_relevant_doc(path: Path) -> bool:
     if rel.startswith(DEF_PACKET_DIR_PREFIX):
         return True
     if rel.startswith(OPENAI_PACKET_DIR_PREFIXES):
+        return True
+    if rel.startswith(LOCAL_MODEL_PACKET_DIR_PREFIX):
         return True
     return rel.startswith(RUNS_DIR.as_posix()) and LOCAL_ORCHESTRATION_DIR_MARKER in rel
 

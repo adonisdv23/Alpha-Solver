@@ -5,6 +5,8 @@ Ollama, hosted providers, benchmarks, dashboard routes, or /v1/solve.
 """
 from pathlib import Path
 
+LOCAL_MODEL_CATALOG_PACKET_DIR = Path("docs/evals/runs/alpha-solver-local-model-catalog-001")
+
 from scripts.check_local_llm_packet_consistency import (
     CONTROLLED_USAGE_ACCEPTED,
     LEVEL_3_ACCEPTED,
@@ -84,6 +86,31 @@ def test_current_repo_local_llm_packets_pass_packet_consistency_check():
 
     assert packet_dirs, "expected local LLM solver orchestration packet dirs"
     assert check_packet_consistency(packet_dirs) == []
+
+
+def test_default_discovery_includes_local_model_packet_families(tmp_path):
+    packet_dirs = [
+        LOCAL_MODEL_CATALOG_PACKET_DIR,
+        Path("docs/evals/runs/alpha-solver-local-multi-model-smoke-harness-001"),
+    ]
+    for packet_dir in packet_dirs:
+        _write_packet(
+            tmp_path,
+            packet_dir,
+            selected_text="`ALPHA-SOLVER-LOCAL-FIXTURE-NEXT-001`\n",
+            boundary_name="non-actions.md",
+        )
+
+    discovered = iter_packet_dirs(tmp_path)
+
+    for packet_dir in packet_dirs:
+        assert packet_dir in discovered
+
+
+def test_default_discovery_includes_current_local_model_catalog_packet():
+    assert (
+        LOCAL_MODEL_CATALOG_PACKET_DIR in iter_packet_dirs()
+    )
 
 
 def test_default_discovery_includes_openai_packet_families(tmp_path):

@@ -37,6 +37,7 @@ PACKET_DIR_MARKERS = (
     "alpha-solver-post-level-3-",
     "alpha-solver-post-level-7-",
     "alpha-solver-def-",
+    "alpha-solver-local-",
     "openai-",
     "local-openai-",
     "alpha-solver-openai-",

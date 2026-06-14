@@ -5,6 +5,8 @@ Ollama, hosted providers, benchmarks, dashboard routes, or /v1/solve.
 """
 from pathlib import Path
 
+LOCAL_MODEL_CATALOG_PACKET_DIR = Path("docs/evals/runs/alpha-solver-local-model-catalog-001")
+
 from scripts.check_local_llm_evidence_boundaries import (
     AUTHORITATIVE_FINAL_PACKET_FILES,
     FINAL_PACKET_DIR,
@@ -31,8 +33,26 @@ def test_relevant_docs_include_closeout_and_skip_source_artifacts():
     assert is_relevant_doc(Path("docs/evals/runs/openai-fixture/README.md"))
     assert is_relevant_doc(Path("docs/evals/runs/local-openai-fixture/README.md"))
     assert is_relevant_doc(Path("docs/evals/runs/alpha-solver-openai-fixture/README.md"))
+    assert is_relevant_doc(
+        LOCAL_MODEL_CATALOG_PACKET_DIR / "README.md"
+    )
+    assert is_relevant_doc(
+        Path("docs/evals/runs/alpha-solver-local-multi-model-smoke-harness-001/README.md")
+    )
     assert not is_relevant_doc(Path("docs/RUNTIME_READINESS.md"))
 
+
+
+def test_current_local_model_catalog_packet_files_are_discovered():
+    docs = set(iter_relevant_docs())
+    catalog_files = {
+        path
+        for path in LOCAL_MODEL_CATALOG_PACKET_DIR.glob("*.md")
+        if path.is_file()
+    }
+
+    assert catalog_files, "expected local model catalog packet markdown files"
+    assert catalog_files <= docs
 
 def test_promotional_claim_without_boundary_language_is_flagged():
     findings = find_promotional_claim_findings(
@@ -113,4 +133,7 @@ def test_current_relevant_docs_pass_static_check():
     docs = iter_relevant_docs()
 
     assert docs, "expected local LLM solver orchestration docs to be discovered"
+    assert (
+        LOCAL_MODEL_CATALOG_PACKET_DIR / "README.md" in docs
+    )
     assert check_paths(docs) == []
