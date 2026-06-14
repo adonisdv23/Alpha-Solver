@@ -1,21 +1,23 @@
 # Selected Next Lane
 
-Selected next lane: `ALPHA-SOLVER-OPERATOR-UI-SIDECAR-FEASIBILITY-001` completion or import.
+Selected next lane: `ALPHA-SOLVER-OPERATOR-UI-SIDECAR-SECURITY-GATES-001`.
 
 ## Rationale
 
-This lane depends on the sidecar feasibility decision. The next action is to add or import the lane 33 evidence packet that selects one sidecar pattern and states the approved bridge seam. Only after that packet exists should a narrow implementation lane create a local-only CLI or loopback endpoint bridge.
+The sidecar feasibility packet now exists and selects the acceptable architecture pattern. The bridge must not proceed until the sidecar security/API-shape gate decides the Alpha Solver controlled endpoint or CLI seam, request mapping, response-envelope mapping, authn/authz, tenancy, CORS/CSRF, provider lockdown, cost controls, telemetry/audit identity, retention, replay, and evidence-envelope rendering contract.
 
 ## Future implementation lane candidate
 
 `ALPHA-SOLVER-OPERATOR-CONSOLE-BRIDGE-LOCAL-ONLY-IMPLEMENTATION-001`
 
-Required scope:
+Required scope after the gate passes:
 
 - local-only;
 - default-off;
 - authenticated;
 - no hosted providers;
 - no direct model bypass;
+- Alpha Solver controlled endpoint or CLI bridge only;
 - Alpha Solver envelope and SAFE-OUT preserved;
-- tests for auth denial, loopback-only bind, provider-disabled behavior, and non-claim evidence labels.
+- auth, tenancy, CORS/CSRF, cost, telemetry, and evidence boundaries tested;
+- tests for auth denial, loopback-only bind, provider-disabled behavior, request mapping, response-envelope mapping, and non-claim evidence labels.

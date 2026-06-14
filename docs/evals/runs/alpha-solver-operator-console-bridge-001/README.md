@@ -4,13 +4,19 @@ Verdict: `OPERATOR_CONSOLE_BRIDGE_BLOCKED_SECURITY_DECISION_REQUIRED`
 
 ## TLDR
 
-The operator console bridge lane is captured as a **design-only blocked packet**. No endpoint, CLI bridge, public route, deployment configuration, provider call, token use, or model invocation was implemented.
+The operator console bridge lane is captured as a **design-only blocked packet** that now binds to the sidecar feasibility decision in `docs/evals/runs/alpha-solver-operator-ui-sidecar-feasibility-001/`. No endpoint, CLI bridge, public route, deployment configuration, UI, provider call, token use, credential access, or model invocation was implemented.
 
-The blocking reason is the required dependency: `docs/evals/runs/alpha-solver-operator-ui-sidecar-feasibility-001/` is absent in this checkout, so no sidecar architecture decision exists for this lane to bind to. Because the requested bridge must follow the architecture selected by lane 33, implementation is intentionally deferred.
+The current blocker is no longer sidecar feasibility. Lane 33 selected the acceptable early pattern:
+
+```text
+UI sidecar -> Alpha Solver controlled endpoint -> Alpha Solver router/policy/evidence layer -> local or hosted model backend
+```
+
+Bridge implementation remains blocked pending the sidecar security/API-shape decision gate, including request mapping, auth, tenancy, CORS/CSRF, provider lockdown, cost controls, telemetry, retention, replay, and evidence-envelope rendering requirements.
 
 ## Source context inspected
 
-- Missing dependency path: `docs/evals/runs/alpha-solver-operator-ui-sidecar-feasibility-001/`
+- Sidecar feasibility decision packet: `docs/evals/runs/alpha-solver-operator-ui-sidecar-feasibility-001/`
 - Runtime entrypoint map: `docs/evals/runs/alpha-solver-runtime-entrypoint-map-001/`
 - Public exposure readiness gate: `docs/evals/runs/alpha-solver-public-exposure-readiness-gate-001/`
 - Local model catalog: `docs/evals/runs/alpha-solver-local-model-catalog-001/`
