@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import json
 import logging
+import math
 import os
 import time
 import re
@@ -256,7 +257,8 @@ def _required_provider_caps() -> ProviderCostCaps:
             safe_message="Provider execution disabled: provider cost caps must be numeric.",
         ) from exc
     if (
-        caps.max_cost_usd < 0
+        not math.isfinite(caps.max_cost_usd)
+        or caps.max_cost_usd <= 0
         or caps.max_input_tokens <= 0
         or caps.max_output_tokens <= 0
         or caps.max_requests <= 0
@@ -926,12 +928,51 @@ def _execute_provider_call(
     _enforce_provider_preflight_caps(provider_request, caps)
     _emit_provider_telemetry(request, _provider_request_started_event(provider_request))
     result = provider_client.execute(provider_request)
-    if result.usage.input_tokens is not None and result.usage.input_tokens > caps.max_input_tokens:
-        raise ProviderError(provider=result.provider, category="invalid_request", retryable=False, safe_message="Provider result exceeded input token cap.", request_id=provider_request.request_id, retry_count=result.retry_count)
-    if result.usage.output_tokens is not None and result.usage.output_tokens > caps.max_output_tokens:
-        raise ProviderError(provider=result.provider, category="invalid_request", retryable=False, safe_message="Provider result exceeded output token cap.", request_id=provider_request.request_id, retry_count=result.retry_count)
+    if result.usage.input_tokens is None:
+        raise ProviderError(
+            provider=result.provider,
+            category="invalid_request",
+            retryable=False,
+            safe_message="Provider result missing input token usage.",
+            request_id=provider_request.request_id,
+            retry_count=result.retry_count,
+        )
+    if result.usage.input_tokens > caps.max_input_tokens:
+        raise ProviderError(
+            provider=result.provider,
+            category="invalid_request",
+            retryable=False,
+            safe_message="Provider result exceeded input token cap.",
+            request_id=provider_request.request_id,
+            retry_count=result.retry_count,
+        )
+    if result.usage.output_tokens is None:
+        raise ProviderError(
+            provider=result.provider,
+            category="invalid_request",
+            retryable=False,
+            safe_message="Provider result missing output token usage.",
+            request_id=provider_request.request_id,
+            retry_count=result.retry_count,
+        )
+    if result.usage.output_tokens > caps.max_output_tokens:
+        raise ProviderError(
+            provider=result.provider,
+            category="invalid_request",
+            retryable=False,
+            safe_message="Provider result exceeded output token cap.",
+            request_id=provider_request.request_id,
+            retry_count=result.retry_count,
+        )
     if result.cost.estimated_usd is None or result.cost.estimated_usd > caps.max_cost_usd:
-        raise ProviderError(provider=result.provider, category="invalid_request", retryable=False, safe_message="Provider result missing or exceeded cost cap.", request_id=provider_request.request_id, retry_count=result.retry_count)
+        raise ProviderError(
+            provider=result.provider,
+            category="invalid_request",
+            retryable=False,
+            safe_message="Provider result missing or exceeded cost cap.",
+            request_id=provider_request.request_id,
+            retry_count=result.retry_count,
+        )
     _emit_provider_telemetry(
         request, _provider_request_completed_event(provider_request, result)
     )

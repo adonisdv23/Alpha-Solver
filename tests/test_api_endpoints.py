@@ -502,6 +502,95 @@ def test_solve_openai_mode_requires_explicit_provider_caps(monkeypatch):
     assert fake.requests == []
 
 
+@pytest.mark.parametrize("cost_cap", ["0", "nan", "inf", "-inf", "-1", "not-a-number", " "])
+def test_solve_openai_mode_rejects_invalid_cost_caps_before_provider_call(
+    monkeypatch, cost_cap
+):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    monkeypatch.setenv("ALPHA_PROVIDER_MAX_COST_USD", cost_cap)
+    fake = FakeProviderClient([])
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={"query": "hello provider", "context": {"model_set": "cost_saver"}},
+        headers={"X-API-Key": key, "X-Request-ID": "req-invalid-cost-cap"},
+    )
+
+    assert resp.status_code == 400
+    _assert_provider_safe_out_schema(
+        resp.json(),
+        category="invalid_request",
+        retryable=False,
+        request_id=None,
+    )
+    assert fake.requests == []
+
+
+@pytest.mark.parametrize(
+    ("usage", "safe_message"),
+    [
+        (
+            ProviderUsage(input_tokens=None, output_tokens=1, total_tokens=1),
+            "Provider result missing input token usage.",
+        ),
+        (
+            ProviderUsage(input_tokens=1, output_tokens=None, total_tokens=1),
+            "Provider result missing output token usage.",
+        ),
+    ],
+)
+def test_solve_openai_mode_missing_token_usage_fails_before_success_accounting(
+    monkeypatch, usage, safe_message
+):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    fake = FakeProviderClient(
+        [
+            ProviderResult(
+                provider="openai",
+                model="gpt-test",
+                text="provider answer",
+                finish_reason="stop",
+                usage=usage,
+                cost=ProviderCost(estimated_usd=0.001, source="price_hint"),
+                latency_ms=12,
+                request_id="req-missing-usage",
+                raw_metadata={"provider_request_id": "openai-req-missing-usage"},
+            )
+        ]
+    )
+    app.state.provider_client_factory = lambda _model_set: fake
+    provider_events = []
+    provider_accounting_records = []
+    app.state.provider_telemetry_sink = provider_events.append
+    app.state.provider_accounting_sink = provider_accounting_records.append
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={"query": "hello provider", "context": {"model_set": "cost_saver"}},
+        headers={"X-API-Key": key, "X-Request-ID": "req-missing-usage"},
+    )
+
+    assert resp.status_code == 400
+    body = resp.json()
+    _assert_provider_safe_out_schema(
+        body,
+        category="invalid_request",
+        retryable=False,
+        request_id="req-missing-usage",
+    )
+    assert safe_message in resp.text
+    assert len(fake.requests) == 1
+    assert [event["event"] for event in provider_events] == [
+        PROVIDER_REQUEST_STARTED,
+        PROVIDER_REQUEST_FAILED,
+    ]
+    assert provider_events[1]["safe_message"] == safe_message
+    assert provider_accounting_records == []
+
+
 def test_solve_openai_mode_emergency_stop_blocks_before_provider_call(monkeypatch):
     monkeypatch.setenv("MODEL_PROVIDER", "openai")
     monkeypatch.setenv("ALPHA_PROVIDER_EMERGENCY_STOP", "1")
