@@ -30,7 +30,7 @@
 | --- | --- | --- |
 | Prompts and user context | Runtime `/v1/solve` provider gate first; canonical classification registry for policy; config classifier only where explicitly invoked. | Default local path does not call providers; current classification enforcement is not proven on every prompt/provider path in this lane. |
 | Reasoning traces / session traces | Runtime trace writers first; evidence-boundary docs for claims. | Not proven classification-filtered here. |
-| Provider calls | Provider opt-in/config gate, provider client code, provider telemetry allowlist, then canonical classification policy for future gating. | Provider calls were not exercised; no new provider enforcement was added. |
+| Provider calls | Provider opt-in/config gate, provider client code, provider telemetry allowlist, then canonical classification policy for future gating. | No intentional provider validation was performed by this lane and no new provider enforcement was added. A broad-suite validation attempt nevertheless exercised one OpenAI provider path; that incident remains recorded as a failed validation-boundary signal, is not used as provider-readiness evidence, and does not authorize provider calls. |
 | Request logs and provider telemetry | Logging code and telemetry allowlist first; canonical policy registry for allowed future fields. | Provider telemetry is allowlist-only; generic loggers require caller hygiene. |
 | Replay artifacts | Replay harness behavior first; canonical policy registry for future capture decisions. | Replay can persist supplied events; classification/redaction is not automatically enforced by the harness. |
 | Evidence packets | Evidence-boundary docs and packet-specific non-actions first. | Policy-only; no runtime effect. |

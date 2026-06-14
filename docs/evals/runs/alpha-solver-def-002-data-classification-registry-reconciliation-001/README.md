@@ -41,4 +41,7 @@ readiness, provider-safety validation, dashboard readiness, or full runtime
 enforcement of every policy-only registry field. The policy precedence decision is
 reconciled, but the lane verdict is partial because an attempted broad test run
 encountered environment-coupled provider-path failures and one live-provider
-request despite the intended no-provider boundary.
+request despite the intended no-provider boundary. Targeted lane validation was
+rerun with `MODEL_PROVIDER=local` controls; the broad-suite provider incident is
+retained only as a boundary violation / failed validation-boundary signal and is
+not provider-readiness evidence.

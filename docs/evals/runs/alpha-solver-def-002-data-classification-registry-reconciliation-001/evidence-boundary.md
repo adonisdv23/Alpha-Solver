@@ -16,13 +16,14 @@ safety evidence.
 - Local source modules for registry loading, policy classification, governance
   classification, provider telemetry, JSONL logging, replay, registry snapshots,
   and Self Operator redaction.
-- Offline tests and static docs checks run from the repository checkout.
+- Targeted local-only tests and static docs checks run from the repository checkout with `MODEL_PROVIDER=local` controls.
 
 ## Excluded evidence
 
-- Live provider behavior, except for the recorded validation incident, which is
-  treated only as a boundary violation and failed validation signal.
-- Token billing or model usage.
+- Live provider behavior, except for the recorded broad-suite validation incident,
+  which is treated only as a boundary violation and failed validation signal.
+- Provider-readiness evidence, provider-safety validation, token billing, or model
+  usage evidence.
 - Public API or dashboard exposure.
 - External vendor policy review.
 - Runtime proof that every prompt, trace, replay event, evidence packet, log, and

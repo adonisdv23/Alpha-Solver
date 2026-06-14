@@ -14,6 +14,8 @@ registry with explicit tests.
 - Expected handling for `pii`, `phi`, `secret`, and `token` is explicitly stated.
 - Replay, shortlist snapshot, JSONL logging, provider-call, and dashboard data
   surfaces have approved event/data schemas or redaction requirements.
+- Validation commands for the lane have an explicit no-provider profile before any
+  broad suite is attempted.
 
 ## Non-goals
 
