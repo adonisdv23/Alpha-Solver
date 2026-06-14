@@ -81,7 +81,7 @@ This packet captures fake-model test templates, expected role fields, disagreeme
   "agreement_summary": ["all roles preserve local-only boundary"],
   "disagreement_summary": ["confidence in behavior remains unresolved without execution"],
   "escalation_status": "no escalation for design; escalation required before real-model claims",
-  "must_not_claim": ["benchmark value", "model superiority", "production readiness"]
+  "must_not_claim": ["no benchmark-value claim is supported", "no model-superiority claim is supported", "no production-readiness claim is supported"]
 }
 ```
 
@@ -92,9 +92,10 @@ This packet captures fake-model test templates, expected role fields, disagreeme
 - The disagreement matrix contains at least one explicit agreement and one explicit disagreement or `none_observed` marker.
 - Strong disagreement maps to a taxonomy category.
 - Unsupported material claims are excluded from the final answer.
-- Finalizer `must_not_claim` includes council quality, model superiority, benchmark value, and production readiness.
+- Finalizer `must_not_claim` records forbidden non-claims with immediate boundary wording: no council-quality claim is supported, no model-superiority claim is supported, no benchmark-value claim is supported, and no production-readiness claim is supported.
+- These are forbidden non-claims from a docs-only, fake-fixture packet, not observed evidence.
 - Any missing role, echo output, or boundary violation returns `STOP_INCONCLUSIVE`.
 
 ## Evidence limitation
 
-Fake fixtures can test schema and stop-state mechanics only. They do not test answer quality, local model reliability, benchmark value, or production readiness.
+Fake fixtures can test schema and stop-state mechanics only. They are not observed evidence for answer quality, local model reliability, benchmark value, model superiority, production readiness, provider readiness, or local model behavior.
