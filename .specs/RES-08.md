@@ -33,6 +33,8 @@ This spec was reconstructed on 2026-06-14 by reading the contaminated spec's `##
 ## Reconstruction Sources
 
 - `service/budget/simulator.py`
+- `service/finops/simulator.py`
+- `cli/budget_sim.py`
 - `service/evidence/collector.py`
 - `config/cost_models.yaml`
 - `tests/test_budget_simulator.py`
@@ -40,4 +42,4 @@ This spec was reconstructed on 2026-06-14 by reading the contaminated spec's `##
 
 ## Code Targets
 
-service/budget/simulator.py; service/evidence/collector.py; config/cost_models.yaml; tests/test_budget_simulator.py; tests/test_evidence_pack.py
+service/budget/simulator.py; service/finops/simulator.py; cli/budget_sim.py; service/evidence/collector.py; config/cost_models.yaml; tests/test_budget_simulator.py; tests/test_evidence_pack.py

@@ -10,7 +10,7 @@
 | `MCP-007` | `service/mcp/observability.py`; `tests/test_mcp_observability.py` |
 | `NEW-009` | `service/clarify/trigger.py`; `service/clarify/templates.yaml`; `service/clarify/render.py`; `tests/test_clarify.py` |
 | `NEW-010` | `service/prompts/decks.yaml`; `service/prompts/selector.py`; `service/prompts/renderer.py`; `tests/test_prompt_decks.py` |
-| `NEW-011` | `service/scoring/tuning.py`; `config/tuning.yaml`; `tests/test_weight_tuning.py` |
+| `NEW-011` | `service/tuning/weight_harness.py`; `service/tuning/weights_normalize.py`; `tests/test_weight_tuning.py` |
 | `NEW-012` | `service/budget/guard.py`; `service/budget/cli.py`; `tests/test_budget_cli_guard.py` |
 | `NEW-013` | `service/observability/replay_cli.py`; `service/observability/diff.py`; `tests/test_replay_cli_diff.py` |
 | `NEW-014` | `service/evidence/store.py`; `service/evidence/index.jsonl`; `service/evidence/api.py`; `tests/test_evidence_store.py` |
@@ -22,5 +22,5 @@
 | `RES-05` | `service/adapters/base.py`; `service/adapters/playwright_adapter.py`; `service/adapters/gsheets_adapter.py`; `tests/test_adapters_playwright.py`; `tests/test_adapters_gsheets.py` |
 | `RES-06` | `service/scenarios/runner.py`; `service/scenarios/rubric.py`; `scenarios/pack.yaml`; `tests/test_scenarios.py` |
 | `RES-07` | `service/observability/logger.py`; `service/observability/replay.py`; `tests/test_observability.py` |
-| `RES-08` | `service/budget/simulator.py`; `service/evidence/collector.py`; `config/cost_models.yaml`; `tests/test_budget_simulator.py`; `tests/test_evidence_pack.py` |
+| `RES-08` | `service/budget/simulator.py`; `service/finops/simulator.py`; `cli/budget_sim.py`; `service/evidence/collector.py`; `config/cost_models.yaml`; `tests/test_budget_simulator.py`; `tests/test_evidence_pack.py` |
 | `AS-145` | `service/adapters/base.py`; `service/adapters/playwright_adapter.py`; `service/adapters/gsheets_adapter.py`; `tests/test_adapters_playwright_hardened.py`; `tests/test_adapters_gsheets_hardened.py` |
