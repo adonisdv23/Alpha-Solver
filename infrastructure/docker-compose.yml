@@ -6,7 +6,9 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - API_KEY=${API_KEY:-changeme}
+      # Required: set API_KEY in the host environment before running Compose.
+      # There is intentionally no default; missing API_KEY fails Compose interpolation.
+      - API_KEY=${API_KEY:?Set API_KEY in the host environment before running Alpha Solver}
       - OTEL_ENDPOINT=http://otel-collector:4317
     volumes:
       - ../artifacts:/app/artifacts
