@@ -3,6 +3,7 @@ from __future__ import annotations
 import sys
 from hashlib import sha256
 from pathlib import Path
+from urllib.error import URLError
 
 import pytest
 
@@ -312,6 +313,26 @@ def test_ollama_backend_fails_closed_on_connection_failure_from_injected_transpo
 
     result = run_local_llm_provider_adapter(
         "Connection failure should fail closed.", backend=backend
+    )
+
+    assert result.status == "failed_closed"
+    assert result.reason == "connection_failure_non_evidence"
+    assert result.metadata["failure_label"] == "failed_closed_result"
+    assert result.behavior_evidence is False
+
+
+def test_ollama_backend_fails_closed_on_urllib_connection_failure():
+    from alpha.local_llm.provider_adapter import OllamaLocalHTTPBackend
+
+    def urllib_connection_transport(*, endpoint_url, payload, timeout_seconds):
+        raise URLError("connection refused by local loopback ollama fixture")
+
+    backend = OllamaLocalHTTPBackend(
+        model="offline-fixture-model", transport=urllib_connection_transport
+    )
+
+    result = run_local_llm_provider_adapter(
+        "Default urllib connection failure should fail closed.", backend=backend
     )
 
     assert result.status == "failed_closed"

@@ -16,7 +16,7 @@ from math import isfinite
 import os
 from typing import Any, Mapping, Protocol
 from urllib.parse import urlsplit
-from urllib.error import HTTPError
+from urllib.error import HTTPError, URLError
 from urllib.request import HTTPRedirectHandler, Request as URLRequest, build_opener
 
 from .portable_contract import PortableContract, PortableContractError, load_portable_contract
@@ -274,6 +274,10 @@ class OllamaLocalHTTPBackend:
             raise LocalLLMProviderAdapterError(
                 "connection_failure_non_evidence", str(exc)
             ) from exc
+        except URLError as exc:
+            raise LocalLLMProviderAdapterError(
+                "connection_failure_non_evidence", str(exc)
+            ) from exc
         except LocalLLMProviderAdapterError:
             raise
         except Exception as exc:
@@ -456,12 +460,28 @@ def run_local_llm_provider_adapter(
         output_text = backend.generate(request)
     except Exception as exc:  # injected-backend-only failure normalization
         reason = getattr(exc, "reason_code", f"adapter_error:{exc.__class__.__name__}")
+        cause = exc.__cause__
+        failure_metadata = {
+            "adapter_exception_class": exc.__class__.__name__,
+            "adapter_exception_module": exc.__class__.__module__,
+        }
+        if cause is not None:
+            failure_metadata.update(
+                {
+                    "adapter_exception_cause_class": cause.__class__.__name__,
+                    "adapter_exception_cause_module": cause.__class__.__module__,
+                }
+            )
         return LocalLLMAdapterResult(
             request=request,
             output_text="",
             status="failed_closed",
             reason=reason,
-            metadata={**result_metadata, "failure_label": "failed_closed_result"},
+            metadata={
+                **result_metadata,
+                **failure_metadata,
+                "failure_label": "failed_closed_result",
+            },
         )
 
     if not output_text.strip():
