@@ -5,6 +5,8 @@ Ollama, hosted providers, benchmarks, dashboard routes, or /v1/solve.
 """
 from pathlib import Path
 
+LOCAL_MODEL_CATALOG_PACKET_DIR = Path("docs/evals/runs/alpha-solver-local-model-catalog-001")
+
 from scripts.check_local_llm_packet_consistency import (
     CONTROLLED_USAGE_ACCEPTED,
     LEVEL_3_ACCEPTED,
@@ -88,7 +90,7 @@ def test_current_repo_local_llm_packets_pass_packet_consistency_check():
 
 def test_default_discovery_includes_local_model_packet_families(tmp_path):
     packet_dirs = [
-        Path("docs/evals/runs/alpha-solver-local-model-catalog-001"),
+        LOCAL_MODEL_CATALOG_PACKET_DIR,
         Path("docs/evals/runs/alpha-solver-local-multi-model-smoke-harness-001"),
     ]
     for packet_dir in packet_dirs:
@@ -107,8 +109,7 @@ def test_default_discovery_includes_local_model_packet_families(tmp_path):
 
 def test_default_discovery_includes_current_local_model_catalog_packet():
     assert (
-        Path("docs/evals/runs/alpha-solver-local-model-catalog-001")
-        in iter_packet_dirs()
+        LOCAL_MODEL_CATALOG_PACKET_DIR in iter_packet_dirs()
     )
 
 

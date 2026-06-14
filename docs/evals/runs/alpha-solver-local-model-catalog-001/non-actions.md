@@ -12,4 +12,5 @@ This lane intentionally did not:
 - implement routing or retrieval;
 - claim model performance;
 - claim local routing works;
-- claim production readiness, provider readiness, benchmark validation, value evidence, Alpha superiority, or safety validation.
+- claim production readiness, provider readiness, benchmark validation, value evidence, Alpha superiority, or safety validation;
+- bypass or intentionally exclude this packet from local LLM guardrail discovery.

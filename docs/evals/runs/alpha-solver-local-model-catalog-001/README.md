@@ -18,6 +18,10 @@ This packet inventories Ollama-hosted local model families that operators may co
 - `docs/evals/runs/20260604-alpha-local-llm-preview-readiness/`
 - `docs/evals/runs/20260604-alpha-local-llm-provider-adapter/`
 
+## Guardrail coverage
+
+This packet lives under `docs/evals/runs/alpha-solver-local-model-catalog-001/`. The local LLM evidence-boundary checker and packet-consistency checker must discover the general `docs/evals/runs/alpha-solver-local-*` namespace so this packet is scanned instead of skipped.
+
 ## Packet files
 
 - `current-local-llm-adapter-map.md`

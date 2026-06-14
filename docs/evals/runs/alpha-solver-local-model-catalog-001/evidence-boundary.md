@@ -4,6 +4,10 @@
 
 This lane may be cited only as evidence that a documentation catalog of local Ollama model family candidates was captured against the existing default-off local LLM adapter context. It is not evidence that the default urllib loopback transport or an injected fake transport was exercised.
 
+## Guardrail expectation
+
+The repository guardrail checks must include this packet path: `docs/evals/runs/alpha-solver-local-model-catalog-001/`. Passing checks are meaningful for this lane only when this packet is included in evidence-boundary and packet-consistency discovery.
+
 ## Required evidence before behavior use
 
 Before any model family can be used as behavior evidence, a future lane must capture at minimum:
