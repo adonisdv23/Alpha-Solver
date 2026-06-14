@@ -7,6 +7,9 @@ Only run on an operator machine after confirming all of the following:
 - No private repo files, secrets, customer data, or credentials are included in the prompt.
 - No hosted provider keys are present in the environment.
 - The output will be treated as smoke evidence only.
+- If local Ollama is unavailable, preserve that result as
+  `connection_failed` / `LOCAL_MULTI_MODEL_SMOKE_BLOCKED_LOCAL_OLLAMA_UNAVAILABLE`
+  and do not retry through hosted providers.
 
 Template:
 

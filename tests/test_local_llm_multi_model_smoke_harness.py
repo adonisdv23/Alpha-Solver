@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from urllib.error import URLError
+
 from alpha.local_llm.multi_model_smoke_harness import (
     run_multi_model_smoke_harness,
 )
@@ -129,3 +131,50 @@ def test_no_hosted_fallback_exists_on_connection_failure():
     assert results[0].reason == "connection_failure_non_evidence"
     assert results[0].metadata["no_hosted_fallback"] is True
     assert results[0].metadata["no_provider_keys_accepted"] is True
+
+
+def test_default_operator_path_urllib_unavailable_maps_to_connection_failed(monkeypatch):
+    observed = {"called": False}
+
+    def unavailable_default_transport(*, endpoint_url, payload, timeout_seconds):
+        observed["called"] = True
+        raise URLError("connection refused by local loopback ollama fixture")
+
+    monkeypatch.setattr(
+        "alpha.local_llm.provider_adapter.urllib_ollama_json_transport",
+        unavailable_default_transport,
+    )
+
+    results = run_multi_model_smoke_harness(
+        models="operator-local-model",
+        endpoint_url="http://127.0.0.1:11434/api/chat",
+        env={},
+    )
+
+    assert observed["called"] is True
+    assert results[0].status == "connection_failed"
+    assert results[0].reason == "connection_failure_non_evidence"
+    assert results[0].behavior_evidence is False
+    assert results[0].metadata["no_hosted_fallback"] is True
+    assert results[0].metadata["no_provider_keys_accepted"] is True
+
+
+def test_default_operator_path_keeps_generic_backend_errors_blocked(monkeypatch):
+    def malformed_default_transport(*, endpoint_url, payload, timeout_seconds):
+        raise RuntimeError("generic local backend fixture")
+
+    monkeypatch.setattr(
+        "alpha.local_llm.provider_adapter.urllib_ollama_json_transport",
+        malformed_default_transport,
+    )
+
+    results = run_multi_model_smoke_harness(
+        models="operator-local-model",
+        endpoint_url="http://127.0.0.1:11434/api/chat",
+        env={},
+    )
+
+    assert results[0].status == "blocked"
+    assert results[0].reason == "backend_error_non_evidence"
+    assert results[0].behavior_evidence is False
+    assert results[0].metadata["no_hosted_fallback"] is True

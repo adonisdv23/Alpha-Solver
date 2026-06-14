@@ -2,6 +2,10 @@
 
 This lane may be cited only as evidence that a local-only multi-model smoke harness exists and that fake-transport tests exercised its safety boundaries.
 
+`connection_failed` means the local loopback adapter path could not connect to
+local Ollama or a test fixture simulated that condition. It is not behavior
+evidence, not model quality evidence, and not a provider-readiness claim.
+
 It may not be cited as evidence of:
 
 - model quality;

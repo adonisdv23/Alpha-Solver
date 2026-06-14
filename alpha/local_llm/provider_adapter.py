@@ -16,7 +16,7 @@ from math import isfinite
 import os
 from typing import Any, Mapping, Protocol
 from urllib.parse import urlsplit
-from urllib.error import HTTPError
+from urllib.error import HTTPError, URLError
 from urllib.request import HTTPRedirectHandler, Request as URLRequest, build_opener
 
 from .portable_contract import PortableContract, PortableContractError, load_portable_contract
@@ -271,6 +271,10 @@ class OllamaLocalHTTPBackend:
         except TimeoutError as exc:
             raise LocalLLMProviderAdapterError("timeout_non_evidence", str(exc)) from exc
         except ConnectionError as exc:
+            raise LocalLLMProviderAdapterError(
+                "connection_failure_non_evidence", str(exc)
+            ) from exc
+        except URLError as exc:
             raise LocalLLMProviderAdapterError(
                 "connection_failure_non_evidence", str(exc)
             ) from exc

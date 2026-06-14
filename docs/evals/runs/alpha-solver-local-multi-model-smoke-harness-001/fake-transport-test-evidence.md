@@ -17,5 +17,9 @@ Coverage assertions:
 5. Prompt echo is detected.
 6. Per-model result records do not claim behavior evidence.
 7. No hosted fallback exists on local connection failure.
+8. Default/operator-path urllib loopback unavailability is preserved as
+   `connection_failed` without requiring real Ollama.
+9. Generic backend errors remain `blocked` so unrelated backend failures are
+   not hidden as connection failures.
 
 Verdict: `LOCAL_MULTI_MODEL_SMOKE_HARNESS_CAPTURED_FAKE_TRANSPORT_ONLY`.
