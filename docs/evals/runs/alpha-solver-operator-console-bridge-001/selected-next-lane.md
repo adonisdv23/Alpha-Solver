@@ -1,19 +1,25 @@
 # Selected Next Lane
 
-## Recommended next lane
+## Verdict
 
-Create a spec-backed, read-only local bridge spike that exposes one harmless operator status operation over loopback only.
+`OPERATOR_CONSOLE_BRIDGE_BLOCKED_SECURITY_DECISION_REQUIRED`
 
-## Entry criteria
+## Selected next lane
 
-- A spec identifies the first operation, transport, authentication mechanism, and stop conditions.
-- Tests define loopback-only behavior and fail-closed credential behavior.
-- The implementation plan avoids changing solver entrypoint semantics.
+`ALPHA-SOLVER-OPERATOR-UI-SIDECAR-API-SHAPE-SECURITY-GATE-001`
 
-## Exit criteria
+The operator console bridge must not move directly into implementation. The selected next lane is the sidecar API-shape/security gate because PR #546 establishes sidecar feasibility context and PR #549 establishes that API-shape compatibility must be gated before a console or UI bridge can safely map requests.
 
-- One read-only operation succeeds locally with valid short-lived credentials.
-- Invalid credentials fail closed.
-- Non-allowlisted operations fail closed.
-- Bind-address evidence confirms local-only exposure.
-- Logs show required redaction behavior.
+## Future implementation candidate
+
+`ALPHA-SOLVER-OPERATOR-CONSOLE-BRIDGE-LOCAL-ONLY-IMPLEMENTATION-001`
+
+This lane is only a future implementation candidate after the selected sidecar API-shape/security gate passes. It is not selected now.
+
+## Gate exit requirements before implementation selection
+
+- Decide whether the console path uses an OpenAI-compatible shim or native sidecar request mapping.
+- Define and test `/v1/solve` request mapping for Alpha Solver's required `query` field.
+- Define and test response-envelope mapping for console rendering.
+- Prove the sidecar cannot bypass Alpha Solver router, policy, SAFE-OUT, evidence, auth, tenancy, CORS/CSRF, cost, telemetry, retention, or replay boundaries.
+- Confirm direct sidecar-to-model, direct sidecar-to-provider, and direct sidecar-to-Ollama routing remain forbidden.
