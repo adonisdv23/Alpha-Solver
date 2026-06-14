@@ -34,11 +34,45 @@ def test_service_cors_explicit_allowlist_allows_external_origin(
     assert cfg.cors.external_origins == ["https://dashboard.example.com"]
 
 
+def test_service_cors_allow_credentials_reads_env_per_instance(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("SERVICE_CORS_ORIGINS", raising=False)
+    monkeypatch.setenv("SERVICE_CORS_ALLOW_CREDENTIALS", "false")
+
+    cfg = APISettings()
+
+    assert cfg.cors.allow_credentials is False
+    assert cfg.cors.origins == DEFAULT_LOCAL_CORS_ORIGINS
+
+
+def test_service_cors_allows_wildcard_when_credentials_disabled(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("SERVICE_CORS_ORIGINS", "*")
+    monkeypatch.setenv("SERVICE_CORS_ALLOW_CREDENTIALS", "false")
+
+    cfg = APISettings()
+
+    assert cfg.cors.origins == ["*"]
+    assert cfg.cors.allow_credentials is False
+
+
 def test_service_cors_rejects_wildcard_with_credentials(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("SERVICE_CORS_ORIGINS", "*")
     monkeypatch.setenv("SERVICE_CORS_ALLOW_CREDENTIALS", "true")
+
+    with pytest.raises(ValueError, match="cannot contain '\\*'"):
+        APISettings()
+
+
+def test_service_cors_rejects_wildcard_with_common_truthy_credentials_value(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("SERVICE_CORS_ORIGINS", "*")
+    monkeypatch.setenv("SERVICE_CORS_ALLOW_CREDENTIALS", "yes")
 
     with pytest.raises(ValueError, match="cannot contain '\\*'"):
         APISettings()

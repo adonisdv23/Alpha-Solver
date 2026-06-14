@@ -8,12 +8,16 @@ Implemented changes:
   allowlist for `localhost` and `127.0.0.1` development origins.
 - Added `SERVICE_CORS_ALLOW_CREDENTIALS`, defaulting to `true` to preserve
   credential semantics while making wildcard origins invalid under that mode.
+  The value is loaded through a per-instance default factory so environment
+  changes made after module import are honored when constructing `APISettings()`.
 - Added config validation that raises on `SERVICE_CORS_ORIGINS=*` with
   credentials enabled.
 - Wired `service.app` CORS middleware to `cfg.cors.allow_credentials` instead of
   hard-coding credential support.
 - Added tests for default local-only behavior, explicit external allowlists,
-  invalid wildcard-plus-credentials config, and real app CORS behavior for
+  per-instance `SERVICE_CORS_ALLOW_CREDENTIALS=false` opt-out loading,
+  wildcard origins with credentials disabled, invalid wildcard-plus-credentials
+  config, common truthy credential values, and real app CORS behavior for
   allowed/denied origins.
 - Updated `.env.example` with non-wildcard CORS guidance.
 

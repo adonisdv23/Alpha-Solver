@@ -7,9 +7,14 @@ Closure evidence:
 
 - Default `SERVICE_CORS_ORIGINS` now resolves to local-only origins.
 - Credentialed CORS remains allowed only with non-wildcard origins.
+- `SERVICE_CORS_ALLOW_CREDENTIALS` is evaluated when each `ServiceCorsConfig`
+  instance is constructed, so later operator/test opt-outs are not pinned to an
+  import-time value.
 - Explicit external origins must be supplied through `SERVICE_CORS_ORIGINS`.
-- `SERVICE_CORS_ORIGINS=*` with `SERVICE_CORS_ALLOW_CREDENTIALS=true` fails at
-  config construction.
+- `SERVICE_CORS_ORIGINS=*` with `SERVICE_CORS_ALLOW_CREDENTIALS=false` is
+  accepted only as a non-credentialed configuration.
+- `SERVICE_CORS_ORIGINS=*` with `SERVICE_CORS_ALLOW_CREDENTIALS=true` or another
+  common truthy value fails at config construction.
 - Real FastAPI app preflight tests deny an unlisted external origin and allow a
   default local origin.
 

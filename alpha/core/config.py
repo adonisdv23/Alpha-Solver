@@ -70,6 +70,11 @@ def _parse_cors_origins(raw: str | None) -> List[str]:
     return [origin.strip() for origin in raw.split(",") if origin.strip()]
 
 
+def _load_service_cors_allow_credentials() -> bool:
+    raw = os.getenv("SERVICE_CORS_ALLOW_CREDENTIALS", "true")
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
 def _is_loopback_origin(origin: str) -> bool:
     parsed = urlparse(origin)
     return (
@@ -85,9 +90,7 @@ class ServiceCorsConfig:
     origins: List[str] = field(
         default_factory=lambda: _parse_cors_origins(os.getenv("SERVICE_CORS_ORIGINS"))
     )
-    allow_credentials: bool = (
-        os.getenv("SERVICE_CORS_ALLOW_CREDENTIALS", "true").lower() == "true"
-    )
+    allow_credentials: bool = field(default_factory=_load_service_cors_allow_credentials)
 
     def __post_init__(self) -> None:
         self.origins = [origin.strip() for origin in self.origins if origin.strip()]
