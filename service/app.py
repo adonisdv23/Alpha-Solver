@@ -161,7 +161,7 @@ tracer = init_tracer(app)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cfg.cors.origins,
-    allow_credentials=True,
+    allow_credentials=cfg.cors.allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )

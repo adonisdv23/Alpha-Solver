@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, List
+from urllib.parse import urlparse
 import os
 
 try:  # pragma: no cover - exercised in tests
@@ -53,26 +54,52 @@ class ServiceRateLimitConfig:
     )
 
 
-def _load_service_cors_origins() -> List[str]:
-    """Load explicit CORS origins with localhost-only safe defaults.
+DEFAULT_LOCAL_CORS_ORIGINS = [
+    "http://localhost",
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8000",
+]
 
-    The API allows credentials, so the default must not be a wildcard origin.
-    Operators can still opt in to a broader list through SERVICE_CORS_ORIGINS,
-    but the bundled service defaults to local browser clients only.
-    """
 
-    raw = os.getenv(
-        "SERVICE_CORS_ORIGINS",
-        "http://localhost,http://localhost:3000,http://localhost:8000,http://127.0.0.1,http://127.0.0.1:3000,http://127.0.0.1:8000",
-    )
+def _parse_cors_origins(raw: str | None) -> List[str]:
+    if raw is None:
+        return list(DEFAULT_LOCAL_CORS_ORIGINS)
     return [origin.strip() for origin in raw.split(",") if origin.strip()]
+
+
+def _is_loopback_origin(origin: str) -> bool:
+    parsed = urlparse(origin)
+    return (
+        parsed.scheme in {"http", "https"}
+        and parsed.hostname in {"localhost", "127.0.0.1", "::1"}
+    )
 
 
 @dataclass
 class ServiceCorsConfig:
-    """CORS configuration for credentialed browser requests."""
+    """CORS configuration with local-only defaults and credential safety."""
 
-    origins: List[str] = field(default_factory=_load_service_cors_origins)
+    origins: List[str] = field(
+        default_factory=lambda: _parse_cors_origins(os.getenv("SERVICE_CORS_ORIGINS"))
+    )
+    allow_credentials: bool = (
+        os.getenv("SERVICE_CORS_ALLOW_CREDENTIALS", "true").lower() == "true"
+    )
+
+    def __post_init__(self) -> None:
+        self.origins = [origin.strip() for origin in self.origins if origin.strip()]
+        if self.allow_credentials and "*" in self.origins:
+            raise ValueError(
+                "SERVICE_CORS_ORIGINS cannot contain '*' when "
+                "SERVICE_CORS_ALLOW_CREDENTIALS=true"
+            )
+
+    @property
+    def external_origins(self) -> List[str]:
+        return [origin for origin in self.origins if not _is_loopback_origin(origin)]
 
 
 @dataclass
@@ -230,6 +257,7 @@ __all__ = [
     "APISettings",
     "ServiceAuthConfig",
     "ServiceRateLimitConfig",
+    "DEFAULT_LOCAL_CORS_ORIGINS",
     "ServiceCorsConfig",
     "QualityGateConfig",
     "ValidationConfig",

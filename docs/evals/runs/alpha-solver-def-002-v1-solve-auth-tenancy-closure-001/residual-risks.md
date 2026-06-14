@@ -5,4 +5,4 @@
 - Tenant middleware is implemented as reusable middleware but is not mounted on the bundled `/v1/solve` path.
 - API-key authentication has no tenant identity binding in `service/app.py`; tenant values can be supplied as request metadata.
 - Rate limiting on `/v1/solve` is API-key scoped, not tenant-policy scoped.
-- Public allowed origins remain an operator deployment decision through `SERVICE_CORS_ORIGINS`.
+- Public allowed origins remain an operator deployment decision through `SERVICE_CORS_ORIGINS`; this packet does not claim full CORS closure.
