@@ -2,6 +2,7 @@
 
 ## Main risks
 
+- **API-shape mismatch:** Open WebUI, LibreChat, or a custom endpoint shell may send an OpenAI-compatible request shape to `/v1/solve`, which currently requires Alpha Solver's `query` request shape, and fail before router, policy, SAFE-OUT, evidence, auth, tenancy, CORS, cost, and observability boundaries are reached.
 - **Routing bypass:** UI connects directly to local or hosted models.
 - **Evidence confusion:** UI RAG, memory, or notes become untracked evidence sources.
 - **Credential exposure:** UI stores provider keys or permits users to add providers.
@@ -18,5 +19,5 @@
 - No credentials or provider keys.
 - No production mounting of an external UI.
 - No RAG ingestion of private repo data.
-- No product-readiness or public-readiness claim.
+- No endpoint, UI, runtime, provider, production, or public readiness claim.
 - No replacement of Alpha Solver routing, policy, evidence, SAFE-OUT, determinism, replay, observability, or SolverEnvelope semantics.
