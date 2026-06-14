@@ -19,7 +19,10 @@ Coverage assertions:
 7. No hosted fallback exists on local connection failure.
 8. Default/operator-path urllib loopback unavailability is preserved as
    `connection_failed` without requiring real Ollama.
-9. Generic backend errors remain `blocked` so unrelated backend failures are
+9. Adapter-normalized `backend_error_non_evidence` with default loopback
+   Ollama context and a preserved urllib `URLError` cause maps to
+   `connection_failed`.
+10. Generic backend errors remain `blocked` so unrelated backend failures are
    not hidden as connection failures.
 
 Verdict: `LOCAL_MULTI_MODEL_SMOKE_HARNESS_CAPTURED_FAKE_TRANSPORT_ONLY`.

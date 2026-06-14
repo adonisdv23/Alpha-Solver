@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from types import SimpleNamespace
 from urllib.error import URLError
 
 from alpha.local_llm.multi_model_smoke_harness import (
@@ -157,6 +158,41 @@ def test_default_operator_path_urllib_unavailable_maps_to_connection_failed(monk
     assert results[0].behavior_evidence is False
     assert results[0].metadata["no_hosted_fallback"] is True
     assert results[0].metadata["no_provider_keys_accepted"] is True
+
+
+def test_adapter_normalized_urllib_backend_error_with_local_context_maps_to_connection_failed(
+    monkeypatch,
+):
+    def adapter_normalized_backend_error(prompt, *, config, transport, env):
+        assert transport is None
+        return SimpleNamespace(
+            status="failed_closed",
+            reason="backend_error_non_evidence",
+            output_text="",
+            metadata={
+                "endpoint_is_loopback": True,
+                "local_backend": "ollama_chat",
+                "adapter_exception_cause_class": "URLError",
+                "behavior_evidence": False,
+            },
+        )
+
+    monkeypatch.setattr(
+        "alpha.local_llm.multi_model_smoke_harness.run_configured_local_llm_runtime",
+        adapter_normalized_backend_error,
+    )
+
+    results = run_multi_model_smoke_harness(
+        models="operator-local-model",
+        endpoint_url="http://127.0.0.1:11434/api/chat",
+        env={},
+    )
+
+    assert results[0].status == "connection_failed"
+    assert results[0].reason == "backend_error_non_evidence"
+    assert results[0].behavior_evidence is False
+    assert results[0].metadata["default_transport_used"] is True
+    assert results[0].metadata["no_hosted_fallback"] is True
 
 
 def test_default_operator_path_keeps_generic_backend_errors_blocked(monkeypatch):

@@ -460,12 +460,28 @@ def run_local_llm_provider_adapter(
         output_text = backend.generate(request)
     except Exception as exc:  # injected-backend-only failure normalization
         reason = getattr(exc, "reason_code", f"adapter_error:{exc.__class__.__name__}")
+        cause = exc.__cause__
+        failure_metadata = {
+            "adapter_exception_class": exc.__class__.__name__,
+            "adapter_exception_module": exc.__class__.__module__,
+        }
+        if cause is not None:
+            failure_metadata.update(
+                {
+                    "adapter_exception_cause_class": cause.__class__.__name__,
+                    "adapter_exception_cause_module": cause.__class__.__module__,
+                }
+            )
         return LocalLLMAdapterResult(
             request=request,
             output_text="",
             status="failed_closed",
             reason=reason,
-            metadata={**result_metadata, "failure_label": "failed_closed_result"},
+            metadata={
+                **result_metadata,
+                **failure_metadata,
+                "failure_label": "failed_closed_result",
+            },
         )
 
     if not output_text.strip():

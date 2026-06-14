@@ -10,6 +10,9 @@ Implemented `alpha.local_llm.multi_model_smoke_harness` as a narrow, local-only 
 - preserves local loopback connection failures, including default urllib
   operator-path failures when Ollama is unavailable, as `connection_failed`
   rather than collapsing them into generic `blocked`;
+- narrowly maps adapter-normalized `backend_error_non_evidence` to
+  `connection_failed` only when the default loopback Ollama transport context
+  preserves a urllib `URLError` exception/cause class;
 - records per-model statuses only: `not_installed`, `connection_failed`, `timeout`, `empty_output`, `prompt_echo`, `substantive_looking_output`, or `blocked`;
 - labels every result with `local_multi_model_smoke_only_no_behavior_evidence` and `behavior_evidence: false`;
 - contains no hosted-provider fallback path.

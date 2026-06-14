@@ -47,6 +47,7 @@ _REASON_STATUS_MAP = {
     "system_echo_non_evidence": "prompt_echo",
     "model_not_installed_non_evidence": "not_installed",
 }
+_URLLIB_CONNECTION_EXCEPTION_CLASSES = frozenset({"URLError"})
 
 SMOKE_EVIDENCE_LABEL = "local_multi_model_smoke_only_no_behavior_evidence"
 DEFAULT_SMOKE_PROMPT = (
@@ -99,7 +100,47 @@ def _safe_preview(text: str, limit: int = 160) -> str:
     return text[:limit]
 
 
-def _status_from_reason(reason: str) -> str:
+def _is_default_loopback_urllib_connection_failure(
+    *,
+    reason: str,
+    metadata: Mapping[str, Any],
+    default_transport_used: bool,
+) -> bool:
+    """Detect only default local urllib connection failures.
+
+    This intentionally does not map every ``backend_error_non_evidence`` to
+    ``connection_failed``. The mapping applies only when the operator/default
+    transport path was used, the adapter metadata still identifies a loopback
+    Ollama backend, and the preserved exception/cause class is urllib's
+    connection-oriented ``URLError``.
+    """
+
+    if reason != "backend_error_non_evidence" or not default_transport_used:
+        return False
+    if metadata.get("endpoint_is_loopback") is not True:
+        return False
+    if metadata.get("local_backend") != "ollama_chat":
+        return False
+    exception_class = str(metadata.get("adapter_exception_class", ""))
+    cause_class = str(metadata.get("adapter_exception_cause_class", ""))
+    return (
+        exception_class in _URLLIB_CONNECTION_EXCEPTION_CLASSES
+        or cause_class in _URLLIB_CONNECTION_EXCEPTION_CLASSES
+    )
+
+
+def _status_from_adapter_result(
+    *,
+    reason: str,
+    metadata: Mapping[str, Any],
+    default_transport_used: bool,
+) -> str:
+    if _is_default_loopback_urllib_connection_failure(
+        reason=reason,
+        metadata=metadata,
+        default_transport_used=default_transport_used,
+    ):
+        return "connection_failed"
     return _REASON_STATUS_MAP.get(reason, "blocked")
 
 
@@ -158,10 +199,16 @@ def run_multi_model_smoke_harness(
         result = run_configured_local_llm_runtime(
             prompt, config=config, transport=transport, env={}
         )
+        result_metadata = dict(result.metadata)
+        default_transport_used = transport is None
         if result.status == "non_evidence":
             status = "substantive_looking_output"
         else:
-            status = _status_from_reason(result.reason)
+            status = _status_from_adapter_result(
+                reason=result.reason,
+                metadata=result_metadata,
+                default_transport_used=default_transport_used,
+            )
         records.append(
             ModelSmokeResult(
                 model=model,
@@ -169,7 +216,9 @@ def run_multi_model_smoke_harness(
                 reason=result.reason,
                 output_preview=_safe_preview(result.output_text),
                 metadata={
+                    **result_metadata,
                     "adapter_status": result.status,
+                    "default_transport_used": default_transport_used,
                     "no_hosted_fallback": True,
                     "no_provider_keys_accepted": True,
                     "strict_no_behavior_evidence_labeling": True,
