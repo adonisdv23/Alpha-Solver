@@ -8,7 +8,7 @@ Before any public, production, provider, benchmark, value, dashboard, `/v1/solve
 2. Establish a local-first generation path suitable for a value read, after the no-echo / substantive-generation gate is satisfied.
 3. Run a gated head-to-head with preserved artifacts, blind scoring, clear fixtures, and predeclared interpretation rules.
 4. Preserve strict separation between docs-only artifacts, design-only artifacts, simulation evidence, local runtime evidence, provider evidence, and public-surface evidence.
-5. Obtain explicit operator authorization before any provider lane work, including provider, model, project/billing boundary, cost cap, token cap, max request count, exact synthetic fixture, redaction/data-sharing boundary, and stop conditions.
+5. Only after the no-echo / substantive-generation gate or equivalent derivation check has passed, obtain explicit operator authorization before any provider lane work, including provider, model, project/billing boundary, cost cap, token cap, max request count, exact synthetic fixture, redaction/data-sharing boundary, and stop conditions.
 
 ## Evidence that is still missing
 

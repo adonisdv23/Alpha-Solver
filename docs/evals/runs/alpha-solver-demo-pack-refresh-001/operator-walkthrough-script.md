@@ -14,7 +14,7 @@ This script is for a claim-safe human walkthrough. It is not a record of an exec
 
 1. Start with Scenario 1 and show the false-premise pattern: the demo sells the ability to say no to unsupported marketing claims.
 2. Move to Scenario 2 and show how hidden constraints become the product: launch-readiness language requires missing evidence, so the safe output is a gap memo or clarification request.
-3. Use Scenario 3 to show fail-closed provider boundaries: no provider call happens without explicit authorization and stop conditions.
+3. Use Scenario 3 to show fail-closed provider boundaries: no provider/value work proceeds without the post-#552 successor no-echo / substantive-generation gate or equivalent derivation check, and no provider call happens without explicit authorization and stop conditions.
 4. Use Scenario 4 to separate design/demo artifacts from validation evidence: a demo label must say "illustrative" unless execution evidence exists.
 5. End with Scenario 5 to show calibrated non-refusal: Alpha should still answer straightforward, low-risk questions when it can do so within evidence boundaries.
 

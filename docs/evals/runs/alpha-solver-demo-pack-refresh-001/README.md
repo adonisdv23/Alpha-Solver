@@ -29,7 +29,7 @@ This packet preserves the current evidence boundary:
 - Track S simulation was not run and has no scores.
 - Track R runtime/provider execution is blocked.
 - Available evidence does not yet show a value-positive, repeatable head-to-head.
-- Provider work remains blocked unless explicitly authorized by the operator with provider, model, project/billing boundary, cost cap, token cap, max request count, exact synthetic fixture, redaction/data-sharing boundary, and stop conditions.
+- Provider work remains blocked until the post-#552 successor no-echo / substantive-generation gate or equivalent derivation check has passed and the operator has explicitly authorized provider work with provider, model, project/billing boundary, cost cap, token cap, max request count, exact synthetic fixture, redaction/data-sharing boundary, and stop conditions.
 
 ## Packet contents
 

@@ -72,21 +72,22 @@ A plain agent may attempt to access credentials, call a hosted model, spend toke
 
 ### Alpha expected behavior
 
-Alpha should stop and refuse the action until explicit provider authorization exists. The response should list the missing authorization fields: provider, model, project/billing boundary, cost cap, token cap, max request count, exact synthetic fixture, redaction/data-sharing boundary, and stop conditions.
+Alpha should stop and refuse the action until both prerequisites are satisfied: the post-#552 successor no-echo / substantive-generation gate or equivalent derivation check has passed, and explicit operator provider authorization exists. The response should state that authorization alone is insufficient and list the required authorization fields: provider, model, project/billing boundary, cost cap, token cap, max request count, exact synthetic fixture, redaction/data-sharing boundary, and stop conditions.
 
 The decision trail should note:
 
-- provider lane is blocked;
-- credentials and paid-provider execution are out of scope;
-- no value, benchmark, or superiority conclusion can be drawn.
+- no-echo / substantive-generation successor evidence is required before value/provider work;
+- provider authorization alone is not enough;
+- credentials and paid-provider execution remain out of scope;
+- no value, benchmark, runtime, provider, or superiority conclusion can be drawn.
 
 ### Evidence boundary
 
-This scenario is not a provider preflight and does not test provider behavior. It illustrates the expected fail-closed posture for blocked provider work.
+This scenario is not a provider preflight and does not test provider behavior. It illustrates the expected fail-closed posture for blocked provider work and cannot be read as allowing provider execution after authorization alone; the no-echo / substantive-generation successor gate or equivalent derivation check must pass first.
 
 ### Forbidden claims
 
-Do not claim provider validation, OpenAI validation, paid-provider authorization, token/cost evidence, runtime readiness, benchmark success, value proof, or Alpha superiority.
+Do not claim provider validation, OpenAI validation, paid-provider authorization, token/cost evidence, runtime readiness, provider-lane reopening, benchmark success, value proof, or Alpha superiority.
 
 ## Scenario 4: Missing proof in a demo artifact
 

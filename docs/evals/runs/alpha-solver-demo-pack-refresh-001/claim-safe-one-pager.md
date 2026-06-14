@@ -30,4 +30,4 @@ Existing evidence is offline, docs, or fixture evidence. Track S simulation was 
 2. Only after that, consider a local-first generation path to support a value read.
 3. Only after that, run a gated head-to-head with preserved artifacts and blind scoring.
 4. Keep simulation, runtime, provider, design-only, and docs-only evidence separate.
-5. Keep provider work blocked unless the operator explicitly authorizes provider, model, project/billing boundary, cost cap, token cap, max request count, exact synthetic fixture, redaction/data-sharing boundary, and stop conditions.
+5. Keep provider work blocked until the post-#552 successor no-echo / substantive-generation gate or equivalent derivation check has passed and the operator explicitly authorizes provider, model, project/billing boundary, cost cap, token cap, max request count, exact synthetic fixture, redaction/data-sharing boundary, and stop conditions.
