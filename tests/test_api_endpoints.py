@@ -41,6 +41,11 @@ def _clear_provider_accounting_sink():
 @pytest.fixture(autouse=True)
 def _default_local_provider(monkeypatch):
     monkeypatch.setenv("MODEL_PROVIDER", "local")
+    monkeypatch.setenv("ALPHA_PROVIDER_MAX_COST_USD", "1")
+    monkeypatch.setenv("ALPHA_PROVIDER_MAX_INPUT_TOKENS", "100000")
+    monkeypatch.setenv("ALPHA_PROVIDER_MAX_OUTPUT_TOKENS", "100000")
+    monkeypatch.setenv("ALPHA_PROVIDER_MAX_REQUESTS", "10")
+    monkeypatch.delenv("ALPHA_PROVIDER_EMERGENCY_STOP", raising=False)
     _clear_provider_factory()
     _clear_provider_telemetry_sink()
     _clear_provider_accounting_sink()
@@ -455,8 +460,8 @@ def test_solve_openai_provider_errors_return_safe_responses(monkeypatch, categor
     assert provider_accounting_records == []
     failure_event = provider_events[1]
     assert failure_event["provider"] == "openai"
-    assert failure_event["model"] == "gpt-5"
-    assert failure_event["model_set"] == "default"
+    assert failure_event["model"] == fake.requests[0].model
+    assert failure_event["model_set"] == fake.requests[0].metadata["model_set"]
     assert failure_event["route"] == "tot"
     assert failure_event["request_id"] == "req-error"
     assert failure_event["status"] == ("timeout" if category == "timeout" else "failed")
@@ -471,6 +476,54 @@ def test_solve_openai_provider_errors_return_safe_responses(monkeypatch, categor
     _clear_provider_factory()
     _clear_provider_telemetry_sink()
     _clear_provider_accounting_sink()
+
+
+def test_solve_openai_mode_requires_explicit_provider_caps(monkeypatch):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    monkeypatch.delenv("ALPHA_PROVIDER_MAX_COST_USD", raising=False)
+    fake = FakeProviderClient([])
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={"query": "hello provider", "context": {"model_set": "cost_saver"}},
+        headers={"X-API-Key": key, "X-Request-ID": "req-cost-caps"},
+    )
+
+    assert resp.status_code == 400
+    body = resp.json()
+    _assert_provider_safe_out_schema(
+        body,
+        category="invalid_request",
+        retryable=False,
+        request_id=None,
+    )
+    assert fake.requests == []
+
+
+def test_solve_openai_mode_emergency_stop_blocks_before_provider_call(monkeypatch):
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    monkeypatch.setenv("ALPHA_PROVIDER_EMERGENCY_STOP", "1")
+    fake = FakeProviderClient([])
+    app.state.provider_client_factory = lambda _model_set: fake
+    client, key = _client()
+
+    resp = client.post(
+        "/v1/solve",
+        json={"query": "hello provider", "context": {"model_set": "cost_saver"}},
+        headers={"X-API-Key": key, "X-Request-ID": "req-stop"},
+    )
+
+    assert resp.status_code == 400
+    body = resp.json()
+    _assert_provider_safe_out_schema(
+        body,
+        category="invalid_request",
+        retryable=False,
+        request_id="req-stop",
+    )
+    assert fake.requests == []
 
 
 def test_solve_openai_unknown_provider_exception_emits_no_accounting(monkeypatch):

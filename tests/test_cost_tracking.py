@@ -17,6 +17,7 @@ def _client():
 
 
 def test_cost_tracking(monkeypatch, caplog):
+    monkeypatch.setenv("MODEL_PROVIDER", "local")
     client, key = _client()
     monkeypatch.setattr("service.app._tree_of_thought", lambda *a, **k: {})
     path = Path("artifacts/costs.csv")
