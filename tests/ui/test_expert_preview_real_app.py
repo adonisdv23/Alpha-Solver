@@ -53,6 +53,11 @@ def client(monkeypatch: pytest.MonkeyPatch) -> TestClient:
     monkeypatch.setenv("MODEL_PROVIDER", "openai")
     monkeypatch.setenv("ALPHA_LIVE_PREVIEW_ENABLED", "true")
     monkeypatch.setenv("ALPHA_LIVE_PREVIEW_MAX_REQUESTS", "20")
+    monkeypatch.setenv("ALPHA_PROVIDER_MAX_COST_USD", "1")
+    monkeypatch.setenv("ALPHA_PROVIDER_MAX_INPUT_TOKENS", "100000")
+    monkeypatch.setenv("ALPHA_PROVIDER_MAX_OUTPUT_TOKENS", "100000")
+    monkeypatch.setenv("ALPHA_PROVIDER_MAX_REQUESTS", "20")
+    monkeypatch.delenv("ALPHA_PROVIDER_EMERGENCY_STOP", raising=False)
     app.state.live_preview_request_count = 0
     auth.reset_state()
 
