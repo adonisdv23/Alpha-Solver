@@ -29,6 +29,7 @@ def test_build_provider_event_allowlists_safe_fields_and_drops_unknowns():
     )
     event["raw_metadata"] = {"raw": "RAW-MUST-NOT-LEAK"}
     event["prompt"] = "PROMPT-MUST-NOT-LEAK"
+    event["query"] = "QUERY-MUST-NOT-LEAK"
 
     captured = []
     emit_provider_event(event, sink=captured.append)
@@ -56,6 +57,7 @@ def test_build_provider_event_allowlists_safe_fields_and_drops_unknowns():
     ]
     serialized = json.dumps(captured)
     assert "PROMPT-MUST-NOT-LEAK" not in serialized
+    assert "QUERY-MUST-NOT-LEAK" not in serialized
     assert "RAW-MUST-NOT-LEAK" not in serialized
     assert "raw_metadata" not in serialized
 

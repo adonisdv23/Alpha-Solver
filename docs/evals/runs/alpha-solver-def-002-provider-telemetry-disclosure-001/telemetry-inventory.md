@@ -15,11 +15,11 @@ The following field families can contain user or provider-sensitive data and mus
 
 ## Allowlisted provider telemetry fields
 
-`alpha/providers/telemetry.py` emits only explicit provider lifecycle metadata: event name, provider/model identifiers, model set, route, request id, status, tenant, retry count, latency, token counts, estimated cost, cost source, finish reason, coarse error category, retryability, HTTP status code, safe message, and provider request id. Prompt, response, headers, raw metadata, request bodies, and exception dumps are not allowlisted.
+`alpha/providers/telemetry.py` emits only explicit provider lifecycle metadata: event name, provider/model identifiers, model set, route, request id, status, tenant, retry count, latency, token counts (`input_tokens`, `output_tokens`, `total_tokens`, and count-only prompt/completion token fields where used), estimated cost, cost source, finish reason, coarse error category, retryability, HTTP status code, safe message, and provider request id. Prompt-bearing fields, including the canonical `/v1/solve` `query` field, response text, headers, raw metadata, request bodies, and exception dumps are not allowlisted.
 
 ## Default logging boundary
 
-`service/logging/redactor.py` now redacts sensitive field names for prompt-like content, raw payloads, provider secrets, billing-like data, and user-provided sensitive inputs. `service/observability/logger.py` applies that redactor to default JSONL payload and metadata fields, while keeping route explanation allowlisting intact.
+`service/logging/redactor.py` now redacts sensitive field names for prompt-like content, including canonical `query`, raw payloads, provider secrets, billing-like data, and user-provided sensitive inputs. Safe numeric token-count metrics are preserved so replay, filtering, budget telemetry, and cost-boundary evidence are not corrupted. `service/observability/logger.py` applies that redactor to default JSONL payload and metadata fields, while keeping route explanation allowlisting intact.
 
 ## Opt-in verbose/debug boundary
 

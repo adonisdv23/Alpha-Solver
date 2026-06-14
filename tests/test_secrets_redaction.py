@@ -59,13 +59,21 @@ def test_allowlist():
 
 def test_prompt_provider_billing_and_user_sensitive_keys_are_redacted():
     raw = {
+        "query": "canonical query prompt marker must not leak",
         "prompt": "user prompt marker must not leak",
         "messages": [{"role": "user", "content": "nested prompt marker must not leak"}],
         "provider_response": "provider answer marker must not leak",
         "headers": {"Authorization": "Bearer abcdef1234567890"},
         "OPENAI_API_KEY": "sk-ABCDEF1234567890",
+        "access_token": "provider-access-token-marker",
+        "provider_token": "provider-token-marker",
         "billing_account": "card 4242 4242 4242 4242 invoice inv-123",
         "user_input": "alice@example.com +1-415-555-2671 private question",
+        "input_tokens": 11,
+        "output_tokens": 13,
+        "total_tokens": 24,
+        "prompt_tokens": 11,
+        "completion_tokens": 13,
         "safe_metric": 7,
     }
 
@@ -73,20 +81,31 @@ def test_prompt_provider_billing_and_user_sensitive_keys_are_redacted():
     text = str(out)
 
     assert out["safe_metric"] == 7
+    assert out["input_tokens"] == 11
+    assert out["output_tokens"] == 13
+    assert out["total_tokens"] == 24
+    assert out["prompt_tokens"] == 11
+    assert out["completion_tokens"] == 13
     for key in (
+        "query",
         "prompt",
         "messages",
         "provider_response",
         "headers",
         "OPENAI_API_KEY",
+        "access_token",
+        "provider_token",
         "billing_account",
         "user_input",
     ):
         assert out[key] == "***REDACTED***"
+    assert "canonical query prompt marker" not in text
     assert "user prompt marker" not in text
     assert "nested prompt marker" not in text
     assert "provider answer marker" not in text
     assert "sk-ABCDEF1234567890" not in text
+    assert "provider-access-token-marker" not in text
+    assert "provider-token-marker" not in text
     assert "4242 4242 4242 4242" not in text
     assert "alice@example.com" not in text
 

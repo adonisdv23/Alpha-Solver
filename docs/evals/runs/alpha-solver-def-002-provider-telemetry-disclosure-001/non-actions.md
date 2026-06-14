@@ -1,8 +1,8 @@
 # Non-Actions
 
-- The targeted lane implementation and evidence commands did not call OpenAI or any other hosted provider.
-- The targeted lane implementation and evidence commands did not use provider tokens or require network access.
-- The targeted lane implementation and evidence commands did not send prompts externally.
+- Did not call OpenAI or any other hosted provider.
+- Did not use provider tokens, access credentials, or require network access.
+- Did not send prompts externally.
 - Did not expose a dashboard or API.
 - Did not enable verbose prompt logging.
 - Did not broaden provider routing or fallback behavior.
