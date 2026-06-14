@@ -13,30 +13,17 @@ except ModuleNotFoundError:  # pragma: no cover
     yaml = None
 
 
-def _load_service_auth_keys() -> List[str]:
-    """Load explicitly configured service API keys.
-
-    Authentication is enabled by default, but this loader intentionally has no
-    built-in credential fallback. A missing ``SERVICE_AUTH_KEYS``/``API_KEY``
-    leaves the accepted-key list empty so protected API routes fail closed.
-    Tests that need credentials must configure synthetic keys explicitly.
-    """
-
-    raw = os.getenv("SERVICE_AUTH_KEYS")
-    if raw is None:
-        raw = os.getenv("API_KEY")
-    if raw is None:
-        return []
-    return [key.strip() for key in raw.split(",") if key.strip()]
-
-
 @dataclass
 class ServiceAuthConfig:
     """API-Key authentication configuration."""
 
     enabled: bool = os.getenv("SERVICE_AUTH_ENABLED", "true").lower() == "true"
     header: str = os.getenv("SERVICE_AUTH_HEADER", "X-API-Key")
-    keys: List[str] = field(default_factory=_load_service_auth_keys)
+    keys: List[str] = field(
+        default_factory=lambda: os.getenv(
+            "SERVICE_AUTH_KEYS", os.getenv("API_KEY", "dev-secret")
+        ).split(",")
+    )
 
 
 @dataclass

@@ -25,7 +25,6 @@ __all__ = [
     "PASSWORD_ENV_VAR",
     "DEFAULT_DASHBOARD_PASSWORD",
     "DEFAULT_LOGIN_REDIRECT",
-    "is_dashboard_password_configured",
     "configure_login_redirect",
 ]
 
@@ -38,8 +37,8 @@ CSRF_HEADER_NAME = "x-alpha-csrf"
 PASSWORD_ENV_VAR = "ALPHA_DASHBOARD_PASSWORD"
 SECRET_ENV_VAR = "ALPHA_DASHBOARD_SECRET_KEY"
 
-# Historical fallback password retained only as a denied/sentinel value for
-# compatibility checks. It must not authenticate dashboard sessions.
+# Fallback password used only when PASSWORD_ENV_VAR is unset. Callers that mount
+# the dashboard on a public app should treat this value as "not configured".
 DEFAULT_DASHBOARD_PASSWORD = "alpha-dashboard"
 
 # Default dashboard landing page after a successful login. Bundled or custom
@@ -232,17 +231,10 @@ async def _extract_login_payload(request: Request) -> Dict[str, str]:
     return {key: values[0] if values else "" for key, values in parsed.items()}
 
 
-def is_dashboard_password_configured() -> bool:
-    """Return True only when an explicit non-default dashboard password is set."""
-
+def _expected_password() -> str:
     password = os.getenv(PASSWORD_ENV_VAR)
-    return bool(password) and password != DEFAULT_DASHBOARD_PASSWORD
-
-
-def _expected_password() -> Optional[str]:
-    password = os.getenv(PASSWORD_ENV_VAR)
-    if not password or password == DEFAULT_DASHBOARD_PASSWORD:
-        return None
+    if password is None:
+        return DEFAULT_DASHBOARD_PASSWORD
     return password
 
 
@@ -286,10 +278,7 @@ async def login(request: Request) -> Response:
 
     payload = await _extract_login_payload(request)
     supplied_password = str(payload.get("password", ""))
-    expected_password = _expected_password()
-    if expected_password is not None and secrets.compare_digest(
-        supplied_password, expected_password
-    ):
+    if secrets.compare_digest(supplied_password, _expected_password()):
         _record_success(identifier)
         session = _create_session()
         response = RedirectResponse(

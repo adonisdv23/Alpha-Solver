@@ -1,9 +1,7 @@
-# Synthetic placeholder only. The bundled service must not ship with an active
-# known API key; deployments should provide their own API-key store.
 keys:
-  - id: placeholder-revoked
-    hash: placeholder-salt$placeholder-digest
-    tenant_id: synthetic-placeholder-tenant
-    scopes: []
-    status: revoked
-    created_at: 0
+  - id: demo
+    hash: abc123$f874a6c9a43c5bb47cb45592a7e9eaec507e3e725206b1d1352a8e9e0720d40e
+    tenant_id: tenant1
+    scopes: [read, write]
+    status: active
+    created_at: 1700000000

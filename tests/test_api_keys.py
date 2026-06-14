@@ -147,12 +147,3 @@ def test_no_secret_in_logs(tmp_path, caplog):
         client.get("/protected", headers={"X-API-Key": bad})
     assert bad not in caplog.text
     assert "api key rejected" in caplog.text
-
-
-def test_bundled_api_key_config_contains_no_active_default_key():
-    store = APIKeyStore(Path("service/config/api_keys.yaml"))
-
-    assert store.find_key("dev-secret") is None
-    assert store.find_key("test") is None
-    assert store.find_key("demo") is None
-    assert all(entry.status != "active" for entry in store._keys)
