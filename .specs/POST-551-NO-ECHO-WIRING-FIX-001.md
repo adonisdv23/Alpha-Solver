@@ -8,7 +8,8 @@ Prevent the local modular/reference Alpha entrypoint from returning the exact us
 
 - Applies only to the local `alpha_solver_entry._tree_of_thought` path through `alpha.solver.observability.AlphaSolver.solve`.
 - Adds a narrow no-provider post-SAFE-OUT guard that detects exact normalized prompt echo.
-- Replaces exact prompt echo with a bounded deterministic local derived answer for controlled no-echo fixtures.
+- Replaces supported exact prompt echoes with bounded deterministic local derived answers.
+- Replaces unsupported exact prompt echoes with a SAFE-OUT-style unsupported-local clarification that does not pretend to answer the request.
 - Preserves existing SAFE-OUT routing, provider-disabled behavior, `/v1/solve` exposure boundaries, hosted-provider boundaries, and local LLM orchestration boundaries.
 
 ## Non-goals
@@ -20,7 +21,8 @@ Prevent the local modular/reference Alpha entrypoint from returning the exact us
 
 ## Acceptance
 
-- Synthetic no-provider fixtures distinguish exact prompt echo from derived output.
+- Synthetic no-provider fixtures distinguish exact prompt echo from derived output for supported fixtures.
+- Unsupported exact prompt echoes do not receive generic canned answers.
 - `solution` and `final_answer` are non-empty, matching derived answer aliases.
 - Diagnostics retain the raw echoed ToT answer and mark `echo_detected`.
 - Existing focused ToT behavior tests remain compatible.

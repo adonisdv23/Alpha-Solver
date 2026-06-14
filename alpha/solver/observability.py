@@ -26,17 +26,15 @@ def _is_prompt_echo(answer: object, query: str) -> bool:
     return _normalize_for_echo_detection(answer) == _normalize_for_echo_detection(query)
 
 
-def _derived_local_answer(query: str) -> str:
-    """Return a bounded deterministic local answer when ToT selects the prompt.
+def _derive_supported_local_answer(query: str) -> str | None:
+    """Return a bounded deterministic answer for supported echo fixtures only.
 
-    This helper is intentionally narrow: it consumes common controlled fixture
-    shapes without provider calls and otherwise returns a transparent local
-    planning answer. It does not add claims, citations, hidden reasoning, or
-    hosted fallback.
+    Unsupported prompts intentionally return ``None`` so exact prompt echo is
+    handled by a clarification/SAFE-OUT-style response instead of a generic
+    canned answer that could pretend to satisfy the request.
     """
 
-    stripped = query.strip()
-    lowered = stripped.lower()
+    lowered = query.strip().lower()
 
     if "photosynthesis" in lowered:
         return (
@@ -68,9 +66,14 @@ def _derived_local_answer(query: str) -> str:
             "them as facts. Treat the premise as unverified and provide a source or excerpt before asking for a summary."
         )
 
+    return None
+
+
+def _unsupported_echo_safeout() -> str:
     return (
-        "Local deterministic answer: break the request into the requested deliverable, state assumptions explicitly, "
-        "and avoid treating missing or unverified facts as established."
+        "SAFE-OUT: The deterministic local path detected an exact prompt echo "
+        "and could not derive a substantive answer without more supported context. "
+        "Please provide a supported fixture shape or additional context for local-only handling."
     )
 
 
@@ -80,15 +83,22 @@ def _replace_echo_answer(
     if not _is_prompt_echo(envelope.get("final_answer"), query):
         return
 
-    derived = _derived_local_answer(query)
+    derived = _derive_supported_local_answer(query)
+    if derived is None:
+        derived = _unsupported_echo_safeout()
+        reason = "prompt_echo_replaced_with_unsupported_local_safeout"
+        note = "prompt echo replaced by unsupported-local SAFE-OUT clarification"
+        evidence_label = "prompt_echo_replaced_unsupported_local_safeout_no_provider"
+    else:
+        reason = "prompt_echo_replaced_with_local_derived_answer"
+        note = "prompt echo replaced by deterministic local answer"
+        evidence_label = "prompt_echo_replaced_local_no_provider"
+
     envelope["final_answer"] = derived
     envelope["solution"] = derived
-    envelope["reason"] = "prompt_echo_replaced_with_local_derived_answer"
-    envelope["notes"] = (
-        f"{envelope.get('notes', '')} | "
-        "prompt echo replaced by deterministic local answer"
-    )
-    envelope.setdefault("evidence", []).append("prompt_echo_replaced_local_no_provider")
+    envelope["reason"] = reason
+    envelope["notes"] = f"{envelope.get('notes', '')} | {note}"
+    envelope.setdefault("evidence", []).append(evidence_label)
     tot_result["echo_detected"] = True
     tot_result["raw_echo_answer"] = tot_result.get("answer", "")
     tot_result["answer"] = derived
