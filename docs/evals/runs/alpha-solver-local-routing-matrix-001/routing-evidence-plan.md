@@ -10,9 +10,11 @@
 
 ## Minimum artifact fields per route decision
 
+Every route decision must use canonical role IDs from `model-role-map.md`; free-text aliases are allowed only when mapped in that file.
+
 - task id and category;
-- selected route or role;
-- rejected routes or roles;
+- selected route or role using canonical role IDs;
+- rejected routes or roles using canonical role IDs or explicit out-of-scope labels;
 - reason selected;
 - evidence used by the router;
 - evidence missing;
