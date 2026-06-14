@@ -18,7 +18,7 @@ The gate used four synthetic prompts requiring different answer shapes. In all f
 
 Stop before any value-experiment execution.
 
-The selected next lane is `ALPHA-SOLVER-PROMPT-CONSUMPTION-WIRING-FIX-001` because the local Alpha route returns the prompt text as the final answer and therefore fails the no-echo precondition in the accepted value experiment protocol.
+The value/no-echo-local blocking next lane is `ALPHA-SOLVER-PROMPT-CONSUMPTION-WIRING-FIX-001` because the local Alpha route returns the prompt text as the final answer and therefore fails the no-echo precondition in the accepted value experiment protocol. This is a value/no-echo-local blocking next lane only. It does not replace the repo-global selected next lane, which remains controlled by `docs/CURRENT_STATE.md` and `docs/LANE_REGISTRY.md`. Do not proceed to value pilot authorization or value pilot execution until this no-echo blocker is resolved and this gate or a successor no-echo gate passes.
 
 ## Files in this packet
 

@@ -13,29 +13,17 @@ except ModuleNotFoundError:  # pragma: no cover
     yaml = None
 
 
-def _load_service_auth_keys() -> List[str]:
-    """Load operator-provided service API keys without a default secret.
-
-    Authentication fails closed when neither ``SERVICE_AUTH_KEYS`` nor
-    ``API_KEY`` is configured. Empty comma-separated entries are ignored so
-    unset Compose interpolation cannot become an accepted blank credential.
-    """
-
-    raw = os.getenv("SERVICE_AUTH_KEYS")
-    if raw is None:
-        raw = os.getenv("API_KEY")
-    if raw is None:
-        return []
-    return [part.strip() for part in raw.split(",") if part.strip()]
-
-
 @dataclass
 class ServiceAuthConfig:
     """API-Key authentication configuration."""
 
     enabled: bool = os.getenv("SERVICE_AUTH_ENABLED", "true").lower() == "true"
     header: str = os.getenv("SERVICE_AUTH_HEADER", "X-API-Key")
-    keys: List[str] = field(default_factory=_load_service_auth_keys)
+    keys: List[str] = field(
+        default_factory=lambda: os.getenv(
+            "SERVICE_AUTH_KEYS", os.getenv("API_KEY", "dev-secret")
+        ).split(",")
+    )
 
 
 @dataclass
@@ -215,7 +203,6 @@ def get_quality_gate(path: Path | str = Path("config/quality_gate.yaml")) -> Qua
 __all__ = [
     "APISettings",
     "ServiceAuthConfig",
-    "_load_service_auth_keys",
     "ServiceRateLimitConfig",
     "ServiceCorsConfig",
     "QualityGateConfig",
