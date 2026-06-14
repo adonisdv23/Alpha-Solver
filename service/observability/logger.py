@@ -5,6 +5,8 @@ import json
 import os
 from typing import Any, Dict, Optional
 
+from service.logging.redactor import redact
+
 
 class JsonlLogger:
     """Structured JSONL logger with simple size-based rotation."""
@@ -53,7 +55,7 @@ class JsonlLogger:
 
         clean_payload: Dict[str, Any] = {}
         if payload:
-            clean_payload = {k: v for k, v in payload.items() if k != "pii_raw"}
+            clean_payload = redact({k: v for k, v in payload.items() if k != "pii_raw"})
 
         # ensure the route_explain contract – only the required keys and
         # optional pass‑through fields are persisted.  This prevents log
@@ -71,7 +73,7 @@ class JsonlLogger:
             "name": name,
             "route_explain": clean_route,
             "payload": clean_payload,
-            "meta": meta or {},
+            "meta": redact(meta or {}),
         }
 
         line = json.dumps(event, separators=(",", ":"))

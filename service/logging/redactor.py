@@ -41,6 +41,62 @@ _DETECTORS: Dict[str, bool] = {
 }
 _DETECTORS.update(_CONFIG.get("detectors", {}))
 
+_SAFE_TOKEN_COUNT_KEYS = {
+    "input_tokens",
+    "output_tokens",
+    "total_tokens",
+    "prompt_tokens",
+    "completion_tokens",
+}
+_SENSITIVE_EXACT_KEYS = {
+    "query",
+    "prompt",
+    "query_text",
+    "raw_prompt",
+    "user_input",
+    "input_text",
+    "messages",
+    "system_message",
+    "response",
+    "completion",
+    "raw",
+    "payload",
+    "body",
+    "header",
+    "headers",
+    "authorization",
+    "api_key",
+    "apikey",
+    "access_token",
+    "auth_token",
+    "bearer_token",
+    "provider_token",
+    "session_token",
+    "oauth_token",
+    "refresh_token",
+    "id_token",
+    "secret",
+    "password",
+    "credential",
+    "credentials",
+    "billing",
+    "invoice",
+    "card",
+    "cc",
+    "payment",
+}
+_SENSITIVE_KEY_RE = re.compile(
+    r"(?:"
+    r"(?:^|[_-])(?:prompt|response|completion|raw|payload|body|headers?|authorization)(?:$|[_-])|"
+    r"(?:^|[_-])api[_-]?key(?:$|[_-])|"
+    r"(?:^|[_-])(?:access|auth|bearer|provider|session|oauth|refresh|id)[_-]?token(?:$|[_-])|"
+    r"(?:^|[_-])(?:secret|password|credential|credentials)(?:$|[_-])|"
+    r"(?:^|[_-])(?:billing|invoice|card|cc|payment)(?:$|[_-])"
+    r")",
+    re.IGNORECASE,
+)
+_KEY_REDACTION = "***REDACTED***"
+
 # Regular expressions ------------------------------------------------------
 EMAIL_RE = re.compile(r"(?P<local>[A-Za-z0-9._%+-]+)@(?P<domain>[A-Za-z0-9.-]+\.[A-Za-z]{2,})")
 PHONE_RE = re.compile(r"\+?\d[\d\s\-()]{8,}\d")
@@ -138,6 +194,15 @@ def _redact_str(text: str) -> str:
     return text
 
 
+def _is_sensitive_key(key: str) -> bool:
+    normalized = key.lower().replace("-", "_")
+    if normalized in _SAFE_TOKEN_COUNT_KEYS:
+        return False
+    if normalized in _SENSITIVE_EXACT_KEYS:
+        return True
+    return bool(_SENSITIVE_KEY_RE.search(normalized))
+
+
 def _redact(obj: Any, allow: Set[str]) -> Any:
     if isinstance(obj, str):
         return _redact_str(obj)
@@ -146,6 +211,8 @@ def _redact(obj: Any, allow: Set[str]) -> Any:
         for k, v in obj.items():
             if isinstance(k, str) and k in allow:
                 out[k] = v
+            elif isinstance(k, str) and _is_sensitive_key(k):
+                out[k] = _KEY_REDACTION
             else:
                 out[k] = _redact(v, allow)
         return out
