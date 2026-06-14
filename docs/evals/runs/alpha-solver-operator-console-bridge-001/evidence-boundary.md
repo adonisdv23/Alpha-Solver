@@ -1,6 +1,6 @@
 # Evidence Boundary
 
-This packet may be cited only as evidence that the operator console bridge lane was reconciled with `docs/evals/runs/alpha-solver-operator-ui-sidecar-feasibility-001/` and remains blocked pending the sidecar security/API-shape decision gate.
+This packet may be cited only as evidence that the operator console bridge lane was reconciled with `docs/evals/runs/alpha-solver-operator-ui-sidecar-feasibility-001/`, acknowledges the PR #549 API-shape compatibility gate on `main`, and remains blocked pending the sidecar security/API-shape decision gate.
 
 It may not be cited as evidence of:
 

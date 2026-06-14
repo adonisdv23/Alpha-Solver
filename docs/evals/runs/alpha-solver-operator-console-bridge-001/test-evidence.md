@@ -3,18 +3,40 @@
 ## Commands run for this design-only packet
 
 ```bash
+git fetch origin main
+git diff --name-only origin/main...HEAD
+```
+
+Result: passed in this checkout. The output contained only the 10 operator console bridge packet files.
+
+```bash
 python - <<'PY'
 from pathlib import Path
 
 packet = Path("docs/evals/runs/alpha-solver-operator-console-bridge-001")
-text = "\n".join(p.read_text() for p in packet.glob("*.md"))
+required = {
+    "README.md",
+    "auth-and-boundary-map.md",
+    "bridge-design.md",
+    "evidence-boundary.md",
+    "implementation-summary.md",
+    "local-only-runbook.md",
+    "non-actions.md",
+    "residual-risks.md",
+    "selected-next-lane.md",
+    "test-evidence.md",
+}
+present = {p.name for p in packet.glob("*.md")}
+missing = required - present
+assert not missing, f"missing files: {missing}"
 
+text = "\n".join((packet / name).read_text() for name in required)
 assert "alpha-solver-operator-ui-sidecar-feasibility-001" in text
-assert "a" + "bsent" not in text.lower(), "stale dependency wording remains"
-assert "blocked" in text.lower()
 assert "API-shape" in text or "request mapping" in text
+assert "blocked" in text.lower()
 assert "no direct" in text.lower()
-print("operator console bridge dependency wording validation passed")
+assert "a" + "bsent" not in text.lower(), "stale dependency wording remains"
+print("operator console bridge packet validation passed")
 PY
 ```
 

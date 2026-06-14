@@ -19,4 +19,5 @@ This lane intentionally did not:
 - allow a sidecar to call models directly as Alpha Solver evidence;
 - ingest private files, uploads, RAG corpora, memory, workspace data, or embeddings;
 - update Google Sheets or backlog workbooks;
+- include unrelated local routing, council, Hermes, sidecar feasibility, or Pi-like UX packets in this PR diff;
 - claim operator-console readiness, UI readiness, runtime readiness, public readiness, provider readiness, production readiness, model quality, benchmark validation, value evidence, or Alpha superiority.

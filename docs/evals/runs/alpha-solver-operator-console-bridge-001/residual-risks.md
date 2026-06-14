@@ -1,6 +1,7 @@
 # Residual Risks
 
 - Sidecar feasibility is captured, but the sidecar security/API-shape gate is not complete.
+- The PR #549 API-shape compatibility gate exists on `main`, but this bridge packet does not satisfy it.
 - The exact bridge endpoint or CLI seam and request mapping are not approved.
 - Public exposure remains no-go.
 - `/v1/solve` auth/tenancy is not proven for public or sidecar use.

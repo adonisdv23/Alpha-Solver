@@ -4,7 +4,7 @@ Selected next lane: `ALPHA-SOLVER-OPERATOR-UI-SIDECAR-SECURITY-GATES-001`.
 
 ## Rationale
 
-The sidecar feasibility packet now exists and selects the acceptable architecture pattern. The bridge must not proceed until the sidecar security/API-shape gate decides the Alpha Solver controlled endpoint or CLI seam, request mapping, response-envelope mapping, authn/authz, tenancy, CORS/CSRF, provider lockdown, cost controls, telemetry/audit identity, retention, replay, and evidence-envelope rendering contract.
+The sidecar feasibility packet now exists, and PR #549 has merged an API-shape compatibility gate into `main`. The bridge must not proceed until the sidecar security/API-shape gate decides the Alpha Solver controlled endpoint or CLI seam, request mapping, response-envelope mapping, authn/authz, tenancy, CORS/CSRF, provider lockdown, cost controls, telemetry/audit identity, retention, replay, and evidence-envelope rendering contract.
 
 ## Future implementation lane candidate
 
@@ -19,5 +19,5 @@ Required scope after the gate passes:
 - no direct model bypass;
 - Alpha Solver controlled endpoint or CLI bridge only;
 - Alpha Solver envelope and SAFE-OUT preserved;
-- auth, tenancy, CORS/CSRF, cost, telemetry, and evidence boundaries tested;
+- authn/authz, tenancy, CORS/CSRF, cost, telemetry/audit, retention, replay, and evidence-envelope boundaries tested;
 - tests for auth denial, loopback-only bind, provider-disabled behavior, request mapping, response-envelope mapping, and non-claim evidence labels.

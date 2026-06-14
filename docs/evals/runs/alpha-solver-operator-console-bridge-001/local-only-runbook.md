@@ -4,11 +4,12 @@ This runbook is for a future implementation lane only. It must not be used as pr
 
 ## Preconditions
 
-1. Lane 33 sidecar feasibility packet exists and selects a concrete sidecar pattern.
-2. Operator approves a local-only bridge implementation scope.
-3. Hosted provider environment variables are unset.
-4. No private files, secrets, or customer data are used as prompts or evidence.
-5. Public exposure gate remains no-go unless a later gate explicitly changes it.
+1. The sidecar security/API-shape gate has selected an Alpha Solver controlled endpoint or CLI seam.
+2. Request mapping and response-envelope mapping are explicitly approved and tested.
+3. Operator approves a local-only bridge implementation scope.
+4. Hosted provider environment variables are unset.
+5. No private files, secrets, credentials, customer data, uploads, RAG corpora, memory, workspace data, or embeddings are used as prompts or evidence.
+6. Public exposure gate remains no-go unless a later gate explicitly changes it.
 
 ## Future smoke shape
 
@@ -25,7 +26,10 @@ export MODEL_PROVIDER=local
 - loopback bind proof;
 - auth negative test;
 - provider-disabled proof;
+- request mapping proof;
+- response-envelope mapping proof;
 - request ID;
 - response envelope shape;
 - SAFE-OUT negative case;
+- telemetry/audit identity behavior;
 - evidence label stating bridge smoke only and no product-readiness claim.
