@@ -2,9 +2,11 @@
 
 Paste these rows manually only after operator review and only after the post-PR live GitHub recheck rule passes. No sheet was inspected or updated by this packet.
 
-> Pre-PR capture state: before opening this backlog sync packet PR, latest merged PR was #555 and open PR count was 0. This is not authorization to apply external backlog updates while PR #556 is open.
+> Pre-PR capture state: before opening PR #556, latest merged PR was #555 and open PR count was 0. This is not authorization to apply external backlog updates while PR #556 is open.
 
 > Before applying any manual Sheet/backlog update from this packet, recheck live GitHub after PR #556 is merged or closed. If any PR is open, stop and do not apply the rows.
+
+> Current repo-selected next evidence lane: `ALPHA-SOLVER-NO-ECHO-SUBSTANTIVE-GENERATION-GATE-POST-552-SUCCESSOR-001`. Do not replace this with authorization-refresh, smoke, DEF-002, provider, public, or generic docs lanes unless the operator explicitly overrides the repo-selected lane after reviewing the committed evidence.
 
 | group | lane_or_item | sheet_action | state | evidence | next_or_owner | blocks_smoke | blocks_public | notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -18,9 +20,9 @@ Paste these rows manually only after operator review and only after the post-PR 
 | recent completed | PR #549 sidecar API-shape compatibility gate | archive from active queue; keep evidence | DONE / merged | GitHub PR #549 merged 2026-06-14T18:19:21Z | none | No | Review | Docs/UI compatibility gate evidence. |
 | recent completed | PR #546 operator UI sidecar feasibility packet | archive from active queue; keep evidence | DONE / merged | GitHub PR #546 merged 2026-06-14T17:55:36Z | none | No | Review | Feasibility packet only. |
 | recent completed | PR #548 Pi-like agent UX feasibility packet | archive from active queue; keep evidence | DONE / merged | GitHub PR #548 merged 2026-06-14T17:53:06Z | none | No | Review | Feasibility packet only. |
-| current | open GitHub PR queue | do not apply until post-PR live recheck passes | PRE-PR SNAPSHOT ONLY | Pre-PR capture state: before opening PR #556, latest merged PR was #555 and open PR count was 0. | recheck live GitHub after PR #556 merges/closes | No | No | This is not authorization to apply external backlog updates while PR #556 is open; if any PR is open, stop. |
+| current | open GitHub PR queue | do not apply until post-PR live recheck passes | PRE-PR SNAPSHOT ONLY | Pre-PR capture state: before opening PR #556, latest merged PR was #555 and open PR count was 0. This is not authorization to apply external backlog updates while PR #556 is open. | recheck live GitHub after PR #556 merges/closes | No | No | Pre-PR snapshot only; not authorization to apply rows while PR #556 is open. If any PR is open after recheck, stop. |
 | blocked | ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001 / value read | keep blocked, not active execution | BLOCKED / gated | docs/CURRENT_STATE.md, docs/LANE_REGISTRY.md, docs/BACKLOG_OPERATING_MODEL.md | after successful smoke/provider boundary and substantive no-echo preconditions | No | n/a | Do not claim value evidence from simulation-only or protocol packets. |
-| next | operator-selected next implementation lane | requires operator decision | PENDING DECISION | Pre-PR snapshot only; PR #556 is the packet review PR | after PR #556 closes, recheck live GitHub; then choose one narrow lane | TBD | TBD | Do not apply rows while PR #556 is open; if any PR is open after recheck, stop. |
+| next | ALPHA-SOLVER-NO-ECHO-SUBSTANTIVE-GENERATION-GATE-POST-552-SUCCESSOR-001 | set as active next evidence lane after PR #556 merge and live open-PR recheck | SELECTED / PENDING EXECUTION | docs/evals/runs/alpha-solver-mvp-readiness-scorecard-001/selected-next-lane.md | operator to run successor no-echo/substantive-generation gate | Yes | Yes | Required before Value Read execution, provider smoke, paid/provider, release candidate, or public-exposure lanes. |
 | deferred | DEF-002 security/privacy review | keep deferred/open | OPEN | docs/DEFERRAL_REGISTER.md, docs/ISSUE_REGISTER.md | operator-scoped security/privacy assessment | No | Yes | Archive completed evidence, not this deferral. |
 | deferred | DEF-003 audit custody / replacement | keep deferred/open | OPEN | docs/DEFERRAL_REGISTER.md | commit audit text or operator-approved replacement custody path | No | No direct | Do not cite as resolved. |
 | deferred | DEF-004 audit custody / provenance general | keep deferred/open | OPEN | docs/DEFERRAL_REGISTER.md | operator-supplied custody artifact with provenance | No | No direct | Do not cite as resolved. |

@@ -16,4 +16,4 @@ The following were intentionally not performed:
 
 ## Stop/recheck rule
 
-Before applying any manual Sheet/backlog update from this packet, recheck live GitHub after PR #556 is merged or closed. If any PR is open, stop and do not apply the rows.
+Before applying any manual Sheet/backlog update from this packet, recheck live GitHub after PR #556 is merged or closed. If any PR is open, stop and do not apply the rows. The default next-lane row must preserve `ALPHA-SOLVER-NO-ECHO-SUBSTANTIVE-GENERATION-GATE-POST-552-SUCCESSOR-001` unless explicitly overridden after committed-evidence review.
