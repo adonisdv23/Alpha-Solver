@@ -1,10 +1,14 @@
 # Paste-ready Sheet Updates
 
-Paste these rows manually only after operator review. No sheet was inspected or updated by this packet.
+Paste these rows manually only after operator review and only after the post-PR live GitHub recheck rule passes. No sheet was inspected or updated by this packet.
+
+> Pre-PR capture state: before opening this backlog sync packet PR, latest merged PR was #555 and open PR count was 0. This is not authorization to apply external backlog updates while PR #556 is open.
+
+> Before applying any manual Sheet/backlog update from this packet, recheck live GitHub after PR #556 is merged or closed. If any PR is open, stop and do not apply the rows.
 
 | group | lane_or_item | sheet_action | state | evidence | next_or_owner | blocks_smoke | blocks_public | notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| recent completed | PR #555 claim-safe demo pack refresh | archive from active queue; keep evidence | DONE / merged | GitHub PR #555 merged 2026-06-14T22:48:09Z | none | No | No | Latest verified merged PR; claim-safe demo evidence only. |
+| recent completed | PR #555 claim-safe demo pack refresh | archive from active queue; keep evidence | DONE / merged | GitHub PR #555 merged 2026-06-14T22:48:09Z | none | No | No | Pre-PR capture latest merged PR; claim-safe demo evidence only. Recheck after PR #556 closes before applying rows. |
 | recent completed | PR #554 MVP scorecard blocked Value Read / select Fix no-echo | archive from active queue; keep evidence | DONE / merged | GitHub PR #554 merged 2026-06-14T21:57:42Z | none | No | No | Updates MVP scorecard; preserves blocked Value Read posture. |
 | recent completed | PR #553 POST-551-03 Value Read upgrade packet | archive from active queue; keep evidence | DONE / merged | GitHub PR #553 merged 2026-06-14T20:35:01Z | none | No | No | Simulation-only value-read upgrade evidence; no provider/value claim beyond packet. |
 | recent completed | PR #552 Fix local no-echo wiring | archive from active queue; keep evidence | DONE / merged | GitHub PR #552 merged 2026-06-14T20:34:53Z | none | No | No | Local bounded derived-answer no-echo wiring; not provider validation. |
@@ -14,9 +18,9 @@ Paste these rows manually only after operator review. No sheet was inspected or 
 | recent completed | PR #549 sidecar API-shape compatibility gate | archive from active queue; keep evidence | DONE / merged | GitHub PR #549 merged 2026-06-14T18:19:21Z | none | No | Review | Docs/UI compatibility gate evidence. |
 | recent completed | PR #546 operator UI sidecar feasibility packet | archive from active queue; keep evidence | DONE / merged | GitHub PR #546 merged 2026-06-14T17:55:36Z | none | No | Review | Feasibility packet only. |
 | recent completed | PR #548 Pi-like agent UX feasibility packet | archive from active queue; keep evidence | DONE / merged | GitHub PR #548 merged 2026-06-14T17:53:06Z | none | No | Review | Feasibility packet only. |
-| current | open GitHub PR queue | set active PR count to zero | NO OPEN PRS VERIFIED | GitHub pulls?state=open returned 0 on 2026-06-14 | operator selects next lane | No | No | No sheet sync performed. |
+| current | open GitHub PR queue | do not apply until post-PR live recheck passes | PRE-PR SNAPSHOT ONLY | Pre-PR capture state: before opening PR #556, latest merged PR was #555 and open PR count was 0. | recheck live GitHub after PR #556 merges/closes | No | No | This is not authorization to apply external backlog updates while PR #556 is open; if any PR is open, stop. |
 | blocked | ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001 / value read | keep blocked, not active execution | BLOCKED / gated | docs/CURRENT_STATE.md, docs/LANE_REGISTRY.md, docs/BACKLOG_OPERATING_MODEL.md | after successful smoke/provider boundary and substantive no-echo preconditions | No | n/a | Do not claim value evidence from simulation-only or protocol packets. |
-| next | operator-selected next implementation lane | requires operator decision | PENDING DECISION | No open PRs; latest merged PR #555 | choose one narrow lane from operator decisions | TBD | TBD | Paste only after operator confirms priority. |
+| next | operator-selected next implementation lane | requires operator decision | PENDING DECISION | Pre-PR snapshot only; PR #556 is the packet review PR | after PR #556 closes, recheck live GitHub; then choose one narrow lane | TBD | TBD | Do not apply rows while PR #556 is open; if any PR is open after recheck, stop. |
 | deferred | DEF-002 security/privacy review | keep deferred/open | OPEN | docs/DEFERRAL_REGISTER.md, docs/ISSUE_REGISTER.md | operator-scoped security/privacy assessment | No | Yes | Archive completed evidence, not this deferral. |
 | deferred | DEF-003 audit custody / replacement | keep deferred/open | OPEN | docs/DEFERRAL_REGISTER.md | commit audit text or operator-approved replacement custody path | No | No direct | Do not cite as resolved. |
 | deferred | DEF-004 audit custody / provenance general | keep deferred/open | OPEN | docs/DEFERRAL_REGISTER.md | operator-supplied custody artifact with provenance | No | No direct | Do not cite as resolved. |
