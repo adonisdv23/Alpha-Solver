@@ -6,7 +6,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - API_KEY=${API_KEY:-changeme}
+      - API_KEY=${API_KEY:?set API_KEY to a non-default operator-provided value}
       - OTEL_ENDPOINT=http://otel-collector:4317
     volumes:
       - ../artifacts:/app/artifacts
