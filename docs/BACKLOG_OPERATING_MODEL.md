@@ -1,7 +1,7 @@
 # Backlog Operating Model
 
 > Created by lane `ALPHA-SOLVER-CURRENT-STATE-DOCS-BACKLOG-ARCHIVE-ISSUE-REGISTER-001`.
-> Verification date **2026-06-13**. Defines how backlog items are grouped and
+> Verification date **2026-06-14**. Defines how backlog items are grouped and
 > resolved. Docs-only; no item here authorizes a provider call, runtime
 > exposure, or readiness claim.
 
@@ -31,8 +31,9 @@
 | PR #508 checker-scope hardening | 6 Evidence packets / 11 Checker hardening | DONE (merged) | — | No | No |
 | PR #509 OpenAI smoke retry — blocked by project/billing verification | 6 Evidence packets / 5 Provider setup | BLOCKED (merged evidence) | superseded by PR #511/#512 project-billing boundary chain | Yes | n/a |
 | `OPENAI-PROJECT-BILLING-BOUNDARY-CLARIFICATION-001` | 6 Evidence packets / 5 Provider setup | BLOCKED evidence superseded by PR #512 (`BLOCKED_PROJECT_BILLING_OPERATOR_CONFIRMATION_MISSING`) | superseded by `OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001` | Yes | No |
-| `OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001` | 1 Current lane / 5 Provider setup | CONFIRMED (`OPENAI_PROJECT_BILLING_BOUNDARY_CONFIRMED`) | `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` | No | No |
-| `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` | 2 Next ready / 8 OpenAI smoke | **NEXT (selected)** | one tiny synthetic smoke retry only | Yes | No |
+| `OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001` | 6 Evidence packets / 5 Provider setup | CONFIRMED (`OPENAI_PROJECT_BILLING_BOUNDARY_CONFIRMED`) | consumed by `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` | No | No |
+| `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` | 6 Evidence packets / 8 OpenAI smoke | BLOCKED/CONSUMED (`BLOCKED_OPERATOR_AUTHORIZATION_MISSING`; provider calls `0`, tokens `0`, cost `$0.00`) | `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002-AUTHORIZATION-REFRESH` | Yes | No |
+| `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002-AUTHORIZATION-REFRESH` | 2 Next ready / 3 Blocked by operator / 8 OpenAI smoke | **NEXT (selected)** | collect explicit model, project boundary, cost cap, token cap, max run count, and synthetic fixture before any provider call | Yes | No |
 | `ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001` | 12 Value experiment | PROTOCOL DESIGNED / BLOCKED FOR EXECUTION (after smoke) | after a successful tiny smoke and protocol preconditions, including substantive Alpha generation / no-echo gate and appropriate smoke/provider boundary | No | — |
 | DEF-002 security/privacy review | 7 Deferrals / 9 Security | OPEN | DEF-002 review lane | No | Yes |
 | DEF-003 audit custody or replacement | 7 Deferrals | OPEN (custody) | DEF-003 custody lane | No | No |
@@ -50,9 +51,9 @@
 
 ## Operating rules
 
-- Exactly **one** "Next ready" lane at a time (`LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002`).
+- Exactly **one** "Next ready" lane at a time (`LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002-AUTHORIZATION-REFRESH`).
 - Provider-call lanes remain tightly bounded: PR #512 records the redacted project/billing attestation, but it does not authorize broad provider validation, evals, benchmarks, production, public MVP, or readiness claims.
 - Security inputs (group 9) are **recorded, not fixed**, in this docs lane; they
   flow to DEF-002. Runtime/product (group 10) is tracked, not worked here.
 - Evidence packets (group 6) are immutable; never re-run a merged lane verbatim.
-- A tiny smoke proves plumbing only and never advances the value-experiment item.
+- A blocked authorization-refresh or tiny smoke preflight does not advance the value-experiment item; value execution remains blocked until successful smoke and no-echo prerequisites are committed.

@@ -2,12 +2,12 @@
 
 > Source-of-truth navigation doc. Created by lane
 > `ALPHA-SOLVER-CURRENT-STATE-DOCS-BACKLOG-ARCHIVE-ISSUE-REGISTER-001`.
-> Verification date: **2026-06-13**. Reflects committed `main` state plus
-> read-only GitHub PR verification. Docs-only; no provider/runtime claims.
+> Verification date: **2026-06-14**. Reflects committed state plus
+> PR #527 packet updates. Docs-only; no provider/runtime claims.
 
 ## Current verified phase
 
-**Post-local Self Operator evidence; pre-first real OpenAI smoke; OpenAI project/billing boundary attestation confirmed in PR #512 and next tiny smoke retry selected.**
+**Post-local Self Operator evidence; pre-first real OpenAI smoke; OpenAI project/billing boundary attestation confirmed in PR #512; smoke retry 002 attempted but blocked for missing operator authorization; authorization-refresh retry selected next.**
 
 - The Self Operator has a multi-PR local/offline execution-evidence chain
   (PRs #497, #499, #500, #501) that runs its test suite and release-gate CLI
@@ -23,19 +23,25 @@
 - The project/billing boundary attestation retry lane (PR #512) remains
   docs-only and records a redacted operator confirmation, with verdict
   `OPENAI_PROJECT_BILLING_BOUNDARY_CONFIRMED`.
+- The `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` packet in PR #527
+  consumed that lane as a blocked preflight because explicit operator
+  authorization fields were missing, with verdict
+  `BLOCKED_OPERATOR_AUTHORIZATION_MISSING`; provider calls, tokens, and cost
+  remained zero.
 
-No OpenAI/provider call has been executed. No token has been used by PR #512. The value experiment protocol is designed, but no value experiment has been run and no value evidence exists.
+No OpenAI/provider call has been executed. No token has been used by PR #512 or PR #527. The value experiment protocol is designed, but no value experiment has been run and no value evidence exists.
 
 ## At a glance
 
 | Field | Value |
 |-------|-------|
 | Latest merged PR in this chain | **#512** — `docs(openai): add project billing boundary attestation retry packet` |
-| Current controlling lane | `OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001` (PR #512, `OPENAI_PROJECT_BILLING_BOUNDARY_CONFIRMED`) |
-| Next selected lane | **`LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002`** (one tiny synthetic OpenAI smoke retry; provider-call lane remains bounded) |
+| Current open evidence PR | **#527** — `docs(openai): add smoke retry 002 blocked packet` |
+| Current controlling lane | `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` (PR #527, `BLOCKED_OPERATOR_AUTHORIZATION_MISSING`; consumed/blocked with `0` provider calls) |
+| Next selected lane | **`LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002-AUTHORIZATION-REFRESH`** (authorization-refresh packet only; must supply explicit model, project boundary, cost cap, token cap, max run count, and synthetic fixture before any provider call) |
 | Prior blocked control | `OPENAI-PROJECT-BILLING-BOUNDARY-CLARIFICATION-001` (PR #511, superseded by PR #512 attestation) |
 | Highest-value strategic lane after smoke | `ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001` (protocol designed/canonical packet exists; not executed; no value evidence) |
-| Open PRs | none |
+| Open PRs | #527 updates the source-of-truth next-lane pointer for the blocked smoke retry 002 packet |
 
 ## Completed recent lanes (merged, kept as evidence)
 
@@ -55,6 +61,7 @@ No OpenAI/provider call has been executed. No token has been used by PR #512. Th
 | #509 | Local OpenAI token smoke retry 001 | `BLOCKED_OPENAI_PROJECT_OR_BILLING_NOT_VERIFIED` |
 | #511 | OpenAI project/billing boundary clarification 001 | `BLOCKED_PROJECT_BILLING_OPERATOR_CONFIRMATION_MISSING` |
 | #512 | OpenAI project/billing boundary attestation retry 001 | `OPENAI_PROJECT_BILLING_BOUNDARY_CONFIRMED` |
+| #527 | Local OpenAI token smoke retry 002 | `BLOCKED_OPERATOR_AUTHORIZATION_MISSING` |
 
 See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for full per-PR detail and
 [`LANE_REGISTRY.md`](LANE_REGISTRY.md) for lane lifecycle classification.
@@ -70,10 +77,12 @@ See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for full per-PR detail and
 
 ## What is blocked
 
-- **First real OpenAI token smoke** — selected next as
-  `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` after PR #512 recorded the
-  redacted operator attestation. The next lane is still limited to one tiny
-  synthetic smoke retry and does not authorize broad provider validation.
+- **First real OpenAI token smoke** — `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002`
+  has been attempted/consumed as a blocked preflight in PR #527 because explicit
+  operator authorization fields were missing. The repo-global selected next lane
+  is now `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002-AUTHORIZATION-REFRESH`,
+  which is limited to collecting the missing explicit authorization before any
+  provider call and does not authorize broad provider validation.
 
 - **Value experiment protocol** — `ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001` now has a canonical protocol packet, but execution remains blocked until the selected smoke/provider boundary has passed and the protocol preconditions are met, including the substantive Alpha-generation / no-echo gate. It is not the selected next lane and contains no results or value evidence.
 - **DEF-002 closure** — blocked pending security/privacy review (assessment of
