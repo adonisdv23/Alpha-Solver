@@ -5,10 +5,10 @@ Do not run this template unless a real local Ollama run is explicitly authorized
 ## Confirm exact local model without pulling
 
 ```bash
-ollama list | rg '^gemma3:4b\b'
+ollama list | awk 'NR > 1 {print $1}' | grep -Fx 'gemma3:4b'
 ```
 
-If the exact model is missing, stop. This lane does not authorize `ollama pull`, model installation, or registry sweeps.
+The first `ollama list` column must equal `gemma3:4b` exactly. Suffix variants such as `gemma3:4b-it-qat` do not satisfy the approved model boundary. If the exact tag is absent, stop and record a blocked result. This lane does not authorize `ollama pull`, model installation, tag substitution, registry sweeps, or fallback models.
 
 ## Synthetic fixture
 
@@ -33,7 +33,7 @@ python -m alpha.local_llm.operator_cli \
 
 Stop and record a blocked local smoke result if any of the following are true:
 
-- `gemma3:4b` is not already present locally.
+- The first `ollama list` column does not equal `gemma3:4b` exactly, including when only suffix variants such as `gemma3:4b-it-qat` are present.
 - The endpoint differs from `http://127.0.0.1:11434/api/chat`.
 - Any hosted provider credential or token would be needed.
 - The prompt is not synthetic.

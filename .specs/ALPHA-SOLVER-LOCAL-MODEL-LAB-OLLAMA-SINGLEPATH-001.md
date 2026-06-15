@@ -14,14 +14,14 @@ The only approved endpoint is:
 
 - `http://127.0.0.1:11434/api/chat`
 
-The tiny controlled task subset must use synthetic prompts only. No private data, hosted provider calls, tokens, public API exposure, dashboard exposure, model pulls, model installs, model registry sweeps, scoring, routing readiness claims, benchmark claims, or Alpha superiority claims are authorized.
+The tiny controlled task subset must use synthetic prompts only. No private data, hosted provider calls, tokens, public API exposure, dashboard exposure, model pulls, model installs, tag substitution, fallback models, model registry sweeps, scoring, routing readiness claims, benchmark claims, or Alpha superiority claims are authorized.
 
 ## Local-only prerequisites
 
 Before any operator-run local smoke, the operator must confirm:
 
 1. Ollama is already installed locally.
-2. The exact local model `gemma3:4b` is already present locally.
+2. The first `ollama list` column equals the exact local model tag `gemma3:4b`; suffix variants such as `gemma3:4b-it-qat` do not satisfy this boundary.
 3. The local loopback endpoint `http://127.0.0.1:11434/api/chat` is available.
 4. No hosted provider credentials or tokens are set or required for this lane.
 5. The prompt fixture is synthetic and contains no private or production data.
