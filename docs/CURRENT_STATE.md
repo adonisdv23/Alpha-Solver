@@ -1,21 +1,21 @@
 # Alpha Solver — Current State
 
-> Source-of-truth navigation doc. Last verified **2026-06-15** after live
-> GitHub API verification of **0 open PRs** and merged PRs **#569–#574**.
+> Source-of-truth navigation doc. Last verified **2026-06-15** for PR **#576** branch repair.
 > Docs-only; no provider/runtime claims.
 
 ## Current verified phase
 
-**Post-#574 backlog/current-state sync posture; selected next lane is an Alpha-native local operator harness design note.**
+**Post-#576 posture: the Alpha-native local operator harness design note is complete, and an explicit operator decision is required before any next lane.**
 
-The merged #569–#574 wave updated the repository from the post-#568 blocked Value Read state to a broader documentation-and-boundary posture:
+The merged #569–#574 wave updated the repository from the post-#568 blocked Value Read state to a broader documentation-and-boundary posture. PR #576 then completed `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only Alpha-native local operator harness design note.
 
-- PR #569 refreshed the current-state, lane, evidence, and MVP scorecard docs after PR #568 recorded `VALUE_READ_BLOCKED`.
-- PR #570 refreshed the founder memo for the post-#568 state.
-- PR #571 added a blocked `/v1/solve` exposure gate packet.
-- PR #572 added a local Ollama singlepath operator helper.
-- PR #573 recorded a blocked local Ollama singlepath attempt: exact `gemma3:4b` preflight passed, but the local helper failed closed with a timeout/backend error and produced no local model answer.
-- PR #574 recorded Pi.dev harness feasibility research and recommended borrowing patterns only, with no direct integration.
+The current control posture is now `OPERATOR_DECISION_REQUIRED_AFTER_LOCAL_OPERATOR_HARNESS_DESIGN_NOTE_001`: no further implementation or execution lane is selected automatically. The operator must explicitly choose one future path before any new lane:
+
+- authorize a separate local harness implementation/spec lane, or
+- return to Value Read execution authorization, or
+- stop and keep the design note as reference material.
+
+This document does not choose for the operator.
 
 These are docs, gate, helper, static/research, and blocked-attempt artifacts. They do not prove provider behavior, model quality, value, readiness, benchmark success, security/privacy completion, local Ollama validation, `/v1/solve` readiness, production/public readiness, or Alpha superiority.
 
@@ -23,12 +23,12 @@ These are docs, gate, helper, static/research, and blocked-attempt artifacts. Th
 
 | Field | Value |
 |-------|-------|
-| Latest verified merged PR in this wave | **#574** — Pi.dev harness feasibility research note |
-| Live open PR state at verification | **0 open PRs** on `adonisdv23/Alpha-Solver` |
+| Latest verified PR in this wave | **#576** — Alpha-native local operator harness design note completed by this PR |
+| PR branch state at verification | **#576 open / pending merge** on `adonisdv23/Alpha-Solver` |
 | Closed-unmerged superseded PR | **#561** — superseded by merged PR #562 |
-| Current controlling posture | Docs/research sync after blocked Value Read, blocked `/v1/solve` exposure gate, blocked local Ollama attempt, and Pi.dev no-integration decision |
-| Selected next lane | **`ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001`** |
-| Strategic boundary | Convert useful Pi.dev-style operator-harness patterns into Alpha-native design only, without installing Pi.dev, calling providers, exposing runtime surfaces, or claiming readiness/value evidence |
+| Current controlling posture | Operator decision required after completed Alpha-native local operator harness design note |
+| Selected next state | **`OPERATOR_DECISION_REQUIRED_AFTER_LOCAL_OPERATOR_HARNESS_DESIGN_NOTE_001`** |
+| Strategic boundary | No implementation, UI, runtime, dependency, provider, local-model, Pi.dev, `/v1/solve`, dashboard/public API, Google Sheets, benchmark, Value Read, readiness, security/privacy, or superiority work is authorized until the operator chooses a future path |
 
 ## Completed post-552 / post-565 / post-568 infrastructure lanes
 
@@ -49,20 +49,23 @@ These are docs, gate, helper, static/research, and blocked-attempt artifacts. Th
 | #572 | Local Ollama singlepath operator helper | Adds an operator helper script for the local-only lane; helper existence is not a successful run. |
 | #573 | Local Ollama singlepath blocked attempt | Records exact-model preflight success and failed-closed timeout/backend error; no local answer or quality evidence. |
 | #574 | `18 - PI.DEV-HARNESS-FEASIBILITY` | Records `BORROW_PATTERNS_ONLY_NO_INTEGRATION` for Pi.dev harness research. |
+| #576 | `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` | Completes the docs-only Alpha-native local operator harness design note; no implementation or execution authorization. |
 
 See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for the PR status ledger and [`LANE_REGISTRY.md`](LANE_REGISTRY.md) for lifecycle classification.
 
-## Selected next lane
+## Selected next state
 
-**`ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001`** is the recommended next active lane.
+**`OPERATOR_DECISION_REQUIRED_AFTER_LOCAL_OPERATOR_HARNESS_DESIGN_NOTE_001`** is the current global selected next state.
 
-Purpose:
+This is a decision state, not an implementation lane. It means no implementation is authorized, no UI is authorized, no runtime work is authorized, no dependency work is authorized, no provider call is authorized, no local model call is authorized, no Pi.dev install/run/integration is authorized, no `/v1/solve` exposure is authorized, no dashboard or public API exposure is authorized, no Google Sheets mutation is authorized, no benchmark or Value Read execution is authorized, and no readiness, value, security/privacy, provider, local-Ollama, Pi.dev integration, or Alpha superiority claim is authorized.
 
-1. Define Alpha-native local operator-harness concepts inspired by Pi.dev patterns without importing or integrating Pi.dev.
-2. Map prompt packets to named local templates and define a local session evidence format, branch labels, export redaction, and interrupt/follow-up semantics.
-3. Preserve Alpha Solver's repo-native specs, evidence boundaries, budget guardrails, local-first posture, and no-runtime-change boundary.
+The operator must explicitly choose one future path before any new lane:
 
-This lane does **not** itself authorize provider calls, token use, credential access, billing inspection, hosted model calls, local model calls, Pi.dev installation, Pi.dev execution, package installation, dashboard exposure, `/v1/solve` exposure, public API exposure, Google Sheets mutation, benchmark execution, or value/readiness/security/privacy/provider/local-Ollama/Alpha-superiority claims unless a future operator authorization explicitly supplies those boundaries.
+1. authorize a separate local harness implementation/spec lane, or
+2. return to Value Read execution authorization, or
+3. stop and keep the design note as reference material.
+
+This source-of-truth state does not choose for the operator and does not automatically authorize a successor lane.
 
 ## Open deferrals (see [`DEFERRAL_REGISTER.md`](DEFERRAL_REGISTER.md))
 
