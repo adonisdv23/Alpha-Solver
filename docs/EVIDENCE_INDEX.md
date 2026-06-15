@@ -1,11 +1,11 @@
-# Evidence Index — Post-#568 blocked Value Read state
+# Evidence Index — Post-#574 backlog/current-state sync
 
 > Source-of-truth evidence ledger. Verification date **2026-06-15**. Live GitHub
-> API verification confirmed PRs #566, #567, and #568 are merged.
+> API verification confirmed **0 open PRs** and merged PRs **#569–#574**.
 
 ## How to read "evidence value"
 
-The entries below are design, documentation, static-checking, methodology, or scaffold evidence. They are not provider validation, local-model validation, value evidence, benchmark evidence, production readiness evidence, security/privacy completion evidence, or Alpha-superiority evidence.
+The entries below are design, documentation, gate, helper, static-checking, methodology, blocked-attempt, or research evidence. They are not provider validation, local-model validation, value evidence, benchmark evidence, production readiness evidence, security/privacy completion evidence, `/v1/solve` readiness evidence, Pi.dev integration evidence, or Alpha-superiority evidence.
 
 ## PR table
 
@@ -23,13 +23,19 @@ The entries below are design, documentation, static-checking, methodology, or sc
 | #566 | Post-565 Value Read simulation packet refresh | ✅ merged 2026-06-15 | `docs/evals/runs/alpha-solver-value-read-simulation-packet-refresh-post-565-001/` | Refreshes the packet lane for post-565 infrastructure. | Does not prove value, run providers/models, or score outputs. | completed |
 | #567 | Value Read packet follow-up / pre-run state | ✅ merged 2026-06-15 | `docs/evals/runs/alpha-solver-value-read-simulation-packet-refresh-post-565-001/` | Commits the packet state inspected by the manual-run artifact. | Does not itself prove value or readiness. | completed |
 | #568 | Manual Value Read simulation run artifact — stopped | ✅ merged 2026-06-15 | `docs/evals/runs/alpha-solver-value-read-simulation-packet-refresh-post-565-001/manual-run-artifact-2026-06-15.md` | Records `VALUE_READ_BLOCKED`: stopped before output generation and scoring; no Alpha/baseline outputs, blind scores, or discrimination-delta. | Does not claim Alpha value, superiority, provider/local/runtime behavior, endpoint/dashboard/public API behavior, Google Sheets mutation, external ledger mutation, MVP validation, or readiness. | blocked evidence |
+| #569 | Record PR #568 as VALUE_READ_BLOCKED and update MVP scorecard + docs; select controlled execution next lane | ✅ merged 2026-06-15 | `docs/CURRENT_STATE.md`; `docs/LANE_REGISTRY.md`; `docs/EVIDENCE_INDEX.md` | Refreshes source-of-truth docs for the blocked Value Read state after #568. | Does not create Value Read success, provider/runtime readiness, or Sheet synchronization evidence. | completed |
+| #570 | Add post-#568 founder memo refresh | ✅ merged 2026-06-15 | founder memo documentation | Refreshes narrative positioning for the blocked Value Read state. | Does not prove value, readiness, or superiority. | completed |
+| #571 | docs: add v1 solve exposure gate packet (BLOCKED) | ✅ merged 2026-06-15 | `docs/evals/runs/14-v1-solve-exposure-gate/README.md` | Records `/v1/solve` public exposure as `BLOCKED` pending auth, tenancy, logging, redaction, rate-limit, CORS/ingress, monitoring, incident-response, rollback, and authorization closure. | Does not expose `/v1/solve` or prove runtime/public/security/privacy readiness. | blocked evidence |
+| #572 | Add local Ollama singlepath operator helper | ✅ merged 2026-06-15 | `scripts/run_local_ollama_singlepath_operator.sh`; local-lab packet docs | Adds an operator helper for the local-only Ollama lane. | Helper existence is not a successful local model run, quality proof, benchmark, or readiness evidence. | completed |
+| #573 | Record blocked local Ollama singlepath attempt | ✅ merged 2026-06-15 | `docs/evals/runs/alpha-solver-local-model-lab-ollama-singlepath-001/local-run-artifact-2026-06-15.md` | Records exact `gemma3:4b` preflight success followed by failed-closed timeout/backend error; no local model answer was generated. | Does not prove local model quality, local Ollama validation, Value Read success, runtime readiness, or Alpha superiority. | blocked evidence |
+| #574 | Add pi.dev harness feasibility research note | ✅ merged 2026-06-15 | `docs/evals/runs/alpha-solver-pi-dev-harness-feasibility-018/README.md` | Records `BORROW_PATTERNS_ONLY_NO_INTEGRATION` for Pi.dev harness research. | Does not install, run, or integrate Pi.dev; does not authorize providers, package installs, runtime exposure, or readiness claims. | completed |
 
 ## Current selected next lane
 
-`ALPHA-SOLVER-VALUE-READ-EXECUTION-PACKET-AUTHORIZATION-001` is the selected next active lane. It should create an explicitly authorized Value Read execution packet/lane with complete per-case prompts, raw-output preservation, blinding-map storage, output-generation boundary, and explicit operator authorization requirements. PR #568 remains blocked-state evidence only.
+`ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` is the selected next active lane. It should create an Alpha-native local operator-harness design note inspired by safe Pi.dev patterns without installing or integrating Pi.dev, calling providers/models, exposing runtime surfaces, or mutating Google Sheets. PR #568 remains blocked-state evidence only, PR #571 remains blocked exposure evidence, and PR #573 remains failed-closed local-lab evidence only.
 
 ## Evidence boundary
 
-The post-#565 state supports only bounded statements that the repository contains merged docs/design/static-checking/scaffold artifacts for no-echo gating, false-premise perturbations, claim-safety linting, calibrated confidence, needs-human protocol guidance, higher-headroom cases, prompt-contract methodology, and a local Ollama lab scaffold.
+The post-#574 state supports only bounded statements that the repository contains merged docs/design/static-checking/scaffold/gate/helper/blocked-attempt/research artifacts for no-echo gating, false-premise perturbations, claim-safety linting, calibrated confidence, needs-human protocol guidance, higher-headroom cases, prompt-contract methodology, a local Ollama lab scaffold/helper, blocked Value Read evidence, blocked `/v1/solve` exposure evidence, a failed-closed local Ollama attempt, and Pi.dev patterns-only research.
 
-It does **not** support claims of provider validation, local Ollama validation, hosted-model validation, token use, benchmark success, value, readiness, security/privacy completion, public API readiness, `/v1/solve` readiness, dashboard readiness, Google Sheets synchronization, or Alpha superiority.
+It does **not** support claims of provider validation, local Ollama validation, hosted-model validation, token use, benchmark success, value, readiness, security/privacy completion, public API readiness, `/v1/solve` readiness, dashboard readiness, Pi.dev integration, Google Sheets synchronization, or Alpha superiority.
