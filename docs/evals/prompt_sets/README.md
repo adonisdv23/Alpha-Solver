@@ -9,6 +9,7 @@ runtime prompt templates and do not change provider behavior.
 | Prompt set | Purpose | Human guide |
 | --- | --- | --- |
 | `higher_headroom_prompt_set_v1.md` | Higher-headroom Alpha-vs-plain comparison prompts for `OUTPUT-DIFFERENTIATION-PHASE-001`. | `docs/evals/HIGHER_HEADROOM_PROMPT_SET.md` |
+| `false_premise_perturbation_case_set_v1.md` | False-premise and hidden-constraint perturbation cases for the next Value Read simulation-only iteration. | `docs/evals/FALSE_PREMISE_PERTURBATION_CASE_SET.md` |
 
 ## Safety rules
 

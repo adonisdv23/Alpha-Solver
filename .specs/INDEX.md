@@ -8,6 +8,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 | File | Title | Health |
 | --- | --- | --- |
 | `ALPHA-ANSWER-STRUCTURE-V2-001.md` | ALPHA-ANSWER-STRUCTURE-V2-001 | ✅ `SPEC_OK` |
+| `ALPHA-SOLVER-EVAL-FALSE-PREMISE-PERTURBATION-001.md` | ALPHA-SOLVER-EVAL-FALSE-PREMISE-PERTURBATION-001 · False-Premise and Hidden-Constraint Perturbation Case Set | ✅ `SPEC_OK` |
 | `ALPHA-BREVITY-CONTROL-001.md` | ALPHA-BREVITY-CONTROL-001 | ✅ `SPEC_OK` |
 | `ALPHA-CLARIFY-THRESHOLD-001.md` | ALPHA-CLARIFY-THRESHOLD-001 · Answer Execution Prompts with Assumptions When Sufficient | ✅ `SPEC_OK` |
 | `ALPHA-FORMAT-PRESERVATION-001.md` | ALPHA-FORMAT-PRESERVATION-001 · Expert Answer Format Preservation | ✅ `SPEC_OK` |
