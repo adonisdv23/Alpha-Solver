@@ -1,21 +1,15 @@
 # Alpha Solver — Current State
 
-> Source-of-truth navigation doc. Last verified **2026-06-15** for PR **#577** replacement branch repair.
+> Source-of-truth navigation doc. Last verified **2026-06-15** for post-#577 Value Read execution authorization decision packet.
 > Docs-only; no provider/runtime claims.
 
 ## Current verified phase
 
-**Post-#577 posture: the Alpha-native local operator harness design note is complete, and an explicit operator decision is required before any next lane.**
+**Post-#577 Value Read authorization-decision posture: the execution authorization decision packet is prepared, and operator review is required before any output-generation run.**
 
 The merged #569–#574 wave updated the repository from the post-#568 blocked Value Read state to a broader documentation-and-boundary posture. PR #576 was superseded by PR #577 and should be closed unmerged. PR #577 completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only Alpha-native local operator harness design note.
 
-The current control posture is now `OPERATOR_DECISION_REQUIRED_AFTER_LOCAL_OPERATOR_HARNESS_DESIGN_NOTE_001`: no further implementation or execution lane is selected automatically. The operator must explicitly choose one future path before any new lane:
-
-- authorize a separate local harness implementation/spec lane, or
-- return to Value Read execution authorization, or
-- stop and keep the design note as reference material.
-
-This document does not choose for the operator.
+The current control posture is now `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_EXECUTION_AUTHORIZATION_DECISION_POST_577_001`: the operator decision to return to the Value Read execution authorization path has been recorded as a docs-only authorization-decision packet, but no output-generation run is authorized automatically. The operator must explicitly approve a future output-generation mechanism before anything runs.
 
 These are docs, gate, helper, static/research, and blocked-attempt artifacts. They do not prove provider behavior, model quality, value, readiness, benchmark success, security/privacy completion, local Ollama validation, `/v1/solve` readiness, production/public readiness, or Alpha superiority.
 
@@ -23,12 +17,12 @@ These are docs, gate, helper, static/research, and blocked-attempt artifacts. Th
 
 | Field | Value |
 |-------|-------|
-| Latest verified PR in this wave | **#577** — Alpha-native local operator harness design note completed by this PR |
-| PR branch state at verification | **#577 replacement merge candidate** on `adonisdv23/Alpha-Solver`; PR #576 superseded and should be closed unmerged |
+| Latest verified completed lane in this wave | **`ALPHA-SOLVER-VALUE-READ-EXECUTION-AUTHORIZATION-DECISION-POST-577-001`** |
+| Live pre-edit verification | PR #577 merged; PR #576 closed unmerged and superseded by #577; no open PRs at verification time |
 | Closed-unmerged superseded PR | **#561** — superseded by merged PR #562 |
-| Current controlling posture | Operator decision required after completed Alpha-native local operator harness design note |
-| Selected next state | **`OPERATOR_DECISION_REQUIRED_AFTER_LOCAL_OPERATOR_HARNESS_DESIGN_NOTE_001`** |
-| Strategic boundary | No implementation, UI, runtime, dependency, provider, local-model, Pi.dev, `/v1/solve`, dashboard/public API, Google Sheets, benchmark, Value Read, readiness, security/privacy, or superiority work is authorized until the operator chooses a future path |
+| Current controlling posture | Operator review required after completed Value Read execution authorization-decision packet |
+| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_EXECUTION_AUTHORIZATION_DECISION_POST_577_001`** |
+| Strategic boundary | No provider call, local-model call, output generation, scoring, unblinding, runtime endpoint, dashboard, public API exposure, Google Sheets mutation, benchmark, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha-superiority claim is authorized until the operator explicitly approves a future output-generation mechanism |
 
 ## Completed post-552 / post-565 / post-568 infrastructure lanes
 
@@ -51,22 +45,17 @@ These are docs, gate, helper, static/research, and blocked-attempt artifacts. Th
 | #574 | `18 - PI.DEV-HARNESS-FEASIBILITY` | Records `BORROW_PATTERNS_ONLY_NO_INTEGRATION` for Pi.dev harness research. |
 | #576 | Superseded local operator harness design note PR | Superseded by PR #577; should be closed unmerged and not cited as the completion artifact. |
 | #577 | `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` | Completes the docs-only Alpha-native local operator harness design note; no implementation or execution authorization. |
+| post-577 lane | `ALPHA-SOLVER-VALUE-READ-EXECUTION-AUTHORIZATION-DECISION-POST-577-001` | Completes a docs-only authorization-decision packet for returning to Value Read execution authorization review; no output generation, scoring, provider/local-model call, endpoint exposure, or value/readiness claim. |
 
 See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for the PR status ledger and [`LANE_REGISTRY.md`](LANE_REGISTRY.md) for lifecycle classification.
 
 ## Selected next state
 
-**`OPERATOR_DECISION_REQUIRED_AFTER_LOCAL_OPERATOR_HARNESS_DESIGN_NOTE_001`** is the current global selected next state.
+**`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_EXECUTION_AUTHORIZATION_DECISION_POST_577_001`** is the current global selected next state.
 
-This is a decision state, not an implementation lane. It means no implementation is authorized, no UI is authorized, no runtime work is authorized, no dependency work is authorized, no provider call is authorized, no local model call is authorized, no Pi.dev install/run/integration is authorized, no `/v1/solve` exposure is authorized, no dashboard or public API exposure is authorized, no Google Sheets mutation is authorized, no benchmark or Value Read execution is authorized, and no readiness, value, security/privacy, provider, local-Ollama, Pi.dev integration, or Alpha superiority claim is authorized.
+This is a review state, not an execution lane. It means the Value Read execution authorization-decision packet is prepared, but no output generation is authorized until the operator explicitly approves a future mechanism, models/providers if any, cost/token caps if any, data boundary, stop conditions, output paths, scoring packet, blinding-map storage, and claim boundaries.
 
-The operator must explicitly choose one future path before any new lane:
-
-1. authorize a separate local harness implementation/spec lane, or
-2. return to Value Read execution authorization, or
-3. stop and keep the design note as reference material.
-
-This source-of-truth state does not choose for the operator and does not automatically authorize a successor lane.
+This selected state authorizes no provider call, local model call, output generation, scoring, unblinding, runtime endpoint, dashboard, public API exposure, Google Sheets mutation, benchmark, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha superiority claim.
 
 ## Open deferrals (see [`DEFERRAL_REGISTER.md`](DEFERRAL_REGISTER.md))
 
@@ -78,7 +67,7 @@ This source-of-truth state does not choose for the operator and does not automat
 ## What is blocked / not authorized
 
 - Provider calls, hosted model calls, local model calls, token use, credential access, billing inspection, dashboard exposure, `/v1/solve` exposure, public API exposure, Pi.dev installation/execution/integration, package-install experiments, and Google Sheets mutation.
-- Value experiment execution and Alpha-vs-baseline claims. PR #568 is `VALUE_READ_BLOCKED`: it generated no Alpha outputs, baseline outputs, blind scores, or measured discrimination-delta.
+- Value experiment execution and Alpha-vs-baseline claims. PR #568 is `VALUE_READ_BLOCKED`: it generated no Alpha outputs, baseline outputs, blind scores, or measured discrimination-delta. The post-577 authorization-decision lane prepares only an authorization-decision packet and still does not authorize execution.
 - Local Ollama validation claims. PR #573 records a failed-closed local timeout/backend error and no local model answer.
 - Security/privacy completion, production readiness, public MVP readiness, benchmark validation/superiority, broad-user readiness, autonomous readiness, provider validation, local Ollama validation, `/v1/solve` readiness, dashboard readiness, or Alpha superiority.
 

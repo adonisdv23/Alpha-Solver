@@ -1,6 +1,6 @@
-# Evidence Index — Post-#577 operator-decision state
+# Evidence Index — Post-#577 Value Read authorization-decision state
 
-> Source-of-truth evidence ledger. Verification date **2026-06-15** for PR **#577** replacement branch repair.
+> Source-of-truth evidence ledger. Verification date **2026-06-15** for post-#577 Value Read execution authorization decision packet.
 
 ## How to read "evidence value"
 
@@ -29,18 +29,19 @@ The entries below are design, documentation, gate, helper, static-checking, meth
 | #573 | Record blocked local Ollama singlepath attempt | ✅ merged 2026-06-15 | `docs/evals/runs/alpha-solver-local-model-lab-ollama-singlepath-001/local-run-artifact-2026-06-15.md` | Records exact `gemma3:4b` preflight success followed by failed-closed timeout/backend error; no local model answer was generated. | Does not prove local model quality, local Ollama validation, Value Read success, runtime readiness, or Alpha superiority. | blocked evidence |
 | #574 | Add pi.dev harness feasibility research note | ✅ merged 2026-06-15 | `docs/evals/runs/alpha-solver-pi-dev-harness-feasibility-018/README.md` | Records `BORROW_PATTERNS_ONLY_NO_INTEGRATION` for Pi.dev harness research. | Does not install, run, or integrate Pi.dev; does not authorize providers, package installs, runtime exposure, or readiness claims. | completed |
 | #576 | Add Alpha-native local operator harness design note | closed unmerged / superseded by #577 | superseded by #577 | No merged evidence artifact from #576. | Must not be cited as the merged completion artifact for this lane. | superseded |
-| #577 | Add Alpha-native local operator harness design note | merged after PR completion | `docs/evals/runs/alpha-solver-local-operator-harness-design-note-001/` | Docs-only Alpha-native local operator harness design note. | Does not prove implementation, runtime behavior, UI readiness, provider behavior, local model behavior, Pi.dev integration, Value Read success, benchmark success, production readiness, public readiness, security/privacy completion, or Alpha superiority. | completed |
+| #577 | Add Alpha-native local operator harness design note | ✅ merged 2026-06-15 | `docs/evals/runs/alpha-solver-local-operator-harness-design-note-001/` | Docs-only Alpha-native local operator harness design note. | Does not prove implementation, runtime behavior, UI readiness, provider behavior, local model behavior, Pi.dev integration, Value Read success, benchmark success, production readiness, public readiness, security/privacy completion, or Alpha superiority. | completed |
+| post-577 lane | docs: prepare post-577 Value Read execution authorization decision | completed | `docs/evals/runs/alpha-solver-value-read-execution-authorization-decision-post-577-001/` | Docs-only authorization-decision packet for operator review before any future Value Read output-generation run. | Does not authorize or perform output generation, scoring, unblinding, provider calls, local model runs, runtime endpoints, dashboard/public API exposure, Google Sheets mutation, benchmarks, readiness claims, value claims, provider claims, local-model claims, security/privacy claims, or Alpha-superiority claims. | completed |
 
 ## Current selected next state
 
-`OPERATOR_DECISION_REQUIRED_AFTER_LOCAL_OPERATOR_HARNESS_DESIGN_NOTE_001` is the selected next state. This is a decision state, not an implementation lane.
+`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_EXECUTION_AUTHORIZATION_DECISION_POST_577_001` is the selected next state. This is a review state, not an execution lane.
 
-PR #576 is superseded by PR #577 and should be closed unmerged. PR #577 completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` after merge. The completed packet does not automatically authorize a successor lane. Future implementation or execution requires a separate explicit operator-authorized lane.
+`ALPHA-SOLVER-VALUE-READ-EXECUTION-AUTHORIZATION-DECISION-POST-577-001` is completed as a docs-only authorization-decision packet. The operator must explicitly authorize a future output-generation mechanism before anything runs.
 
-The selected state authorizes no implementation, UI, runtime work, dependency work, provider call, local model call, Pi.dev install/run/integration, `/v1/solve` exposure, dashboard or public API exposure, Google Sheets mutation, benchmark execution, Value Read execution, or readiness/value/security/privacy/provider/local-Ollama/Pi.dev-integration/Alpha-superiority claim.
+The selected state authorizes no provider call, local model call, output generation, scoring, unblinding, runtime endpoint, dashboard or public API exposure, Google Sheets mutation, benchmark execution, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha-superiority claim.
 
 ## Evidence boundary
 
-The post-#577 state supports only bounded statements that the repository contains docs/design/static-checking/scaffold/gate/helper/blocked-attempt/research artifacts for no-echo gating, false-premise perturbations, claim-safety linting, calibrated confidence, needs-human protocol guidance, higher-headroom cases, prompt-contract methodology, a local Ollama lab scaffold/helper, blocked Value Read evidence, blocked `/v1/solve` exposure evidence, a failed-closed local Ollama attempt, and Pi.dev patterns-only research.
+The post-#577 authorization-decision state supports only bounded statements that the repository contains docs/design/static-checking/scaffold/gate/helper/blocked-attempt/research artifacts for no-echo gating, false-premise perturbations, claim-safety linting, calibrated confidence, needs-human protocol guidance, higher-headroom cases, prompt-contract methodology, a local Ollama lab scaffold/helper, blocked Value Read evidence, blocked `/v1/solve` exposure evidence, a failed-closed local Ollama attempt, Pi.dev patterns-only research, and a docs-only Value Read execution authorization-decision packet.
 
 It does **not** support claims of provider validation, local Ollama validation, hosted-model validation, token use, benchmark success, value, readiness, security/privacy completion, public API readiness, `/v1/solve` readiness, dashboard readiness, Pi.dev integration, Google Sheets synchronization, or Alpha superiority.

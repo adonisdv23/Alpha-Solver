@@ -1,7 +1,7 @@
 # Lane Registry
 
 > Source-of-truth lane lifecycle registry. Verification date **2026-06-15** for
-> PR **#577** replacement branch repair.
+> post-#577 Value Read execution authorization decision packet.
 
 ## Lifecycle classes
 
@@ -11,13 +11,13 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Post-#577 operator-decision posture | **current control posture** | PR #576 is superseded and should be closed unmerged. PR #577 completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only design note. The current selected state is an operator decision requirement, not an implementation lane. |
+| Post-#577 Value Read authorization-decision posture | **current control posture** | `ALPHA-SOLVER-VALUE-READ-EXECUTION-AUTHORIZATION-DECISION-POST-577-001` is completed as a docs-only decision packet. The current selected state is operator review required, not an execution lane. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_DECISION_REQUIRED_AFTER_LOCAL_OPERATOR_HARNESS_DESIGN_NOTE_001`** | **selected next state; not an implementation lane** | The operator must explicitly choose whether to authorize a separate local harness implementation/spec lane, return to Value Read execution authorization, or stop and keep the design note as reference material. No implementation, UI, runtime, dependency, provider, local-model, Pi.dev, `/v1/solve`, dashboard/public API, Google Sheets, benchmark, Value Read, readiness, security/privacy, or superiority work is authorized. |
+| **`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_EXECUTION_AUTHORIZATION_DECISION_POST_577_001`** | **selected next state; review state, not an execution lane** | The operator must explicitly approve any future output-generation mechanism before anything runs. No provider call, local model call, output generation, scoring, unblinding, runtime endpoint, dashboard/public API, Google Sheets mutation, benchmark, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha-superiority claim is authorized. |
 
 ## Completed (kept as evidence)
 
@@ -37,6 +37,7 @@
 - Local Ollama singlepath blocked attempt (PR #573) — exact `gemma3:4b` model preflight passed, then helper failed closed with timeout/backend error and produced no local answer.
 - `18 - PI.DEV-HARNESS-FEASIBILITY` (PR #574) — `BORROW_PATTERNS_ONLY_NO_INTEGRATION` research note.
 - `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` (PR #577) — docs-only Alpha-native local operator harness design note; completed by PR #577 with no implementation or execution authorization.
+- `ALPHA-SOLVER-VALUE-READ-EXECUTION-AUTHORIZATION-DECISION-POST-577-001` (stable post-merge state) — docs-only authorization-decision packet; no output generation, scoring, provider/local-model call, endpoint exposure, or value/readiness claim.
 
 ## Superseded
 
@@ -63,7 +64,7 @@
 
 - PR #561 lane as a standalone needs-human protocol PR — closed unmerged and superseded by PR #562.
 - Any merged packet lane verbatim — packets are immutable evidence; create a new lane id instead.
-- Any selected-next pointer that conflicts with `OPERATOR_DECISION_REQUIRED_AFTER_LOCAL_OPERATOR_HARNESS_DESIGN_NOTE_001`.
+- Any selected-next pointer that conflicts with `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_EXECUTION_AUTHORIZATION_DECISION_POST_577_001`.
 - Direct Pi.dev integration from PR #574's research lane — the recorded verdict is patterns-only/no-integration.
 
 ## Forward path (single track)
@@ -93,7 +94,10 @@ ALPHA-SOLVER-VALUE-READ-SIMULATION-PACKET-REFRESH-POST-565-001 / PR #568 artifac
 #577 local operator harness design note completed
         │
         ▼
-OPERATOR_DECISION_REQUIRED_AFTER_LOCAL_OPERATOR_HARNESS_DESIGN_NOTE_001 ← selected next state; decision only, not an implementation lane
+ALPHA-SOLVER-VALUE-READ-EXECUTION-AUTHORIZATION-DECISION-POST-577-001 ← docs-only packet; no output generation
+        │
+        ▼
+OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_EXECUTION_AUTHORIZATION_DECISION_POST_577_001 ← selected next state; review only, not an execution lane
 ```
 
-This registry does not authorize any provider call, local model call, Pi.dev install/run/integration, runtime exposure, public API exposure, Google Sheets mutation, or readiness/value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
+This registry does not authorize any provider call, local model call, output generation, scoring, unblinding, Pi.dev install/run/integration, runtime endpoint, dashboard exposure, public API exposure, Google Sheets mutation, benchmark, or readiness/value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
