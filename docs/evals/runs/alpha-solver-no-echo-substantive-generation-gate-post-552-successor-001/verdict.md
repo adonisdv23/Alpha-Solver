@@ -4,10 +4,10 @@ Verdict: `POST_552_NO_ECHO_SUBSTANTIVE_GATE_PASS`
 
 ## Rationale
 
-The deterministic checker classified all 10 synthetic fixtures into their expected categories:
+The deterministic checker classified all 11 synthetic fixtures into their expected categories:
 
 - 2 exact prompt echo fixtures;
-- 2 near-echo fixtures;
+- 3 near-echo fixtures, including a clarification-marker copied-prompt regression fixture;
 - 2 placeholder/stub/canned fixtures;
 - 2 bounded SAFE-OUT/refusal/clarification fixtures;
 - 2 substantive-derived output fixtures.

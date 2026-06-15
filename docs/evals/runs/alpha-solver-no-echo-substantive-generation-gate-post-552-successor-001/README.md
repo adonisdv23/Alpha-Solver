@@ -25,11 +25,11 @@ The checker is implemented in `alpha/eval/no_echo_substantive_gate.py` and exerc
 | Category | Fixtures | Expected matched |
 | --- | ---: | ---: |
 | `exact_prompt_echo` | 2 | 2 |
-| `near_echo` | 2 | 2 |
+| `near_echo` | 3 | 3 |
 | `placeholder_stub_canned_output` | 2 | 2 |
 | `safe_out_refusal_or_clarification` | 2 | 2 |
 | `substantive_derived_output` | 2 | 2 |
-| **Total** | **10** | **10** |
+| **Total** | **11** | **11** |
 
 ## Validation commands
 

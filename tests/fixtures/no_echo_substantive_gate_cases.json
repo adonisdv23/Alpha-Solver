@@ -28,6 +28,13 @@
     "expected_category": "near_echo"
   },
   {
+    "id": "near-echo-clarification-marker-copy",
+    "category_group": "near-echo cases",
+    "prompt": "Before importing customer billing records into production, list the privacy checks, rollback plan, access controls, validation steps, and owner signoff needed.",
+    "output": "Please clarify: before importing customer billing records into production, list the privacy checks, rollback plan, access controls, validation steps, and owner signoff needed.",
+    "expected_category": "near_echo"
+  },
+  {
     "id": "placeholder-todo",
     "category_group": "placeholder/stub cases",
     "prompt": "Give a bounded migration checklist for a small SQLite app moving to Postgres.",
@@ -60,7 +67,10 @@
     "category_group": "known derived-output cases",
     "prompt": "Explain photosynthesis in two plain-language sentences.",
     "output": "Answer: Plants use light energy to turn water and carbon dioxide into sugars they can store and use. Because oxygen is released during that process, photosynthesis also helps refresh the air many organisms breathe.",
-    "required_answer_fields": ["Answer:", "Because"],
+    "required_answer_fields": [
+      "Answer:",
+      "Because"
+    ],
     "expected_category": "substantive_derived_output"
   },
   {
@@ -68,7 +78,11 @@
     "category_group": "known derived-output cases",
     "prompt": "Give a three-item checklist for packing for a one-night work trip.",
     "output": "Answer: 1. Pack one professional outfit, sleepwear, toiletries, chargers, and required work devices. 2. Put wallet, identification, medication, keys, and booking details in an easy-access pocket. 3. Check weather, meeting expectations, and return timing before leaving.",
-    "required_answer_fields": ["Answer:", "1.", "3."],
+    "required_answer_fields": [
+      "Answer:",
+      "1.",
+      "3."
+    ],
     "expected_category": "substantive_derived_output"
   }
 ]

@@ -10,6 +10,7 @@ Source fixture file: `tests/fixtures/no_echo_substantive_gate_cases.json`
 | `exact-echo-normalized-case` | exact echo cases | `exact_prompt_echo` |
 | `near-echo-preface` | near-echo cases | `near_echo` |
 | `near-echo-long-span` | near-echo cases | `near_echo` |
+| `near-echo-clarification-marker-copy` | near-echo cases | `near_echo` |
 | `placeholder-todo` | placeholder/stub cases | `placeholder_stub_canned_output` |
 | `placeholder-canned` | placeholder/stub cases | `placeholder_stub_canned_output` |
 | `safeout-unsupported` | bounded SAFE-OUT cases | `safe_out_refusal_or_clarification` |
@@ -19,8 +20,8 @@ Source fixture file: `tests/fixtures/no_echo_substantive_gate_cases.json`
 
 ## Pass/fail counts
 
-- Total fixtures: 10
-- Expected category matches: 10
+- Total fixtures: 11
+- Expected category matches: 11
 - Expected category mismatches: 0
 
 ## Heuristic coverage

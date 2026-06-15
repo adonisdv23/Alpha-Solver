@@ -140,12 +140,12 @@ def classify_output(
 
     if normalized_output and normalized_output == normalized_prompt:
         return GateResult(EXACT_PROMPT_ECHO, False, "normalized output exactly equals normalized prompt", metrics)
-    if safe:
-        return GateResult(SAFE_OUT_REFUSAL_CLARIFICATION, True, "bounded safe-out/refusal/clarification detected", metrics)
-    if placeholder:
-        return GateResult(PLACEHOLDER_STUB_CANNED, False, "placeholder, stub, or canned phrase detected", metrics)
     if overlap >= near_echo_overlap_threshold or span_ratio >= near_echo_span_threshold:
         return GateResult(NEAR_ECHO, False, "output copies too much prompt text", metrics)
+    if placeholder:
+        return GateResult(PLACEHOLDER_STUB_CANNED, False, "placeholder, stub, or canned phrase detected", metrics)
+    if safe:
+        return GateResult(SAFE_OUT_REFUSAL_CLARIFICATION, True, "bounded safe-out/refusal/clarification detected", metrics)
     if len(output_tokens) < min_derived_tokens:
         return GateResult(PLACEHOLDER_STUB_CANNED, False, "output is too short for a derived answer", metrics)
     if novelty < min_novelty_ratio:

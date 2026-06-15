@@ -50,3 +50,20 @@ def test_safeout_is_not_misclassified_as_placeholder_or_echo():
     assert result.category == SAFE_OUT_REFUSAL_CLARIFICATION
     assert result.passed is True
     assert result.metrics.safe_refusal_detected is True
+
+
+def test_safeout_or_clarification_marker_does_not_override_near_echo():
+    prompt = (
+        "Before importing customer billing records into production, list the privacy checks, "
+        "rollback plan, access controls, validation steps, and owner signoff needed."
+    )
+    result = classify_output(
+        prompt,
+        "Please clarify: before importing customer billing records into production, list the "
+        "privacy checks, rollback plan, access controls, validation steps, and owner signoff needed.",
+    )
+
+    assert result.category == NEAR_ECHO
+    assert result.passed is False
+    assert result.metrics.safe_refusal_detected is True
+    assert result.metrics.longest_copied_span_ratio >= 0.55

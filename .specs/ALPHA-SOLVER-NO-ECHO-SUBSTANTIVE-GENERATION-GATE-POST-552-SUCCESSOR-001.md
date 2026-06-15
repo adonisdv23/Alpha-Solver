@@ -31,6 +31,7 @@ Create a repeatable, deterministic, local-only successor gate after #552 that se
 - `minimum derived-answer length`: default 16 output tokens.
 - Placeholder/stub detection uses deterministic phrase patterns such as `placeholder`, `stub`, `TODO`, `TBD`, `coming soon`, `not implemented`, and generic-answer markers.
 - SAFE-OUT/refusal/clarification detection uses deterministic bounded refusal/clarification markers, including the `SAFE-OUT:` prefix.
+- SAFE-OUT/refusal/clarification markers are evaluated only after exact-echo and near-echo/copy-span checks, so those markers cannot make copied prompt text pass.
 
 ## Acceptance
 
