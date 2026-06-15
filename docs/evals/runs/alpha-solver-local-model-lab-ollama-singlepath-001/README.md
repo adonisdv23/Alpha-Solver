@@ -24,6 +24,7 @@ The helper script `scripts/run_local_ollama_singlepath_operator.sh` is operator-
 - `evidence-boundary.md` records blocked surfaces and non-actions.
 - `non-claims.md` records claims this packet does not make.
 - `checks-run.md` records validation for this docs/scaffold lane.
+- `local-run-artifact-2026-06-15.md` records the blocked operator-local Ollama singlepath attempt verdict.
 
 ## Closed follow-on state
 
