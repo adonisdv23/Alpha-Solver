@@ -1,26 +1,48 @@
 # Selected next lane
 
-Selected next lane: `ALPHA-SOLVER-NO-ECHO-SUBSTANTIVE-GENERATION-GATE-POST-552-SUCCESSOR-001`
+Selected next lane: `ALPHA-SOLVER-VALUE-READ-EXECUTION-PACKET-AUTHORIZATION-001`
 
-Decision label: **post-#552 no-echo/substantive-generation gate successor rerun first**.
+Decision label: **controlled Value Read execution authorization packet**.
 
 ## Rationale
 
-#552 provides partial local exact-echo remediation for controlled fixtures and unsupported SAFE-OUT-style clarification. It does not prove broad no-echo behavior, general answer quality, provider behavior, runtime readiness, benchmark success, value, public readiness, production readiness, or Alpha superiority.
+PR #568 recorded `VALUE_READ_BLOCKED`. The committed manual-run artifact stopped before output generation and scoring. It generated no Alpha outputs, no baseline outputs, no blind scores, and no measured discrimination-delta.
 
-The actual manual discrimination Value Read result is blocked, not scored. Track S simulation was not run. Track R runtime/provider execution stopped before producing runtime/provider outputs because no Value Read readiness proof or provider authorization exists.
+The next lane must therefore create a controlled execution authorization packet/lane before any output generation occurs. That packet/lane must define complete per-case prompts, raw-output preservation paths, blinding-map storage, output-generation boundary, score-lock and unblind rules, and explicit operator authorization requirements.
 
-The next lane must therefore rerun or create a successor no-echo/substantive-generation gate against the post-#552 state before any Value Read execution, provider smoke, release-candidate, paid/provider, or public-exposure lane is considered. This does not reselect the already-landed prompt-consumption wiring fix.
+The PR #568 artifact is blocked-state evidence only. It must not be treated as value evidence, benchmark evidence, MVP validation evidence, provider validation evidence, runtime readiness evidence, public readiness evidence, production readiness evidence, or Alpha-superiority evidence.
 
-## Not selected
+## Required next-lane contents
 
-- `ALPHA-SOLVER-PROMPT-CONSUMPTION-WIRING-FIX-001` — not selected because #552 already landed partial local exact-echo remediation.
-- `Continue value-read refinement` — not selected as the immediate evidence lane because post-#552 no-echo/substantive-generation behavior must be checked first.
-- `Open next release candidate` — not supported by a blocked Value Read.
-- `Keep docs-only and stop` — not selected because there is an actionable narrow successor evidence gate.
-- `Block paid/provider work` — enforced as a boundary until post-#552 no-echo/substantive-generation evidence exists and explicit operator authorization exists, but not selected as the next documentation lane.
-- `Block public exposure` — enforced as a boundary until security/public/readiness gates are closed or explicitly risk-accepted, but not selected as the next documentation lane.
+The selected next lane must include all of the following before any Alpha or baseline output generation:
 
-## Future route after successor gate
+1. Complete per-case prompts for every Value Read case.
+2. Raw Alpha and baseline output preservation paths.
+3. Blinding-map storage requirements.
+4. Output-generation boundary, including the allowed mechanism and stop conditions.
+5. Score-lock procedure before unblinding.
+6. Unblind-after-score-lock rules.
+7. Explicit operator authorization requirements.
+8. Non-claims and evidence-boundary language matching the blocked PR #568 state.
 
-If the post-#552 successor gate passes narrowly, the operator may choose a narrow value-read simulation or an explicitly authorized runtime/provider Value Read. Simulation results must remain labeled as simulation and must not be promoted to runtime evidence. Runtime/provider work remains blocked unless explicit operator authorization supplies model, project/billing boundary, cost cap, token cap, max request count, exact synthetic fixture, redaction/data-sharing boundary, and stop conditions.
+## Not authorized by this selection
+
+This selected next lane does **not** authorize:
+
+- provider calls;
+- token use;
+- credential access;
+- billing inspection;
+- hosted model calls;
+- local model calls;
+- endpoint calls;
+- dashboard exposure;
+- `/v1/solve` exposure;
+- public API exposure;
+- Google Sheets mutation;
+- external ledger mutation;
+- value, readiness, benchmark, provider-validation, runtime-readiness, production-readiness, public-use, MVP-validation, security/privacy, or Alpha-superiority claims.
+
+## Historical / completed context
+
+`ALPHA-SOLVER-NO-ECHO-SUBSTANTIVE-GENERATION-GATE-POST-552-SUCCESSOR-001` remains historical/completed evidence context in this packet. It is **not** the selected next lane after PR #568.

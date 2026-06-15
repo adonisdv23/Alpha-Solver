@@ -27,9 +27,9 @@ this framing:
 
 ## Selected next packet lane
 
-**`ALPHA-SOLVER-VALUE-READ-SIMULATION-PACKET-REFRESH-POST-565-001`** is the selected next active lane. It should refresh the Value Read simulation packet against the merged #557–#565 infrastructure before any execution or evidence promotion.
+**`ALPHA-SOLVER-VALUE-READ-EXECUTION-PACKET-AUTHORIZATION-001`** is the selected next active lane after the PR #568 blocked manual-run artifact. It should create an explicitly authorized Value Read execution packet/lane before any output generation, execution, or evidence promotion.
 
-The refresh should incorporate:
+The next packet/lane should incorporate:
 
 - no-echo substantive generation gating;
 - false-premise and hidden-constraint perturbation cases;
@@ -62,5 +62,5 @@ The refresh should incorporate:
   this lane.
 - This direction makes **no** claim of benchmark validation, benchmark
   superiority, or broad-user readiness.
-- The selected next lane is a packet refresh only; it does not run providers, use tokens, inspect credentials or billing, run hosted/local models, expose dashboards, expose `/v1/solve`, expose a public API, mutate Google Sheets, or claim value/readiness/provider validation/security/privacy completion/Alpha superiority.
+- PR #568 is blocked-state evidence only: it did not generate Alpha outputs, baseline outputs, blind scores, or discrimination-delta. The selected next lane must not run providers, use tokens, inspect credentials or billing, run hosted/local models, expose dashboards, expose `/v1/solve`, expose a public API, mutate Google Sheets, or claim value/readiness/provider validation/security/privacy completion/Alpha superiority unless a future operator authorization explicitly supplies those boundaries.
 - Later protocol execution remains blocked until a future authorized lane explicitly satisfies its prerequisites and evidence boundaries (see [`LANE_REGISTRY.md`](LANE_REGISTRY.md)).

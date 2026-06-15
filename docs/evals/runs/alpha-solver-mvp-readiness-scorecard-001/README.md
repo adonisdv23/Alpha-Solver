@@ -1,12 +1,12 @@
 # ALPHA-SOLVER-MVP-READINESS-SCORECARD-001
 
-Verdict: `MVP_SCORECARD_UPDATED_POST_552_VALUE_READ_BLOCKED`
+Verdict: `VALUE_READ_BLOCKED_POST_568`
 
 This packet is an internal MVP readiness evidence and non-claims scorecard. It is not an MVP readiness claim, public-readiness claim, production-readiness claim, provider-validation claim, runtime-readiness claim, dashboard-readiness claim, benchmark claim, value-evidence claim, or Alpha-superiority claim.
 
 ## Purpose
 
-Update the MVP scorecard using the actual manual discrimination Value Read status and the post-#552 evidence state. The Value Read did not produce simulation or runtime scores; it produced a blocked verdict for runtime/provider execution and no simulation run. #552 provides partial local exact-echo remediation only, so the next lane must be a post-#552 successor no-echo/substantive-generation gate rather than the already-landed prompt-consumption wiring fix.
+Update the MVP scorecard using the committed PR #568 blocked manual Value Read artifact. PR #568 records `VALUE_READ_BLOCKED`: the run stopped before output generation and scoring, and it produced no Alpha outputs, baseline outputs, blind scores, or measured discrimination-delta. The packet-level next lane is now a controlled Value Read execution authorization packet/lane, not the historical post-#552 no-echo successor lane.
 
 ## Source context inspected
 
@@ -18,6 +18,7 @@ Update the MVP scorecard using the actual manual discrimination Value Read statu
 - `docs/evals/runs/alpha-solver-manual-discrimination-value-read-001/evidence-boundary.md`
 - Existing MVP scorecard packet files in this directory.
 - Post-#552 repository state represented by merged PR #552 partial local exact-echo remediation.
+- PR #568 committed artifact: `docs/evals/runs/alpha-solver-value-read-simulation-packet-refresh-post-565-001/manual-run-artifact-2026-06-15.md`.
 
 ## Required outputs
 
@@ -33,6 +34,10 @@ Update the MVP scorecard using the actual manual discrimination Value Read statu
 
 ## Decision summary
 
-Selected next lane: `ALPHA-SOLVER-NO-ECHO-SUBSTANTIVE-GENERATION-GATE-POST-552-SUCCESSOR-001`.
+Selected next lane: `ALPHA-SOLVER-VALUE-READ-EXECUTION-PACKET-AUTHORIZATION-001`.
 
-#552 provides partial local exact-echo remediation for controlled fixtures and unsupported SAFE-OUT-style clarification. It does not prove broad no-echo behavior, general answer quality, provider behavior, runtime readiness, benchmark success, value, public readiness, production readiness, or Alpha superiority. Therefore the immediate next evidence lane is a post-#552 successor no-echo/substantive-generation gate or derivation check, not the already-landed prompt-consumption wiring fix.
+Decision label: controlled Value Read execution authorization packet.
+
+PR #568 recorded `VALUE_READ_BLOCKED`; it generated no Alpha outputs, baseline outputs, blind scores, or measured discrimination-delta. The next lane must create complete per-case prompts, raw-output preservation paths, blinding-map storage, output-generation boundary, score-lock/unblind rules, and explicit operator authorization requirements before any output generation.
+
+The old post-#552 no-echo successor lane, `ALPHA-SOLVER-NO-ECHO-SUBSTANTIVE-GENERATION-GATE-POST-552-SUCCESSOR-001`, remains historical/completed evidence context only. It is not the selected next lane after PR #568. This packet does not authorize provider calls, token use, credential access, hosted model calls, local model calls, endpoint calls, dashboard exposure, `/v1/solve`, public API exposure, Google Sheets mutation, or value/readiness/superiority claims.

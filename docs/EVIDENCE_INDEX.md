@@ -1,9 +1,7 @@
-# Evidence Index — Post-#565 consolidation
+# Evidence Index — Post-#568 blocked Value Read state
 
 > Source-of-truth evidence ledger. Verification date **2026-06-15**. Live GitHub
-> API verification confirmed PRs #557, #558, #559, #560, #562, #563, #564, and
-> #565 are merged; PR #561 is closed unmerged; and the repository had `0` open
-> PRs at verification time.
+> API verification confirmed PRs #566, #567, and #568 are merged.
 
 ## How to read "evidence value"
 
@@ -22,10 +20,13 @@ The entries below are design, documentation, static-checking, methodology, or sc
 | #563 | Add higher-headroom Value Read case set (design-only) | ✅ merged 2026-06-15 | `.specs/ALPHA-SOLVER-EVAL-HIGHER-HEADROOM-CASESET-001.md`; `docs/evals/HIGHER_HEADROOM_VALUE_READ_CASE_SET.md` | Adds higher-headroom synthetic Value Read candidate cases. | Does not score outputs, prove lift, or establish benchmark success. | completed |
 | #564 | Add prompt-contract simulation methodology | ✅ merged 2026-06-15 | `docs/evals/runs/alpha-solver-prompt-contract-simulation-methodology-001/` | Records methodology for prompt-contract simulation. | Does not execute a simulation, call providers, or prove value. | completed |
 | #565 | Add local Ollama singlepath lab lane | ✅ merged 2026-06-15 | `.specs/ALPHA-SOLVER-LOCAL-MODEL-LAB-OLLAMA-SINGLEPATH-001.md`; `docs/evals/runs/alpha-solver-local-model-lab-ollama-singlepath-001/` | Records a local-only Ollama singlepath lab scaffold. | Does not run Ollama, run a local model, validate a provider, expose an API, or prove readiness. | completed |
+| #566 | Post-565 Value Read simulation packet refresh | ✅ merged 2026-06-15 | `docs/evals/runs/alpha-solver-value-read-simulation-packet-refresh-post-565-001/` | Refreshes the packet lane for post-565 infrastructure. | Does not prove value, run providers/models, or score outputs. | completed |
+| #567 | Value Read packet follow-up / pre-run state | ✅ merged 2026-06-15 | `docs/evals/runs/alpha-solver-value-read-simulation-packet-refresh-post-565-001/` | Commits the packet state inspected by the manual-run artifact. | Does not itself prove value or readiness. | completed |
+| #568 | Manual Value Read simulation run artifact — stopped | ✅ merged 2026-06-15 | `docs/evals/runs/alpha-solver-value-read-simulation-packet-refresh-post-565-001/manual-run-artifact-2026-06-15.md` | Records `VALUE_READ_BLOCKED`: stopped before output generation and scoring; no Alpha/baseline outputs, blind scores, or discrimination-delta. | Does not claim Alpha value, superiority, provider/local/runtime behavior, endpoint/dashboard/public API behavior, Google Sheets mutation, external ledger mutation, MVP validation, or readiness. | blocked evidence |
 
 ## Current selected next lane
 
-`ALPHA-SOLVER-VALUE-READ-SIMULATION-PACKET-REFRESH-POST-565-001` is the selected next active lane unless newer live repo evidence supersedes it. The lane is limited to refreshing the Value Read simulation packet against the merged #557–#565 infrastructure and preserving evidence boundaries.
+`ALPHA-SOLVER-VALUE-READ-EXECUTION-PACKET-AUTHORIZATION-001` is the selected next active lane. It should create an explicitly authorized Value Read execution packet/lane with complete per-case prompts, raw-output preservation, blinding-map storage, output-generation boundary, and explicit operator authorization requirements. PR #568 remains blocked-state evidence only.
 
 ## Evidence boundary
 

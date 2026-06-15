@@ -1,13 +1,13 @@
 # Alpha Solver — Current State
 
 > Source-of-truth navigation doc. Last verified **2026-06-15** after live
-> GitHub verification of PRs #557–#565. Docs-only; no provider/runtime claims.
+> GitHub verification of PRs #566–#568. Docs-only; no provider/runtime claims.
 
 ## Current verified phase
 
-**Post-#565 infrastructure consolidation; no open PRs at verification time; selected next lane is a docs/eval packet refresh.**
+**Post-#568 Value Read blocked state; selected next lane is an explicitly authorized Value Read execution packet/lane.**
 
-The merged #557–#565 wave moved the repository from stale smoke-authorisation pointers to a Value Read infrastructure/design posture:
+The merged #566–#568 wave refreshed the post-565 Value Read packet and recorded a stopped manual run artifact. The prior #557–#565 wave moved the repository from stale smoke-authorisation pointers to a Value Read infrastructure/design posture:
 
 - PR #557 merged the post-552 **no-echo substantive generation gate**.
 - PR #558 merged the **false-premise and hidden-constraint perturbation case set**.
@@ -25,12 +25,12 @@ These are infrastructure, design, methodology, and docs/tooling artifacts. They 
 
 | Field | Value |
 |-------|-------|
-| Latest verified merged PR in this consolidation wave | **#565** — `Add local Ollama singlepath lab lane` |
+| Latest verified merged PR in this consolidation wave | **#568** — blocked/stopped manual Value Read artifact committed |
 | Live open PR state at verification | **0 open PRs** on `adonisdv23/Alpha-Solver` |
 | Closed-unmerged superseded PR | **#561** — superseded by merged PR #562 |
-| Current controlling posture | Post-#565 docs/eval infrastructure consolidation; no provider/model execution authorized |
-| Selected next lane | **`ALPHA-SOLVER-VALUE-READ-SIMULATION-PACKET-REFRESH-POST-565-001`** |
-| Strategic boundary | Refresh the Value Read simulation packet against the merged infrastructure before any execution/evidence promotion |
+| Current controlling posture | `VALUE_READ_BLOCKED`; PR #568 generated no outputs and no scores |
+| Selected next lane | **`ALPHA-SOLVER-VALUE-READ-EXECUTION-PACKET-AUTHORIZATION-001`** |
+| Strategic boundary | Convert the blocked PR #568 Value Read state into a controlled authorization packet/lane before any output generation or evidence promotion |
 
 ## Completed post-552 / post-565 infrastructure lanes
 
@@ -49,15 +49,15 @@ See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for the PR status ledger and [`LANE
 
 ## Selected next lane
 
-**`ALPHA-SOLVER-VALUE-READ-SIMULATION-PACKET-REFRESH-POST-565-001`** is the recommended next active lane.
+**`ALPHA-SOLVER-VALUE-READ-EXECUTION-PACKET-AUTHORIZATION-001`** is the recommended next active lane.
 
 Purpose:
 
-1. Refresh the Value Read simulation packet so it explicitly incorporates the merged #557–#565 infrastructure.
-2. Preserve the evidence boundary: design/simulation packet refresh only unless a later lane separately authorizes execution.
-3. Align future Value Read prompts/scoring with the no-echo gate, false-premise set, claim-safety linter, calibrated-confidence contract, needs-human protocol, higher-headroom cases, prompt-contract methodology, and local Ollama scaffold boundaries.
+1. Create a controlled Value Read execution packet/lane after the PR #568 blocked artifact.
+2. Include complete per-case prompts, raw-output preservation, blinding-map storage, output-generation boundary, and explicit operator authorization requirements.
+3. Keep PR #568 as blocked-state evidence only; do not treat it as Alpha value evidence.
 
-This lane does **not** authorize provider calls, token use, credential access, billing inspection, hosted model calls, local model calls, dashboard exposure, `/v1/solve` exposure, public API exposure, Google Sheets mutation, benchmark execution, or value/readiness claims.
+This lane does **not** itself authorize provider calls, token use, credential access, billing inspection, hosted model calls, local model calls, dashboard exposure, `/v1/solve` exposure, public API exposure, Google Sheets mutation, benchmark execution, or value/readiness claims unless a future operator authorization explicitly supplies those boundaries.
 
 ## Open deferrals (see [`DEFERRAL_REGISTER.md`](DEFERRAL_REGISTER.md))
 
@@ -69,7 +69,7 @@ This lane does **not** authorize provider calls, token use, credential access, b
 ## What is blocked / not authorized
 
 - Provider calls, hosted model calls, local model calls, token use, credential access, billing inspection, dashboard exposure, `/v1/solve` exposure, public API exposure, and Google Sheets mutation.
-- Value experiment execution and Alpha-vs-baseline claims. The post-#565 infrastructure can support better packet design, but it is not execution evidence.
+- Value experiment execution and Alpha-vs-baseline claims. PR #568 is `VALUE_READ_BLOCKED`: it generated no Alpha outputs, baseline outputs, blind scores, or measured discrimination-delta.
 - Security/privacy completion, production readiness, public MVP readiness, benchmark validation/superiority, broad-user readiness, autonomous readiness, provider validation, local Ollama validation, or Alpha superiority.
 
 ## What must not be claimed
