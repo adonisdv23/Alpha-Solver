@@ -1,10 +1,7 @@
 # Lane Registry
 
-> Created by lane `ALPHA-SOLVER-CURRENT-STATE-DOCS-BACKLOG-ARCHIVE-ISSUE-REGISTER-001`.
-> Verification date **2026-06-14**. Classifies every recent lane by lifecycle.
-> The controlling latest packet is PR #527 (`local-openai-token-smoke-capture-retry-002`);
-> its `selected-next-lane.md` is the authoritative forward pointer. All
-> older `selected-next-lane.md` files are **historical** snapshots.
+> Source-of-truth lane lifecycle registry. Verification date **2026-06-15** after
+> live GitHub verification of PRs #557–#565 and current open PR state.
 
 ## Lifecycle classes
 
@@ -14,85 +11,62 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` | **current control, consumed/blocked** | PR #527 → `BLOCKED_OPERATOR_AUTHORIZATION_MISSING`; provider calls `0`, tokens `0`, cost `$0.00` |
+| Post-#565 consolidation | **current control posture** | PRs #557, #558, #559, #560, #562, #563, #564, and #565 are merged; PR #561 is closed unmerged and superseded by #562; live open PR count was `0` at verification. |
 
 ## Next ready
 
 | Lane | State | Notes |
 |------|-------|-------|
-| **`LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002-AUTHORIZATION-REFRESH`** | **selected next** | Authorization-refresh packet only. It must supply explicit model, project boundary, cost cap, token cap, max run count, and synthetic fixture before any provider call. |
-
-## Blocked
-
-| Lane | Blocked by | Unblock condition |
-|------|-----------|-------------------|
-| `ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001` | No real provider smoke yet; no no-echo evidence; protocol designed/canonical packet exists but not executed | After a successful tiny smoke and protocol preconditions, including substantive Alpha generation / no-echo gate and appropriate smoke/provider boundary; highest strategic value |
-| `DEF-002` security/privacy review lane | Review not scoped/executed | Operator-scoped security/privacy assessment |
-| `DEF-003` audit custody lane | Audit text not committed | Committed audit text or accepted replacement custody |
+| **`ALPHA-SOLVER-VALUE-READ-SIMULATION-PACKET-REFRESH-POST-565-001`** | **selected next** | Docs/eval packet refresh only. Incorporates merged no-echo, false-premise, claim-safety, calibrated-confidence, needs-human, higher-headroom, prompt-contract, and local Ollama scaffold artifacts without running providers or models. |
 
 ## Completed (kept as evidence)
 
-- `ALPHA-SOLVER-…-EXECUTION-EVIDENCE-004` (PR #501) — local approved flow captured.
-- `OPENAI-FREE-TOKEN-EVAL-SMOKE-HARNESS-PLAN-001` (PR #502).
-- `…-DEF-002-DEF-003-EVIDENCE-BOUNDARY-001` (PR #503).
-- `OPENAI-DATA-SHARING-OPERATOR-VERIFICATION-001` (PR #504).
-- `OPENAI-SYNTHETIC-SMOKE-PROMPT-FIXTURE-001` (PR #506).
-- `OPENAI-DATA-SHARING-OPERATOR-ATTESTATION-001` (PR #507).
-- `OPENAI-PACKET-CHECKER-SCOPE-001` (PR #508).
-- `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-001` (PR #509) — blocked before provider call.
-- `OPENAI-PROJECT-BILLING-BOUNDARY-CLARIFICATION-001` (PR #511) — blocked pending operator confirmation, superseded by PR #512.
-- `OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001` (PR #512) — redacted operator confirmation recorded; no provider call.
-- `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` (PR #527) — consumed as a blocked preflight because explicit operator authorization was missing; no provider call, no tokens, no cost.
-
-## Historical (earlier in a still-active chain; superseded as the forward pointer)
-
-- `ALPHA-SOLVER-…-EXECUTION-EVIDENCE-001 / 002 / 003` (PRs #497, #499, #500).
-- All `selected-next-lane.md` files in packets older than PR #527.
+- `ALPHA-SOLVER-NO-ECHO-SUBSTANTIVE-GENERATION-GATE-POST-552-SUCCESSOR-001` (PR #557) — no-echo substantive generation gate.
+- `ALPHA-SOLVER-EVAL-FALSE-PREMISE-PERTURBATION-001` (PR #558) — false-premise and hidden-constraint perturbation case set.
+- `ALPHA-SOLVER-NARRATIVE-CLAIM-SAFETY-LINTER-001` (PR #559) — narrative claim-safety linter.
+- `ALPHA-SOLVER-CALIBRATED-CONFIDENCE-OUTPUT-CONTRACT-001` (PR #560) — calibrated-confidence output contract.
+- `ALPHA-SOLVER-ESCALATION-NEEDS-HUMAN-PROTOCOL-001` (PR #562) — docs-only needs-human escalation protocol.
+- `ALPHA-SOLVER-EVAL-HIGHER-HEADROOM-CASESET-001` (PR #563) — higher-headroom Value Read case set.
+- `ALPHA-SOLVER-PROMPT-CONTRACT-SIMULATION-METHODOLOGY-001` (PR #564) — prompt-contract simulation methodology.
+- `ALPHA-SOLVER-LOCAL-MODEL-LAB-OLLAMA-SINGLEPATH-001` (PR #565) — local Ollama singlepath lab scaffold.
 
 ## Superseded
 
-| Lane | Superseded by | Why |
-|------|---------------|-----|
-| `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-001` (used by PR #505, blocked: attestation missing) | the #507→#508→#509 retry chain | First blocked smoke attempt; attestation since captured (#507). Preserved as evidence. |
+| Lane / PR | Superseded by | Why |
+|-----------|---------------|-----|
+| PR #561 — `Add needs-human escalation protocol` | PR #562 | #561 is closed unmerged; #562 merged the docs-only needs-human protocol. |
+| Older smoke-authorization selected-next pointers | Post-#565 selected next lane in this registry and [`CURRENT_STATE.md`](CURRENT_STATE.md) | The #557–#565 wave changed the active posture to Value Read infrastructure consolidation. |
+
+## Blocked / not authorized
+
+| Lane / activity | Blocked by | Unblock condition |
+|-----------------|-----------|-------------------|
+| Provider calls / hosted model runs / token use | Hard boundary for current docs-only consolidation | Separate explicit operator authorization in a future lane. |
+| Local model / Ollama execution | Current #565 scaffold is design/local-lab lane only | Separate operator-managed local run authorization and preserved evidence boundaries. |
+| Dashboard, `/v1/solve`, public API exposure | Not part of the selected next lane | Separate exposure/readiness/security lane. |
+| Google Sheets or backlog workbook mutation | Repo task boundary | Operator-managed external ledger process only. |
+| Value/readiness/provider/security/privacy/Alpha-superiority claims | No execution or validation evidence in this lane | Properly scoped future evidence with pre-registered boundaries. |
 
 ## Do not run again (as-is)
 
-- `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-001` — already consumed as a blocked attempt
-  (PR #505). Do not re-enter under this id; the live path is the RETRY chain.
-- `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-001` — already consumed as a blocked
-  project/billing-verification attempt (PR #509).
-- `OPENAI-PROJECT-BILLING-BOUNDARY-CLARIFICATION-001` — PR #511 control
-  packet; do not re-enter after merge. It was superseded by the PR #512
-  attestation retry.
-- `OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001` — PR #512 control
-  packet; do not re-enter after merge. Its selected next lane was consumed by
-  `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002`.
-- `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` — PR #527 control packet; do
-  not re-enter as a provider-call lane because it is consumed/blocked with
-  verdict `BLOCKED_OPERATOR_AUTHORIZATION_MISSING`.
-- Re-running any merged packet lane verbatim — packets are immutable evidence;
-  create a new lane id instead.
+- PR #561 lane as a standalone needs-human protocol PR — closed unmerged and superseded by PR #562.
+- Any merged packet lane verbatim — packets are immutable evidence; create a new lane id instead.
+- Any selected-next pointer that predates this post-#565 consolidation if it conflicts with `ALPHA-SOLVER-VALUE-READ-SIMULATION-PACKET-REFRESH-POST-565-001`.
 
 ## Forward path (single track)
 
-```
-LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-001 (PR #509, blocked)
+```text
+#557 no-echo gate
+#558 false-premise / hidden-constraint set
+#559 claim-safety linter
+#560 calibrated-confidence contract
+#562 needs-human protocol (supersedes #561)
+#563 higher-headroom cases
+#564 prompt-contract methodology
+#565 local Ollama singlepath scaffold
         │
         ▼
-OPENAI-PROJECT-BILLING-BOUNDARY-CLARIFICATION-001   ← PR #511 blocked, superseded
-        │
-        ▼
-OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001 ← PR #512 current control, confirmed (no call)
-        │
-        ▼
-LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002          ← consumed/blocked; missing operator authorization; 0 calls/tokens/cost
-        │
-        ▼
-LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002-AUTHORIZATION-REFRESH ← selected next; collect explicit authorization only
-        │  (a later successful tiny smoke would prove plumbing only, never value)
-        ▼
-ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001          ← protocol designed; blocked until smoke + no-echo evidence, not executed
+ALPHA-SOLVER-VALUE-READ-SIMULATION-PACKET-REFRESH-POST-565-001 ← selected next; docs/eval packet refresh only
 ```
 
-This registry does not authorize any provider call, runtime exposure, or
-readiness claim.
+This registry does not authorize any provider call, local model call, runtime exposure, public API exposure, Google Sheets mutation, or readiness/value claim.
