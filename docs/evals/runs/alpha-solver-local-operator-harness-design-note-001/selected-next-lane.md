@@ -2,11 +2,11 @@
 
 ## Recommendation
 
-After merge, this packet completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only Alpha-native local operator harness design note.
+After PR #577 merges, this packet completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only Alpha-native local operator harness design note. PR #576 is superseded by PR #577 and should be closed unmerged.
 
 ## Global source-of-truth update
 
-This PR updates `docs/CURRENT_STATE.md`, `docs/LANE_REGISTRY.md`, and `docs/EVIDENCE_INDEX.md` so the global selected next state is:
+PR #577 updates `docs/CURRENT_STATE.md`, `docs/LANE_REGISTRY.md`, and `docs/EVIDENCE_INDEX.md` so the global selected next state is:
 
 `OPERATOR_DECISION_REQUIRED_AFTER_LOCAL_OPERATOR_HARNESS_DESIGN_NOTE_001`
 

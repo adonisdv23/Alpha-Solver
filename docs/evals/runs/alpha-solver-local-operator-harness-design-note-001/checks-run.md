@@ -1,6 +1,6 @@
 # Checks Run
 
-This file records checks for the docs-only design packet and PR #576 source-of-truth repair. It does not record runtime execution, model/provider calls, benchmark execution, scoring, dashboard exposure, `/v1/solve` exposure, or Google Sheets mutation.
+This file records checks for the docs-only design packet and PR #577 replacement source-of-truth repair. It does not record runtime execution, model/provider calls, benchmark execution, scoring, dashboard exposure, `/v1/solve` exposure, or Google Sheets mutation.
 
 | Check | Status | Notes |
 | --- | --- | --- |
@@ -16,4 +16,4 @@ The failing `test`/`unit` path was reproducible locally as `tests/test_local_llm
 
 ## Non-execution attestation
 
-During packet preparation and branch repair, Pi.dev was not installed, run, copied, vendored, or integrated; dependencies were not added; providers were not called; tokens were not used; credentials were not accessed; hosted models were not run; local models were not run; models were not pulled or installed; dashboard behavior was not exposed; `/v1/solve` was not exposed; public API behavior was not exposed; runtime/API/dashboard code was not modified; package/skill/shell/file/MCP/email/calendar/memory features were not activated; benchmark/scoring/routing/council/model-comparison/local-model-registry/provider behavior was not added; and Google Sheets were not mutated.
+During packet preparation and PR #577 branch repair, Pi.dev was not installed, run, copied, vendored, or integrated; dependencies were not added; providers were not called; tokens were not used; credentials were not accessed; hosted models were not run; local models were not run; models were not pulled or installed; dashboard behavior was not exposed; `/v1/solve` was not exposed; public API behavior was not exposed; runtime/API/dashboard code was not modified; package/skill/shell/file/MCP/email/calendar/memory features were not activated; benchmark/scoring/routing/council/model-comparison/local-model-registry/provider behavior was not added; and Google Sheets were not mutated.

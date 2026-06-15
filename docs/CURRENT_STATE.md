@@ -1,13 +1,13 @@
 # Alpha Solver — Current State
 
-> Source-of-truth navigation doc. Last verified **2026-06-15** for PR **#576** branch repair.
+> Source-of-truth navigation doc. Last verified **2026-06-15** for PR **#577** replacement branch repair.
 > Docs-only; no provider/runtime claims.
 
 ## Current verified phase
 
-**Post-#576 posture: the Alpha-native local operator harness design note is complete, and an explicit operator decision is required before any next lane.**
+**Post-#577 posture: the Alpha-native local operator harness design note is complete, and an explicit operator decision is required before any next lane.**
 
-The merged #569–#574 wave updated the repository from the post-#568 blocked Value Read state to a broader documentation-and-boundary posture. PR #576 then completed `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only Alpha-native local operator harness design note.
+The merged #569–#574 wave updated the repository from the post-#568 blocked Value Read state to a broader documentation-and-boundary posture. PR #576 was superseded by PR #577 and should be closed unmerged. PR #577 completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only Alpha-native local operator harness design note.
 
 The current control posture is now `OPERATOR_DECISION_REQUIRED_AFTER_LOCAL_OPERATOR_HARNESS_DESIGN_NOTE_001`: no further implementation or execution lane is selected automatically. The operator must explicitly choose one future path before any new lane:
 
@@ -23,8 +23,8 @@ These are docs, gate, helper, static/research, and blocked-attempt artifacts. Th
 
 | Field | Value |
 |-------|-------|
-| Latest verified PR in this wave | **#576** — Alpha-native local operator harness design note completed by this PR |
-| PR branch state at verification | **#576 open / pending merge** on `adonisdv23/Alpha-Solver` |
+| Latest verified PR in this wave | **#577** — Alpha-native local operator harness design note completed by this PR |
+| PR branch state at verification | **#577 replacement merge candidate** on `adonisdv23/Alpha-Solver`; PR #576 superseded and should be closed unmerged |
 | Closed-unmerged superseded PR | **#561** — superseded by merged PR #562 |
 | Current controlling posture | Operator decision required after completed Alpha-native local operator harness design note |
 | Selected next state | **`OPERATOR_DECISION_REQUIRED_AFTER_LOCAL_OPERATOR_HARNESS_DESIGN_NOTE_001`** |
@@ -49,7 +49,8 @@ These are docs, gate, helper, static/research, and blocked-attempt artifacts. Th
 | #572 | Local Ollama singlepath operator helper | Adds an operator helper script for the local-only lane; helper existence is not a successful run. |
 | #573 | Local Ollama singlepath blocked attempt | Records exact-model preflight success and failed-closed timeout/backend error; no local answer or quality evidence. |
 | #574 | `18 - PI.DEV-HARNESS-FEASIBILITY` | Records `BORROW_PATTERNS_ONLY_NO_INTEGRATION` for Pi.dev harness research. |
-| #576 | `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` | Completes the docs-only Alpha-native local operator harness design note; no implementation or execution authorization. |
+| #576 | Superseded local operator harness design note PR | Superseded by PR #577; should be closed unmerged and not cited as the completion artifact. |
+| #577 | `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` | Completes the docs-only Alpha-native local operator harness design note; no implementation or execution authorization. |
 
 See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for the PR status ledger and [`LANE_REGISTRY.md`](LANE_REGISTRY.md) for lifecycle classification.
 
