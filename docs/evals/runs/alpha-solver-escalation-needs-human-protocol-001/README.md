@@ -60,7 +60,7 @@ Concise next-safe-action format:
 
 `Next safe action: [owner] should [single non-harmful action] using/providing [redacted or approved artifact], without [blocked action or claim].`
 
-Compatibility note: needs-human escalation should use the canonical `answerability_verdict` value `should_escalate` from `ALPHA-SOLVER-CALIBRATED-CONFIDENCE-OUTPUT-CONTRACT-001`. This is a design-only compatibility note and does not claim runtime behavior.
+Compatibility note: Needs-human escalation should use the canonical answerability value `should_escalate` from `ALPHA-SOLVER-CALIBRATED-CONFIDENCE-OUTPUT-CONTRACT-001` when mapped into future Value Read scoring artifacts. This packet is design-only and does not claim runtime emission or correctness.
 
 ## 4. Examples
 
