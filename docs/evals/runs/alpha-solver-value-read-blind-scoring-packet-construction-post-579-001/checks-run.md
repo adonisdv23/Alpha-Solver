@@ -17,3 +17,11 @@ Post-edit checks:
 - Custom packet consistency check — passed: all 10 raw Alpha/baseline pairs exist, scorer-facing packet did not contain the checked identity/path leak terms, and blank score fields are present.
 
 No scoring, blind-score filling, unblinding, final interpretation, provider call, local model call, runtime endpoint exposure, dashboard exposure, public API exposure, Google Sheets mutation, dependency addition, or product-code change occurred.
+
+Repair patch checks for PR #580 review findings:
+
+- `git diff --check` — passed after the scorer-packet normalization repair.
+- `python scripts/check_narrative_claim_safety.py <changed markdown files>` — passed for 2 changed markdown files after the repair. This is not a completeness claim.
+- `python scripts/check_local_llm_packet_consistency.py docs/evals/runs/alpha-solver-value-read-blind-scoring-packet-construction-post-579-001` — passed for 1 packet directory after the repair.
+- Required identity-leak search on `blind-scorer-packet/scorer-packet.md` — returned no matches; exit code `1` is the expected ripgrep no-match result for this search.
+- `python scripts/check_local_llm_evidence_boundaries.py <changed markdown files>` — passed with 0 files scanned because the changed files did not fall under the checker-owned local-LLM relevant path set.
