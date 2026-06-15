@@ -154,7 +154,7 @@ Create `ALPHA-SOLVER-VALUE-READ-EXECUTION-PACKET-AUTHORIZATION-001` with:
 - score-lock-before-unblind procedure;
 - stop conditions and non-claims matching the current blocked state.
 
-Then execute only within the authorized boundary and interpret the result narrowly.
+After that packet is reviewed and merged, execution remains blocked until the operator separately authorizes the output-generation mechanism and all required boundaries are present. If a later execution lane is explicitly authorized, execute only within that authorized boundary and interpret the result narrowly.
 
 ## Investor objections and honest answers
 
@@ -169,7 +169,7 @@ Then execute only within the authorized boundary and interpret the result narrow
 
 ## Required next proof
 
-The required next proof is not another narrative memo. It is a controlled execution authorization packet followed by a completed blinded Value Read. Until then, the strongest fair claim is that Alpha Solver has a rigorous evaluation hypothesis and guardrail-rich documentation, not that the system has proven value.
+The required next proof is not another narrative memo. It starts with a controlled execution authorization packet; any completed blinded Value Read remains a separate later step that requires explicit operator authorization for the output-generation mechanism and all required boundaries. Until then, the strongest fair claim is that Alpha Solver has a rigorous evaluation hypothesis and guardrail-rich documentation, not that the system has proven value.
 
 ## Suggested one-liner
 
