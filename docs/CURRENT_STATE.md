@@ -1,28 +1,28 @@
 # Alpha Solver — Current State
 
-> Source-of-truth navigation doc. Last verified **2026-06-15** for post-#577 Value Read execution authorization decision packet.
+> Source-of-truth navigation doc. Last verified **2026-06-15** for post-#578 manual Value Read output-generation pilot.
 > Docs-only; no provider/runtime claims.
 
 ## Current verified phase
 
-**Post-#577 Value Read authorization-decision posture: the execution authorization decision packet is prepared, and operator review is required before any output-generation run.**
+**Post-#578 manual Value Read output-generation pilot posture: the manual no-provider raw-output pilot is complete, and operator review is required before any scoring or interpretation lane.**
 
 The merged #569–#574 wave updated the repository from the post-#568 blocked Value Read state to a broader documentation-and-boundary posture. PR #576 was superseded by PR #577 and should be closed unmerged. PR #577 completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only Alpha-native local operator harness design note.
 
-The current control posture is now `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_EXECUTION_AUTHORIZATION_DECISION_POST_577_001`: the operator decision to return to the Value Read execution authorization path has been recorded as a docs-only authorization-decision packet, but no output-generation run is authorized automatically. The operator must explicitly approve a future output-generation mechanism before anything runs.
+The current control posture is now `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_MANUAL_OUTPUT_GENERATION_PILOT_POST_578_001`: the operator-authorized manual no-provider prompt-contract simulation generated raw Alpha and baseline outputs for the selected 10 committed synthetic cases. The operator must separately authorize blind scorer packet construction, scoring, unblinding, and any final interpretation before those activities occur.
 
-These are docs, gate, helper, static/research, and blocked-attempt artifacts. They do not prove provider behavior, model quality, value, readiness, benchmark success, security/privacy completion, local Ollama validation, `/v1/solve` readiness, production/public readiness, or Alpha superiority.
+These are docs, gate, helper, static/research, and blocked-attempt artifacts. They do not prove provider behavior, model quality, value, readiness, benchmark success, security/privacy completion, local Ollama validation, `/v1/solve` readiness, production/public readiness, scoring outcomes, or Alpha superiority.
 
 ## At a glance
 
 | Field | Value |
 |-------|-------|
-| Latest verified completed lane in this wave | **`ALPHA-SOLVER-VALUE-READ-EXECUTION-AUTHORIZATION-DECISION-POST-577-001`** |
-| Live pre-edit verification | PR #577 merged; PR #576 closed unmerged and superseded by #577; no open PRs at verification time |
+| Latest verified completed lane in this wave | **`ALPHA-SOLVER-VALUE-READ-MANUAL-OUTPUT-GENERATION-PILOT-POST-578-001`** |
+| Live pre-edit verification | PR #578 merged; no open PRs at verification time |
 | Closed-unmerged superseded PR | **#561** — superseded by merged PR #562 |
-| Current controlling posture | Operator review required after completed Value Read execution authorization-decision packet |
-| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_EXECUTION_AUTHORIZATION_DECISION_POST_577_001`** |
-| Strategic boundary | No provider call, local-model call, output generation, scoring, unblinding, runtime endpoint, dashboard, public API exposure, Google Sheets mutation, benchmark, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha-superiority claim is authorized until the operator explicitly approves a future output-generation mechanism |
+| Current controlling posture | Operator review required after completed manual no-provider Value Read output-generation pilot |
+| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_MANUAL_OUTPUT_GENERATION_PILOT_POST_578_001`** |
+| Strategic boundary | Raw Alpha and raw baseline outputs were generated only as manual no-provider prompt-contract simulation artifacts. No scoring, blind-score filling, unblinding, final interpretation, provider call, local-model call, runtime endpoint, dashboard, public API exposure, Google Sheets mutation, benchmark claim, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha-superiority claim is authorized until separately approved |
 
 ## Completed post-552 / post-565 / post-568 infrastructure lanes
 
@@ -45,17 +45,18 @@ These are docs, gate, helper, static/research, and blocked-attempt artifacts. Th
 | #574 | `18 - PI.DEV-HARNESS-FEASIBILITY` | Records `BORROW_PATTERNS_ONLY_NO_INTEGRATION` for Pi.dev harness research. |
 | #576 | Superseded local operator harness design note PR | Superseded by PR #577; should be closed unmerged and not cited as the completion artifact. |
 | #577 | `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` | Completes the docs-only Alpha-native local operator harness design note; no implementation or execution authorization. |
-| post-577 lane | `ALPHA-SOLVER-VALUE-READ-EXECUTION-AUTHORIZATION-DECISION-POST-577-001` | Completes a docs-only authorization-decision packet for returning to Value Read execution authorization review; no output generation, scoring, provider/local-model call, endpoint exposure, or value/readiness claim. |
+| post-577 lane | `ALPHA-SOLVER-VALUE-READ-EXECUTION-AUTHORIZATION-DECISION-POST-577-001` | Completes a docs-only authorization-decision packet for returning to Value Read execution authorization review. |
+| post-578 lane | `ALPHA-SOLVER-VALUE-READ-MANUAL-OUTPUT-GENERATION-PILOT-POST-578-001` | Completes a bounded manual no-provider prompt-contract simulation output-generation pilot for 10 synthetic Value Read cases; raw Alpha and baseline outputs are documentation artifacts only, with no scoring, unblinding, provider/local-model call, endpoint exposure, or value/readiness claim. |
 
 See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for the PR status ledger and [`LANE_REGISTRY.md`](LANE_REGISTRY.md) for lifecycle classification.
 
 ## Selected next state
 
-**`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_EXECUTION_AUTHORIZATION_DECISION_POST_577_001`** is the current global selected next state.
+**`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_MANUAL_OUTPUT_GENERATION_PILOT_POST_578_001`** is the current global selected next state.
 
-This is a review state, not an execution lane. It means the Value Read execution authorization-decision packet is prepared, but no output generation is authorized until the operator explicitly approves a future mechanism, models/providers if any, cost/token caps if any, data boundary, stop conditions, output paths, scoring packet, blinding-map storage, and claim boundaries.
+This is a review state, not a scoring or interpretation lane. It means the raw manual no-provider Alpha and baseline outputs exist for the authorized subset, but no scoring, blind-score filling, unblinding, final interpretation, provider/local-model execution, runtime endpoint, dashboard/public API exposure, or Google Sheets mutation is authorized. The operator must separately authorize blind scorer packet construction and scoring.
 
-This selected state authorizes no provider call, local model call, output generation, scoring, unblinding, runtime endpoint, dashboard, public API exposure, Google Sheets mutation, benchmark, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha superiority claim.
+This selected state authorizes no scoring, blind-score filling, unblinding, final interpretation, provider call, local model call, runtime endpoint, dashboard, public API exposure, Google Sheets mutation, benchmark claim, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha superiority claim.
 
 ## Open deferrals (see [`DEFERRAL_REGISTER.md`](DEFERRAL_REGISTER.md))
 
