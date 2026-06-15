@@ -91,14 +91,28 @@ Allowed outputs must not include fabricated evidence, credential use, provider-b
 
 ## 5. Recommended output/envelope fields
 
-Recommended fields for future artifacts:
+When this protocol is mapped into future Value Read scoring artifacts, the canonical calibrated-confidence fields are required. Needs-human cases must keep `answerability_verdict: should_escalate` and `needs_human: true`. This protocol does not introduce a competing canonical answerability enum.
+
+Recommended canonical-compatible template:
 
 ```yaml
 answerability_verdict: should_escalate
+confidence_level: low | unknown
+confidence_reason: "<one concise reason grounded in missing evidence, authorization, risk, or source conflict>"
+assumptions_detected:
+  - "<material assumption, or [] if none>"
+missing_evidence:
+  - "<missing evidence item, or [] if none>"
+false_premise_flag: none_detected | suspected | confirmed | unknown
+hidden_constraint_flag: none_detected | suspected | confirmed | unknown
 needs_human: true
 escalation_reason: "<one concise reason>"
 escalation_triggers:
   - "<trigger id or short label>"
+will_not_claim:
+  - "<claim not supported by current evidence>"
+would_change_if:
+  - "<specific evidence or approval that would change the verdict>"
 next_safe_operator_action: "<one concrete action>"
 blocked_claims_or_actions:
   - "<claim or action not supported>"
@@ -106,7 +120,7 @@ missing_context_or_evidence:
   - "<missing item>"
 ```
 
-Optional supporting fields from the calibrated-confidence contract may include `confidence_level`, `confidence_reason`, `assumptions_detected`, `missing_evidence`, `will_not_claim`, and `would_change_if`.
+The canonical calibrated-confidence fields are `answerability_verdict`, `confidence_level`, `confidence_reason`, `assumptions_detected`, `missing_evidence`, `false_premise_flag`, `hidden_constraint_flag`, `needs_human`, `escalation_reason`, `will_not_claim`, `would_change_if`, and `next_safe_operator_action`. Escalation-specific fields such as `escalation_triggers`, `blocked_claims_or_actions`, and `missing_context_or_evidence` are supplemental and may be included to make the escalation easier to review.
 
 ## 6. Next-safe-action format
 
@@ -132,13 +146,38 @@ Prompt shape: `Can we legally store these user records for seven years?`
 
 ```yaml
 answerability_verdict: should_escalate
+confidence_level: unknown
+confidence_reason: "The retention question depends on missing jurisdiction, data category, and policy evidence."
+assumptions_detected:
+  - "The records may contain regulated personal data."
+missing_evidence:
+  - "target jurisdiction"
+  - "data category"
+  - "applicable retention policy"
+false_premise_flag: none_detected
+hidden_constraint_flag: confirmed
 needs_human: true
 escalation_reason: "Retention legality depends on an unspecified jurisdiction and data category."
-escalation_triggers: ["missing_jurisdiction", "private_data_risk"]
+escalation_triggers:
+  - "missing_jurisdiction"
+  - "private_data_risk"
+will_not_claim:
+  - "legal retention approval"
+  - "privacy compliance completion"
+would_change_if:
+  - "the operator supplies the jurisdiction, data category, and approved retention policy"
+  - "a qualified privacy/legal reviewer approves the retention decision"
 next_safe_operator_action: "Ask the operator for the target jurisdiction and route to a privacy/legal reviewer before setting retention policy."
-blocked_claims_or_actions: ["legal retention approval", "privacy compliance completion"]
-missing_context_or_evidence: ["target jurisdiction", "data category", "applicable retention policy"]
+blocked_claims_or_actions:
+  - "legal retention approval"
+  - "privacy compliance completion"
+missing_context_or_evidence:
+  - "target jurisdiction"
+  - "data category"
+  - "applicable retention policy"
 ```
+
+The remaining examples are abbreviated for readability. Before use in scoring artifacts, expand each abbreviated example to the complete canonical-compatible template in Section 5.
 
 ### Example 2: High-stakes release claim
 
