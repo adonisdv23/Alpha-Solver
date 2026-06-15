@@ -1,7 +1,6 @@
 # Roadmap
 
-> Refreshed **2026-06-13** by lane
-> `ALPHA-SOLVER-CURRENT-STATE-DOCS-BACKLOG-ARCHIVE-ISSUE-REGISTER-001`.
+> Refreshed **2026-06-15** for the post-#565 current-state consolidation.
 > The old PR #91–#99 list below is **historical** and no longer the current
 > roadmap. Source of truth for current state:
 > [`CURRENT_STATE.md`](CURRENT_STATE.md). This roadmap makes **no** readiness,
@@ -9,47 +8,30 @@
 
 ## Current phase
 
-**Post-local Self Operator evidence; pre-first real OpenAI smoke; blocked on
-OpenAI project/billing clarification after PR #509.**
+**Post-#565 Value Read infrastructure consolidation.** Live GitHub verification on 2026-06-15 confirmed PRs #557, #558, #559, #560, #562, #563, #564, and #565 are merged; PR #561 is closed unmerged and superseded by #562; and there were `0` open PRs.
 
-- Local/offline Self Operator execution evidence captured (PRs #497, #499, #500,
-  #501) — no provider/model/token.
-- OpenAI governance/pre-smoke chain captured (PRs #502–#508).
-- First real-token smoke retry (PR #509) **halted before any provider call**
-  (`BLOCKED_OPENAI_PROJECT_OR_BILLING_NOT_VERIFIED`).
+The recently merged infrastructure records no-echo gating, false-premise / hidden-constraint cases, claim-safety linting, calibrated-confidence vocabulary, needs-human protocol guidance, higher-headroom Value Read cases, prompt-contract simulation methodology, and a local Ollama singlepath scaffold. These are not provider/model/value/readiness evidence.
 
 ## Current next lane
 
-**`OPENAI-PROJECT-BILLING-BOUNDARY-CLARIFICATION-001`** — docs/operator
-clarification of OpenAI project + billing readiness. **No provider call.**
-
-Then (only if clarified): `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` (first real
-call attempt; proves plumbing only). Highest strategic value after smoke:
-`ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001`.
+**`ALPHA-SOLVER-VALUE-READ-SIMULATION-PACKET-REFRESH-POST-565-001`** — refresh the Value Read simulation packet so future packet design explicitly incorporates the merged #557–#565 infrastructure. This is docs/eval packet work only and does not authorize provider calls, token use, credential access, billing inspection, hosted model calls, local model calls, dashboard exposure, `/v1/solve` exposure, public API exposure, Google Sheets mutation, benchmark execution, or value/readiness claims.
 
 ## Active deferrals
 
 See [`DEFERRAL_REGISTER.md`](DEFERRAL_REGISTER.md).
 
-- **DEF-001** — Self Operator execution evidence: advanced (local-only); not
-  provider/runtime proof.
+- **DEF-001** — Self Operator execution evidence: advanced (local-only); not provider/runtime proof.
 - **DEF-002** — Security/privacy review: open.
 - **DEF-003** — Fable delta-audit custody/replacement: open.
 - **DEF-004** — Audit custody/provenance: open.
 
-## Near-term roadmap (docs-only governance phase)
+## Near-term roadmap (docs-only governance / Value Read packet phase)
 
-1. Clarify OpenAI project/billing boundary (next lane).
-2. Tiny synthetic OpenAI smoke (plumbing only) once clarified.
-3. Design `ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001` (Alpha vs plain baseline;
-   verbosity-controlled; blind-scored). See
-   [`VALUE_EXPERIMENT_DIRECTION.md`](VALUE_EXPERIMENT_DIRECTION.md).
-4. DEF-002 security/privacy review (assessment + gap closure of existing
-   machinery). See [`DEF_002_SECURITY_PRIVACY_INPUTS.md`](DEF_002_SECURITY_PRIVACY_INPUTS.md).
-5. `ALPHA-SOLVER-SPEC-CONTAMINATION-RECONCILIATION-001` (see
-   [`SPECS_HEALTH_AUDIT.md`](SPECS_HEALTH_AUDIT.md)).
-6. Technical-debt items (alpha/service map, pricing, redaction hardening, test
-   hermeticity). See [`TECHNICAL_DEBT_AND_RUNTIME_NOTES.md`](TECHNICAL_DEBT_AND_RUNTIME_NOTES.md).
+1. Refresh the Value Read simulation packet for post-#565 infrastructure: `ALPHA-SOLVER-VALUE-READ-SIMULATION-PACKET-REFRESH-POST-565-001`.
+2. Keep no-echo, false-premise, hidden-constraint, confidence, needs-human, higher-headroom, and claim-safety boundaries explicit in any later packet.
+3. Keep local Ollama work as scaffold/design unless a future operator-managed lane separately authorizes a local run.
+4. Keep provider calls, hosted/local model runs, public surfaces, and Google Sheets mutation out of scope until separately authorized.
+5. Continue DEF-002/DEF-003/DEF-004 only through their own scoped lanes.
 
 ---
 

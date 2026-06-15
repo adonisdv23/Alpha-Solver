@@ -1,14 +1,13 @@
 # Value Experiment Direction
 
 > Created by lane `ALPHA-SOLVER-CURRENT-STATE-DOCS-BACKLOG-ARCHIVE-ISSUE-REGISTER-001`.
-> Verification date **2026-06-13**. This sets **direction only** — it is **not**
+> Verification date **2026-06-15** after the post-#565 infrastructure wave. This sets **direction only** — it is **not**
 > the full experiment protocol, and **no experiment is run in this lane**.
 
 ## The core unresolved question
 
 Alpha Solver has strong **evidence discipline** (a large, disciplined packet
-history) but the **core value question remains unresolved**: does Alpha Solver
-produce materially better outputs than a plain baseline? Repo signals support
+history) but the **core value question remains unresolved**: whether Alpha Solver outputs are materially better than a plain baseline under a bounded, pre-registered comparison. Repo signals support
 this framing:
 
 - Differentiation/measurement specs exist (`.specs/EVAL-DIFFERENTIATION-RUN-001.md`,
@@ -23,13 +22,27 @@ this framing:
 
 - A tiny synthetic OpenAI smoke proves **plumbing only**: that a request can be
   formed, sent, and a response captured under redaction/cost boundaries.
-- It does **not** prove Alpha Solver value, quality, or superiority. Smoke must
+- It does **not** provide evidence of Alpha Solver value, quality, or superiority. Smoke must
   never be promoted to value evidence (record an explicit smoke→eval gate).
 
-## Next strategic validation
+## Selected next packet lane
 
-**`ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001`** — the highest-value strategic
-lane after a successful tiny smoke. Direction for that protocol:
+**`ALPHA-SOLVER-VALUE-READ-SIMULATION-PACKET-REFRESH-POST-565-001`** is the selected next active lane. It should refresh the Value Read simulation packet against the merged #557–#565 infrastructure before any execution or evidence promotion.
+
+The refresh should incorporate:
+
+- no-echo substantive generation gating;
+- false-premise and hidden-constraint perturbation cases;
+- narrative claim-safety linting;
+- calibrated-confidence output vocabulary;
+- needs-human escalation protocol guidance;
+- higher-headroom Value Read cases;
+- prompt-contract simulation methodology;
+- local Ollama singlepath scaffold boundaries, without running Ollama or any local model.
+
+## Later strategic validation
+
+**`ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001`** remains a later strategic protocol direction after required boundaries and prerequisites are explicitly satisfied. Direction for that protocol:
 
 1. **Baseline comparison** — Alpha Solver vs a plain LLM baseline on the same
    tasks and same model.
@@ -49,5 +62,5 @@ lane after a successful tiny smoke. Direction for that protocol:
   this lane.
 - This direction makes **no** claim of benchmark validation, benchmark
   superiority, or broad-user readiness.
-- The protocol is **blocked** until a real tiny smoke proves plumbing and
-  OpenAI project/billing is clarified (see [`LANE_REGISTRY.md`](LANE_REGISTRY.md)).
+- The selected next lane is a packet refresh only; it does not run providers, use tokens, inspect credentials or billing, run hosted/local models, expose dashboards, expose `/v1/solve`, expose a public API, mutate Google Sheets, or claim value/readiness/provider validation/security/privacy completion/Alpha superiority.
+- Later protocol execution remains blocked until a future authorized lane explicitly satisfies its prerequisites and evidence boundaries (see [`LANE_REGISTRY.md`](LANE_REGISTRY.md)).

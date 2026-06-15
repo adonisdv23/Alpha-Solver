@@ -1,52 +1,34 @@
-# Evidence Index — PRs #497–#512 plus PR #527
+# Evidence Index — Post-#565 consolidation
 
-> Created by lane `ALPHA-SOLVER-CURRENT-STATE-DOCS-BACKLOG-ARCHIVE-ISSUE-REGISTER-001`.
-> Verification date **2026-06-13**. Merge status verified read-only via GitHub
-> (API `merged:true` for #497, #503, #505, #507, #508, #509; `base.sha` chain on
-> `origin/main` for #499, #500, #501, #502, #504, #506). All packets are
-> docs-only evidence. **Evidence value** states what each packet does and does
-> **not** prove. Packet paths are under `docs/evals/runs/`.
+> Source-of-truth evidence ledger. Verification date **2026-06-15**. Live GitHub
+> API verification confirmed PRs #557, #558, #559, #560, #562, #563, #564, and
+> #565 are merged; PR #561 is closed unmerged; and the repository had `0` open
+> PRs at verification time.
 
 ## How to read "evidence value"
 
-Every packet below is **plumbing / process / governance / boundary evidence**.
-None is provider validation, value/quality proof, benchmark evidence, or
-readiness evidence. The local-execution chain proves only offline determinism;
-the OpenAI chain proves only planning/governance and blocked preflights; no provider call has been made.
+The entries below are design, documentation, static-checking, methodology, or scaffold evidence. They are not provider validation, local-model validation, value evidence, benchmark evidence, production readiness evidence, security/privacy completion evidence, or Alpha-superiority evidence.
 
 ## PR table
 
-| PR | Title | Merged | Packet path (`docs/evals/runs/…`) | Verdict | Selected next lane | Evidence value | Non-claims | Status |
-|----|-------|--------|-----------------------------------|---------|--------------------|----------------|-----------|--------|
-| #497 | self-operator: local execution evidence | ✅ | `alpha-solver-post-level-3-level-14-self-operator-execution-evidence-001` | `LOCAL_EXECUTION_EVIDENCE_CAPTURED` (DEF-001 partial) | EXECUTION-EVIDENCE-002 | Offline Self Operator suite + release-gate run | No provider/runtime/benchmark/readiness | historical |
-| #499 | self-operator: execution evidence 002 | ✅ | `…execution-evidence-002` | `PARTIAL_LOCAL_FLOW_CAPTURED_OPERATOR_INPUT_REQUIRED` | EXECUTION-EVIDENCE-003 | Partial local flow; needs real operator approval | No provider/runtime; not full DEF-001 | historical |
-| #500 | self-operator: approved local execution evidence | ✅ | `…execution-evidence-003` | `APPROVAL_CAPTURED_EXECUTION_BLOCKED_BY_LOCAL_SAFETY_GATE` | EXECUTION-EVIDENCE-004 | Approval captured; safety gate blocked exec | No provider/runtime; gate working as designed | historical |
-| #501 | self-operator: gate-compatible local execution evidence | ✅ | `…execution-evidence-004` | `APPROVAL_ACCEPTED_LOCAL_FLOW_CAPTURED` | DEF-002-DEF-003-EVIDENCE-BOUNDARY-001 | Local approved flow captured; DEF-001 advanced | No provider/runtime; DEF-002/003 still open | completed |
-| #502 | eval: OpenAI free-token smoke & eval harness plan | ✅ | `alpha-solver-openai-free-token-eval-smoke-harness-plan-001` | `OPENAI_FREE_TOKEN_EVAL_SMOKE_HARNESS_PLAN_CAPTURED` | OPENAI-DATA-SHARING-OPERATOR-VERIFICATION-001 | Plan only; no call, no eval | No OpenAI/provider/eval validation | completed |
-| #503 | self-operator: DEF-002 DEF-003 evidence boundary | ✅ | `alpha-solver-post-level-3-level-14-self-operator-def-002-def-003-evidence-boundary-001` | `DEF_002_DEF_003_EVIDENCE_BOUNDARY_CAPTURED` | LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-001 | Records what closes DEF-002/003 | DEF-002 not resolved; DEF-003 not resolved | completed |
-| #504 | openai: data-sharing operator verification | ✅ | `openai-data-sharing-operator-verification-001` | `OPENAI_DATA_SHARING_OPERATOR_VERIFICATION_PACKET_CAPTURED` | OPENAI-DATA-SHARING-OPERATOR-ATTESTATION-001 | Verification checklist (all `pending_operator_verification`) | No OpenAI validation; settings unverified | completed |
-| #505 | openai: local token smoke capture 001 | ✅ | `local-openai-token-smoke-capture-001` | `BLOCKED_OPERATOR_ATTESTATION_PACKET_MISSING` | LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-001 | Self-blocked preflight; no call | No provider call; attestation missing | superseded (by #509 chain) |
-| #506 | openai: synthetic smoke prompt fixture | ✅ | `openai-synthetic-smoke-prompt-fixture-001` | `OPENAI_SYNTHETIC_SMOKE_PROMPT_FIXTURE_CAPTURED` | WAIT_FOR_OPENAI_OPERATOR_PRE_SMOKE_ATTESTATION | Synthetic SMOKE-001 fixture; not sent | No call; synthetic data only | completed |
-| #507 | openai: operator pre-smoke attestation | ✅ | `openai-data-sharing-operator-attestation-001` | `OPENAI_OPERATOR_PRE_SMOKE_ATTESTATION_CAPTURED` | LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-001 | Operator go/no-go attestation (redacted) | No call; attestation ≠ project/billing proof | completed |
-| #508 | openai: extend static checks to OpenAI packets | ✅ | `openai-packet-checker-scope-001` | `OPENAI_PACKET_CHECKER_SCOPE_EXTENDED` | LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-001 | Checker scope hardening (docs-only packet; checker code changed in same PR) | No provider/runtime; tooling only | completed |
-| #509 | openai: local token smoke retry capture | ✅ | `local-openai-token-smoke-capture-retry-001` | `BLOCKED_OPENAI_PROJECT_OR_BILLING_NOT_VERIFIED` | OPENAI-PROJECT-BILLING-BOUNDARY-CLARIFICATION-001 | Retry halted before provider call | No call; key-presence ≠ project/billing readiness | completed |
-| #511 | openai: project billing boundary clarification | ✅ | `openai-project-billing-boundary-clarification-001` | `BLOCKED_PROJECT_BILLING_OPERATOR_CONFIRMATION_MISSING` | OPENAI-PROJECT-BILLING-BOUNDARY-ATTESTATION-RETRY-001 | Clarification lane blocked pending operator confirmation | No call; no token; no private billing data; no readiness | superseded by #512 |
-| #512 | openai: project billing boundary attestation retry | ✅ | `openai-project-billing-boundary-attestation-retry-001` | `OPENAI_PROJECT_BILLING_BOUNDARY_CONFIRMED` | LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002 | Redacted operator confirmation for project, billing, cost, and data-sharing boundary | No call; no token; no provider validation; no private billing data; no readiness | completed |
-| #527 | openai: local token smoke retry 002 blocked packet | PR open | `local-openai-token-smoke-capture-retry-002` | `BLOCKED_OPERATOR_AUTHORIZATION_MISSING` | LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002-AUTHORIZATION-REFRESH | Consumes retry 002 as blocked before provider call because explicit operator authorization fields were missing; provider calls `0`, tokens `0`, cost `$0.00` | No provider validation; no provider call; no token; no readiness; no value/no-echo evidence | **current-control** |
+| PR | Title | Merged / status | Primary artifact | Evidence value | Non-claims | Lifecycle |
+|----|-------|-----------------|------------------|----------------|------------|-----------|
+| #557 | Add post-552 no-echo substantive generation gate | ✅ merged 2026-06-15 | `.specs/ALPHA-SOLVER-NO-ECHO-SUBSTANTIVE-GENERATION-GATE-POST-552-SUCCESSOR-001.md`; `docs/evals/runs/alpha-solver-no-echo-substantive-generation-gate-post-552-successor-001/` | Records a substantive-generation / no-echo gate after the post-552 sequence. | Does not prove model quality, provider behavior, or value. | completed |
+| #558 | Add false-premise & hidden-constraint perturbation case set for Value Read | ✅ merged 2026-06-15 | `.specs/ALPHA-SOLVER-EVAL-FALSE-PREMISE-PERTURBATION-001.md` | Adds future Value Read perturbation material for false-premise and hidden-constraint handling. | Does not run an eval, call a model, or prove robustness. | completed |
+| #559 | Add narrative claim-safety linter | ✅ merged 2026-06-15 | `.specs/ALPHA-SOLVER-NARRATIVE-CLAIM-SAFETY-LINTER-001.md`; `docs/evals/runs/alpha-solver-narrative-claim-safety-linter-001/` | Adds claim-safety linting infrastructure for unsupported narrative claims. | Does not certify all docs, security/privacy, readiness, or claim safety globally. | completed |
+| #560 | Add calibrated-confidence output contract for Alpha Solver | ✅ merged 2026-06-15 | `.specs/ALPHA-SOLVER-CALIBRATED-CONFIDENCE-OUTPUT-CONTRACT-001.md` | Defines answerability, confidence, non-claims, evidence gaps, assumptions, false-premise risk, hidden-constraint risk, and next-safe-action vocabulary. | Does not prove runtime enforcement or calibrated model behavior. | completed |
+| #561 | Add needs-human escalation protocol | ❌ closed unmerged | superseded by #562 | No merged evidence artifact from this PR. | Must not be cited as merged implementation/evidence. | superseded |
+| #562 | Add needs-human escalation protocol (docs-only) | ✅ merged 2026-06-15 | `.specs/ALPHA-SOLVER-ESCALATION-NEEDS-HUMAN-PROTOCOL-001.md`; `docs/evals/runs/alpha-solver-escalation-needs-human-protocol-001/` | Records docs-only protocol guidance for needs-human outcomes. | Does not prove runtime escalation, `/v1/solve` behavior, or human-review operations. | completed |
+| #563 | Add higher-headroom Value Read case set (design-only) | ✅ merged 2026-06-15 | `.specs/ALPHA-SOLVER-EVAL-HIGHER-HEADROOM-CASESET-001.md`; `docs/evals/HIGHER_HEADROOM_VALUE_READ_CASE_SET.md` | Adds higher-headroom synthetic Value Read candidate cases. | Does not score outputs, prove lift, or establish benchmark success. | completed |
+| #564 | Add prompt-contract simulation methodology | ✅ merged 2026-06-15 | `docs/evals/runs/alpha-solver-prompt-contract-simulation-methodology-001/` | Records methodology for prompt-contract simulation. | Does not execute a simulation, call providers, or prove value. | completed |
+| #565 | Add local Ollama singlepath lab lane | ✅ merged 2026-06-15 | `.specs/ALPHA-SOLVER-LOCAL-MODEL-LAB-OLLAMA-SINGLEPATH-001.md`; `docs/evals/runs/alpha-solver-local-model-lab-ollama-singlepath-001/` | Records a local-only Ollama singlepath lab scaffold. | Does not run Ollama, run a local model, validate a provider, expose an API, or prove readiness. | completed |
 
-## Notes
+## Current selected next lane
 
-- **#508 caveat**: the merged PR #508 changed `scripts/check_local_llm_*.py` and
-  their tests *and* added a docs packet. From this docs-only lane we treat the
-  packet as evidence and do **not** modify the checker code or tests.
-- **#505 → #509**: PR #505 was the first blocked smoke attempt (missing
-  attestation); after attestation (#507) and checker scope (#508), PR #509 was
-  the blocked project/billing retry. #505 is therefore superseded as the active
-  smoke attempt by the #509 retry chain, but preserved as evidence.
-- No PR in this range claims OpenAI/provider validation, runtime/production/MVP
-  readiness, security/privacy completion, benchmark validation/superiority, or
-  DEF-002/DEF-003 resolution.
+`ALPHA-SOLVER-VALUE-READ-SIMULATION-PACKET-REFRESH-POST-565-001` is the selected next active lane unless newer live repo evidence supersedes it. The lane is limited to refreshing the Value Read simulation packet against the merged #557–#565 infrastructure and preserving evidence boundaries.
 
-## Later merged PRs
+## Evidence boundary
 
-PR #527 is now the current-control packet for this branch. `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002` is attempted/consumed but blocked with `BLOCKED_OPERATOR_AUTHORIZATION_MISSING`, provider calls `0`, tokens `0`, and cost `$0.00`. `LOCAL-OPENAI-TOKEN-SMOKE-CAPTURE-RETRY-002-AUTHORIZATION-REFRESH` is the single selected next lane. `ALPHA-SOLVER-VALUE-EXPERIMENT-PROTOCOL-001` has a canonical protocol packet, but it is not executed, contains no results or value evidence, and remains gated by a successful smoke/provider boundary and substantive no-echo preconditions. Append rows here as new evidence merges.
+The post-#565 state supports only bounded statements that the repository contains merged docs/design/static-checking/scaffold artifacts for no-echo gating, false-premise perturbations, claim-safety linting, calibrated confidence, needs-human protocol guidance, higher-headroom cases, prompt-contract methodology, and a local Ollama lab scaffold.
+
+It does **not** support claims of provider validation, local Ollama validation, hosted-model validation, token use, benchmark success, value, readiness, security/privacy completion, public API readiness, `/v1/solve` readiness, dashboard readiness, Google Sheets synchronization, or Alpha superiority.
