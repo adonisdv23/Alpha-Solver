@@ -1,26 +1,36 @@
 # MVP readiness scorecard
 
-Verdict: `MVP_SCORECARD_UPDATED_POST_552_VALUE_READ_BLOCKED`
+Verdict: `VALUE_READ_BLOCKED_POST_568`
 
 ## 1. TLDR
 
-The MVP scorecard is updated with the actual manual discrimination Value Read status and the post-#552 evidence state: **blocked, not executed**. #552 provides partial local exact-echo remediation for controlled fixtures and unsupported SAFE-OUT-style clarification. It does not prove broad no-echo behavior, general answer quality, provider behavior, runtime readiness, benchmark success, value, public readiness, production readiness, or Alpha superiority. Track S simulation was not run, and Track R runtime/provider execution remains blocked. Therefore the immediate next evidence lane is a post-#552 successor no-echo/substantive-generation gate or derivation check, not the already-landed prompt-consumption wiring fix.
+The MVP scorecard is updated from the committed PR #568 manual-run artifact: the post-565 Value Read attempt was **stopped before output generation and scoring**. The artifact contains no Alpha outputs, no baseline outputs, no blind scores, and no measured discrimination-delta. This is a controlled blocked state, not value evidence, benchmark evidence, MVP validation, provider validation, runtime readiness, public readiness, production readiness, or Alpha superiority evidence.
 
-## 2. Readiness judgment
+## 2. Live verification and input artifact
 
-**Not MVP ready. Not public ready. Not production ready. Not provider ready.**
+Live GitHub verification on 2026-06-15 confirmed the relevant PRs are merged:
 
-The actual Value Read result is a blocked verdict, not a simulation result and not runtime evidence:
+- PR #566 — merged 2026-06-15, merge commit `b2ef888abb64e3ff56745fc78f2afa28e15c7cdc`.
+- PR #567 — merged 2026-06-15, merge commit `9234e6425295a13047c76bad2038e99331b28c55`.
+- PR #568 — merged 2026-06-15, merge commit `4a7cfb61293035043dce802b5aaa6b05c1d078da`.
 
-- Value Read lane: `ALPHA-SOLVER-MANUAL-DISCRIMINATION-VALUE-READ-001`.
-- Track S simulation result: `not run / no scores`.
-- Track R runtime/provider result: `not run / blocked`.
-- Runtime blocked verdicts preserved by the Value Read packet: `BLOCKED_NO_ECHO_PROOF_MISSING` and `BLOCKED_OPERATOR_AUTHORIZATION_MISSING`.
-- Post-#552 evidence state: partial local exact-echo remediation landed for controlled fixtures and unsupported SAFE-OUT-style clarification, but broad no-echo/substantive-generation behavior remains unproven.
+Input artifact used: [`manual-run-artifact-2026-06-15.md`](../alpha-solver-value-read-simulation-packet-refresh-post-565-001/manual-run-artifact-2026-06-15.md).
 
-This scorecard treats the blocked Value Read and #552 as bounded local evidence only. It does not convert the blocked run, #552 partial remediation, prompt-contract templates, or local documentation into value, runtime, provider, benchmark, public, production, or readiness evidence.
+The PR #568 artifact records `Outcome | Stopped before output generation and scoring`. It also records that no Alpha, baseline, provider, hosted-model, local-model, endpoint, dashboard, public-API, or runtime outputs were generated or collected.
 
-## 3. Scorecard table
+## 3. Closed scorecard decision
+
+Closed decision: `VALUE_READ_BLOCKED`.
+
+Reason: the committed artifact is a stopped/blocked manual Value Read artifact. It states that the packet was preparation-only, did not contain outputs, and could not be used to generate Alpha/baseline answers or perform blind scoring under the packet-only evidence boundary. No live repo evidence reviewed in this lane supports any different closed decision.
+
+## 4. Readiness judgment
+
+**Not MVP ready. Not public ready. Not production ready. Not provider ready. Not runtime ready.**
+
+The PR #568 artifact is not an executed Value Read result. It does not support claims that Alpha Solver has generated value evidence, outperformed a baseline, completed an eval, completed a benchmark, validated provider behavior, validated a hosted model, validated a local model, exposed `/v1/solve`, exposed dashboard behavior, exposed public API behavior, mutated Google Sheets, or updated any external ledger.
+
+## 5. Scorecard table
 
 Scale:
 
@@ -33,81 +43,54 @@ Scale:
 
 | Required dimension | Score | Current read | Evidence boundary | Consequence |
 | --- | ---: | --- | --- | --- |
-| Discrimination signal | 0 | Blocked; no Alpha-vs-baseline outputs exist. | Manual Value Read task bank and rubric exist, but Track S and Track R did not run. | No value, superiority, or wedge claim. |
-| False-premise catch behavior | 0 | Unmeasured. | False-premise tasks are present in the task bank, but no outputs or scores exist. | Cannot claim false-premise reliability. |
-| Hidden-constraint surfacing | 0 | Unmeasured. | Hidden-constraint tasks are present in the task bank, but no outputs or scores exist. | Cannot claim hidden-constraint handling. |
-| Near-echo avoidance | 1 | Partial local exact-echo remediation landed in #552, but broad no-echo/substantive-generation behavior remains unproven. | #552 is local fixture evidence only; the Value Read has no post-#552 scores or runtime/provider outputs. | Rerun or create a post-#552 successor gate before value or provider lanes. |
-| Confidence usefulness | 1 | Designed only. | Alpha-side envelope requires `confidence_level`, assumptions, missing evidence, and boundary fields, but no scored answers exist. | Keep as rubric requirement; do not claim usefulness. |
-| Escalation usefulness | 1 | Designed only. | Task bank and scoring dimensions include needs-human escalation, but no scored answers exist. | Keep as rubric requirement; do not claim user-visible escalation quality. |
-| Operator decision quality | 2 | Conservative decision quality is present in documentation only. | The scorecard and Value Read correctly stop on no-echo and authorization blockers. | Supports internal governance, not MVP readiness. |
-| Claim boundary discipline | 3 | Strong documentation discipline; answer-quality boundary untested. | Existing packets repeatedly forbid readiness, superiority, runtime, provider, public, and benchmark claims. | Permits conservative internal statements only. |
-| Runtime/provider/local readiness boundaries | 2 | Boundaries are explicit; runtime/provider evidence is absent. | Track separation is documented: simulation must not be mixed with runtime/provider evidence; Track R is blocked. | Blocks paid/provider work until prerequisites and authorization exist. |
-| Next-lane clarity | 4 | Clear after correction. | The selected lane is `ALPHA-SOLVER-NO-ECHO-SUBSTANTIVE-GENERATION-GATE-POST-552-SUCCESSOR-001`, a post-#552 successor gate, not the already-landed wiring fix. | Rerun/check post-#552 no-echo/substantive generation before any Value Read/provider/public lane. |
+| Discrimination-delta signal | 0 | Not measured. | PR #568 generated no Alpha/baseline outputs and no blind scores. | No value, superiority, wedge, or benchmark claim. |
+| False-premise catch behavior | 0 | Unmeasured. | Cases were listed, but no answers were produced or scored. | Cannot claim false-premise reliability. |
+| Hidden-constraint surfacing | 0 | Unmeasured. | Cases were listed, but no answers were produced or scored. | Cannot claim hidden-constraint handling. |
+| No-echo / substantive derivation outcome | 0 | Unmeasured in the Value Read. | The PR #568 artifact preserves no output text to inspect for echoing or derivation. | Cannot promote no-echo behavior to value evidence. |
+| Confidence / needs-human usefulness | 0 | Unmeasured. | Needs-human/confidence cases are in the task list, but no scored answers exist. | Cannot claim usefulness in practice. |
+| Claim-boundary discipline | 3 | Documentation discipline is strong; answer behavior untested. | The artifact stops instead of fabricating outputs or overclaiming. | Supports conservative governance only, not MVP readiness. |
+| Contested cases / score lock | 0 | No contested cases were adjudicated; all 19 cases are invalid for scoring. | No raw Output A / Output B packets exist. | No score interpretation is possible. |
+| Runtime/provider/local readiness boundaries | 2 | Boundaries are explicit; execution evidence is absent. | The artifact records no provider calls, hosted/local model calls, endpoints, dashboard, public API, or runtime outputs. | Blocks runtime/provider/public claims. |
+| Next-lane clarity | 4 | Clear controlled next lane selected. | Exactly one next lane is selected below. | Move only to an authorized execution packet/lane, not evidence promotion. |
 
-## 4. Permitted claims
+## 6. Permitted claims
 
-- The MVP scorecard has been updated with the actual Value Read blocked verdict.
-- The manual discrimination Value Read was designed but not executed.
-- Track S simulation produced no results.
-- Track R runtime/provider testing did not run and produced no runtime/provider outputs.
-- #552 provides partial local exact-echo remediation for controlled fixtures and unsupported SAFE-OUT-style clarification only.
-- The next evidence-bound lane is a post-#552 no-echo/substantive-generation successor gate before any value or provider lane.
-- Current documentation shows conservative evidence-boundary discipline and correctly prevents readiness overclaiming.
+- PRs #566, #567, and #568 are merged according to live GitHub verification performed for this update.
+- The PR #568 manual Value Read attempt stopped before output generation and scoring.
+- No Alpha outputs, baseline outputs, blind scores, or measured discrimination-delta exist in the PR #568 artifact.
+- The scorecard decision is `VALUE_READ_BLOCKED`.
+- The selected next lane is an explicitly authorized Value Read execution packet/lane with complete prompts and preservation/blinding requirements.
 
-## 5. Forbidden claims
+## 7. Forbidden claims
 
-Do not claim any of the following:
+Do not claim any of the following from PR #568 or this scorecard update:
 
-- MVP readiness.
-- Public exposure readiness.
-- Production readiness.
-- Runtime readiness.
-- Provider readiness or provider validation.
-- Dashboard readiness.
-- `/v1/solve` readiness.
-- Benchmark success.
-- Alpha superiority over a baseline.
-- Discrimination value has been proven.
-- False-premise or hidden-constraint behavior has been validated.
-- Confidence or escalation fields are useful in practice.
-- Simulation evidence exists for this Value Read.
-- Runtime evidence exists for this Value Read.
-- Provider outputs exist for this Value Read.
-- #552 proves broad no-echo closure, general answer quality, provider behavior, runtime readiness, benchmark success, value, public readiness, production readiness, or Alpha superiority.
-- The blocked Value Read or #552 authorizes paid/provider work.
-- Google Sheets or backlog ledgers were updated.
+- MVP readiness, public readiness, production readiness, runtime readiness, provider readiness, dashboard readiness, `/v1/solve` readiness, public API readiness, security/privacy completion, benchmark success, value validation, or Alpha superiority.
+- That Alpha outputs, baseline outputs, blind scores, discrimination-delta, no-echo behavior, false-premise behavior, hidden-constraint behavior, confidence usefulness, needs-human usefulness, or claim-boundary behavior were measured.
+- That provider calls, hosted model calls, local model calls, endpoint calls, dashboard behavior, `/v1/solve` behavior, public API behavior, runtime behavior, Google Sheets mutation, or external ledger mutation occurred.
 
-## 6. Recommended next lane
+## 8. Selected next lane
 
-Selected next lane: `ALPHA-SOLVER-NO-ECHO-SUBSTANTIVE-GENERATION-GATE-POST-552-SUCCESSOR-001`.
+Selected next lane: `ALPHA-SOLVER-VALUE-READ-EXECUTION-PACKET-AUTHORIZATION-001`.
 
-Rationale: #552 should be treated as partial local exact-echo remediation, not broad no-echo closure. The immediate next evidence step is to rerun or create a successor no-echo/substantive-generation gate using the post-#552 state before any Value Read execution, provider work, release-candidate, paid/provider, or public-exposure lane. Provider work remains blocked unless explicit operator authorization is supplied with model, project/billing boundary, cost cap, token cap, max request count, exact synthetic fixture, redaction/data-sharing boundary, and stop conditions.
+Purpose: create an explicitly authorized Value Read execution packet/lane that contains complete per-case prompts, raw-output preservation requirements, blinding-map storage requirements, a clear output-generation boundary, and explicit operator authorization requirements before any Alpha/baseline output generation occurs.
 
-## 7. Stop conditions
+Minimum unblock requirements:
 
-Stop and do not proceed to value, provider, public, or release-candidate lanes if any condition applies:
+1. Complete per-case prompts for every Value Read case.
+2. Explicit authorization for the output-generation mechanism, including whether it is manual, hosted provider, local model, endpoint, or another bounded path.
+3. Raw Alpha and baseline output preservation paths.
+4. Blind Output A / Output B packet construction rules.
+5. Blinding-map storage path and unblind-after-score-lock rule.
+6. Score-lock procedure before unblinding.
+7. Non-claims and stop conditions matching this scorecard boundary.
 
-- Post-#552 Alpha output still echoes the prompt or lacks substantive derivation.
-- Post-#552 no-echo/substantive-generation successor gate remains blocked or absent.
-- Provider authorization is missing or incomplete, including model, project/billing boundary, cost cap, token cap, max request count, exact synthetic fixture, redaction/data-sharing boundary, and stop conditions.
-- Track S simulation outputs are mislabeled as runtime/provider evidence.
-- Any answer or packet claims MVP, public, production, provider, runtime, dashboard, benchmark, or Alpha-superiority readiness from this blocked Value Read.
-- DEF-002/public exposure blockers are used as if closed without explicit closure or operator risk acceptance.
-- Google Sheets/backlog workbooks would need to be edited from this repo task.
+## 9. Blocked claims and actions
 
-## Legacy category mapping
+Blocked until a future authorized lane supplies valid evidence:
 
-The previous scorecard categories remain conservatively interpreted as follows:
-
-| Category | Updated read after Value Read blocked verdict |
-| --- | --- |
-| Core product value evidence | Blocked; no executed Value Read result. |
-| Provider smoke and billing boundary | Provider work remains blocked without explicit authorization. |
-| No-echo substantive generation gate | #552 partially remediated local exact echo; successor gate still required. |
-| Security and privacy closure | Not claimably closed; public exposure remains blocked. |
-| Runtime entrypoint clarity | Mapped only; no runtime readiness claim. |
-| Public exposure gate | Blocked. |
-| Test and CI health | Not changed by this docs-only update. |
-| Documentation and backlog hygiene | Scorecard updated; Google Sheets not touched. |
-| Demo readiness | Internal boundary narration only; no external/live demo readiness. |
-| Investor/incubator narrative readiness | Boundary-heavy internal narrative only; no traction/readiness claim. |
+- Alpha/baseline output generation.
+- Blind scoring and discrimination-delta measurement.
+- Provider calls, hosted model calls, local model calls, endpoint calls, dashboard exposure, `/v1/solve` exposure, public API exposure, and runtime behavior claims.
+- Google Sheets mutation and external ledger mutation.
+- Any MVP, value, benchmark, public, production, runtime, provider, security/privacy, or Alpha-superiority claim.
