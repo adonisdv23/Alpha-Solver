@@ -1,7 +1,7 @@
 # Lane Registry
 
-> Source-of-truth lane lifecycle registry. Verification date **2026-06-15** after
-> live GitHub API verification of **0 open PRs** and merged PRs **#569–#574**.
+> Source-of-truth lane lifecycle registry. Verification date **2026-06-15** for
+> PR **#577** replacement branch repair.
 
 ## Lifecycle classes
 
@@ -11,13 +11,13 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Post-#574 backlog/current-state sync posture | **current control posture** | PRs #569–#574 are merged. The newest evidence is docs/research/gate/helper work: post-#568 source-of-truth sync, founder memo refresh, blocked `/v1/solve` exposure gate, local Ollama helper, failed-closed local Ollama attempt, and Pi.dev no-integration feasibility note. |
+| Post-#577 operator-decision posture | **current control posture** | PR #576 is superseded and should be closed unmerged. PR #577 completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only design note. The current selected state is an operator decision requirement, not an implementation lane. |
 
-## Next ready
+## Next ready / current selected state
 
-| Lane | State | Notes |
-|------|-------|-------|
-| **`ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001`** | **selected next** | Alpha-native design note only. Borrow useful Pi.dev-style operator-harness patterns without installing Pi.dev, integrating Pi.dev, changing runtime behavior, exposing `/v1/solve`, calling providers/models, or mutating Google Sheets. |
+| State | Lifecycle | Notes |
+|-------|-----------|-------|
+| **`OPERATOR_DECISION_REQUIRED_AFTER_LOCAL_OPERATOR_HARNESS_DESIGN_NOTE_001`** | **selected next state; not an implementation lane** | The operator must explicitly choose whether to authorize a separate local harness implementation/spec lane, return to Value Read execution authorization, or stop and keep the design note as reference material. No implementation, UI, runtime, dependency, provider, local-model, Pi.dev, `/v1/solve`, dashboard/public API, Google Sheets, benchmark, Value Read, readiness, security/privacy, or superiority work is authorized. |
 
 ## Completed (kept as evidence)
 
@@ -36,6 +36,7 @@
 - Local Ollama singlepath operator helper (PR #572) — local-only helper added; no successful model run implied.
 - Local Ollama singlepath blocked attempt (PR #573) — exact `gemma3:4b` model preflight passed, then helper failed closed with timeout/backend error and produced no local answer.
 - `18 - PI.DEV-HARNESS-FEASIBILITY` (PR #574) — `BORROW_PATTERNS_ONLY_NO_INTEGRATION` research note.
+- `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` (PR #577) — docs-only Alpha-native local operator harness design note; completed by PR #577 with no implementation or execution authorization.
 
 ## Superseded
 
@@ -43,7 +44,9 @@
 |-----------|---------------|-----|
 | PR #561 — `Add needs-human escalation protocol` | PR #562 | #561 is closed unmerged; #562 merged the docs-only needs-human protocol. |
 | Older smoke-authorization selected-next pointers | Post-#568 and post-#574 selected-next lanes in this registry and [`CURRENT_STATE.md`](CURRENT_STATE.md) | The #557–#574 wave changed the active posture to Value Read blocked evidence, exposure/local-lab gates, and an Alpha-native harness design next step. |
-| `ALPHA-SOLVER-VALUE-READ-EXECUTION-PACKET-AUTHORIZATION-001` as immediate global next | PR #574's proposed `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` | Value Read execution remains blocked; the newest merged research note selects a safer docs-only harness design lane. |
+| `ALPHA-SOLVER-VALUE-READ-EXECUTION-PACKET-AUTHORIZATION-001` as immediate global next | `OPERATOR_DECISION_REQUIRED_AFTER_LOCAL_OPERATOR_HARNESS_DESIGN_NOTE_001` | Value Read execution remains blocked until the operator explicitly returns to Value Read execution authorization. |
+| PR #576 - Add Alpha-native local operator harness design note | PR #577 | PR #577 includes the design note plus source-of-truth closeout and green checks; #576 should be closed unmerged and not cited as merged evidence. |
+| `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as selected next | PR #577 completed that lane | Future operators must not be sent back to the completed design-note lane; the global selected state is now operator decision required. |
 
 ## Blocked / not authorized
 
@@ -60,7 +63,7 @@
 
 - PR #561 lane as a standalone needs-human protocol PR — closed unmerged and superseded by PR #562.
 - Any merged packet lane verbatim — packets are immutable evidence; create a new lane id instead.
-- Any selected-next pointer that predates this post-#574 sync if it conflicts with `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001`.
+- Any selected-next pointer that conflicts with `OPERATOR_DECISION_REQUIRED_AFTER_LOCAL_OPERATOR_HARNESS_DESIGN_NOTE_001`.
 - Direct Pi.dev integration from PR #574's research lane — the recorded verdict is patterns-only/no-integration.
 
 ## Forward path (single track)
@@ -87,7 +90,10 @@ ALPHA-SOLVER-VALUE-READ-SIMULATION-PACKET-REFRESH-POST-565-001 / PR #568 artifac
 #574 Pi.dev harness feasibility ← BORROW_PATTERNS_ONLY_NO_INTEGRATION
         │
         ▼
-ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001 ← selected next; Alpha-native docs-only design lane
+#577 local operator harness design note completed
+        │
+        ▼
+OPERATOR_DECISION_REQUIRED_AFTER_LOCAL_OPERATOR_HARNESS_DESIGN_NOTE_001 ← selected next state; decision only, not an implementation lane
 ```
 
 This registry does not authorize any provider call, local model call, Pi.dev install/run/integration, runtime exposure, public API exposure, Google Sheets mutation, or readiness/value/security/privacy/provider/local-Ollama/Alpha-superiority claim.

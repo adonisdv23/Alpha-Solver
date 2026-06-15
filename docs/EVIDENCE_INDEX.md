@@ -1,7 +1,6 @@
-# Evidence Index — Post-#574 backlog/current-state sync
+# Evidence Index — Post-#577 operator-decision state
 
-> Source-of-truth evidence ledger. Verification date **2026-06-15**. Live GitHub
-> API verification confirmed **0 open PRs** and merged PRs **#569–#574**.
+> Source-of-truth evidence ledger. Verification date **2026-06-15** for PR **#577** replacement branch repair.
 
 ## How to read "evidence value"
 
@@ -29,13 +28,19 @@ The entries below are design, documentation, gate, helper, static-checking, meth
 | #572 | Add local Ollama singlepath operator helper | ✅ merged 2026-06-15 | `scripts/run_local_ollama_singlepath_operator.sh`; local-lab packet docs | Adds an operator helper for the local-only Ollama lane. | Helper existence is not a successful local model run, quality proof, benchmark, or readiness evidence. | completed |
 | #573 | Record blocked local Ollama singlepath attempt | ✅ merged 2026-06-15 | `docs/evals/runs/alpha-solver-local-model-lab-ollama-singlepath-001/local-run-artifact-2026-06-15.md` | Records exact `gemma3:4b` preflight success followed by failed-closed timeout/backend error; no local model answer was generated. | Does not prove local model quality, local Ollama validation, Value Read success, runtime readiness, or Alpha superiority. | blocked evidence |
 | #574 | Add pi.dev harness feasibility research note | ✅ merged 2026-06-15 | `docs/evals/runs/alpha-solver-pi-dev-harness-feasibility-018/README.md` | Records `BORROW_PATTERNS_ONLY_NO_INTEGRATION` for Pi.dev harness research. | Does not install, run, or integrate Pi.dev; does not authorize providers, package installs, runtime exposure, or readiness claims. | completed |
+| #576 | Add Alpha-native local operator harness design note | closed unmerged / superseded by #577 | superseded by #577 | No merged evidence artifact from #576. | Must not be cited as the merged completion artifact for this lane. | superseded |
+| #577 | Add Alpha-native local operator harness design note | merged after PR completion | `docs/evals/runs/alpha-solver-local-operator-harness-design-note-001/` | Docs-only Alpha-native local operator harness design note. | Does not prove implementation, runtime behavior, UI readiness, provider behavior, local model behavior, Pi.dev integration, Value Read success, benchmark success, production readiness, public readiness, security/privacy completion, or Alpha superiority. | completed |
 
-## Current selected next lane
+## Current selected next state
 
-`ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` is the selected next active lane. It should create an Alpha-native local operator-harness design note inspired by safe Pi.dev patterns without installing or integrating Pi.dev, calling providers/models, exposing runtime surfaces, or mutating Google Sheets. PR #568 remains blocked-state evidence only, PR #571 remains blocked exposure evidence, and PR #573 remains failed-closed local-lab evidence only.
+`OPERATOR_DECISION_REQUIRED_AFTER_LOCAL_OPERATOR_HARNESS_DESIGN_NOTE_001` is the selected next state. This is a decision state, not an implementation lane.
+
+PR #576 is superseded by PR #577 and should be closed unmerged. PR #577 completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` after merge. The completed packet does not automatically authorize a successor lane. Future implementation or execution requires a separate explicit operator-authorized lane.
+
+The selected state authorizes no implementation, UI, runtime work, dependency work, provider call, local model call, Pi.dev install/run/integration, `/v1/solve` exposure, dashboard or public API exposure, Google Sheets mutation, benchmark execution, Value Read execution, or readiness/value/security/privacy/provider/local-Ollama/Pi.dev-integration/Alpha-superiority claim.
 
 ## Evidence boundary
 
-The post-#574 state supports only bounded statements that the repository contains merged docs/design/static-checking/scaffold/gate/helper/blocked-attempt/research artifacts for no-echo gating, false-premise perturbations, claim-safety linting, calibrated confidence, needs-human protocol guidance, higher-headroom cases, prompt-contract methodology, a local Ollama lab scaffold/helper, blocked Value Read evidence, blocked `/v1/solve` exposure evidence, a failed-closed local Ollama attempt, and Pi.dev patterns-only research.
+The post-#577 state supports only bounded statements that the repository contains docs/design/static-checking/scaffold/gate/helper/blocked-attempt/research artifacts for no-echo gating, false-premise perturbations, claim-safety linting, calibrated confidence, needs-human protocol guidance, higher-headroom cases, prompt-contract methodology, a local Ollama lab scaffold/helper, blocked Value Read evidence, blocked `/v1/solve` exposure evidence, a failed-closed local Ollama attempt, and Pi.dev patterns-only research.
 
 It does **not** support claims of provider validation, local Ollama validation, hosted-model validation, token use, benchmark success, value, readiness, security/privacy completion, public API readiness, `/v1/solve` readiness, dashboard readiness, Pi.dev integration, Google Sheets synchronization, or Alpha superiority.
