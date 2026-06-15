@@ -32,7 +32,7 @@ This packet does not run the simulation, generate Alpha answers, generate baseli
 
 ## Selected task mix
 
-The bounded task set is 12 simulation-only cases:
+The packet defines 19 frozen candidate simulation-only cases. The category summary below shows coverage; some cases intentionally count toward more than one category:
 
 - False premise: `FP-HC-002`, `HVR-001`, `HVR-003`
 - Hidden constraint: `FP-HC-007`, `HVR-004`, `HVR-006`
@@ -42,7 +42,7 @@ The bounded task set is 12 simulation-only cases:
 - Claim-boundary: `FP-HC-008`, `HVR-022`, `HVR-023`, `HVR-024`
 - Evidence conflict: `HVR-015`, `HVR-016`, `HVR-017`
 
-Some cases intentionally cover more than one category. The future operator may choose a smaller subset only if all required categories remain represented and the reduction is recorded before any output generation.
+A smaller future run may select a subset only if the minimum category coverage in `task-selection.md` remains represented and the reduction is recorded before any output generation.
 
 ## Frozen objective for future execution
 

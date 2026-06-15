@@ -23,7 +23,7 @@ Every future generated output must include the canonical answerability fields fr
 - `would_change_if`
 - `next_safe_operator_action`
 
-Canonical answerability values are: `answerable`, `needs_clarification`, `should_refuse`, `should_escalate`, and `blocked`.
+Canonical persisted answerability values are: `answerable`, `answerable_with_assumptions`, `needs_clarification`, `should_refuse`, `should_escalate`, and `blocked`. `answerable_with_assumptions` is a persisted scoring value, not a display-only label.
 
 Needs-human mapping is mandatory: a needs-human case must use `answerability_verdict: should_escalate`, `needs_human: true`, and a concrete `escalation_reason`.
 
