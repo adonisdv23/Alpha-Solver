@@ -30,3 +30,7 @@ Confirmations:
 - No hosted models were run through product/runtime code.
 - No runtime endpoints, dashboard, public API, `/v1/solve`, or Google Sheets were used.
 - No scoring, blind-score filling, unblinding, final interpretation, benchmark behavior, or external ledger mutation occurred.
+
+Pre-merge repair note:
+
+- `VR-SIM-013` raw Alpha output was corrected before merge because the confidence-calibration solution said "Low confidence" while the confidence field incorrectly recorded `82%`; the field now records `38%`.

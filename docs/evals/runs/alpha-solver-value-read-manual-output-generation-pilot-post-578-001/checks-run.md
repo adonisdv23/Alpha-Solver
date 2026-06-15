@@ -8,3 +8,7 @@
 | `python scripts/check_local_llm_evidence_boundaries.py $(cat /tmp/changed_md.txt)` | Passed | No relevant local-LLM evidence-boundary files were scanned for these changed paths. |
 | `python scripts/check_local_llm_packet_consistency.py docs/evals/runs/alpha-solver-value-read-manual-output-generation-pilot-post-578-001` | Passed | One packet directory scanned. |
 | `python -m pytest -q` | Passed | Full test suite passed; three tests were skipped by existing environment gates. |
+
+## Pre-merge repair check context
+
+`VR-SIM-013` confidence-field repair changed the raw Alpha confidence field from `82%` to `38%` to match the low-confidence solution before merge. Required checks were rerun for the changed Markdown files and packet.

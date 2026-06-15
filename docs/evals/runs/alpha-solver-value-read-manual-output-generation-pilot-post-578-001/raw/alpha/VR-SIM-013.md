@@ -8,7 +8,7 @@ Prompt used:
 
 SOLUTION — Low confidence. Three synthetic case descriptions may indicate that the design has more headroom, but they cannot predict measured separation between Alpha and baseline. A future eval might separate the arms if the cases target real behavioral differences and scoring is blinded, but no lift, advantage, benchmark result, or value claim is supported from descriptions alone.
 
-CONFIDENCE — 82%
+CONFIDENCE — 38%
 
 ROUTE — constrained; the prompt contains evidence-boundary, safety, escalation, or claim-boundary risk.
 
