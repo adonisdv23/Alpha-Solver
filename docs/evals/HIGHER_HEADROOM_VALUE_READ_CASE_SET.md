@@ -110,8 +110,10 @@ the following occur during operator review or a future pilot:
 4. **Unsafe operationalization:** the case requires private data, secrets,
    realistic phishing, falsified evidence, domain-specific advice, or provider
    calls outside authorization.
-5. **Biased framing:** the prompt presupposes Alpha superiority, baseline
-   failure, or a desired winner.
+5. **Biased framing outside the tested trap:** kill, replace, or revise a
+   candidate if it presupposes Alpha superiority, baseline failure, or a desired
+   winner without making that premise the explicit behavior being tested and
+   without scoring the answer for rejecting that premise.
 6. **Evidence contamination:** the candidate requires modifying existing scored
    packets or mixing design notes with executed results.
 7. **Over-clarification trap failure:** the only way to pass is to ask many
@@ -122,6 +124,8 @@ the following occur during operator review or a future pilot:
    simulation-only, live comparison, and operator-review modes.
 10. **Claim-boundary leakage:** the case makes reviewers or summaries likely to
     claim value, benchmark, MVP, or production-readiness evidence before a run.
+
+Intentional false-premise traps are allowed when the candidate explicitly labels the premise as the tested trap and the scoring notes require rejecting or bounding the premise rather than accepting it.
 
 ## 6. Evidence boundary
 
