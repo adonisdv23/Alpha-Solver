@@ -1,15 +1,15 @@
 # Alpha Solver — Current State
 
-> Source-of-truth navigation doc. Last verified **2026-06-15** for post-#579 blind scoring packet construction.
+> Source-of-truth navigation doc. Last verified **2026-06-15** for post-blind-packet scoring-review authorization preparation.
 > Docs-only; no provider/runtime claims.
 
 ## Current verified phase
 
-**Post-#579 blind scoring packet construction posture: the blind scorer packet for the manual no-provider raw-output pilot is complete, and operator review is required before any scoring lane.**
+**Post-blind-packet scoring-review authorization posture: scoring authorization materials exist for the completed blind scorer packet, and operator review is required before any scoring happens.**
 
 The merged #569–#574 wave updated the repository from the post-#568 blocked Value Read state to a broader documentation-and-boundary posture. PR #576 was superseded by PR #577 and should be closed unmerged. PR #577 completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only Alpha-native local operator harness design note.
 
-The current control posture is now `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PACKET_CONSTRUCTION_POST_579_001`: the docs-only blind scorer packet has been constructed from the preserved post-578 manual no-provider raw outputs for the selected 10 committed synthetic cases. The operator must separately authorize scoring, score lock, unblinding, and any final interpretation before those activities occur.
+The current control posture is now `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_SCORING_REVIEW_AUTHORIZATION_POST_BLIND_PACKET_001`: docs-only scoring-review authorization materials have been prepared for the completed blind scorer packet. The operator must separately authorize scoring before any score is filled, and must separately authorize score lock review, unblinding, and any final interpretation before those activities occur.
 
 These are docs, gate, helper, static/research, and blocked-attempt artifacts. They do not prove provider behavior, model quality, value, readiness, benchmark success, security/privacy completion, local Ollama validation, `/v1/solve` readiness, production/public readiness, scoring outcomes, or Alpha superiority.
 
@@ -17,12 +17,12 @@ These are docs, gate, helper, static/research, and blocked-attempt artifacts. Th
 
 | Field | Value |
 |-------|-------|
-| Latest verified completed lane in this wave | **`ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PACKET-CONSTRUCTION-POST-579-001`** |
-| Live pre-edit verification | PR #579 merged; no open PRs at verification time |
+| Latest verified completed lane in this wave | **`ALPHA-SOLVER-VALUE-READ-SCORING-REVIEW-AUTHORIZATION-POST-BLIND-PACKET-001`** |
+| Live pre-edit verification | Blind packet construction PR #580 merged; no open PRs at verification time |
 | Closed-unmerged superseded PR | **#561** — superseded by merged PR #562 |
-| Current controlling posture | Operator review required after completed blind scoring packet construction |
-| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PACKET_CONSTRUCTION_POST_579_001`** |
-| Strategic boundary | A blinded scorer packet now exists for the preserved manual no-provider raw-output pilot. No scoring, blind-score filling, unblinding, final interpretation, provider call, local-model call, runtime endpoint, dashboard, public API exposure, Google Sheets mutation, benchmark claim, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha-superiority claim is authorized until separately approved |
+| Current controlling posture | Operator review required after completed scoring-review authorization preparation |
+| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_SCORING_REVIEW_AUTHORIZATION_POST_BLIND_PACKET_001`** |
+| Strategic boundary | A blinded scorer packet and scoring-authorization materials now exist for the preserved manual no-provider raw-output pilot. No scoring, blind-score filling, unblinding, final interpretation, provider call, local-model call, runtime endpoint, dashboard, public API exposure, Google Sheets mutation, benchmark claim, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha-superiority claim is authorized until separately approved |
 
 ## Completed post-552 / post-565 / post-568 infrastructure lanes
 
@@ -48,14 +48,15 @@ These are docs, gate, helper, static/research, and blocked-attempt artifacts. Th
 | post-577 lane | `ALPHA-SOLVER-VALUE-READ-EXECUTION-AUTHORIZATION-DECISION-POST-577-001` | Completes a docs-only authorization-decision packet for returning to Value Read execution authorization review. |
 | post-578 lane | `ALPHA-SOLVER-VALUE-READ-MANUAL-OUTPUT-GENERATION-PILOT-POST-578-001` | Completes a bounded manual no-provider prompt-contract simulation output-generation pilot for 10 synthetic Value Read cases; raw Alpha and baseline outputs are documentation artifacts only, with no scoring, unblinding, provider/local-model call, endpoint exposure, or value/readiness claim. |
 | post-579 lane | `ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PACKET-CONSTRUCTION-POST-579-001` | Completes docs-only blind scorer packet construction for the 10-case manual no-provider pilot; all scoring fields remain blank, the unblinding map is not committed, and no scoring, unblinding, provider/local-model call, endpoint exposure, or value/readiness claim occurs. |
+| post-blind-packet lane | `ALPHA-SOLVER-VALUE-READ-SCORING-REVIEW-AUTHORIZATION-POST-BLIND-PACKET-001` | Completes docs-only scoring-review authorization preparation; scoring authorization language and blank score-output structure exist, but scoring, unblinding, final interpretation, provider/local-model calls, endpoint exposure, and value/readiness claims have not occurred. |
 
 See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for the PR status ledger and [`LANE_REGISTRY.md`](LANE_REGISTRY.md) for lifecycle classification.
 
 ## Selected next state
 
-**`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PACKET_CONSTRUCTION_POST_579_001`** is the current global selected next state.
+**`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_SCORING_REVIEW_AUTHORIZATION_POST_BLIND_PACKET_001`** is the current global selected next state.
 
-This is a review state, not a scoring or interpretation lane. It means the blinded scorer packet exists for the authorized subset, but no scoring, blind-score filling, unblinding, final interpretation, provider/local-model execution, runtime endpoint, dashboard/public API exposure, or Google Sheets mutation is authorized. The operator must separately authorize scoring before any score is filled.
+This is a review state, not a scoring or interpretation lane. It means scoring-review authorization materials exist for the blinded scorer packet, but no scoring, blind-score filling, unblinding, final interpretation, provider/local-model execution, runtime endpoint, dashboard/public API exposure, or Google Sheets mutation is authorized. The operator must separately authorize scoring before any score is filled.
 
 This selected state authorizes no scoring, blind-score filling, unblinding, final interpretation, provider call, local model call, runtime endpoint, dashboard, public API exposure, Google Sheets mutation, benchmark claim, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha superiority claim.
 
