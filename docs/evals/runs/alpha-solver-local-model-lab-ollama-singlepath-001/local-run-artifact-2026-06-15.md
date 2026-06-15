@@ -19,7 +19,72 @@ This artifact supports only the bounded facts listed below. It does not claim lo
 The operator-provided terminal output is preserved verbatim below.
 
 ```text
-PASTE_FULL_TERMINAL_OUTPUT_HERE
+$ python3 --version
+Python 3.13.5
+$ tmpbin="$(mktemp -d)"
+$ ln -s "$(command -v python3)" "$tmpbin/python"
+$ PATH="$tmpbin:$PATH" which python
+/var/folders/operator/tmp/tmp.ollama-singlepath-python/python
+$ PATH="$tmpbin:$PATH" python --version
+Python 3.13.5
+$ PATH="$tmpbin:$PATH" bash scripts/run_local_ollama_singlepath_operator.sh
+=== ALPHA SOLVER LOCAL OLLAMA SINGLEPATH OPERATOR HELPER ===
+Evidence boundary: operator-local smoke helper only.
+Run this only on the same local machine where Ollama is already installed and serving http://127.0.0.1:11434/api/chat.
+This script does not run ollama pull, install models, call hosted providers, use provider tokens, access credentials, expose /v1/solve, expose dashboard/public API behavior, mutate Google Sheets, sweep registries, use fallback models, or substitute model tags.
+Exact required first-column ollama model tag: gemma3:4b
+
+=== LOCAL OLLAMA SINGLEPATH OPERATOR RESULT ===
+preflight exact model check result: PRESENT_EXACT_MODEL_gemma3:4b
+command exit status: 1
+raw stdout:
+{
+  "answer": "",
+  "assumptions": [],
+  "behavior_evidence": false,
+  "confidence": null,
+  "considerations": [],
+  "evidence_boundary": "non-production local solver orchestration only; not runtime smoke execution, local model quality evidence, hosted provider evidence, /v1/solve readiness, dashboard readiness, MVP validation, production readiness, benchmark evidence, provider orchestration evidence, Alpha superiority evidence, evidence-model promotion, or broad runtime readiness evidence",
+  "final_answer": "",
+  "metadata": {
+    "adapter_exception_cause_class": "timeout",
+    "backend_class": "ollama-local-http-runtime",
+    "behavior_evidence": false,
+    "endpoint_is_loopback": true,
+    "failure_label": "failed_closed_result",
+    "local_model": "gemma3:4b",
+    "no_hosted_fallback": true,
+    "no_provider_keys_required": true,
+    "provider_mode": "local_llm",
+    "real_provider_call_enabled": false,
+    "reason": "backend_error_non_evidence",
+    "status": "failed_closed",
+    "timeout_seconds": 30.0
+  },
+  "mode": "block",
+  "no_hosted_fallback": true,
+  "no_provider_keys_required": true,
+  "orchestration_mode": "non_production_local_solver_orchestration",
+  "pass_count": 1,
+  "provider_mode": "local_llm",
+  "status": "failed_closed",
+  "strategy": "local_expert_two_pass"
+}
+raw stderr if available:
+<empty>
+operator verdict: BLOCKED_LOCAL_LAB_ENDPOINT_UNREACHABLE
+non-claims:
+  - no local model quality claim
+  - no Value Read success claim
+  - no hosted provider validation claim
+  - no production readiness claim
+  - no public readiness claim
+  - no benchmark success claim
+  - no runtime readiness claim
+  - no Alpha superiority claim
+  - no /v1/solve, dashboard, public API, Google Sheets, provider-token, model-pull, model-install, registry-sweep, fallback-model, or tag-substitution claim
+$ echo "script exit: $?"
+script exit: 1
 ```
 
 ## Extracted facts
