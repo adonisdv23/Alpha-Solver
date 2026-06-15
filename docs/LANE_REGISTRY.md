@@ -45,9 +45,11 @@
 |-----------|---------------|-----|
 | PR #561 — `Add needs-human escalation protocol` | PR #562 | #561 is closed unmerged; #562 merged the docs-only needs-human protocol. |
 | Older smoke-authorization selected-next pointers | Post-#568 and post-#574 selected-next lanes in this registry and [`CURRENT_STATE.md`](CURRENT_STATE.md) | The #557–#574 wave changed the active posture to Value Read blocked evidence, exposure/local-lab gates, and an Alpha-native harness design next step. |
-| `ALPHA-SOLVER-VALUE-READ-EXECUTION-PACKET-AUTHORIZATION-001` as immediate global next | `OPERATOR_DECISION_REQUIRED_AFTER_LOCAL_OPERATOR_HARNESS_DESIGN_NOTE_001` | Value Read execution remains blocked until the operator explicitly returns to Value Read execution authorization. |
+| `ALPHA-SOLVER-VALUE-READ-EXECUTION-PACKET-AUTHORIZATION-001` as older immediate next pointer | Historical pointer; not current selected state | Value Read execution remains blocked unless the operator separately authorizes a future output-generation lane. |
+| `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as selected next after PR #575 | PR #577 completed that lane | Future operators must not be routed back to the completed design-note lane. |
 | PR #576 - Add Alpha-native local operator harness design note | PR #577 | PR #577 includes the design note plus source-of-truth closeout and green checks; #576 should be closed unmerged and not cited as merged evidence. |
-| `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as selected next | PR #577 completed that lane | Future operators must not be sent back to the completed design-note lane; the global selected state is now operator decision required. |
+| `OPERATOR_DECISION_REQUIRED_AFTER_LOCAL_OPERATOR_HARNESS_DESIGN_NOTE_001` as post-#577 decision state | `ALPHA-SOLVER-VALUE-READ-EXECUTION-AUTHORIZATION-DECISION-POST-577-001` | This was the decision-only state after PR #577. PR #578 records the operator decision to return to Value Read execution authorization review by completing the docs-only authorization-decision packet. |
+| `ALPHA-SOLVER-VALUE-READ-EXECUTION-AUTHORIZATION-DECISION-POST-577-001` | `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_EXECUTION_AUTHORIZATION_DECISION_POST_577_001` | PR #578 completes the docs-only authorization-decision packet. The current selected state is operator review only, not an execution lane. |
 
 ## Blocked / not authorized
 
