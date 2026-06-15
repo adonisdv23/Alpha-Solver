@@ -12,6 +12,10 @@ This packet defines a single-model, single-path local Ollama lab lane for a tiny
 - Execution surface: operator-only local CLI path
 - Evidence status: local non-behavior/smoke evidence only, unless a separate approved scoring lane changes that status
 
+## Operator-local helper script
+
+The helper script `scripts/run_local_ollama_singlepath_operator.sh` is operator-local only. It must be run by the human operator on the same machine where Ollama is already installed and serving `http://127.0.0.1:11434`. The script preserves the packet boundary: it checks only for the exact first-column model tag `gemma3:4b`, refuses suffix variants, does not run `ollama pull`, does not install models, does not call hosted providers, and runs only the committed synthetic singlepath command against `http://127.0.0.1:11434/api/chat`.
+
 ## Packet files
 
 - `local-prerequisites.md` records prerequisites that must be confirmed locally before any real Ollama run.
