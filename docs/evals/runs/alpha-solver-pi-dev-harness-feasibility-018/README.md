@@ -163,7 +163,7 @@ This research does not claim:
 - Pi.dev packages are safe for Alpha Solver;
 - Alpha Solver public APIs, dashboards, `/v1/solve`, or runtime behavior support
   Pi.dev;
-- Alpha Solver is production-ready because of Pi.dev patterns;
+- Pi.dev patterns change Alpha Solver release gates, operating status, or evidence status;
 - Pi.dev creates Alpha Solver value, superiority, or partnership;
 - Odysseus, AGPL code, or unrelated operator-workbench components were folded
   into Alpha Solver.
