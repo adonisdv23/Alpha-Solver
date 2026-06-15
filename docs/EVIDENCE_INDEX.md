@@ -1,6 +1,6 @@
-# Evidence Index — Post-#578 manual Value Read output-generation pilot state
+# Evidence Index — Post-#579 blind scoring packet construction state
 
-> Source-of-truth evidence ledger. Verification date **2026-06-15** for post-#578 manual Value Read output-generation pilot.
+> Source-of-truth evidence ledger. Verification date **2026-06-15** for post-#579 blind scoring packet construction.
 
 ## How to read "evidence value"
 
@@ -32,17 +32,18 @@ The entries below are design, documentation, gate, helper, static-checking, meth
 | #577 | Add Alpha-native local operator harness design note | ✅ merged 2026-06-15 | `docs/evals/runs/alpha-solver-local-operator-harness-design-note-001/` | Docs-only Alpha-native local operator harness design note. | Does not prove implementation, runtime behavior, UI readiness, provider behavior, local model behavior, Pi.dev integration, Value Read success, benchmark success, production readiness, public readiness, security/privacy completion, or Alpha superiority. | completed |
 | post-577 lane | docs: prepare post-577 Value Read execution authorization decision | completed | `docs/evals/runs/alpha-solver-value-read-execution-authorization-decision-post-577-001/` | Docs-only authorization-decision packet for operator review before the manual pilot was authorized. | Does not itself perform output generation, scoring, unblinding, provider calls, local model runs, runtime endpoints, dashboard/public API exposure, Google Sheets mutation, benchmarks, readiness claims, value claims, provider claims, local-model claims, security/privacy claims, or Alpha-superiority claims. | completed |
 | post-578 lane | docs: run manual Value Read output-generation pilot post-578 | completed | `docs/evals/runs/alpha-solver-value-read-manual-output-generation-pilot-post-578-001/` | Generates raw Alpha-style and raw plain-baseline outputs for 10 committed synthetic Value Read cases as manual no-provider prompt-contract simulation documentation artifacts only. | Does not score, fill blind scores, unblind, interpret, call providers, run local models, use runtime endpoints, expose dashboard/public API, mutate Google Sheets, prove value/readiness/provider/local-model behavior, or show Alpha superiority. | completed |
+| post-579 lane | docs: construct blind scoring packet post-579 | completed | `docs/evals/runs/alpha-solver-value-read-blind-scoring-packet-construction-post-579-001/` | Constructs a blinded scorer packet for the 10-case post-578 manual no-provider raw-output pilot and freezes blank scoring dimensions for a future separately authorized scoring review. | Does not score, fill blind scores, unblind, interpret, call providers, run local models, use runtime endpoints, expose dashboard/public API, mutate Google Sheets, prove value/readiness/provider/local-model behavior, or show Alpha superiority. The unblinding map is not committed. | completed |
 
 ## Current selected next state
 
-`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_MANUAL_OUTPUT_GENERATION_PILOT_POST_578_001` is the selected next state. This is a review state, not a scoring or interpretation lane.
+`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PACKET_CONSTRUCTION_POST_579_001` is the selected next state. This is a review state, not a scoring or interpretation lane.
 
-`ALPHA-SOLVER-VALUE-READ-MANUAL-OUTPUT-GENERATION-PILOT-POST-578-001` is completed as a bounded manual no-provider prompt-contract simulation output-generation pilot. The operator must separately authorize blind scorer packet construction and scoring before those activities occur.
+`ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PACKET-CONSTRUCTION-POST-579-001` is completed as docs-only blind scorer packet construction for the bounded manual no-provider pilot. The operator must separately authorize scoring before any score is filled.
 
 The selected state authorizes no scoring, blind-score filling, unblinding, final interpretation, provider call, local model call, runtime endpoint, dashboard or public API exposure, Google Sheets mutation, benchmark claim, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha-superiority claim.
 
 ## Evidence boundary
 
-The post-#578 manual output-generation pilot state supports only bounded statements that the repository contains docs/design/static-checking/scaffold/gate/helper/blocked-attempt/research artifacts for no-echo gating, false-premise perturbations, claim-safety linting, calibrated confidence, needs-human protocol guidance, higher-headroom cases, prompt-contract methodology, a local Ollama lab scaffold/helper, blocked Value Read evidence, blocked `/v1/solve` exposure evidence, a failed-closed local Ollama attempt, Pi.dev patterns-only research, a docs-only Value Read execution authorization-decision packet, and a manual no-provider Value Read raw-output pilot.
+The post-#579 blind scoring packet construction state supports only bounded statements that the repository contains docs/design/static-checking/scaffold/gate/helper/blocked-attempt/research artifacts for no-echo gating, false-premise perturbations, claim-safety linting, calibrated confidence, needs-human protocol guidance, higher-headroom cases, prompt-contract methodology, a local Ollama lab scaffold/helper, blocked Value Read evidence, blocked `/v1/solve` exposure evidence, a failed-closed local Ollama attempt, Pi.dev patterns-only research, a docs-only Value Read execution authorization-decision packet, a manual no-provider Value Read raw-output pilot, and a docs-only blinded scorer packet with blank scoring fields.
 
-It does **not** support claims of provider validation, local Ollama validation, hosted-model validation, token use, benchmark success, value, readiness, security/privacy completion, public API readiness, `/v1/solve` readiness, dashboard readiness, Pi.dev integration, Google Sheets synchronization, scoring outcome, final interpretation, or Alpha superiority.
+It does **not** support claims of provider validation, local Ollama validation, hosted-model validation, token use, benchmark success, value, readiness, security/privacy completion, public API readiness, `/v1/solve` readiness, dashboard readiness, Pi.dev integration, Google Sheets synchronization, scoring outcome, unblinding outcome, final interpretation, or Alpha superiority.

@@ -1,7 +1,7 @@
 # Lane Registry
 
 > Source-of-truth lane lifecycle registry. Verification date **2026-06-15** for
-> post-#578 manual Value Read output-generation pilot.
+> post-#579 blind scoring packet construction.
 
 ## Lifecycle classes
 
@@ -11,13 +11,13 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Post-#578 manual Value Read output-generation pilot posture | **current control posture** | `ALPHA-SOLVER-VALUE-READ-MANUAL-OUTPUT-GENERATION-PILOT-POST-578-001` is completed as a manual no-provider prompt-contract simulation output-generation pilot. The current selected state is operator review required, not a scoring or interpretation lane. |
+| Post-#579 blind scoring packet construction posture | **current control posture** | `ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PACKET-CONSTRUCTION-POST-579-001` is completed as docs-only blind scorer packet construction for the post-578 manual no-provider pilot. The current selected state is operator review required, not a scoring or interpretation lane. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_MANUAL_OUTPUT_GENERATION_PILOT_POST_578_001`** | **selected next state; review state, not an execution lane** | The operator must separately authorize blind scorer packet construction and scoring. No scoring, blind-score filling, unblinding, final interpretation, provider call, local model call, runtime endpoint, dashboard/public API, Google Sheets mutation, benchmark claim, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha-superiority claim is authorized. |
+| **`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PACKET_CONSTRUCTION_POST_579_001`** | **selected next state; review state, not an execution lane** | The operator must separately authorize scoring before any scores are filled. No scoring, blind-score filling, unblinding, final interpretation, provider call, local model call, runtime endpoint, dashboard/public API, Google Sheets mutation, benchmark claim, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha-superiority claim is authorized. |
 
 ## Completed (kept as evidence)
 
@@ -39,6 +39,7 @@
 - `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` (PR #577) — docs-only Alpha-native local operator harness design note; completed by PR #577 with no implementation or execution authorization.
 - `ALPHA-SOLVER-VALUE-READ-EXECUTION-AUTHORIZATION-DECISION-POST-577-001` (stable post-merge state) — docs-only authorization-decision packet.
 - `ALPHA-SOLVER-VALUE-READ-MANUAL-OUTPUT-GENERATION-PILOT-POST-578-001` (stable post-merge state) — manual no-provider prompt-contract simulation raw-output pilot; no scoring, unblinding, provider/local-model call, endpoint exposure, or value/readiness claim.
+- `ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PACKET-CONSTRUCTION-POST-579-001` (stable post-merge state) — docs-only blind scorer packet construction; no scoring, unblinding, provider/local-model call, endpoint exposure, or value/readiness claim.
 
 ## Superseded
 
@@ -50,7 +51,8 @@
 | `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as selected next after PR #575 | PR #577 completed that lane | Future operators must not be routed back to the completed design-note lane. |
 | PR #576 - Add Alpha-native local operator harness design note | PR #577 | PR #577 includes the design note plus source-of-truth closeout and green checks; #576 should be closed unmerged and not cited as merged evidence. |
 | `OPERATOR_DECISION_REQUIRED_AFTER_LOCAL_OPERATOR_HARNESS_DESIGN_NOTE_001` as post-#577 decision state | `ALPHA-SOLVER-VALUE-READ-EXECUTION-AUTHORIZATION-DECISION-POST-577-001` | This was the decision-only state after PR #577. PR #578 records the operator decision to return to Value Read execution authorization review by completing the docs-only authorization-decision packet. |
-| `ALPHA-SOLVER-VALUE-READ-EXECUTION-AUTHORIZATION-DECISION-POST-577-001` | `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_MANUAL_OUTPUT_GENERATION_PILOT_POST_578_001` | The post-578 manual pilot supersedes the prior review-state pointer. The current selected state is operator review only, not a scoring or interpretation lane. |
+| `ALPHA-SOLVER-VALUE-READ-EXECUTION-AUTHORIZATION-DECISION-POST-577-001` | `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_MANUAL_OUTPUT_GENERATION_PILOT_POST_578_001` | The post-578 manual pilot supersedes the prior review-state pointer. |
+| `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_MANUAL_OUTPUT_GENERATION_PILOT_POST_578_001` | `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PACKET_CONSTRUCTION_POST_579_001` | The post-579 blind scoring packet construction supersedes the post-578 review pointer. The current selected state is operator review only, not a scoring or interpretation lane. |
 
 ## Blocked / not authorized
 
@@ -67,7 +69,7 @@
 
 - PR #561 lane as a standalone needs-human protocol PR — closed unmerged and superseded by PR #562.
 - Any merged packet lane verbatim — packets are immutable evidence; create a new lane id instead.
-- Any selected-next pointer that conflicts with `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_MANUAL_OUTPUT_GENERATION_PILOT_POST_578_001`.
+- Any selected-next pointer that conflicts with `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PACKET_CONSTRUCTION_POST_579_001`.
 - Direct Pi.dev integration from PR #574's research lane — the recorded verdict is patterns-only/no-integration.
 
 ## Forward path (single track)
@@ -103,7 +105,10 @@ ALPHA-SOLVER-VALUE-READ-EXECUTION-AUTHORIZATION-DECISION-POST-577-001 ← docs-o
 ALPHA-SOLVER-VALUE-READ-MANUAL-OUTPUT-GENERATION-PILOT-POST-578-001 ← manual no-provider raw outputs; no scoring/unblinding
         │
         ▼
-OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_MANUAL_OUTPUT_GENERATION_PILOT_POST_578_001 ← selected next state; review only, not scoring or interpretation
+ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PACKET-CONSTRUCTION-POST-579-001 ← blinded packet exists; no scoring/unblinding
+        │
+        ▼
+OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PACKET_CONSTRUCTION_POST_579_001 ← selected next state; review only, not scoring or interpretation
 ```
 
 This registry does not authorize any provider call, local model call, scoring, blind-score filling, unblinding, final interpretation, Pi.dev install/run/integration, runtime endpoint, dashboard exposure, public API exposure, Google Sheets mutation, benchmark, or readiness/value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
