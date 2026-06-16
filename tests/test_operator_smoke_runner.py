@@ -1,6 +1,10 @@
 from __future__ import annotations
 
 import json
+import os
+from pathlib import Path
+import subprocess
+import sys
 
 import httpx
 
@@ -173,3 +177,69 @@ def test_main_prints_expected_schema_for_gated_failure(monkeypatch, capsys):
     assert printed["behavior_evidence"] is False
     assert printed["quality_evidence"] is False
     assert printed["readiness_evidence"] is False
+
+
+def _direct_script_env(**overrides):
+    env = os.environ.copy()
+    env.pop("PYTHONPATH", None)
+    env.pop("ALPHA_LIVE_OPENAI", None)
+    env.pop("OPENAI_API_KEY", None)
+    env.update(overrides)
+    return env
+
+
+def test_direct_script_openai_command_is_import_safe_without_pythonpath():
+    repo_root = Path(__file__).resolve().parents[1]
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "tools/operator_smoke_runner.py",
+            "--mode",
+            "openai",
+            "--prompt",
+            PROMPT,
+        ],
+        cwd=repo_root,
+        env=_direct_script_env(MODEL_PROVIDER="openai"),
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert completed.returncode != 0
+    payload = json.loads(completed.stdout)
+    assert payload["reason"] == "live_openai_opt_in_required"
+    assert "ModuleNotFoundError" not in completed.stderr
+    assert SECRET not in completed.stdout
+    assert SECRET not in completed.stderr
+
+
+def test_direct_script_local_command_fails_closed_without_pythonpath():
+    repo_root = Path(__file__).resolve().parents[1]
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "tools/operator_smoke_runner.py",
+            "--mode",
+            "local",
+            "--prompt",
+            PROMPT,
+        ],
+        cwd=repo_root,
+        env=_direct_script_env(
+            ALPHA_LOCAL_LLM_ENABLED="1",
+            ALPHA_LOCAL_LLM_ENDPOINT="https://example.com/api/chat",
+            ALPHA_LOCAL_LLM_MODEL="fixture-model",
+            ALPHA_LOCAL_LLM_TIMEOUT_SECONDS="1",
+        ),
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert completed.returncode != 0
+    payload = json.loads(completed.stdout)
+    assert payload["reason"] == "endpoint_not_local_non_evidence"
+    assert "ModuleNotFoundError" not in completed.stderr
+    assert SECRET not in completed.stdout
+    assert SECRET not in completed.stderr
