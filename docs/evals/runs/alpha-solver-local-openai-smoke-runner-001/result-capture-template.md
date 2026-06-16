@@ -48,12 +48,12 @@
 
 ## What is still not proven
 
-- Provider quality is not proven.
-- Local model quality is not proven.
-- Benchmark success is not proven.
-- Readiness is not proven.
-- Production or public readiness is not proven.
-- Alpha superiority is not proven.
+- This result does not prove provider quality.
+- This result does not prove local model quality.
+- This result does not prove benchmark success.
+- This result does not prove readiness.
+- This result does not prove production readiness or public readiness.
+- This result does not prove Alpha superiority.
 
 ## Whether UI lane is allowed next
 
