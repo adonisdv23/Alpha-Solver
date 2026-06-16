@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import html as html_lib
 import json
 
 import httpx
@@ -148,6 +149,46 @@ def test_sanitized_json_rendered_without_secrets():
     assert "sanitized-json" in html
 
 
+def test_usage_token_counts_remain_visible_when_numeric():
+    result = console.sanitize_result(
+        {
+            "usage": {
+                "input_tokens": 11,
+                "output_tokens": 7,
+                "total_tokens": 18,
+                "cached_tokens": 3,
+            }
+        }
+    )
+
+    assert result["usage"]["input_tokens"] == 11
+    assert result["usage"]["output_tokens"] == 7
+    assert result["usage"]["total_tokens"] == 18
+    assert result["usage"]["cached_tokens"] == 3
+
+
+def test_secret_fields_and_bearer_strings_remain_redacted():
+    result = console.sanitize_result(
+        {
+            "api_key": SECRET,
+            "Author" + "ization": "bearer " + SECRET,
+            "access_token": SECRET,
+            "refresh_token": SECRET,
+            "nested": {"message": "bearer-prefix " + SECRET},
+            "other": "s" + "k-" + SECRET,
+        }
+    )
+    payload = json.dumps(result, sort_keys=True)
+
+    assert SECRET not in payload
+    assert result["api_key"] == "[REDACTED]"
+    assert result["Author" + "ization"] == "[REDACTED]"
+    assert result["access_token"] == "[REDACTED]"
+    assert result["refresh_token"] == "[REDACTED]"
+    assert result["nested"]["message"] == "[REDACTED]"
+    assert result["other"] == "[REDACTED]"
+
+
 def test_evidence_flags_remain_smoke_only():
     result = console.sanitize_result(
         {
@@ -211,6 +252,31 @@ def test_ui_result_rendering_handles_openai_shape_with_usage_tokens():
     assert "gpt-4.1-mini-2025-04-14" in html
     assert "input_tokens" in html
     assert "Estimated cost" not in html
+
+
+def test_openai_form_state_is_preserved_after_submit():
+    prompt = "Use <xml> & keep form state."
+    html = console.render_result_html(
+        {"mode": "openai", "provider": "openai", "model": console.DEFAULT_OPENAI_MODEL},
+        form_state={"mode": "openai", "model": console.DEFAULT_OPENAI_MODEL, "prompt": prompt},
+    )
+
+    assert '<option value="openai" selected>openai</option>' in html
+    assert f'value="{console.DEFAULT_OPENAI_MODEL}"' in html
+    assert html_lib.escape(prompt) in html
+    assert prompt not in html
+
+
+def test_local_form_state_is_preserved_after_submit():
+    prompt = "Local prompt should remain visible."
+    html = console.render_result_html(
+        {"mode": "local", "provider": "ollama", "model": "qwen2.5:3b"},
+        form_state={"mode": "local", "model": "qwen2.5:3b", "prompt": prompt},
+    )
+
+    assert '<option value="local" selected>local</option>' in html
+    assert 'value="qwen2.5:3b"' in html
+    assert prompt in html
 
 
 def test_loopback_api_returns_sanitized_json(monkeypatch):

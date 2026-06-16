@@ -1,7 +1,7 @@
 # Lane Registry
 
 > Source-of-truth lane lifecycle registry. Verification date **2026-06-16** for
-> local/OpenAI smoke results import.
+> local/OpenAI test console UX redaction refinement.
 
 ## Lifecycle classes
 
@@ -11,13 +11,13 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Operator review after local/OpenAI test console | **current control posture** | `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-001` added a local-only Operator smoke test console. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`. |
+| Operator review after local/OpenAI test console UX redaction refinement | **current control posture** | `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UX-REDUCTION-001` preserves submitted form state and safe numeric usage token counts. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001`. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`** | **review-only selected next state** | Operator review is required after the local-only local/OpenAI test console. The evidence is console implementation only. No provider/local-model quality claim, readiness claim, benchmark claim, production/public claim, security/privacy completion claim, or Alpha-superiority claim is created by this lane. |
+| **`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001`** | **review-only selected next state** | Operator review is required after the local-only local/OpenAI test console UX/redaction refinement. The evidence is UX/redaction refinement only. No provider/local-model quality claim, readiness claim, benchmark claim, production/public claim, security/privacy completion claim, or Alpha-superiority claim is created by this lane. |
 
 ## Completed (kept as evidence)
 
@@ -203,3 +203,5 @@ Boundary: no provider quality, local model quality, readiness, benchmark success
 - Tests: `tests/test_operator_test_console.py`.
 - Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`.
 - Evidence boundary: console implementation only, no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim.
+
+- `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UX-REDUCTION-001` (this PR) - local-only test console UX/redaction refinement. Purpose: preserve submitted form state after console runs and avoid over-redacting safe usage token counts. Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001`. Boundary: no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim.

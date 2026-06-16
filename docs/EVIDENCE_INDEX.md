@@ -51,7 +51,7 @@ The entries below are design, documentation, gate, helper, static-checking, meth
 
 ## Current selected next state
 
-`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001` is the selected next state. This is a review-only state after the local-only Operator smoke test console implementation, not production/public readiness authorization.
+`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001` is the selected next state. This is a review-only state after the local-only Operator smoke test console implementation, not production/public readiness authorization.
 
 `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` was completed by merged PR #591 as a docs-first gate packet. It defines criteria, fixture planning, heuristic review aids, stop conditions, non-actions, and non-claims for operator review. `ALPHA-SOLVER-DISCRIMINATION-TASK-BANK-FIRST-CHEAP-TEST-001` was completed by merged PR #595 as a docs-only cheap-test packet grounded in that gate and the discrimination task-bank asset.
 
@@ -95,3 +95,14 @@ This entry records Operator-provided, redacted smoke-only evidence. It does not 
 | Packet | `docs/evals/runs/alpha-solver-local-openai-test-console-001/` |
 | Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001` |
 | Evidence boundary | console implementation only, no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim |
+
+
+## ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UX-REDUCTION-001
+
+| Field | Value |
+|-------|-------|
+| Lane ID | `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UX-REDUCTION-001` |
+| Purpose | preserve submitted form state after console runs and avoid over-redacting safe usage token counts |
+| Packet | `docs/evals/runs/alpha-solver-local-openai-test-console-ux-reduction-001/` |
+| Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001` |
+| Evidence boundary | UX/redaction refinement only, no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim |
