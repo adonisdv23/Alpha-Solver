@@ -1,15 +1,15 @@
 # Alpha Solver — Current State
 
-> Source-of-truth navigation doc. Last verified **2026-06-16** for post-581 blinded scoring pass completion.
+> Source-of-truth navigation doc. Last verified **2026-06-16** for post-581 blinded scoring pass completion and MVP scorecard score-state update.
 > Docs-only; no provider/runtime claims.
 
 ## Current verified phase
 
-**Post-581 blinded scoring pass posture: the authorized blinded scorer packet has been scored and score-locked, and operator review is required before any unblinding or final interpretation happens.**
+**Post-581 blinded scoring pass posture plus MVP scorecard score-state update: the authorized blinded scorer packet has been scored and score-locked, the MVP scorecard now records that locked blind scores exist, and operator review is required before any unblinding or final interpretation happens.**
 
 The merged #569–#574 wave updated the repository from the post-#568 blocked Value Read state to a broader documentation-and-boundary posture. PR #576 was superseded by PR #577 and should be closed unmerged. PR #577 completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only Alpha-native local operator harness design note.
 
-The current control posture is now `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PASS_POST_581_001`: the authorized blinded scorer packet has been scored in a scoring-only lane and the scores are locked. The operator must separately authorize unblinding or final interpretation before either activity occurs.
+The current control posture is now `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PASS_POST_581_001`: the authorized blinded scorer packet has been scored in a scoring-only lane, the scores are locked, and the docs-only MVP scorecard update records score-state existence without score interpretation. The operator must separately authorize unblinding or final interpretation before either activity occurs.
 
 These are docs, gate, helper, static/research, and blocked-attempt artifacts. They do not prove provider behavior, model quality, value, readiness, benchmark success, security/privacy completion, local Ollama validation, `/v1/solve` readiness, production/public readiness, unblinding outcome, final interpretation, or Alpha superiority.
 
@@ -17,7 +17,7 @@ These are docs, gate, helper, static/research, and blocked-attempt artifacts. Th
 
 | Field | Value |
 |-------|-------|
-| Latest verified completed lane in this wave | **`ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PASS-POST-581-001`** |
+| Latest verified completed lane in this wave | **`ALPHA-SOLVER-MVP-SCORECARD-AFTER-VALUE-READ-SCORE-001`** |
 | Live pre-edit verification | PR #581 merged; no open PRs at verification time |
 | Closed-unmerged superseded PR | **#561** — superseded by merged PR #562 |
 | Current controlling posture | Operator review required after completed blinded scoring pass and score lock |
@@ -50,6 +50,7 @@ These are docs, gate, helper, static/research, and blocked-attempt artifacts. Th
 | post-579 lane | `ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PACKET-CONSTRUCTION-POST-579-001` | Completes docs-only blind scorer packet construction for the 10-case manual no-provider pilot; all scoring fields remain blank, the unblinding map is not committed, and no scoring, unblinding, provider/local-model call, endpoint exposure, or value/readiness claim occurs. |
 | post-blind-packet lane | `ALPHA-SOLVER-VALUE-READ-SCORING-REVIEW-AUTHORIZATION-POST-BLIND-PACKET-001` | Completes docs-only scoring-review authorization preparation; scoring authorization language and blank score-output structure exist, but scoring, unblinding, final interpretation, provider/local-model calls, endpoint exposure, and value/readiness claims have not occurred. |
 | post-581 lane | `ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PASS-POST-581-001` | Completes scoring-only review of the blinded scorer packet; case-level blind scores, notes, contested-score flags, scorer identity/tool, scoring method, timestamp, and score-lock confirmation are recorded, with no unblinding, final interpretation, provider/local-model call, endpoint exposure, or value/readiness claim. |
+| scorecard-after-score lane | `ALPHA-SOLVER-MVP-SCORECARD-AFTER-VALUE-READ-SCORE-001` | Updates the docs-only MVP scorecard posture to record that locked blind scores exist while preserving the no-unblinding, no-final-interpretation, no-source-identity, and no-value/readiness/superiority-claim boundary. |
 
 See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for the PR status ledger and [`LANE_REGISTRY.md`](LANE_REGISTRY.md) for lifecycle classification.
 
