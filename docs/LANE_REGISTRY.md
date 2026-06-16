@@ -1,7 +1,7 @@
 # Lane Registry
 
 > Source-of-truth lane lifecycle registry. Verification date **2026-06-16** for
-> next-release selector after final interpretation.
+> substantive derivation check gate.
 
 ## Lifecycle classes
 
@@ -11,13 +11,13 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Next-release selector after final interpretation | **current control posture** | `ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-FINAL-INTERPRETATION-001` completed after the Value Read final interpretation and the parallel feasibility group sync. It selects exactly one next lane for operator review: `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001`. The selector does not create or implement the selected lane. |
+| Operator review after substantive derivation check | **current control posture** | `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` completed a docs-first substantive derivation / no-echo gate packet. The selected next state is review-only: `OPERATOR_REVIEW_REQUIRED_AFTER_SUBSTANTIVE_DERIVATION_CHECK_001`. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`ALPHA_SOLVER_GATE_SUBSTANTIVE_DERIVATION_CHECK_001_SELECTED_FOR_OPERATOR_REVIEW`** | **selected next state; one lane selected for operator review, not implementation authorization** | `ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-FINAL-INTERPRETATION-001` selected `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` as the single next lane for operator review. The selector does not create or implement that lane. No runtime work, providers, local models, dashboard/public API work, `/v1/solve`, Google Sheets mutation, scoring, source-map work, final interpretation, implementation lane, readiness/broad-value/provider/local-model/security/privacy/production/public/partnership/Pi.dev integration/demo external-use/discrimination-scoring claim, or Alpha-superiority claim is authorized. |
+| **`OPERATOR_REVIEW_REQUIRED_AFTER_SUBSTANTIVE_DERIVATION_CHECK_001`** | **review-only selected next state** | Operator review is required after the docs-first substantive derivation check gate. No implementation, runtime work, providers, local models, dashboard/public API work, `/v1/solve`, Google Sheets mutation, scoring, unblinding, source-map work, raw output inspection, release behavior, dependency addition, readiness/broad-value/provider/local-model/security/privacy/production/public/partnership/Pi.dev integration/demo external-use/discrimination-scoring claim, or Alpha-superiority claim is authorized. |
 
 ## Completed (kept as evidence)
 
@@ -50,6 +50,7 @@
 - `ALPHA-SOLVER-DEMO-EVIDENCE-PACKET-TO-DEMO-001` (PR #588) — docs-only claim-safe demo evidence packet feasibility packet; strict evidence-boundary follow-up deferred, no runtime demo/external-use approval/product proof/value/readiness/superiority claim.
 - `ALPHA-SOLVER-PARALLEL-FEASIBILITY-GROUP-SYNC-001` (stable post-merge state) — preservation-only source-of-truth sync after tabs 13-16; records PR #581, #587, and #588 as merged and no open source-of-truth doc conflict.
 - `ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-FINAL-INTERPRETATION-001` (stable post-merge state) — docs-only selector after final interpretation and the parallel feasibility group sync; selects `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` for operator review and does not create or implement it.
+- `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` (this PR after merge) — docs-first substantive derivation / no-echo gate packet; defines criteria, fixture planning, heuristic review aids, stop conditions, non-actions, and non-claims, with no implementation or broad claims.
 
 ## Superseded
 
@@ -79,7 +80,7 @@
 
 - PR #561 lane as a standalone needs-human protocol PR — closed unmerged and superseded by PR #562.
 - Any merged packet lane verbatim — packets are immutable evidence; create a new lane id instead.
-- Any selected-next pointer that conflicts with `ALPHA_SOLVER_GATE_SUBSTANTIVE_DERIVATION_CHECK_001_SELECTED_FOR_OPERATOR_REVIEW`.
+- Any selected-next pointer that conflicts with `OPERATOR_REVIEW_REQUIRED_AFTER_SUBSTANTIVE_DERIVATION_CHECK_001`.
 - Direct Pi.dev integration from PR #574's research lane — the recorded verdict is patterns-only/no-integration.
 
 ## Forward path (single track)
@@ -139,7 +140,10 @@ ALPHA-SOLVER-VALUE-READ-UNBLINDING-FINAL-INTERPRETATION-PASS-001 ← source iden
 ALPHA-SOLVER-PARALLEL-FEASIBILITY-GROUP-SYNC-001 ← source-of-truth sync; no open PR conflicts
         │
         ▼
-ALPHA_SOLVER_GATE_SUBSTANTIVE_DERIVATION_CHECK_001_SELECTED_FOR_OPERATOR_REVIEW ← selected next state; one lane selected for operator review, not implementation
+ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001 ← docs-first criteria packet completed; no implementation
+        │
+        ▼
+OPERATOR_REVIEW_REQUIRED_AFTER_SUBSTANTIVE_DERIVATION_CHECK_001 ← review-only selected next state
 ```
 
 This registry does not authorize any provider call, local model call, score change, Pi.dev install/run/integration, runtime endpoint, dashboard exposure, public API exposure, Google Sheets mutation, benchmark, release implementation lane, or readiness/broad-value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
