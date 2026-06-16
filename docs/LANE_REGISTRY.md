@@ -1,7 +1,7 @@
 # Lane Registry
 
 > Source-of-truth lane lifecycle registry. Verification date **2026-06-16** for
-> local/OpenAI smoke runner.
+> local/OpenAI smoke results import.
 
 ## Lifecycle classes
 
@@ -11,13 +11,13 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Operator review after local/OpenAI smoke runner | **current control posture** | `ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RUNNER-001` completed an operator smoke runner and runbook without running smoke checks. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`. |
+| Operator review after local/OpenAI smoke results import | **current control posture** | `ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RESULTS-IMPORT-001` imported Operator-provided, redacted smoke-only results. Local/Ollama passed using `qwen2.5:3b`; OpenAI passed using `gpt-4.1-mini-2025-04-14`. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`** | **review-only selected next state** | Operator review is required after the local/OpenAI smoke runner. No UI implementation is authorized unless the Operator later provides reviewed smoke results. No smoke execution, provider/local-model quality claim, readiness claim, benchmark claim, production/public claim, or Alpha-superiority claim is created by this lane. |
+| **`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`** | **review-only selected next state** | Operator review is required after the local/OpenAI smoke results import. The evidence is smoke-only: local/Ollama passed using `qwen2.5:3b`, and OpenAI passed using `gpt-4.1-mini-2025-04-14`. No provider/local-model quality claim, readiness claim, benchmark claim, production/public claim, or Alpha-superiority claim is created by this lane. |
 
 ## Completed (kept as evidence)
 
@@ -81,7 +81,7 @@
 
 - PR #561 lane as a standalone needs-human protocol PR - closed unmerged and superseded by PR #562.
 - Any merged packet lane verbatim - packets are immutable evidence; create a new lane id instead.
-- Any selected-next pointer that conflicts with `OPERATOR_REVIEW_REQUIRED_AFTER_DISCRIMINATION_TASK_BANK_FIRST_CHEAP_TEST_001`.
+- Any selected-next pointer that conflicts with `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`. Earlier selected-next pointers, including `OPERATOR_REVIEW_REQUIRED_AFTER_DISCRIMINATION_TASK_BANK_FIRST_CHEAP_TEST_001` and `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`, are prior review states and must not be treated as current.
 - Direct Pi.dev integration from PR #574's research lane - the recorded verdict is patterns-only/no-integration.
 
 ## Forward path (single track)
@@ -156,7 +156,13 @@ OPERATOR_REVIEW_REQUIRED_AFTER_DISCRIMINATION_TASK_BANK_FIRST_CHEAP_TEST_001 ←
 ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RUNNER-001 ← smoke runner and runbook completed; no smoke execution
         │
         ▼
-OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001 ← current review-only selected next state
+OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001 ← prior review-only selected next state
+        │
+        ▼
+ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RESULTS-IMPORT-001 ← smoke-only results imported; local/Ollama and OpenAI passed
+        │
+        ▼
+OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001 ← current review-only selected next state
 ```
 
 This registry does not authorize UI implementation without later reviewed smoke results, public provider exposure, local model validation claims, task execution, output generation, scoring, score change, unblinding, source-map work, raw output inspection, Pi.dev install/run/integration, runtime endpoint, dashboard exposure, public API exposure, Google Sheets mutation, benchmark, dependency addition, release implementation lane, or readiness/broad-value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
@@ -167,6 +173,19 @@ This registry does not authorize UI implementation without later reviewed smoke 
 |------|-------|----------|
 | `ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RUNNER-001` | completed packet / review-only selected next | Adds `tools/operator_smoke_runner.py` and `docs/evals/runs/alpha-solver-local-openai-smoke-runner-001/` so the Operator can explicitly run one local/Ollama smoke check or one OpenAI smoke check with sanitized JSON output. The lane itself does not run smoke checks. |
 
-Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`.
+Selected next state after runner lane: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`.
+
+Current selected next state after smoke-results import: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`.
 
 Boundary: no provider quality, local model quality, readiness, benchmark success, production readiness, public readiness, security/privacy completion, UI authorization, or Alpha-superiority claim is created.
+
+- `ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RESULTS-IMPORT-001` (this PR) - docs-only import of Operator-provided, redacted smoke-only results: local/Ollama passed using `qwen2.5:3b`, and OpenAI passed using `gpt-4.1-mini-2025-04-14`; no behavior quality, provider quality, local-model quality, readiness, benchmark, production/public, or Alpha-superiority claim.
+
+## ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RESULTS-IMPORT-001
+
+- Packet: `docs/evals/runs/alpha-solver-local-openai-smoke-results-import-001/`
+- Lifecycle: completed docs-only evidence import with review-only selected next state.
+- Local/Ollama smoke: passed using `qwen2.5:3b`.
+- OpenAI smoke: passed using `gpt-4.1-mini-2025-04-14`.
+- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`.
+- Boundary: smoke-only evidence; no behavior quality, provider quality, local-model quality, readiness, benchmark, production/public, or Alpha-superiority claim.

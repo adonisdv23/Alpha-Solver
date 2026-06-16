@@ -1,11 +1,11 @@
 # Alpha Solver - Current State
 
-> Source-of-truth navigation doc. Last verified **2026-06-16** for local/OpenAI smoke runner.
-> This lane adds a safe local/OpenAI smoke runner and runbook. The PR does not run smoke checks and makes no provider/runtime quality or readiness claims.
+> Source-of-truth navigation doc. Last verified **2026-06-16** for local/OpenAI smoke results import.
+> This lane imports Operator-provided, redacted local/Ollama and OpenAI smoke results. The results are smoke-only and make no provider/runtime quality or readiness claims.
 
 ## Current verified phase
 
-**Local/OpenAI smoke runner lane completed: the selected next state is review-only operator review after the smoke runner.**
+**Local/OpenAI smoke results import lane completed: the selected next state is review-only operator review after the smoke results import.**
 
 The merged #569–#574 wave updated the repository from the post-#568 blocked Value Read state to a broader documentation-and-boundary posture. PR #576 was superseded by PR #577 and should be closed unmerged. PR #577 completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only Alpha-native local operator harness design note.
 
@@ -17,12 +17,12 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 
 | Field | Value |
 |-------|-------|
-| Latest verified completed lane in this wave | **`ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RUNNER-001`** |
-| Source-of-truth sync | Current docs record the completed local/OpenAI smoke runner and a review-only selected next state |
+| Latest verified completed lane in this wave | **`ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RESULTS-IMPORT-001`** |
+| Source-of-truth sync | Current docs record the completed local/OpenAI smoke results import and a review-only selected next state |
 | Closed-unmerged superseded PR | **#561** - superseded by merged PR #562 |
-| Current controlling posture | Operator review required after local/OpenAI smoke runner |
-| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`** |
-| Strategic boundary | This review-only state records the completed local/OpenAI smoke runner and runbook; it does not run smoke checks, authorize UI implementation without later reviewed smoke results, expose `/v1/solve`, mutate Google Sheets, generate scores, or support provider/local-model quality, readiness, benchmark, production/public, security/privacy, partnership/Pi.dev integration, or Alpha-superiority claims |
+| Current controlling posture | Operator review required after local/OpenAI smoke results import |
+| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`** |
+| Strategic boundary | This review-only state records the imported Operator-provided smoke-only local/Ollama and OpenAI results; it does not authorize UI implementation, expose `/v1/solve`, mutate Google Sheets, generate scores, or support provider/local-model quality, readiness, benchmark, production/public, security/privacy, partnership/Pi.dev integration, or Alpha-superiority claims |
 
 ## Completed post-552 / post-565 / post-568 infrastructure lanes
 
@@ -61,14 +61,15 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 | derivation-check lane | `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` | Completes a docs-first review-only substantive derivation / no-echo gate packet that defines criteria, fixture planning, heuristic review aids, stop conditions, non-actions, and non-claims; no implementation, provider/local-model/runtime/API/Sheet/scoring/unblinding/source-map/raw-output/release work or broad claims occur. |
 | cheap-test packet lane | `ALPHA-SOLVER-DISCRIMINATION-TASK-BANK-FIRST-CHEAP-TEST-001` | Completes a docs-only first cheap-test packet with five representative taxonomy task cards for discrimination task-bank preparation, grounded in the derivation / no-echo gate and task-bank asset; no task execution, Alpha or baseline output generation, scoring, raw output inspection, unblinding, source-map work, provider/local-model/runtime/API/Sheet work, dependency addition, release implementation, or broad claims occur. |
 | smoke-runner lane | `ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RUNNER-001` | Adds `tools/operator_smoke_runner.py` and the operator packet for explicit local/Ollama or OpenAI smoke checks; this PR does not run either smoke and proves no provider quality, local model quality, readiness, benchmark success, production readiness, public readiness, or Alpha superiority. |
+| smoke-results-import lane | `ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RESULTS-IMPORT-001` | Imports Operator-provided, redacted smoke-only results showing local/Ollama passed using `qwen2.5:3b` and OpenAI passed using `gpt-4.1-mini-2025-04-14`; proves no behavior quality, provider quality, local-model quality, readiness, benchmark success, production/public readiness, or Alpha superiority. |
 
 See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for the PR status ledger and [`LANE_REGISTRY.md`](LANE_REGISTRY.md) for lifecycle classification.
 
 ## Selected next state
 
-**`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`** is the current global selected next state.
+**`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`** is the current global selected next state.
 
-This is a review-only state after `ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RUNNER-001`. It means the smoke runner and runbook have been created for operator review. It does not mean either smoke was run by this PR.
+This is a review-only state after `ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RESULTS-IMPORT-001`. It means Operator-provided, redacted smoke-only results were imported for review: local/Ollama passed using `qwen2.5:3b`, and OpenAI passed using `gpt-4.1-mini-2025-04-14`.
 
 This state authorizes no UI implementation unless the Operator later provides reviewed smoke results, and no task execution, output generation, scoring, score change, source-map work, unblinding, raw Alpha output inspection, raw baseline output inspection, provider call, local model call, runtime work, API work, `/v1/solve` exposure, dashboard/public API exposure, Google Sheets mutation, dependency addition, routing behavior, council behavior, benchmark work, release behavior, readiness claim, broad value claim, provider claim, local-model claim, security/privacy claim, production/public claim, partnership/Pi.dev integration claim, demo external-use approval, discrimination-task execution/scoring, or Alpha-superiority claim.
 
@@ -81,7 +82,7 @@ This state authorizes no UI implementation unless the Operator later provides re
 
 ## What is blocked / not authorized
 
-- Provider calls, hosted model calls, local model calls, token use, credential access, billing inspection, dashboard exposure, `/v1/solve` exposure, public API exposure, Pi.dev installation/execution/integration, package-install experiments, and Google Sheets mutation.
+- New provider calls, hosted model calls, local model calls, token use, credential access, billing inspection, dashboard exposure, `/v1/solve` exposure, public API exposure, Pi.dev installation/execution/integration, package-install experiments, and Google Sheets mutation.
 - Release implementation lanes and broad Alpha-vs-baseline claims. The bounded manual no-provider pilot now has locked blind scores and a final interpretation, but this pass selects no release implementation lane and does not support claims beyond the 10-case manual no-provider prompt-contract simulation.
 - Local Ollama validation claims. PR #573 records a failed-closed local timeout/backend error and no local model answer.
 - Security/privacy completion, production readiness, public MVP readiness, benchmark validation/superiority, broad-user readiness, autonomous readiness, provider validation, local Ollama validation, `/v1/solve` readiness, dashboard readiness, or Alpha superiority.
@@ -89,3 +90,12 @@ This state authorizes no UI implementation unless the Operator later provides re
 ## What must not be claimed
 
 This phase does **not** support claims of broad value, OpenAI validation, provider validation, local Ollama validation, Pi.dev integration, runtime readiness, production readiness, public MVP readiness, security/privacy completion, DEF-002 resolved, DEF-003 resolved, benchmark validation, benchmark superiority, broad-user readiness, autonomous readiness, `/v1/solve` readiness, dashboard readiness, Google Sheets synchronization, or Alpha superiority.
+
+## ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RESULTS-IMPORT-001
+
+- Packet: `docs/evals/runs/alpha-solver-local-openai-smoke-results-import-001/`
+- Evidence type: Operator-provided, redacted smoke-only result import.
+- Local/Ollama smoke result: passed using `qwen2.5:3b`.
+- OpenAI smoke result: passed using `gpt-4.1-mini-2025-04-14`.
+- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`.
+- Boundary: does not prove behavior quality, provider quality, local-model quality, readiness, benchmark success, production readiness, public readiness, security/privacy completion, buyer validation, traction, partnership/Pi.dev integration, or Alpha superiority.
