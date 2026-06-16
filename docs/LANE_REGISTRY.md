@@ -1,7 +1,7 @@
 # Lane Registry
 
 > Source-of-truth lane lifecycle registry. Verification date **2026-06-16** for
-> discrimination task-bank first cheap-test packet.
+> local/OpenAI smoke runner.
 
 ## Lifecycle classes
 
@@ -11,13 +11,13 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Operator review after discrimination task-bank first cheap-test packet | **current control posture** | `ALPHA-SOLVER-DISCRIMINATION-TASK-BANK-FIRST-CHEAP-TEST-001` completed a docs-only first cheap-test packet. The selected next state is review-only: `OPERATOR_REVIEW_REQUIRED_AFTER_DISCRIMINATION_TASK_BANK_FIRST_CHEAP_TEST_001`. |
+| Operator review after local/OpenAI smoke runner | **current control posture** | `ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RUNNER-001` completed an operator smoke runner and runbook without running smoke checks. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_REVIEW_REQUIRED_AFTER_DISCRIMINATION_TASK_BANK_FIRST_CHEAP_TEST_001`** | **review-only selected next state** | Operator review is required after the docs-only discrimination task-bank first cheap-test packet. No implementation, task execution, output generation, runtime work, providers, local models, dashboard/public API work, `/v1/solve`, Google Sheets mutation, scoring, unblinding, source-map work, raw output inspection, release behavior, dependency addition, readiness/broad-value/provider/local-model/security/privacy/production/public/partnership/Pi.dev integration/demo external-use/discrimination-scoring claim, or Alpha-superiority claim is authorized. |
+| **`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`** | **review-only selected next state** | Operator review is required after the local/OpenAI smoke runner. No UI implementation is authorized unless the Operator later provides reviewed smoke results. No smoke execution, provider/local-model quality claim, readiness claim, benchmark claim, production/public claim, or Alpha-superiority claim is created by this lane. |
 
 ## Completed (kept as evidence)
 
@@ -150,7 +150,23 @@ OPERATOR_REVIEW_REQUIRED_AFTER_SUBSTANTIVE_DERIVATION_CHECK_001 ← prior review
 ALPHA-SOLVER-DISCRIMINATION-TASK-BANK-FIRST-CHEAP-TEST-001 ← docs-only cheap-test packet completed; no execution
         │
         ▼
-OPERATOR_REVIEW_REQUIRED_AFTER_DISCRIMINATION_TASK_BANK_FIRST_CHEAP_TEST_001 ← review-only selected next state
+OPERATOR_REVIEW_REQUIRED_AFTER_DISCRIMINATION_TASK_BANK_FIRST_CHEAP_TEST_001 ← prior review-only selected next state
+        │
+        ▼
+ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RUNNER-001 ← smoke runner and runbook completed; no smoke execution
+        │
+        ▼
+OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001 ← current review-only selected next state
 ```
 
-This registry does not authorize any provider call, local model call, task execution, output generation, scoring, score change, unblinding, source-map work, raw output inspection, Pi.dev install/run/integration, runtime endpoint, dashboard exposure, public API exposure, Google Sheets mutation, benchmark, dependency addition, release implementation lane, or readiness/broad-value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
+This registry does not authorize UI implementation without later reviewed smoke results, public provider exposure, local model validation claims, task execution, output generation, scoring, score change, unblinding, source-map work, raw output inspection, Pi.dev install/run/integration, runtime endpoint, dashboard exposure, public API exposure, Google Sheets mutation, benchmark, dependency addition, release implementation lane, or readiness/broad-value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
+
+## Local/OpenAI smoke runner lane
+
+| Lane | State | Evidence |
+|------|-------|----------|
+| `ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RUNNER-001` | completed packet / review-only selected next | Adds `tools/operator_smoke_runner.py` and `docs/evals/runs/alpha-solver-local-openai-smoke-runner-001/` so the Operator can explicitly run one local/Ollama smoke check or one OpenAI smoke check with sanitized JSON output. The lane itself does not run smoke checks. |
+
+Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`.
+
+Boundary: no provider quality, local model quality, readiness, benchmark success, production readiness, public readiness, security/privacy completion, UI authorization, or Alpha-superiority claim is created.
