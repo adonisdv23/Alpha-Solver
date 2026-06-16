@@ -50,7 +50,7 @@
 - `ALPHA-SOLVER-DEMO-EVIDENCE-PACKET-TO-DEMO-001` (PR #588) — docs-only claim-safe demo evidence packet feasibility packet; strict evidence-boundary follow-up deferred, no runtime demo/external-use approval/product proof/value/readiness/superiority claim.
 - `ALPHA-SOLVER-PARALLEL-FEASIBILITY-GROUP-SYNC-001` (stable post-merge state) — preservation-only source-of-truth sync after tabs 13-16; records PR #581, #587, and #588 as merged and no open source-of-truth doc conflict.
 - `ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-FINAL-INTERPRETATION-001` (stable post-merge state) — docs-only selector after final interpretation and the parallel feasibility group sync; selects `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` for operator review and does not create or implement it.
-- `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` (this PR after merge) — docs-first substantive derivation / no-echo gate packet; defines criteria, fixture planning, heuristic review aids, stop conditions, non-actions, and non-claims, with no implementation or broad claims.
+- `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` (merged PR #591) - docs-first substantive derivation / no-echo gate packet; defines criteria, fixture planning, heuristic review aids, stop conditions, non-actions, and non-claims, with no implementation or broad claims.
 
 ## Superseded
 
