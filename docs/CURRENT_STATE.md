@@ -1,28 +1,28 @@
 # Alpha Solver — Current State
 
-> Source-of-truth navigation doc. Last verified **2026-06-15** for post-blind-packet scoring-review authorization preparation.
+> Source-of-truth navigation doc. Last verified **2026-06-16** for post-581 blinded scoring pass completion.
 > Docs-only; no provider/runtime claims.
 
 ## Current verified phase
 
-**Post-blind-packet scoring-review authorization posture: scoring authorization materials exist for the completed blind scorer packet, and operator review is required before any scoring happens.**
+**Post-581 blinded scoring pass posture: the authorized blinded scorer packet has been scored and score-locked, and operator review is required before any unblinding or final interpretation happens.**
 
 The merged #569–#574 wave updated the repository from the post-#568 blocked Value Read state to a broader documentation-and-boundary posture. PR #576 was superseded by PR #577 and should be closed unmerged. PR #577 completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only Alpha-native local operator harness design note.
 
-The current control posture is now `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_SCORING_REVIEW_AUTHORIZATION_POST_BLIND_PACKET_001`: docs-only scoring-review authorization materials have been prepared for the completed blind scorer packet. The operator must separately authorize scoring before any score is filled, and must separately authorize score lock review, unblinding, and any final interpretation before those activities occur.
+The current control posture is now `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PASS_POST_581_001`: the authorized blinded scorer packet has been scored in a scoring-only lane and the scores are locked. The operator must separately authorize unblinding or final interpretation before either activity occurs.
 
-These are docs, gate, helper, static/research, and blocked-attempt artifacts. They do not prove provider behavior, model quality, value, readiness, benchmark success, security/privacy completion, local Ollama validation, `/v1/solve` readiness, production/public readiness, scoring outcomes, or Alpha superiority.
+These are docs, gate, helper, static/research, and blocked-attempt artifacts. They do not prove provider behavior, model quality, value, readiness, benchmark success, security/privacy completion, local Ollama validation, `/v1/solve` readiness, production/public readiness, unblinding outcome, final interpretation, or Alpha superiority.
 
 ## At a glance
 
 | Field | Value |
 |-------|-------|
-| Latest verified completed lane in this wave | **`ALPHA-SOLVER-VALUE-READ-SCORING-REVIEW-AUTHORIZATION-POST-BLIND-PACKET-001`** |
-| Live pre-edit verification | Blind packet construction PR #580 merged; no open PRs at verification time |
+| Latest verified completed lane in this wave | **`ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PASS-POST-581-001`** |
+| Live pre-edit verification | PR #581 merged; no open PRs at verification time |
 | Closed-unmerged superseded PR | **#561** — superseded by merged PR #562 |
-| Current controlling posture | Operator review required after completed scoring-review authorization preparation |
-| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_SCORING_REVIEW_AUTHORIZATION_POST_BLIND_PACKET_001`** |
-| Strategic boundary | A blinded scorer packet and scoring-authorization materials now exist for the preserved manual no-provider raw-output pilot. No scoring, blind-score filling, unblinding, final interpretation, provider call, local-model call, runtime endpoint, dashboard, public API exposure, Google Sheets mutation, benchmark claim, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha-superiority claim is authorized until separately approved |
+| Current controlling posture | Operator review required after completed blinded scoring pass and score lock |
+| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PASS_POST_581_001`** |
+| Strategic boundary | The authorized blinded scorer packet has case-level blind scores and score-lock confirmation for the preserved manual no-provider raw-output pilot. No unblinding, final interpretation, provider call, local-model call, runtime endpoint, dashboard, public API exposure, Google Sheets mutation, benchmark claim, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha-superiority claim is authorized until separately approved |
 
 ## Completed post-552 / post-565 / post-568 infrastructure lanes
 
@@ -49,16 +49,17 @@ These are docs, gate, helper, static/research, and blocked-attempt artifacts. Th
 | post-578 lane | `ALPHA-SOLVER-VALUE-READ-MANUAL-OUTPUT-GENERATION-PILOT-POST-578-001` | Completes a bounded manual no-provider prompt-contract simulation output-generation pilot for 10 synthetic Value Read cases; raw Alpha and baseline outputs are documentation artifacts only, with no scoring, unblinding, provider/local-model call, endpoint exposure, or value/readiness claim. |
 | post-579 lane | `ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PACKET-CONSTRUCTION-POST-579-001` | Completes docs-only blind scorer packet construction for the 10-case manual no-provider pilot; all scoring fields remain blank, the unblinding map is not committed, and no scoring, unblinding, provider/local-model call, endpoint exposure, or value/readiness claim occurs. |
 | post-blind-packet lane | `ALPHA-SOLVER-VALUE-READ-SCORING-REVIEW-AUTHORIZATION-POST-BLIND-PACKET-001` | Completes docs-only scoring-review authorization preparation; scoring authorization language and blank score-output structure exist, but scoring, unblinding, final interpretation, provider/local-model calls, endpoint exposure, and value/readiness claims have not occurred. |
+| post-581 lane | `ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PASS-POST-581-001` | Completes scoring-only review of the blinded scorer packet; case-level blind scores, notes, contested-score flags, scorer identity/tool, scoring method, timestamp, and score-lock confirmation are recorded, with no unblinding, final interpretation, provider/local-model call, endpoint exposure, or value/readiness claim. |
 
 See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for the PR status ledger and [`LANE_REGISTRY.md`](LANE_REGISTRY.md) for lifecycle classification.
 
 ## Selected next state
 
-**`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_SCORING_REVIEW_AUTHORIZATION_POST_BLIND_PACKET_001`** is the current global selected next state.
+**`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PASS_POST_581_001`** is the current global selected next state.
 
-This is a review state, not a scoring or interpretation lane. It means scoring-review authorization materials exist for the blinded scorer packet, but no scoring, blind-score filling, unblinding, final interpretation, provider/local-model execution, runtime endpoint, dashboard/public API exposure, or Google Sheets mutation is authorized. The operator must separately authorize scoring before any score is filled.
+This is a review state, not an unblinding or interpretation lane. It means blind scores and score-lock confirmation exist for the blinded scorer packet, but no unblinding, final interpretation, provider/local-model execution, runtime endpoint, dashboard/public API exposure, or Google Sheets mutation is authorized. The operator must separately authorize unblinding or final interpretation before either activity happens.
 
-This selected state authorizes no scoring, blind-score filling, unblinding, final interpretation, provider call, local model call, runtime endpoint, dashboard, public API exposure, Google Sheets mutation, benchmark claim, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha superiority claim.
+This selected state authorizes no unblinding, final interpretation, provider call, local model call, runtime endpoint, dashboard, public API exposure, Google Sheets mutation, benchmark claim, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha superiority claim.
 
 ## Open deferrals (see [`DEFERRAL_REGISTER.md`](DEFERRAL_REGISTER.md))
 
