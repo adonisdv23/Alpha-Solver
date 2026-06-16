@@ -60,7 +60,7 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 | selector-after-final-interpretation lane | `ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-FINAL-INTERPRETATION-001` | Completes a docs-only selector after final interpretation and the parallel feasibility group sync; selects `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` for operator review and does not create or implement that lane. |
 | derivation-check lane | `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` | Completes a docs-first review-only substantive derivation / no-echo gate packet that defines criteria, fixture planning, heuristic review aids, stop conditions, non-actions, and non-claims; no implementation, provider/local-model/runtime/API/Sheet/scoring/unblinding/source-map/raw-output/release work or broad claims occur. |
 | cheap-test packet lane | `ALPHA-SOLVER-DISCRIMINATION-TASK-BANK-FIRST-CHEAP-TEST-001` | Completes a docs-only first cheap-test packet with five representative taxonomy task cards for discrimination task-bank preparation, grounded in the derivation / no-echo gate and task-bank asset; no task execution, Alpha or baseline output generation, scoring, raw output inspection, unblinding, source-map work, provider/local-model/runtime/API/Sheet work, dependency addition, release implementation, or broad claims occur. |
-| smoke-runner lane | `ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RUNNER-001` | Adds `tools/operator_smoke_runner.py` and the operator packet for explicit local/Ollama or OpenAI smoke checks; this PR does not run either smoke and proves no provider quality, local model quality, readiness, benchmark success, production readiness, public readiness, or Alpha superiority. |
+| smoke-runner lane | `ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RUNNER-001` | Adds `tools/operator_smoke_runner.py` and the operator packet for explicit local/Ollama or OpenAI smoke checks; the merged runner lane did not run either smoke and proves no provider quality, local model quality, readiness, benchmark success, production readiness, public readiness, or Alpha superiority. |
 | smoke-results-import lane | `ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RESULTS-IMPORT-001` | Imports Operator-provided, redacted smoke-only results showing local/Ollama passed using `qwen2.5:3b` and OpenAI passed using `gpt-4.1-mini-2025-04-14`; proves no behavior quality, provider quality, local-model quality, readiness, benchmark success, production/public readiness, or Alpha superiority. |
 | test-console lane | `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-001` | Adds a local-only Operator console for bounded local/Ollama and OpenAI smoke checks through the existing smoke runner path; proves no behavior quality, provider quality, local-model quality, readiness, benchmark success, production/public readiness, security/privacy completion, or Alpha superiority. |
 | test-console-ux-redaction lane | `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UX-REDUCTION-001` | Preserves submitted form state after console runs and avoids over-redacting safe numeric usage token counts; proves no behavior quality, provider quality, local-model quality, readiness, benchmark success, production/public readiness, security/privacy completion, or Alpha superiority. |
@@ -100,7 +100,7 @@ This phase does **not** support claims of broad value, OpenAI validation, provid
 - Evidence type: Operator-provided, redacted smoke-only result import.
 - Local/Ollama smoke result: passed using `qwen2.5:3b`.
 - OpenAI smoke result: passed using `gpt-4.1-mini-2025-04-14`.
-- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`.
+- Prior selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`.
 - Boundary: does not prove behavior quality, provider quality, local-model quality, readiness, benchmark success, production readiness, public readiness, security/privacy completion, buyer validation, traction, partnership/Pi.dev integration, or Alpha superiority.
 
 
@@ -109,7 +109,7 @@ This phase does **not** support claims of broad value, OpenAI validation, provid
 - Packet: `docs/evals/runs/alpha-solver-local-openai-test-console-001/`
 - Evidence type: Local-only Operator smoke test console implementation.
 - Console: `tools/operator_test_console.py`.
-- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`.
+- Prior selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`.
 - Boundary: console implementation only, no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim.
 
 
@@ -118,7 +118,7 @@ This phase does **not** support claims of broad value, OpenAI validation, provid
 - Packet: `docs/evals/runs/alpha-solver-local-openai-test-console-ux-reduction-001/`
 - Evidence type: Local-only Operator smoke test console UX/redaction refinement.
 - Purpose: preserve submitted form state after console runs and avoid over-redacting safe usage token counts.
-- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001`.
+- Prior selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001`.
 - Boundary: UX/redaction refinement only, no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim.
 
 ## ALPHA-SOLVER-MODEL-CATALOG-ROUTING-PREVIEW-001
