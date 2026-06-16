@@ -7,7 +7,7 @@ Lane:
 
 This docs-only feasibility study examines whether Alpha Solver should later create a reusable discrimination task bank for false-premise, hidden-constraint, should-stop, confidence, and claim-boundary tasks.
 
-The proposed asset would support future evaluation design by standardizing task intent, ideal behavior fields, baseline failure-mode fields, repeatability controls, and stop criteria before any implementation or scoring lane is authorized.
+The proposed asset would support future evaluation design by standardizing task intent, ideal behavior fields, baseline failure-mode fields, repeatability controls, current-fact freeze metadata, and stop criteria before any implementation or scoring lane is authorized.
 
 ## Feasibility verdict
 
@@ -31,4 +31,4 @@ This verdict is not a claim that Alpha Solver is ready, valuable, superior, safe
 
 ## Boundaries
 
-This packet does not create output artifacts, generate model responses, score responses, call providers, run local models, modify runtime behavior, expose dashboards, expose public APIs, call `/v1/solve`, update Google Sheets, or update global source-of-truth files.
+This packet does not create output artifacts, generate model responses, score responses, call providers, run local models, modify runtime behavior, expose dashboards, expose public APIs, call `/v1/solve`, update Google Sheets, or update global source-of-truth files. Current-fact task reuse is conditioned on preserving the frozen as-of date and source snapshot or creating a new task revision.

@@ -11,5 +11,6 @@ A future task card should also describe likely failure modes so reviewers can id
 - `observable_marker`: Textual or behavioral marker that suggests the failure occurred.
 - `why_it_matters`: Narrow reason the failure is relevant to discrimination behavior.
 - `confounders`: Conditions that could make the marker ambiguous.
+- `current_fact_freeze_gap`: Whether a current-fact task is missing `as_of_date`, `source_snapshot`, `truth_status_at_freeze`, `staleness_review_required`, or `reuse_rule`.
 - `reviewer_caution`: Instruction to avoid converting a single marker into a broad performance claim.
 - `non_scoring_note`: Reminder that the field supports review design only until a scoring lane is authorized.

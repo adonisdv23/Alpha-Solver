@@ -4,7 +4,7 @@ This outline is a non-executing candidate map. It does not contain finalized pro
 
 ## False-premise tasks
 
-1. Incorrect entity status in a current-facts request.
+1. Incorrect entity status in a current-facts request, frozen with an as-of date and source snapshot.
 2. Impossible chronological ordering in an event summary.
 3. Nonexistent cited document used as a premise.
 4. Misstated repository file role used to request a change.
