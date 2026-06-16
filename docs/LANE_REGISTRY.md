@@ -1,7 +1,7 @@
 # Lane Registry
 
 > Source-of-truth lane lifecycle registry. Verification date **2026-06-16** for
-> post-581 blinded scoring pass completion and MVP scorecard score-state update.
+> next-release selector completion after the Value Read score-state update.
 
 ## Lifecycle classes
 
@@ -11,13 +11,13 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Post-581 blinded scoring pass plus scorecard score-state posture | **current control posture** | `ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PASS-POST-581-001` is completed as scoring-only review for the post-579 blind scorer packet, and `ALPHA-SOLVER-MVP-SCORECARD-AFTER-VALUE-READ-SCORE-001` records the locked-score state for MVP scorecard tracking. The current selected state is operator review required, not an unblinding or interpretation lane. |
+| Next-release selector after Value Read | **current control posture** | `ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-VALUE-READ-001` completed as a docs-only selection gate with verdict `NEXT_RELEASE_SELECTION_BLOCKED_PENDING_VALUE_READ_UNBLINDING_AND_FINAL_INTERPRETATION`. It selected no implementation lane because locked blind scores exist but remain blinded and uninterpreted. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PASS_POST_581_001`** | **selected next state; review state, not an unblinding or interpretation lane** | The operator must separately authorize unblinding or final interpretation before either activity happens. No unblinding, final interpretation, provider call, local model call, runtime endpoint, dashboard/public API, Google Sheets mutation, benchmark claim, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha-superiority claim is authorized. |
+| **`NEXT_RELEASE_SELECTION_BLOCKED_PENDING_VALUE_READ_UNBLINDING_AND_FINAL_INTERPRETATION`** | **selected next state; blocked selection state, not an implementation lane** | The selector selected no implementation lane. A future operator may separately authorize Value Read source-identity review and final interpretation. No unblinding, final interpretation, provider call, local model call, runtime work, dashboard/public API work, `/v1/solve`, Google Sheets mutation, dependencies, routing, council behavior, benchmark work, readiness/value/provider/local-model/security/privacy/production/public/partnership/Pi.dev integration claim, or Alpha-superiority claim is authorized. |
 
 ## Completed (kept as evidence)
 
@@ -43,6 +43,7 @@
 - `ALPHA-SOLVER-VALUE-READ-SCORING-REVIEW-AUTHORIZATION-POST-BLIND-PACKET-001` (stable post-merge state) — docs-only scoring-review authorization preparation; scoring language and blank score-output structure exist, but no scoring, unblinding, provider/local-model call, endpoint exposure, final interpretation, or value/readiness claim.
 - `ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PASS-POST-581-001` (stable post-merge state) — scoring-only review of the blinded scorer packet; blind scores are locked, with no unblinding, final interpretation, provider/local-model call, endpoint exposure, or value/readiness claim.
 - `ALPHA-SOLVER-MVP-SCORECARD-AFTER-VALUE-READ-SCORE-001` (stable post-merge state) — docs-only MVP scorecard score-state update; locked blind scores exist, but score interpretation remains blocked with no unblinding, source-identity reveal, final interpretation, provider/local-model call, endpoint exposure, or value/readiness claim.
+- `ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-VALUE-READ-001` (PR #584) — docs-only next-release selector; verdict `NEXT_RELEASE_SELECTION_BLOCKED_PENDING_VALUE_READ_UNBLINDING_AND_FINAL_INTERPRETATION`; selected no implementation lane because locked blind scores remain blinded and uninterpreted.
 
 ## Superseded
 
@@ -72,7 +73,7 @@
 
 - PR #561 lane as a standalone needs-human protocol PR — closed unmerged and superseded by PR #562.
 - Any merged packet lane verbatim — packets are immutable evidence; create a new lane id instead.
-- Any selected-next pointer that conflicts with `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PASS_POST_581_001`.
+- Any selected-next pointer that conflicts with `NEXT_RELEASE_SELECTION_BLOCKED_PENDING_VALUE_READ_UNBLINDING_AND_FINAL_INTERPRETATION`.
 - Direct Pi.dev integration from PR #574's research lane — the recorded verdict is patterns-only/no-integration.
 
 ## Forward path (single track)
@@ -117,7 +118,10 @@ ALPHA-SOLVER-VALUE-READ-SCORING-REVIEW-AUTHORIZATION-POST-BLIND-PACKET-001 ← s
 ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PASS-POST-581-001 ← blind scores locked; no unblinding/final interpretation
         │
         ▼
-OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PASS_POST_581_001 ← selected next state; review only, not unblinding or interpretation
+ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-VALUE-READ-001 ← docs-only selection gate; no implementation lane selected
+        │
+        ▼
+NEXT_RELEASE_SELECTION_BLOCKED_PENDING_VALUE_READ_UNBLINDING_AND_FINAL_INTERPRETATION ← selected next state; blocked selection, not implementation
 ```
 
 This registry does not authorize any provider call, local model call, unblinding, final interpretation, Pi.dev install/run/integration, runtime endpoint, dashboard exposure, public API exposure, Google Sheets mutation, benchmark, or readiness/value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
