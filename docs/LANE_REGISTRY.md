@@ -81,7 +81,7 @@
 
 - PR #561 lane as a standalone needs-human protocol PR - closed unmerged and superseded by PR #562.
 - Any merged packet lane verbatim - packets are immutable evidence; create a new lane id instead.
-- Any selected-next pointer that conflicts with `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001`. Earlier selected-next pointers, including `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`, and `OPERATOR_REVIEW_REQUIRED_AFTER_DISCRIMINATION_TASK_BANK_FIRST_CHEAP_TEST_001`, are prior review states and must not be treated as current.
+- Any selected-next pointer that conflicts with `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_ROUTING_PREVIEW_001`. Earlier selected-next pointers, including `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`, and `OPERATOR_REVIEW_REQUIRED_AFTER_DISCRIMINATION_TASK_BANK_FIRST_CHEAP_TEST_001`, are prior review states and must not be treated as current.
 - Direct Pi.dev integration from PR #574's research lane - the recorded verdict is patterns-only/no-integration.
 
 ## Forward path (single track)
@@ -211,3 +211,13 @@ Boundary: no provider quality, local model quality, readiness, benchmark success
 - Evidence boundary: console implementation only, no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim.
 
 - `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UX-REDUCTION-001` (this PR) - local-only test console UX/redaction refinement. Purpose: preserve submitted form state after console runs and avoid over-redacting safe usage token counts. Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001`. Boundary: no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim.
+
+## ALPHA-SOLVER-MODEL-CATALOG-ROUTING-PREVIEW-001
+
+| Field | Value |
+|-------|-------|
+| Status | completed backend implementation / review-only selected next |
+| Purpose | Add configurable model catalog metadata and deterministic routing preview backend. |
+| Packet | `docs/evals/runs/alpha-solver-model-catalog-routing-preview-001/` |
+| Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_ROUTING_PREVIEW_001` |
+| Evidence boundary | Routing preview only; no provider/local-model calls; no quality, readiness, benchmark, production/public, security/privacy, Alpha-superiority, partnership/Pi.dev integration, buyer-validation, or traction claim. |
