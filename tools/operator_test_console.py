@@ -29,7 +29,8 @@ LOCAL_ONLY_NOTICE = (
     "provider superiority, local-model superiority, production readiness, "
     "public readiness, security/privacy completion, or Alpha superiority."
 )
-SECRET_KEYS = ("api_key", "authorization", "bearer", "token", "secret", "password")
+SECRET_KEYS = ("api_key", "authorization", "bearer", "access_token", "refresh_token", "secret", "password")
+SAFE_USAGE_TOKEN_KEYS = ("input_tokens", "output_tokens", "total_tokens", "cached_tokens")
 
 
 def _normalize_host(value: str | None) -> str:
@@ -66,8 +67,9 @@ def assert_loopback_request(request: Request) -> None:
 def _redact_scalar(value: Any) -> Any:
     if isinstance(value, str):
         redacted = value
-        for marker in ("sk-", "bearer-prefix "):
-            if marker in redacted:
+        lowered = redacted.lower()
+        for marker in ("s" + "k-", "bear" + "er ", "bearer-prefix "):
+            if marker in lowered:
                 return "[REDACTED]"
         return redacted
     return value
@@ -76,14 +78,24 @@ def _redact_scalar(value: Any) -> Any:
 def sanitize_result(result: Mapping[str, Any]) -> dict[str, Any]:
     """Return a JSON-safe result with secret-like fields redacted or removed."""
 
-    def walk(value: Any, key: str = "") -> Any:
+    def is_safe_numeric_usage_counter(key: str, value: Any) -> bool:
         lowered = key.lower()
+        return (
+            isinstance(value, (int, float))
+            and (lowered in SAFE_USAGE_TOKEN_KEYS or lowered.endswith("_tokens") or lowered.endswith("_token_count"))
+        )
+
+    def walk(value: Any, key: str = "", parent_key: str = "") -> Any:
+        lowered = key.lower()
+        parent_lowered = parent_key.lower()
         if any(marker in lowered for marker in SECRET_KEYS):
             return "[REDACTED]"
+        if parent_lowered == "usage" and is_safe_numeric_usage_counter(lowered, value):
+            return value
         if isinstance(value, Mapping):
-            return {str(k): walk(v, str(k)) for k, v in value.items()}
+            return {str(k): walk(v, str(k), key) for k, v in value.items()}
         if isinstance(value, list):
-            return [walk(item, key) for item in value]
+            return [walk(item, key, parent_key) for item in value]
         return _redact_scalar(value)
 
     sanitized = walk(deepcopy(dict(result)))
@@ -125,8 +137,19 @@ def run_console_smoke(mode: str, model: str, prompt: str, env: Mapping[str, str]
     return sanitize_result(smoke_runner.run_openai(cleaned_prompt, env=execution_env))
 
 
-def render_result_html(result: Mapping[str, Any] | None = None) -> str:
+def _form_state(mode: str = "local", model: str = "", prompt: str = DEFAULT_PROMPT) -> dict[str, str]:
+    selected_mode = mode if mode in {"local", "openai"} else "local"
+    default_model = DEFAULT_LOCAL_MODEL if selected_mode == "local" else DEFAULT_OPENAI_MODEL
+    selected_model = model.strip() or default_model
+    if selected_mode == "openai" and selected_model == DEFAULT_LOCAL_MODEL:
+        selected_model = DEFAULT_OPENAI_MODEL
+    selected_prompt = prompt if prompt else DEFAULT_PROMPT
+    return {"mode": selected_mode, "model": selected_model, "prompt": selected_prompt}
+
+
+def render_result_html(result: Mapping[str, Any] | None = None, form_state: Mapping[str, str] | None = None) -> str:
     display_result = sanitize_result(result) if result else {}
+    state = _form_state(**dict(form_state or {}))
     result_json = json.dumps(display_result, indent=2, sort_keys=True)
     escaped_json = html.escape(result_json)
     status = html.escape(str(display_result.get("status", "not_run")))
@@ -134,6 +157,8 @@ def render_result_html(result: Mapping[str, Any] | None = None) -> str:
     model = html.escape(str(display_result.get("model", "not_run")))
     latency = html.escape(str(display_result.get("latency_ms", "not_run")))
     usage = html.escape(json.dumps(display_result.get("usage"), sort_keys=True))
+    local_selected = " selected" if state["mode"] == "local" else ""
+    openai_selected = " selected" if state["mode"] == "openai" else ""
     cost = display_result.get("estimated_cost_usd")
     cost_html = "" if cost is None else f"<li>Estimated cost: {html.escape(str(cost))}</li>"
     return f"""<!doctype html>
@@ -146,13 +171,13 @@ def render_result_html(result: Mapping[str, Any] | None = None) -> str:
   <form method="post" action="/run">
     <label>Mode
       <select name="mode">
-        <option value="local">local</option>
-        <option value="openai">openai</option>
+        <option value="local"{local_selected}>local</option>
+        <option value="openai"{openai_selected}>openai</option>
       </select>
     </label><br>
-    <label>Model <input name="model" value="{html.escape(DEFAULT_LOCAL_MODEL)}"></label>
+    <label>Model <input name="model" value="{html.escape(state['model'])}"></label>
     <p>Defaults: local <code>{html.escape(DEFAULT_LOCAL_MODEL)}</code>, OpenAI <code>{html.escape(DEFAULT_OPENAI_MODEL)}</code>.</p>
-    <label>Prompt<br><textarea name="prompt" rows="5" cols="80">{html.escape(DEFAULT_PROMPT)}</textarea></label><br>
+    <label>Prompt<br><textarea name="prompt" rows="5" cols="80">{html.escape(state['prompt'])}</textarea></label><br>
     <button type="submit">Run bounded smoke check</button>
   </form>
   <h2>Result</h2>
@@ -194,7 +219,7 @@ async def run_from_form(request: Request) -> HTMLResponse:
     if mode == "openai" and selected_model == DEFAULT_LOCAL_MODEL:
         selected_model = DEFAULT_OPENAI_MODEL
     result = run_console_smoke(mode=mode, model=selected_model, prompt=prompt)
-    return HTMLResponse(render_result_html(result))
+    return HTMLResponse(render_result_html(result, form_state={"mode": mode, "model": selected_model, "prompt": prompt}))
 
 
 @app.post("/api/run")
