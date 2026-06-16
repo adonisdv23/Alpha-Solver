@@ -1,7 +1,7 @@
 # Lane Registry
 
 > Source-of-truth lane lifecycle registry. Verification date **2026-06-16** for
-> post-581 blinded scoring pass completion.
+> post-581 blinded scoring pass completion and MVP scorecard score-state update.
 
 ## Lifecycle classes
 
@@ -11,7 +11,7 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Post-581 blinded scoring pass posture | **current control posture** | `ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PASS-POST-581-001` is completed as scoring-only review for the post-579 blind scorer packet. The current selected state is operator review required, not an unblinding or interpretation lane. |
+| Post-581 blinded scoring pass plus scorecard score-state posture | **current control posture** | `ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PASS-POST-581-001` is completed as scoring-only review for the post-579 blind scorer packet, and `ALPHA-SOLVER-MVP-SCORECARD-AFTER-VALUE-READ-SCORE-001` records the locked-score state for MVP scorecard tracking. The current selected state is operator review required, not an unblinding or interpretation lane. |
 
 ## Next ready / current selected state
 
@@ -42,6 +42,7 @@
 - `ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PACKET-CONSTRUCTION-POST-579-001` (stable post-merge state) — docs-only blind scorer packet construction; no scoring, unblinding, provider/local-model call, endpoint exposure, or value/readiness claim.
 - `ALPHA-SOLVER-VALUE-READ-SCORING-REVIEW-AUTHORIZATION-POST-BLIND-PACKET-001` (stable post-merge state) — docs-only scoring-review authorization preparation; scoring language and blank score-output structure exist, but no scoring, unblinding, provider/local-model call, endpoint exposure, final interpretation, or value/readiness claim.
 - `ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PASS-POST-581-001` (stable post-merge state) — scoring-only review of the blinded scorer packet; blind scores are locked, with no unblinding, final interpretation, provider/local-model call, endpoint exposure, or value/readiness claim.
+- `ALPHA-SOLVER-MVP-SCORECARD-AFTER-VALUE-READ-SCORE-001` (stable post-merge state) — docs-only MVP scorecard score-state update; locked blind scores exist, but score interpretation remains blocked with no unblinding, source-identity reveal, final interpretation, provider/local-model call, endpoint exposure, or value/readiness claim.
 
 ## Superseded
 
