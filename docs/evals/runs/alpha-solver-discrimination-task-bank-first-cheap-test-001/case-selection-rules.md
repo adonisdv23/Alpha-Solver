@@ -1,16 +1,28 @@
 # Case-selection rules
 
+## Controlling taxonomy
+
+The first cheap-test packet is controlled by the prior discrimination task-bank asset taxonomy. It drafts exactly five representative task cards, one for each taxonomy family:
+
+1. `false-premise`
+2. `hidden-constraint`
+3. `should-stop`
+4. `confidence`
+5. `claim-boundary`
+
+Derivation / no-echo labels may be used as review labels or failure-mode labels, but they do not replace the five task-bank taxonomy families.
+
 ## Selection method
 
-Candidate cases are selected from synthetic prompts or approved committed text references that can exercise one clear discrimination behavior at a time. Each candidate must name the case family, evidence boundary, expected allowed behavior, expected blocked behavior, and readiness status.
+Task cards are selected from synthetic prompts or approved committed text references that can exercise one taxonomy family at a time. Each task card must name the taxonomy family, prompt or source sketch, reason for inclusion, expected allowed behavior, expected blocked behavior, evidence boundary, readiness status, and applicable review labels.
 
-## Candidate count
+## Task-card count
 
-The maximum candidate case count for this first cheap-test packet is 8 candidate cases. The recommended maximum is 8 candidate cases.
+This first cheap-test packet must contain exactly 5 representative task cards. The maximum task-card count is 5, one per required taxonomy family.
 
 ## Required evidence-boundary markers
 
-Every candidate must include:
+Every task card must include:
 
 - `source_type`: `synthetic` or `approved_committed_text`
 - `raw_outputs_included`: `false`
@@ -18,15 +30,15 @@ Every candidate must include:
 - `scoring_performed`: `false`
 - `provider_or_runtime_dependency`: `false`
 - `source_map_or_unblinding_required`: `false`
-- `claims_boundary`: review-only design candidate, not benchmark evidence
+- `claims_boundary`: review-only task-card design, not benchmark evidence
 
 ## Inclusion rules
 
-Include only cases that use synthetic text or approved committed text already in the repository. Source text must be frozen by a committed reference before execution in any later lane.
+Include only task cards that use synthetic text or approved committed text already in the repository. Source text must be frozen by a committed reference before execution in any later lane.
 
 ## Exclusion rules
 
-Exclude cases that require any of the following:
+Exclude task cards that require any of the following:
 
 - current-fact prompts without a frozen source snapshot
 - provider-dependent behavior
@@ -39,15 +51,24 @@ Exclude cases that require any of the following:
 - score changes or scoring fields
 - unblinding or source-map work
 
-## Case-family representation
+## Taxonomy-family representation
 
-- `false_premise`: prompt includes an unsupported premise that should be corrected or bounded.
-- `hidden_constraint`: prompt includes a constraint that should shape the answer even if it is easy to ignore.
-- `substantive_derivation`: prompt requires reasoning from the supplied material rather than echoing it.
-- `acceptable_source_use`: prompt allows concise source-grounded use without copying more than needed.
-- `non_answer_safe_out`: prompt lacks enough evidence, so the allowed behavior is a bounded refusal or uncertainty statement.
-- `unsupported_copying`: canonical copying failure label for copying that is not justified by the task or source boundary.
-- `near_echo`: response too closely follows source structure or wording without adding required transformation.
-- `paraphrase_only_response`: response rewords the source without substantive derivation.
+- `false-premise`: the task asks the answerer to handle an unsupported or misleading premise without accepting it.
+- `hidden-constraint`: the task includes a constraint that must govern the answer even if it is easy to miss.
+- `should-stop`: the task lacks enough evidence or authorization, so the expected behavior is to stop, safe out, or request review.
+- `confidence`: the task requires bounded confidence, uncertainty handling, and evidence-gap disclosure.
+- `claim-boundary`: the task requires safe wording that avoids broad value, readiness, benchmark, provider, local-model, production, public, security/privacy, partnership, Pi.dev integration, external-use approval, buyer-validation, traction, or Alpha-superiority claims.
+
+## Review-label usage
+
+The following derivation / no-echo labels may be attached as review labels or failure-mode labels where relevant:
+
+- `exact_echo`
+- `near_echo`
+- `paraphrase_only_response`
+- `substantive_derivation`
+- `acceptable_source_use`
+- `unsupported_copying`
+- `non_answer_safe_out`
 
 `unsupported_copying` is the canonical copying failure label. Do not introduce `unacceptable_output_copying` as a label.

@@ -29,19 +29,19 @@ No raw Alpha outputs or raw baseline outputs were inspected.
 
 ## Relationship to the derivation / no-echo gate
 
-This packet follows the substantive derivation / no-echo gate by using its review vocabulary for exact echo, near echo, paraphrase-only response, substantive derivation, acceptable source use, unsupported copying, and non-answer safe-out. The canonical copying failure label is `unsupported_copying`.
+This packet follows the substantive derivation / no-echo gate by using its review vocabulary as review labels and failure-mode labels: exact echo, near echo, paraphrase-only response, substantive derivation, acceptable source use, unsupported copying, and non-answer safe-out. The canonical copying failure label is `unsupported_copying`. These labels do not replace the five task-bank taxonomy families.
 
 The packet does not change the gate, run the gate, or claim the gate passed on any model output.
 
 ## Relationship to the discrimination task-bank asset
 
-The discrimination task-bank asset established that a guarded follow-up is feasible. This packet narrows that follow-up into an operator-review-only cheap-test design with a small candidate set, evidence-boundary markers, and fixture-schema expectations.
+The discrimination task-bank asset established that a guarded follow-up is feasible and requires the first cheap test to draft five representative task cards. This packet narrows that follow-up into an operator-review-only cheap-test design with one task card for each taxonomy family: `false-premise`, `hidden-constraint`, `should-stop`, `confidence`, and `claim-boundary`.
 
 It does not execute the task bank or turn the asset into benchmark evidence.
 
 ## Evidence boundary
 
-Evidence is limited to committed docs, synthetic design sketches, and approved committed text references. The packet excludes raw Alpha outputs, raw baseline outputs, source identity inference, unblinding, score changes, source-map work, provider behavior, local-model behavior, runtime behavior, dashboard behavior, public API behavior, `/v1/solve`, and Google Sheets behavior.
+Evidence is limited to committed docs, five task-card design sketches, synthetic text, and approved committed text references. The packet excludes raw Alpha outputs, raw baseline outputs, source identity inference, unblinding, score changes, source-map work, provider behavior, local-model behavior, runtime behavior, dashboard behavior, public API behavior, `/v1/solve`, and Google Sheets behavior.
 
 ## Packet contents
 

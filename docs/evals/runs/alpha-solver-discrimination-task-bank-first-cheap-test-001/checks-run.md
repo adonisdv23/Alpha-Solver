@@ -31,11 +31,12 @@
 
 | Check | Result | Notes |
 |-------|--------|-------|
-| `python scripts/check_narrative_claim_safety.py $(git diff --cached --name-only -- '*.md')` | pass | Scanned 15 changed Markdown files. This is not a completeness claim. |
+| `python scripts/check_narrative_claim_safety.py $(git diff --cached --name-only -- '*.md')` | pass | Scanned 10 changed Markdown files for the five-task-card revision. This is not a completeness claim. |
 | `git diff --cached --check` | pass | No whitespace errors in staged changes. |
-| `python - <<'PY' ... PY` packet consistency check | pass | Confirmed all 12 required packet files exist. |
-| `python - <<'PY' ... PY` source-of-truth consistency check | pass | Confirmed updated source-of-truth docs and packet selected-next file include `OPERATOR_REVIEW_REQUIRED_AFTER_DISCRIMINATION_TASK_BANK_FIRST_CHEAP_TEST_001`. |
-| `python - <<'PY' ... PY` label consistency check | pass | Confirmed required copying-failure sections use `unsupported_copying` and no fixture label-set entry uses `unacceptable_output_copying`. |
+| `python - <<'PY' ... PY` packet consistency check | pass | Confirmed all 12 required packet files still exist after the five-task-card revision. |
+| `python - <<'PY' ... PY` source-of-truth consistency check | pass | Confirmed updated source-of-truth docs and packet selected-next file still include `OPERATOR_REVIEW_REQUIRED_AFTER_DISCRIMINATION_TASK_BANK_FIRST_CHEAP_TEST_001`. |
+| `python - <<'PY' ... PY` taxonomy consistency check | pass | Confirmed exactly five task cards exist, one for each taxonomy family: `false-premise`, `hidden-constraint`, `should-stop`, `confidence`, and `claim-boundary`. |
+| `python - <<'PY' ... PY` label consistency check | pass | Confirmed required copying-failure sections use `unsupported_copying` and no fixture review-label-set entry uses `unacceptable_output_copying`. |
 | `python - <<'PY' ... PY` em dash check | pass | Confirmed changed Markdown files do not contain em dashes. |
 
 ## Checks not run and why

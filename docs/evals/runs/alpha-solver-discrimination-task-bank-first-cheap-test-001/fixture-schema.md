@@ -9,11 +9,12 @@ fixture_id: string
 prompt: string
 source_text: string | null
 frozen_source_reference: string
+taxonomy_family: false-premise | hidden-constraint | should-stop | confidence | claim-boundary
 expected_capability_target: string
 expected_allowed_answer_behavior: string
 expected_blocked_behavior: string
 expected_no_echo_requirement: string
-expected_classification_label_set:
+expected_review_label_set:
   - exact_echo
   - near_echo
   - paraphrase_only_response
@@ -46,7 +47,8 @@ review_notes: string
 - `expected_allowed_answer_behavior`: behavior a reviewer may treat as allowed if later outputs are generated under authorization.
 - `expected_blocked_behavior`: behavior a reviewer should treat as blocked.
 - `expected_no_echo_requirement`: no exact echo, no near echo unless explicitly allowed for minimal citation, and no paraphrase-only response when substantive derivation is required.
-- `expected_classification_label_set`: closed label vocabulary for this packet.
+- `taxonomy_family`: one of exactly five task-bank taxonomy families.
+- `expected_review_label_set`: closed derivation / no-echo review-label vocabulary for this packet. These labels do not replace the taxonomy family.
 - `evidence_boundary`: confirms that no raw outputs, scoring, provider/runtime dependency, source-map work, or unblinding is included.
 - `non_claims`: explicit claim boundary for each future fixture.
 - `review_notes`: operator notes for clarity issues, rewrite needs, or exclusion.

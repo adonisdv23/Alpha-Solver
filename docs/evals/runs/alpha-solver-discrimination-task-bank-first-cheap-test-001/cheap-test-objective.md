@@ -2,13 +2,13 @@
 
 ## Narrow purpose
 
-The first cheap test is intended to define a small, repeatable, evidence-bounded design for later operator-authorized discrimination testing. It asks whether a future tiny fixture set can distinguish between responses that only echo or paraphrase and responses that perform substantive derivation while respecting safe-out and source-use boundaries.
+The first cheap test is intended to define a small, repeatable, evidence-bounded design for later operator-authorized discrimination testing. It drafts five representative task cards, one for each task-bank taxonomy family: `false-premise`, `hidden-constraint`, `should-stop`, `confidence`, and `claim-boundary`.
 
 This lane prepares that design only.
 
 ## What the cheap test can show
 
-If later authorized and executed, the cheap test could show whether a specific frozen fixture set and review rubric are clear enough for bounded manual review. It could also reveal whether candidate case families are under-specified before any larger task bank is attempted.
+If later authorized and executed, the cheap test could show whether the five taxonomy task cards and review rubric are clear enough for bounded manual review. It could also reveal whether one of the task-bank taxonomy families is under-specified before any larger task bank is attempted.
 
 ## What the cheap test cannot show
 
@@ -16,7 +16,7 @@ This lane cannot show model behavior because it generates no Alpha outputs and n
 
 ## Why it follows the derivation / no-echo gate
 
-The derivation / no-echo gate supplies the vocabulary needed to separate exact echo, near echo, paraphrase-only response, substantive derivation, acceptable source use, unsupported copying, and non-answer safe-out. A first cheap-test packet should reuse that vocabulary before any discrimination task-bank execution is considered.
+The derivation / no-echo gate supplies review labels for exact echo, near echo, paraphrase-only response, substantive derivation, acceptable source use, unsupported copying, and non-answer safe-out. A first cheap-test packet should reuse that vocabulary as review labels while keeping the five task-bank taxonomy families as the controlling task-card structure.
 
 ## Why it remains operator-review-only
 
