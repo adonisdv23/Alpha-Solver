@@ -49,13 +49,15 @@ The entries below are design, documentation, gate, helper, static-checking, meth
 | this PR | tools: add local OpenAI test console | source-of-truth sync in this PR | `tools/operator_test_console.py`; `tests/test_operator_test_console.py`; `docs/evals/runs/alpha-solver-local-openai-test-console-001/`; `docs/CURRENT_STATE.md`; `docs/LANE_REGISTRY.md`; `docs/EVIDENCE_INDEX.md` | Adds a local-only Operator smoke test console that reuses the existing smoke runner path for local/Ollama and OpenAI smoke checks. | Does not create behavior evidence, quality evidence, readiness evidence, benchmark evidence, production/public evidence, security/privacy completion evidence, provider-quality evidence, local-model-quality evidence, or Alpha-superiority evidence. | completed console implementation / review-only selected next |
 | this PR | docs: import local and OpenAI smoke results | source-of-truth sync in this PR | `docs/evals/runs/alpha-solver-local-openai-smoke-results-import-001/`; `docs/CURRENT_STATE.md`; `docs/LANE_REGISTRY.md`; `docs/EVIDENCE_INDEX.md` | Imports Operator-provided, redacted smoke-only results: local/Ollama passed using `qwen2.5:3b`, and OpenAI passed using `gpt-4.1-mini-2025-04-14`. | Does not create behavior evidence, quality evidence, readiness evidence, benchmark evidence, production/public evidence, provider-quality evidence, local-model-quality evidence, or Alpha-superiority evidence. | completed evidence import / review-only selected next |
 
+| this PR | alpha: add model catalog routing preview | source-of-truth sync in this PR | `alpha/model_catalog.py`; `alpha/model_router.py`; `configs/model_catalog.json`; `tests/test_model_catalog.py`; `tests/test_model_router.py`; `docs/evals/runs/alpha-solver-model-catalog-routing-preview-001/`; `docs/CURRENT_STATE.md`; `docs/LANE_REGISTRY.md`; `docs/EVIDENCE_INDEX.md` | Adds configurable backend model catalog metadata and deterministic routing preview. | Does not call providers, run local models, expose `/v1/solve`, mutate Sheets, generate eval outputs, score outputs, unblind, add dependencies, build UI, or make quality/readiness/benchmark/production/public/security/privacy/Alpha-superiority claims. | completed backend implementation / review-only selected next |
+
 ## Current selected next state
 
-`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001` is the selected next state. This is a review-only state after the local-only Operator smoke test console implementation, not production/public readiness authorization.
+`OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_ROUTING_PREVIEW_001` is the selected next state. This is a review-only state after backend model catalog and deterministic routing-preview support, not production/public readiness authorization.
 
 `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` was completed by merged PR #591 as a docs-first gate packet. It defines criteria, fixture planning, heuristic review aids, stop conditions, non-actions, and non-claims for operator review. `ALPHA-SOLVER-DISCRIMINATION-TASK-BANK-FIRST-CHEAP-TEST-001` was completed by merged PR #595 as a docs-only cheap-test packet grounded in that gate and the discrimination task-bank asset.
 
-The selected state records console implementation only and authorizes no score change, source-map work, raw Alpha output inspection, raw baseline output inspection, dashboard or public API work, `/v1/solve` exposure, Google Sheets mutation, routing behavior, council behavior, benchmark work, release behavior, readiness claim, broad value claim, provider claim, local-model claim, security/privacy claim, production/public claim, demo external-use approval, discrimination-task execution/scoring, partnership/Pi.dev integration claim, or Alpha-superiority claim.
+The selected state records backend catalog and routing-preview implementation only and authorizes no score change, source-map work, raw Alpha output inspection, raw baseline output inspection, dashboard or public API work, `/v1/solve` exposure, Google Sheets mutation, provider/local-model execution, council behavior, benchmark work, release behavior, readiness claim, broad value claim, provider claim, local-model claim, security/privacy claim, production/public claim, demo external-use approval, discrimination-task execution/scoring, partnership/Pi.dev integration claim, or Alpha-superiority claim.
 
 ## Evidence boundary
 
@@ -106,3 +108,11 @@ This entry records Operator-provided, redacted smoke-only evidence. It does not 
 | Packet | `docs/evals/runs/alpha-solver-local-openai-test-console-ux-reduction-001/` |
 | Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001` |
 | Evidence boundary | UX/redaction refinement only, no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim |
+
+## ALPHA-SOLVER-MODEL-CATALOG-ROUTING-PREVIEW-001
+
+- Artifact: `alpha/model_catalog.py`, `alpha/model_router.py`, and `configs/model_catalog.json`
+- Packet: `docs/evals/runs/alpha-solver-model-catalog-routing-preview-001/`
+- Purpose: add configurable model catalog and deterministic routing preview backend.
+- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_ROUTING_PREVIEW_001`.
+- Evidence boundary: routing preview only, no provider/local-model calls, no quality/readiness/benchmark/production/public/security/privacy/Alpha-superiority claim.
