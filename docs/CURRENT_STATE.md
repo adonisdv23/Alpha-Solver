@@ -1,11 +1,11 @@
 # Alpha Solver — Current State
 
-> Source-of-truth navigation doc. Last verified **2026-06-16** for preservation-only parallel feasibility group sync after tabs 13-16.
+> Source-of-truth navigation doc. Last verified **2026-06-16** for next-release selector after Value Read final interpretation.
 > Docs-only; no provider/runtime claims.
 
 ## Current verified phase
 
-**Preservation-only parallel feasibility group sync completed after tabs 13-16: PR #587 and PR #588 are merged, PR #581 is confirmed merged, no open PR is editing the same source-of-truth docs, and deferred follow-up choices require an operator decision.**
+**Docs-only next-release selector completed after Value Read final interpretation and the parallel feasibility group sync: exactly one next lane is selected for operator review, and the selector does not implement that lane.**
 
 The merged #569–#574 wave updated the repository from the post-#568 blocked Value Read state to a broader documentation-and-boundary posture. PR #576 was superseded by PR #577 and should be closed unmerged. PR #577 completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only Alpha-native local operator harness design note.
 
@@ -17,12 +17,12 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 
 | Field | Value |
 |-------|-------|
-| Latest verified completed lane in this wave | **`ALPHA-SOLVER-PARALLEL-FEASIBILITY-GROUP-SYNC-001`** |
-| Source-of-truth sync | Current docs record the settled preservation-only feasibility group after tabs 13-16 and one operator decision selected next state |
+| Latest verified completed lane in this wave | **`ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-FINAL-INTERPRETATION-001`** |
+| Source-of-truth sync | Current docs record the completed next-release selector after final interpretation and exactly one selected next state for operator review |
 | Closed-unmerged superseded PR | **#561** — superseded by merged PR #562 |
-| Current controlling posture | Operator decision required after preservation-only parallel feasibility group sync |
-| Selected next state | **`OPERATOR_DECISION_REQUIRED_AFTER_PARALLEL_FEASIBILITY_GROUP_SYNC_001`** |
-| Strategic boundary | This sync creates no new feasibility content and only records merged preservation-only packets; it does not change scores, perform source-map work, inspect raw outputs, call providers, run local models, expose runtime/dashboard/public API behavior, expose `/v1/solve`, mutate Google Sheets, add dependencies, implement a release lane, or authorize broad value/readiness/benchmark/provider/local-model/production/public/security/privacy/partnership/Pi.dev integration/Alpha-superiority claims |
+| Current controlling posture | Substantive derivation / no-echo gate selected for operator review |
+| Selected next state | **`ALPHA_SOLVER_GATE_SUBSTANTIVE_DERIVATION_CHECK_001_SELECTED_FOR_OPERATOR_REVIEW`** |
+| Strategic boundary | This selector selects exactly one next lane for operator review but does not create or implement it; it does not change scores, perform source-map work, inspect raw outputs, call providers, run local models, expose runtime/dashboard/public API behavior, expose `/v1/solve`, mutate Google Sheets, add dependencies, implement a release lane, or authorize broad value/readiness/benchmark/provider/local-model/production/public/security/privacy/partnership/Pi.dev integration/Alpha-superiority claims |
 
 ## Completed post-552 / post-565 / post-568 infrastructure lanes
 
@@ -57,16 +57,17 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 | PR #587 lane | `ALPHA-SOLVER-DISCRIMINATION-TASK-BANK-ASSET-001` | Completes a docs-only discrimination task-bank asset feasibility packet with verdict `FEASIBLE_WITH_GUARDED_NEXT_STEP`; no task execution, output generation, scoring, runtime/provider/local-model/API/Sheet work, benchmark, readiness, value, or superiority claim occurs. |
 | PR #588 lane | `ALPHA-SOLVER-DEMO-EVIDENCE-PACKET-TO-DEMO-001` | Completes a docs-only claim-safe demo evidence packet feasibility packet with verdict `FEASIBLE_WITH_STRICT_EVIDENCE_BOUNDARIES`; no runtime demo, provider/local-model/API/Sheet work, product proof, value/readiness/superiority claim, or external-use approval occurs. |
 | group-sync lane | `ALPHA-SOLVER-PARALLEL-FEASIBILITY-GROUP-SYNC-001` | Completes a preservation-only source-of-truth sync after the tabs 13-16 feasibility group settled; PR #581, PR #587, and PR #588 are merged, no open PR is editing the same source-of-truth docs, and deferred follow-up choices require a single operator decision. |
+| selector-after-final-interpretation lane | `ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-FINAL-INTERPRETATION-001` | Completes a docs-only selector after final interpretation and the parallel feasibility group sync; selects `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` for operator review and does not create or implement that lane. |
 
 See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for the PR status ledger and [`LANE_REGISTRY.md`](LANE_REGISTRY.md) for lifecycle classification.
 
 ## Selected next state
 
-**`OPERATOR_DECISION_REQUIRED_AFTER_PARALLEL_FEASIBILITY_GROUP_SYNC_001`** is the current global selected next state.
+**`ALPHA_SOLVER_GATE_SUBSTANTIVE_DERIVATION_CHECK_001_SELECTED_FOR_OPERATOR_REVIEW`** is the current global selected next state.
 
-This is one operator decision state, not an implementation lane. It means the preservation-only feasibility group after tabs 13-16 has settled, the merged packets have been recorded in source-of-truth docs, and the operator must choose at most one future follow-up lane before any additional work proceeds.
+This is one selected next lane for operator review, not implementation authorization. It means `ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-FINAL-INTERPRETATION-001` completed and selected `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` as the next lane to review.
 
-This selected state authorizes no new feasibility content, score change, source-map work, raw Alpha output inspection, raw baseline output inspection, provider call, local model call, runtime work, API work, `/v1/solve` exposure, dashboard/public API exposure, Google Sheets mutation, dependency addition, routing behavior, council behavior, benchmark work, readiness claim, broad value claim, provider claim, local-model claim, security/privacy claim, production/public claim, partnership/Pi.dev integration claim, demo external-use approval, discrimination-task execution/scoring, or Alpha-superiority claim.
+This selector does not create or implement `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001`. The selected state authorizes no score change, source-map work, raw Alpha output inspection, raw baseline output inspection, provider call, local model call, runtime work, API work, `/v1/solve` exposure, dashboard/public API exposure, Google Sheets mutation, dependency addition, routing behavior, council behavior, benchmark work, readiness claim, broad value claim, provider claim, local-model claim, security/privacy claim, production/public claim, partnership/Pi.dev integration claim, demo external-use approval, discrimination-task execution/scoring, or Alpha-superiority claim.
 
 ## Open deferrals (see [`DEFERRAL_REGISTER.md`](DEFERRAL_REGISTER.md))
 
