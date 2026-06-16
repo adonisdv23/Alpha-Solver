@@ -32,22 +32,34 @@ LOCAL_ONLY_NOTICE = (
 SECRET_KEYS = ("api_key", "authorization", "bearer", "token", "secret", "password")
 
 
-def _is_loopback_host(host: str | None) -> bool:
-    if not host:
-        return False
-    normalized = host.strip().lower().strip("[]")
-    if normalized.startswith("localhost:") or normalized.startswith("127.0.0.1:"):
+def _normalize_host(value: str | None) -> str:
+    if not value:
+        return ""
+    normalized = value.strip().lower()
+    if normalized.startswith("["):
+        end = normalized.find("]")
+        return normalized[1:end] if end != -1 else normalized.strip("[]")
+    if normalized.count(":") == 1:
         normalized = normalized.rsplit(":", 1)[0]
-    if normalized.startswith("[::1]:"):
-        normalized = "::1"
-    return normalized in {"127.0.0.1", "localhost", "::1"}
+    return normalized.strip("[]")
+
+
+def _is_loopback_host(host: str | None) -> bool:
+    return _normalize_host(host) in {"127.0.0.1", "localhost", "::1"}
+
+
+def _is_loopback_request(host_header: str | None, peer_host: str | None) -> bool:
+    host_is_safe = True if not host_header else _is_loopback_host(host_header)
+    peer_is_safe = _is_loopback_host(peer_host)
+    return host_is_safe and peer_is_safe
 
 
 def assert_loopback_request(request: Request) -> None:
-    """Reject non-loopback Host headers for the local console."""
+    """Reject requests unless both Host and peer address are loopback."""
 
-    host = request.headers.get("host", "")
-    if not _is_loopback_host(host):
+    host = request.headers.get("host")
+    peer_host = request.client.host if request.client and request.client.host else None
+    if not _is_loopback_request(host, peer_host):
         raise HTTPException(status_code=403, detail="operator_test_console_loopback_only")
 
 
@@ -98,6 +110,10 @@ def run_console_smoke(mode: str, model: str, prompt: str, env: Mapping[str, str]
     """Run one smoke check through the existing smoke runner path."""
 
     cleaned_prompt = prompt.strip() or DEFAULT_PROMPT
+    if mode not in {"local", "openai"}:
+        result = smoke_runner._base_result(mode=mode, provider=mode, model=model)  # noqa: SLF001
+        result["reason"] = "unsupported_mode"
+        return sanitize_result(result)
     if len(cleaned_prompt) > smoke_runner.MAX_PROMPT_CHARS:
         result = smoke_runner._base_result(mode=mode, provider=mode, model=model)  # noqa: SLF001
         result["reason"] = "prompt_too_long"
@@ -106,11 +122,7 @@ def run_console_smoke(mode: str, model: str, prompt: str, env: Mapping[str, str]
     execution_env = _env_for_mode(mode, model, env)
     if mode == "local":
         return sanitize_result(smoke_runner.run_local(cleaned_prompt, env=execution_env))
-    if mode == "openai":
-        return sanitize_result(smoke_runner.run_openai(cleaned_prompt, env=execution_env))
-    result = smoke_runner._base_result(mode=mode, provider=mode, model=model)  # noqa: SLF001
-    result["reason"] = "unsupported_mode"
-    return sanitize_result(result)
+    return sanitize_result(smoke_runner.run_openai(cleaned_prompt, env=execution_env))
 
 
 def render_result_html(result: Mapping[str, Any] | None = None) -> str:

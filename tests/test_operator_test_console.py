@@ -1,13 +1,23 @@
 from __future__ import annotations
 
+import asyncio
 import json
 
-from fastapi.testclient import TestClient
+import httpx
 
 from tools import operator_test_console as console
 
 SECRET = "test-" + "secret-" + "value"
 PROMPT = "Reply with one concise sentence that does not echo this prompt."
+
+
+def _api_post(path: str, *, host: str, peer: str, payload: dict[str, str]) -> httpx.Response:
+    async def run() -> httpx.Response:
+        transport = httpx.ASGITransport(app=console.app, client=(peer, 12345))
+        async with httpx.AsyncClient(transport=transport, base_url=f"http://{host}") as client:
+            return await client.post(path, headers={"host": host}, json=payload)
+
+    return asyncio.run(run())
 
 
 def test_console_documents_loopback_only_run_command():
@@ -17,10 +27,31 @@ def test_console_documents_loopback_only_run_command():
     assert "/v1/solve" not in html
 
 
-def test_console_rejects_non_loopback_host():
-    client = TestClient(console.app)
+def test_non_loopback_host_is_rejected():
+    assert console._is_loopback_request("example.com", "127.0.0.1") is False
 
-    response = client.get("/", headers={"host": "example.com"})
+
+def test_loopback_host_with_non_loopback_peer_is_rejected():
+    assert console._is_loopback_request("127.0.0.1", "203.0.113.7") is False
+
+
+def test_loopback_host_with_loopback_peer_is_allowed():
+    assert console._is_loopback_request("127.0.0.1:8765", "127.0.0.1") is True
+    assert console._is_loopback_request("localhost:8765", "localhost") is True
+    assert console._is_loopback_request("[::1]:8765", "::1") is True
+
+
+def test_absent_host_with_loopback_peer_is_allowed_for_framework_context():
+    assert console._is_loopback_request(None, "127.0.0.1") is True
+
+
+def test_api_route_rejects_non_loopback_peer():
+    response = _api_post(
+        "/api/run",
+        host="127.0.0.1",
+        peer="203.0.113.7",
+        payload={"mode": "local", "model": "qwen2.5:3b", "prompt": PROMPT},
+    )
 
     assert response.status_code == 403
     assert response.json()["detail"] == "operator_test_console_loopback_only"
@@ -39,6 +70,47 @@ def test_openai_mode_preserves_fail_closed_environment_gates(monkeypatch):
     assert result["status"] == "failed_closed"
     assert result["reason"] == "model_provider_not_openai"
     assert called["value"] is False
+
+
+def test_unsupported_mode_returns_failed_closed_without_provider_calls(monkeypatch):
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("provider runner should not be called")
+
+    monkeypatch.setattr(console.smoke_runner, "run_local", fail_if_called)
+    monkeypatch.setattr(console.smoke_runner, "run_openai", fail_if_called)
+
+    result = console.run_console_smoke("bad-mode", "model", PROMPT, env={})
+
+    assert result["status"] == "failed_closed"
+    assert result["reason"] == "unsupported_mode"
+    assert result["smoke_evidence_only"] is True
+    assert result["behavior_evidence"] is False
+    assert result["quality_evidence"] is False
+    assert result["readiness_evidence"] is False
+
+
+def test_api_route_unsupported_mode_returns_sanitized_json_not_500(monkeypatch):
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("provider runner should not be called")
+
+    monkeypatch.setattr(console.smoke_runner, "run_local", fail_if_called)
+    monkeypatch.setattr(console.smoke_runner, "run_openai", fail_if_called)
+
+    response = _api_post(
+        "/api/run",
+        host="127.0.0.1",
+        peer="127.0.0.1",
+        payload={"mode": "bad-mode", "model": "model", "prompt": PROMPT},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["status"] == "failed_closed"
+    assert payload["reason"] == "unsupported_mode"
+    assert payload["smoke_evidence_only"] is True
+    assert payload["behavior_evidence"] is False
+    assert payload["quality_evidence"] is False
+    assert payload["readiness_evidence"] is False
 
 
 def test_local_mode_rejects_non_loopback_endpoint():
@@ -153,12 +225,12 @@ def test_loopback_api_returns_sanitized_json(monkeypatch):
         }
 
     monkeypatch.setattr(console.smoke_runner, "run_local", fake_run_local)
-    client = TestClient(console.app)
 
-    response = client.post(
+    response = _api_post(
         "/api/run",
-        headers={"host": "127.0.0.1"},
-        json={"mode": "local", "model": "qwen2.5:3b", "prompt": PROMPT},
+        host="127.0.0.1",
+        peer="127.0.0.1",
+        payload={"mode": "local", "model": "qwen2.5:3b", "prompt": PROMPT},
     )
 
     assert response.status_code == 200
