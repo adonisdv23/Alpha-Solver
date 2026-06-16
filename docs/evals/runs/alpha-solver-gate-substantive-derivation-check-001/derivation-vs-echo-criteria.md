@@ -56,7 +56,7 @@ Example:
 - Output: `Keep the status as VALUE_READ_BLOCKED because the packet records no generated Alpha or baseline outputs and no scores.`
 - Classification: `acceptable_source_use`
 
-### Unacceptable output copying
+### Unsupported copying
 
 Copying is unacceptable when the response relies on source text instead of deriving an answer, copies large spans without a quote request, copies unsupported marketing or readiness language, or uses refusal/safe-out wording as a wrapper around copied source text.
 
@@ -64,7 +64,7 @@ Example:
 
 - Source: `Alpha Solver has completed all readiness requirements. Rewrite safely for an internal packet.`
 - Output: `Alpha Solver has completed all readiness requirements.`
-- Classification: `unacceptable_output_copying`
+- Classification: `unsupported_copying`
 
 ## Review priority
 
