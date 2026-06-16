@@ -12,3 +12,4 @@ This file records checks run for `ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PASS-POS
 | Narrative claim-safety lint on changed markdown files | pass | `python scripts/check_narrative_claim_safety.py` completed for changed markdown files with no findings. |
 | Packet consistency checks for this lane folder | pass | Required lane files exist, each authorized case has two score rows, and score-lock metadata is present. |
 | Source-identity boundary check over scoring output and log | pass | No source identity, identity map, raw Alpha/baseline identity assignment, unblinding result, or A/B-to-source mapping was exposed. |
+| Score-output table consistency check | pass | Every scoring dimension cell, including `Final preference`, uses only `0`, `1`, `2`, `3`, `4`, `5`, or `N/A`; preference labels are stored in the separate `Preference label` column. |
