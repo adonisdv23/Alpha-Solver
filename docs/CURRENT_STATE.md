@@ -1,28 +1,28 @@
 # Alpha Solver — Current State
 
-> Source-of-truth navigation doc. Last verified **2026-06-16** for next-release selector completion after the Value Read score-state update.
+> Source-of-truth navigation doc. Last verified **2026-06-16** for Value Read unblinding/final-interpretation authorization preparation.
 > Docs-only; no provider/runtime claims.
 
 ## Current verified phase
 
-**Next-release selector after Value Read: the docs-only selector lane completed and selected no implementation lane. Next-release selection is blocked because locked blind scores exist but remain blinded and uninterpreted.**
+**Value Read unblinding and final interpretation authorization: docs-only authorization language and protocols are prepared for operator review. The unblinding/final-interpretation pass has not occurred.**
 
 The merged #569–#574 wave updated the repository from the post-#568 blocked Value Read state to a broader documentation-and-boundary posture. PR #576 was superseded by PR #577 and should be closed unmerged. PR #577 completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only Alpha-native local operator harness design note.
 
-The current control posture is now `NEXT_RELEASE_SELECTION_BLOCKED_PENDING_VALUE_READ_UNBLINDING_AND_FINAL_INTERPRETATION`: `ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-VALUE-READ-001` completed as a docs-only selection gate, selected no implementation lane, and blocked next-release selection because the locked blind scores remain blinded and uninterpreted. A future operator may separately authorize Value Read source-identity review and final interpretation before any Value Read result can drive release-lane selection.
+The current control posture is now `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_UNBLINDING_FINAL_INTERPRETATION_AUTHORIZATION_001`: `ALPHA-SOLVER-VALUE-READ-UNBLINDING-FINAL-INTERPRETATION-AUTHORIZATION-001` completed as a docs-only authorization-decision packet that prepares future operator language, unblinding/source-identity review protocol, final interpretation protocol, score-lock preservation rules, source-identity map handling rules, stop conditions, non-actions, and non-claims. The future unblinding/source-identity review and final interpretation pass has not occurred.
 
-These are docs, gate, helper, static/research, and blocked-attempt artifacts. They do not prove provider behavior, model quality, value, readiness, benchmark success, security/privacy completion, local Ollama validation, `/v1/solve` readiness, production/public readiness, unblinding outcome, final interpretation, or Alpha superiority.
+These are docs, gate, helper, static/research, blocked-attempt, scoring-only, selector, and authorization-preparation artifacts. They do not prove provider behavior, model quality, value, readiness, benchmark success, security/privacy completion, local Ollama validation, `/v1/solve` readiness, production/public readiness, unblinding outcome, final interpretation, or Alpha superiority.
 
 ## At a glance
 
 | Field | Value |
 |-------|-------|
-| Latest verified completed lane in this wave | **`ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-VALUE-READ-001`** |
-| Source-of-truth sync | PR #584 records the completed next-release selector lane and blocked selection state |
+| Latest verified completed lane in this wave | **`ALPHA-SOLVER-VALUE-READ-UNBLINDING-FINAL-INTERPRETATION-AUTHORIZATION-001`** |
+| Source-of-truth sync | Current docs record the completed unblinding/final-interpretation authorization-preparation lane and review-only selected next state |
 | Closed-unmerged superseded PR | **#561** — superseded by merged PR #562 |
-| Current controlling posture | Next-release selection blocked after docs-only selector gate |
-| Selected next state | **`NEXT_RELEASE_SELECTION_BLOCKED_PENDING_VALUE_READ_UNBLINDING_AND_FINAL_INTERPRETATION`** |
-| Strategic boundary | The selector selected no implementation lane. No unblinding, final interpretation, provider call, local-model call, runtime work, dashboard/public API work, `/v1/solve` exposure, Google Sheets mutation, dependency addition, routing/council/benchmark work, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, production/public claim, partnership/Pi.dev integration claim, or Alpha-superiority claim is authorized until separately approved |
+| Current controlling posture | Operator review required after docs-only unblinding/final-interpretation authorization preparation |
+| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_UNBLINDING_FINAL_INTERPRETATION_AUTHORIZATION_001`** |
+| Strategic boundary | This authorization-preparation lane did not unblind, reveal source identities, interpret results, change scores, inspect raw Alpha/baseline outputs, access or commit an identity map, call providers, run local models, expose runtime/dashboard/public API behavior, expose `/v1/solve`, mutate Google Sheets, add dependencies, implement a release lane, or authorize value/readiness/benchmark/provider/local-model/production/public/security/privacy/partnership/Pi.dev integration/Alpha-superiority claims |
 
 ## Completed post-552 / post-565 / post-568 infrastructure lanes
 
@@ -52,16 +52,17 @@ These are docs, gate, helper, static/research, and blocked-attempt artifacts. Th
 | post-581 lane | `ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PASS-POST-581-001` | Completes scoring-only review of the blinded scorer packet; case-level blind scores, notes, contested-score flags, scorer identity/tool, scoring method, timestamp, and score-lock confirmation are recorded, with no unblinding, final interpretation, provider/local-model call, endpoint exposure, or value/readiness claim. |
 | scorecard-after-score lane | `ALPHA-SOLVER-MVP-SCORECARD-AFTER-VALUE-READ-SCORE-001` | Updates the docs-only MVP scorecard posture to record that locked blind scores exist while preserving the no-unblinding, no-final-interpretation, no-source-identity, and no-value/readiness/superiority-claim boundary. |
 | PR #584 lane | `ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-VALUE-READ-001` | Completes a docs-only next-release selection gate with verdict `NEXT_RELEASE_SELECTION_BLOCKED_PENDING_VALUE_READ_UNBLINDING_AND_FINAL_INTERPRETATION`; selects no implementation lane because locked blind scores remain blinded and uninterpreted. |
+| authorization-preparation lane | `ALPHA-SOLVER-VALUE-READ-UNBLINDING-FINAL-INTERPRETATION-AUTHORIZATION-001` | Completes a docs-only authorization-decision packet for a future unblinding/source-identity review and final interpretation pass; the pass itself has not occurred, no identities are revealed, and scores remain unchanged. |
 
 See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for the PR status ledger and [`LANE_REGISTRY.md`](LANE_REGISTRY.md) for lifecycle classification.
 
 ## Selected next state
 
-**`NEXT_RELEASE_SELECTION_BLOCKED_PENDING_VALUE_READ_UNBLINDING_AND_FINAL_INTERPRETATION`** is the current global selected next state.
+**`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_UNBLINDING_FINAL_INTERPRETATION_AUTHORIZATION_001`** is the current global selected next state.
 
-This is a blocked selection state, not an implementation lane. It means the next-release selector ran as a docs-only gate, selected no implementation lane, and blocked release-lane selection because locked blind scores exist but remain blinded and uninterpreted. A future operator may separately authorize Value Read source-identity review and final interpretation.
+This is a review-only state, not an implementation lane. It means the authorization-decision packet prepared future operator language and protocols for unblinding/source-identity review and final interpretation, but did not perform the future pass.
 
-This selected state authorizes no unblinding, final interpretation, provider call, local model call, runtime work, API work, `/v1/solve` exposure, dashboard/public API exposure, Google Sheets mutation, dependency addition, routing behavior, council behavior, benchmark work, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, production/public claim, partnership/Pi.dev integration claim, or Alpha-superiority claim.
+This selected state authorizes no unblinding, source-identity reveal, final interpretation, score change, raw Alpha output inspection, raw baseline output inspection, identity-map access or commit, provider call, local model call, runtime work, API work, `/v1/solve` exposure, dashboard/public API exposure, Google Sheets mutation, dependency addition, routing behavior, council behavior, benchmark work, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, production/public claim, partnership/Pi.dev integration claim, or Alpha-superiority claim.
 
 ## Open deferrals (see [`DEFERRAL_REGISTER.md`](DEFERRAL_REGISTER.md))
 
