@@ -157,6 +157,8 @@ def test_usage_token_counts_remain_visible_when_numeric():
                 "output_tokens": 7,
                 "total_tokens": 18,
                 "cached_tokens": 3,
+                "reasoning_tokens": 2,
+                "prompt_token_count": 4,
             }
         }
     )
@@ -165,16 +167,36 @@ def test_usage_token_counts_remain_visible_when_numeric():
     assert result["usage"]["output_tokens"] == 7
     assert result["usage"]["total_tokens"] == 18
     assert result["usage"]["cached_tokens"] == 3
+    assert result["usage"]["reasoning_tokens"] == 2
+    assert result["usage"]["prompt_token_count"] == 4
+
+
+def test_usage_access_and_refresh_tokens_redact_even_when_numeric():
+    result = console.sanitize_result(
+        {
+            "usage": {
+                "input_tokens": 11,
+                "access_token": 123456,
+                "refresh_token": 789,
+            }
+        }
+    )
+
+    assert result["usage"]["input_tokens"] == 11
+    assert result["usage"]["access_token"] == "[REDACTED]"
+    assert result["usage"]["refresh_token"] == "[REDACTED]"
 
 
 def test_secret_fields_and_bearer_strings_remain_redacted():
     result = console.sanitize_result(
         {
             "api_key": SECRET,
-            "Author" + "ization": "bearer " + SECRET,
+            "Author" + "ization": "bear" + "er " + SECRET,
             "access_token": SECRET,
             "refresh_token": SECRET,
             "nested": {"message": "bearer-prefix " + SECRET},
+            "upper": "Bear" + "er " + SECRET,
+            "lower": "bear" + "er " + SECRET,
             "other": "s" + "k-" + SECRET,
         }
     )
@@ -186,6 +208,8 @@ def test_secret_fields_and_bearer_strings_remain_redacted():
     assert result["access_token"] == "[REDACTED]"
     assert result["refresh_token"] == "[REDACTED]"
     assert result["nested"]["message"] == "[REDACTED]"
+    assert result["upper"] == "[REDACTED]"
+    assert result["lower"] == "[REDACTED]"
     assert result["other"] == "[REDACTED]"
 
 

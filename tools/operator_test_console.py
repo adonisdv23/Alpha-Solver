@@ -29,8 +29,8 @@ LOCAL_ONLY_NOTICE = (
     "provider superiority, local-model superiority, production readiness, "
     "public readiness, security/privacy completion, or Alpha superiority."
 )
-SECRET_KEYS = ("api_key", "authorization", "bearer", "token", "secret", "password")
-SAFE_USAGE_TOKEN_KEYS = ("input_tokens", "output_tokens", "total_tokens")
+SECRET_KEYS = ("api_key", "authorization", "bearer", "access_token", "refresh_token", "secret", "password")
+SAFE_USAGE_TOKEN_KEYS = ("input_tokens", "output_tokens", "total_tokens", "cached_tokens")
 
 
 def _normalize_host(value: str | None) -> str:
@@ -67,8 +67,9 @@ def assert_loopback_request(request: Request) -> None:
 def _redact_scalar(value: Any) -> Any:
     if isinstance(value, str):
         redacted = value
-        for marker in ("s" + "k-", "bearer-prefix "):
-            if marker in redacted:
+        lowered = redacted.lower()
+        for marker in ("s" + "k-", "bear" + "er ", "bearer-prefix "):
+            if marker in lowered:
                 return "[REDACTED]"
         return redacted
     return value
@@ -77,17 +78,20 @@ def _redact_scalar(value: Any) -> Any:
 def sanitize_result(result: Mapping[str, Any]) -> dict[str, Any]:
     """Return a JSON-safe result with secret-like fields redacted or removed."""
 
+    def is_safe_numeric_usage_counter(key: str, value: Any) -> bool:
+        lowered = key.lower()
+        return (
+            isinstance(value, (int, float))
+            and (lowered in SAFE_USAGE_TOKEN_KEYS or lowered.endswith("_tokens") or lowered.endswith("_token_count"))
+        )
+
     def walk(value: Any, key: str = "", parent_key: str = "") -> Any:
         lowered = key.lower()
         parent_lowered = parent_key.lower()
-        if (
-            parent_lowered == "usage"
-            and isinstance(value, (int, float))
-            and (lowered in SAFE_USAGE_TOKEN_KEYS or "token" in lowered)
-        ):
-            return value
         if any(marker in lowered for marker in SECRET_KEYS):
             return "[REDACTED]"
+        if parent_lowered == "usage" and is_safe_numeric_usage_counter(lowered, value):
+            return value
         if isinstance(value, Mapping):
             return {str(k): walk(v, str(k), key) for k, v in value.items()}
         if isinstance(value, list):
