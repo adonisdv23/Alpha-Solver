@@ -15,7 +15,7 @@ The repository already contains a deterministic no-echo substantive gate with sy
 This docs gate passes if:
 
 - required packet files exist;
-- criteria define exact echo, near echo, paraphrase-only response, substantive derivation, acceptable source text use, unacceptable copying, and examples;
+- criteria define exact echo, near echo, paraphrase-only response, substantive derivation, acceptable source text use, unsupported copying, and examples;
 - fixture plan includes positive and negative fixture categories, frozen text rules, and expected labels;
 - heuristic spec includes overlap ratio, copied-span ratio, added-reasoning markers, source-preserving transformed markers, non-answer safe-out markers, and the proof boundary;
 - stop conditions and non-actions preserve the hard boundaries;
