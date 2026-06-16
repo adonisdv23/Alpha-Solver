@@ -1,3 +1,15 @@
+# Current Supersession Notice — Post-581 Score-State Tracking
+
+This file preserves the historical PR #568 blocked MVP scorecard content below. That historical content is **superseded for current score-state tracking** by `docs/evals/runs/alpha-solver-mvp-scorecard-after-value-read-score-001/`.
+
+Current score-state tracking points to the locked blind score output at `docs/evals/runs/alpha-solver-value-read-blind-scoring-pass-post-581-001/score-output.md`. Locked blind scores now exist, but the scores remain blinded and uninterpreted. This notice does not change scores, unblind outputs, reveal source identities, access or reconstruct an identity map, inspect raw Alpha outputs, inspect raw baseline outputs, or create final interpretation.
+
+Unblinding and final interpretation remain separately unauthorized. The current selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PASS_POST_581_001`.
+
+The PR #568 scorecard content below remains historical evidence for the stopped pre-output-generation/pre-scoring state of PR #568 only. It must not be read as current guidance that no later blind scores exist, or as current guidance to proceed to the old `ALPHA-SOLVER-VALUE-READ-EXECUTION-PACKET-AUTHORIZATION-001` lane. Later post-579/post-581 lanes supersede it for score-state tracking while preserving the no-unblinding, no-final-interpretation, no-source-identity, and no-value/readiness/superiority-claim boundary.
+
+---
+
 # MVP readiness scorecard
 
 Verdict: `VALUE_READ_BLOCKED_POST_568`
