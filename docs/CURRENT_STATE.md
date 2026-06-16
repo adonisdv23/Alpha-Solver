@@ -1,15 +1,15 @@
 # Alpha Solver — Current State
 
-> Source-of-truth navigation doc. Last verified **2026-06-16** for post-581 blinded scoring pass completion and MVP scorecard score-state update.
+> Source-of-truth navigation doc. Last verified **2026-06-16** for next-release selector completion after the Value Read score-state update.
 > Docs-only; no provider/runtime claims.
 
 ## Current verified phase
 
-**Post-581 blinded scoring pass posture plus MVP scorecard score-state update: the authorized blinded scorer packet has been scored and score-locked, the MVP scorecard now records that locked blind scores exist, and operator review is required before any unblinding or final interpretation happens.**
+**Next-release selector after Value Read: the docs-only selector lane completed and selected no implementation lane. Next-release selection is blocked because locked blind scores exist but remain blinded and uninterpreted.**
 
 The merged #569–#574 wave updated the repository from the post-#568 blocked Value Read state to a broader documentation-and-boundary posture. PR #576 was superseded by PR #577 and should be closed unmerged. PR #577 completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only Alpha-native local operator harness design note.
 
-The current control posture is now `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PASS_POST_581_001`: the authorized blinded scorer packet has been scored in a scoring-only lane, the scores are locked, and the docs-only MVP scorecard update records score-state existence without score interpretation. The operator must separately authorize unblinding or final interpretation before either activity occurs.
+The current control posture is now `NEXT_RELEASE_SELECTION_BLOCKED_PENDING_VALUE_READ_UNBLINDING_AND_FINAL_INTERPRETATION`: `ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-VALUE-READ-001` completed as a docs-only selection gate, selected no implementation lane, and blocked next-release selection because the locked blind scores remain blinded and uninterpreted. A future operator may separately authorize Value Read source-identity review and final interpretation before any Value Read result can drive release-lane selection.
 
 These are docs, gate, helper, static/research, and blocked-attempt artifacts. They do not prove provider behavior, model quality, value, readiness, benchmark success, security/privacy completion, local Ollama validation, `/v1/solve` readiness, production/public readiness, unblinding outcome, final interpretation, or Alpha superiority.
 
@@ -17,12 +17,12 @@ These are docs, gate, helper, static/research, and blocked-attempt artifacts. Th
 
 | Field | Value |
 |-------|-------|
-| Latest verified completed lane in this wave | **`ALPHA-SOLVER-MVP-SCORECARD-AFTER-VALUE-READ-SCORE-001`** |
-| Live pre-edit verification | PR #581 merged; no open PRs at verification time |
+| Latest verified completed lane in this wave | **`ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-VALUE-READ-001`** |
+| Source-of-truth sync | PR #584 records the completed next-release selector lane and blocked selection state |
 | Closed-unmerged superseded PR | **#561** — superseded by merged PR #562 |
-| Current controlling posture | Operator review required after completed blinded scoring pass and score lock |
-| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PASS_POST_581_001`** |
-| Strategic boundary | The authorized blinded scorer packet has case-level blind scores and score-lock confirmation for the preserved manual no-provider raw-output pilot. No unblinding, final interpretation, provider call, local-model call, runtime endpoint, dashboard, public API exposure, Google Sheets mutation, benchmark claim, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha-superiority claim is authorized until separately approved |
+| Current controlling posture | Next-release selection blocked after docs-only selector gate |
+| Selected next state | **`NEXT_RELEASE_SELECTION_BLOCKED_PENDING_VALUE_READ_UNBLINDING_AND_FINAL_INTERPRETATION`** |
+| Strategic boundary | The selector selected no implementation lane. No unblinding, final interpretation, provider call, local-model call, runtime work, dashboard/public API work, `/v1/solve` exposure, Google Sheets mutation, dependency addition, routing/council/benchmark work, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, production/public claim, partnership/Pi.dev integration claim, or Alpha-superiority claim is authorized until separately approved |
 
 ## Completed post-552 / post-565 / post-568 infrastructure lanes
 
@@ -51,16 +51,17 @@ These are docs, gate, helper, static/research, and blocked-attempt artifacts. Th
 | post-blind-packet lane | `ALPHA-SOLVER-VALUE-READ-SCORING-REVIEW-AUTHORIZATION-POST-BLIND-PACKET-001` | Completes docs-only scoring-review authorization preparation; scoring authorization language and blank score-output structure exist, but scoring, unblinding, final interpretation, provider/local-model calls, endpoint exposure, and value/readiness claims have not occurred. |
 | post-581 lane | `ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PASS-POST-581-001` | Completes scoring-only review of the blinded scorer packet; case-level blind scores, notes, contested-score flags, scorer identity/tool, scoring method, timestamp, and score-lock confirmation are recorded, with no unblinding, final interpretation, provider/local-model call, endpoint exposure, or value/readiness claim. |
 | scorecard-after-score lane | `ALPHA-SOLVER-MVP-SCORECARD-AFTER-VALUE-READ-SCORE-001` | Updates the docs-only MVP scorecard posture to record that locked blind scores exist while preserving the no-unblinding, no-final-interpretation, no-source-identity, and no-value/readiness/superiority-claim boundary. |
+| PR #584 lane | `ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-VALUE-READ-001` | Completes a docs-only next-release selection gate with verdict `NEXT_RELEASE_SELECTION_BLOCKED_PENDING_VALUE_READ_UNBLINDING_AND_FINAL_INTERPRETATION`; selects no implementation lane because locked blind scores remain blinded and uninterpreted. |
 
 See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for the PR status ledger and [`LANE_REGISTRY.md`](LANE_REGISTRY.md) for lifecycle classification.
 
 ## Selected next state
 
-**`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PASS_POST_581_001`** is the current global selected next state.
+**`NEXT_RELEASE_SELECTION_BLOCKED_PENDING_VALUE_READ_UNBLINDING_AND_FINAL_INTERPRETATION`** is the current global selected next state.
 
-This is a review state, not an unblinding or interpretation lane. It means blind scores and score-lock confirmation exist for the blinded scorer packet, but no unblinding, final interpretation, provider/local-model execution, runtime endpoint, dashboard/public API exposure, or Google Sheets mutation is authorized. The operator must separately authorize unblinding or final interpretation before either activity happens.
+This is a blocked selection state, not an implementation lane. It means the next-release selector ran as a docs-only gate, selected no implementation lane, and blocked release-lane selection because locked blind scores exist but remain blinded and uninterpreted. A future operator may separately authorize Value Read source-identity review and final interpretation.
 
-This selected state authorizes no unblinding, final interpretation, provider call, local model call, runtime endpoint, dashboard, public API exposure, Google Sheets mutation, benchmark claim, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha superiority claim.
+This selected state authorizes no unblinding, final interpretation, provider call, local model call, runtime work, API work, `/v1/solve` exposure, dashboard/public API exposure, Google Sheets mutation, dependency addition, routing behavior, council behavior, benchmark work, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, production/public claim, partnership/Pi.dev integration claim, or Alpha-superiority claim.
 
 ## Open deferrals (see [`DEFERRAL_REGISTER.md`](DEFERRAL_REGISTER.md))
 
