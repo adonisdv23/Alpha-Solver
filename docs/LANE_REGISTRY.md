@@ -1,7 +1,7 @@
 # Lane Registry
 
-> Source-of-truth lane lifecycle registry. Verification date **2026-06-15** for
-> post-blind-packet scoring-review authorization preparation.
+> Source-of-truth lane lifecycle registry. Verification date **2026-06-16** for
+> post-581 blinded scoring pass completion.
 
 ## Lifecycle classes
 
@@ -11,13 +11,13 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Post-blind-packet scoring-review authorization posture | **current control posture** | `ALPHA-SOLVER-VALUE-READ-SCORING-REVIEW-AUTHORIZATION-POST-BLIND-PACKET-001` is completed as docs-only scoring-review authorization preparation for the post-579 blind scorer packet. The current selected state is operator review required, not a scoring or interpretation lane. |
+| Post-581 blinded scoring pass posture | **current control posture** | `ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PASS-POST-581-001` is completed as scoring-only review for the post-579 blind scorer packet. The current selected state is operator review required, not an unblinding or interpretation lane. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_SCORING_REVIEW_AUTHORIZATION_POST_BLIND_PACKET_001`** | **selected next state; review state, not an execution lane** | The operator must separately authorize scoring before any scores are filled. No scoring, blind-score filling, unblinding, final interpretation, provider call, local model call, runtime endpoint, dashboard/public API, Google Sheets mutation, benchmark claim, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha-superiority claim is authorized. |
+| **`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PASS_POST_581_001`** | **selected next state; review state, not an unblinding or interpretation lane** | The operator must separately authorize unblinding or final interpretation before either activity happens. No unblinding, final interpretation, provider call, local model call, runtime endpoint, dashboard/public API, Google Sheets mutation, benchmark claim, readiness claim, value claim, provider claim, local-model claim, security/privacy claim, or Alpha-superiority claim is authorized. |
 
 ## Completed (kept as evidence)
 
@@ -41,6 +41,7 @@
 - `ALPHA-SOLVER-VALUE-READ-MANUAL-OUTPUT-GENERATION-PILOT-POST-578-001` (stable post-merge state) — manual no-provider prompt-contract simulation raw-output pilot; no scoring, unblinding, provider/local-model call, endpoint exposure, or value/readiness claim.
 - `ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PACKET-CONSTRUCTION-POST-579-001` (stable post-merge state) — docs-only blind scorer packet construction; no scoring, unblinding, provider/local-model call, endpoint exposure, or value/readiness claim.
 - `ALPHA-SOLVER-VALUE-READ-SCORING-REVIEW-AUTHORIZATION-POST-BLIND-PACKET-001` (stable post-merge state) — docs-only scoring-review authorization preparation; scoring language and blank score-output structure exist, but no scoring, unblinding, provider/local-model call, endpoint exposure, final interpretation, or value/readiness claim.
+- `ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PASS-POST-581-001` (stable post-merge state) — scoring-only review of the blinded scorer packet; blind scores are locked, with no unblinding, final interpretation, provider/local-model call, endpoint exposure, or value/readiness claim.
 
 ## Superseded
 
@@ -70,7 +71,7 @@
 
 - PR #561 lane as a standalone needs-human protocol PR — closed unmerged and superseded by PR #562.
 - Any merged packet lane verbatim — packets are immutable evidence; create a new lane id instead.
-- Any selected-next pointer that conflicts with `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_SCORING_REVIEW_AUTHORIZATION_POST_BLIND_PACKET_001`.
+- Any selected-next pointer that conflicts with `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PASS_POST_581_001`.
 - Direct Pi.dev integration from PR #574's research lane — the recorded verdict is patterns-only/no-integration.
 
 ## Forward path (single track)
@@ -109,7 +110,13 @@ ALPHA-SOLVER-VALUE-READ-MANUAL-OUTPUT-GENERATION-PILOT-POST-578-001 ← manual n
 ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PACKET-CONSTRUCTION-POST-579-001 ← blinded packet exists; no scoring/unblinding
         │
         ▼
-OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_SCORING_REVIEW_AUTHORIZATION_POST_BLIND_PACKET_001 ← selected next state; review only, not scoring or interpretation
+ALPHA-SOLVER-VALUE-READ-SCORING-REVIEW-AUTHORIZATION-POST-BLIND-PACKET-001 ← scoring authorization materials
+        │
+        ▼
+ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PASS-POST-581-001 ← blind scores locked; no unblinding/final interpretation
+        │
+        ▼
+OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_BLIND_SCORING_PASS_POST_581_001 ← selected next state; review only, not unblinding or interpretation
 ```
 
-This registry does not authorize any provider call, local model call, scoring, blind-score filling, unblinding, final interpretation, Pi.dev install/run/integration, runtime endpoint, dashboard exposure, public API exposure, Google Sheets mutation, benchmark, or readiness/value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
+This registry does not authorize any provider call, local model call, unblinding, final interpretation, Pi.dev install/run/integration, runtime endpoint, dashboard exposure, public API exposure, Google Sheets mutation, benchmark, or readiness/value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
