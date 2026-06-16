@@ -1,15 +1,15 @@
 # Alpha Solver — Current State
 
-> Source-of-truth navigation doc. Last verified **2026-06-16** for Value Read unblinding final interpretation pass.
+> Source-of-truth navigation doc. Last verified **2026-06-16** for preservation-only parallel feasibility group sync after tabs 13-16.
 > Docs-only; no provider/runtime claims.
 
 ## Current verified phase
 
-**Value Read unblinding final interpretation pass completed: source identities were reviewed using the operator-provided map, locked scores were not changed, and a bounded final interpretation now exists for the manual no-provider prompt-contract simulation.**
+**Preservation-only parallel feasibility group sync completed after tabs 13-16: PR #587 and PR #588 are merged, PR #581 is confirmed merged, no open PR is editing the same source-of-truth docs, and deferred follow-up choices require an operator decision.**
 
 The merged #569–#574 wave updated the repository from the post-#568 blocked Value Read state to a broader documentation-and-boundary posture. PR #576 was superseded by PR #577 and should be closed unmerged. PR #577 completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only Alpha-native local operator harness design note.
 
-The current control posture is now `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_UNBLINDING_FINAL_INTERPRETATION_PASS_001`: `ALPHA-SOLVER-VALUE-READ-UNBLINDING-FINAL-INTERPRETATION-PASS-001` completed as a docs-only evidence interpretation lane. Source identities were reviewed using an operator-provided map, locked scores were not changed, and the final interpretation remains bounded to the manual no-provider prompt-contract simulation. No release implementation lane is selected by this pass.
+The previous Value Read control posture was `OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_UNBLINDING_FINAL_INTERPRETATION_PASS_001`: `ALPHA-SOLVER-VALUE-READ-UNBLINDING-FINAL-INTERPRETATION-PASS-001` completed as a docs-only evidence interpretation lane. Source identities were reviewed using an operator-provided map, locked scores were not changed, and the final interpretation remains bounded to the manual no-provider prompt-contract simulation. No release implementation lane is selected by this pass.
 
 These are docs, gate, helper, static/research, blocked-attempt, scoring-only, selector, authorization-preparation, and bounded interpretation artifacts. They do not prove provider behavior, model quality, broad value, readiness, benchmark success, security/privacy completion, local Ollama validation, `/v1/solve` readiness, production/public readiness, or Alpha superiority.
 
@@ -17,12 +17,12 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 
 | Field | Value |
 |-------|-------|
-| Latest verified completed lane in this wave | **`ALPHA-SOLVER-VALUE-READ-UNBLINDING-FINAL-INTERPRETATION-PASS-001`** |
-| Source-of-truth sync | Current docs record the completed unblinding/source-identity final-interpretation pass and review-only selected next state |
+| Latest verified completed lane in this wave | **`ALPHA-SOLVER-PARALLEL-FEASIBILITY-GROUP-SYNC-001`** |
+| Source-of-truth sync | Current docs record the settled preservation-only feasibility group after tabs 13-16 and one operator decision selected next state |
 | Closed-unmerged superseded PR | **#561** — superseded by merged PR #562 |
-| Current controlling posture | Operator review required after docs-only unblinding/source-identity final interpretation pass |
-| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_UNBLINDING_FINAL_INTERPRETATION_PASS_001`** |
-| Strategic boundary | This interpretation lane revealed source identities only using the operator-provided map and created a bounded final interpretation; it did not change scores, inspect raw Alpha/baseline outputs, call providers, run local models, expose runtime/dashboard/public API behavior, expose `/v1/solve`, mutate Google Sheets, add dependencies, implement a release lane, or authorize broad value/readiness/benchmark/provider/local-model/production/public/security/privacy/partnership/Pi.dev integration/Alpha-superiority claims |
+| Current controlling posture | Operator decision required after preservation-only parallel feasibility group sync |
+| Selected next state | **`OPERATOR_DECISION_REQUIRED_AFTER_PARALLEL_FEASIBILITY_GROUP_SYNC_001`** |
+| Strategic boundary | This sync creates no new feasibility content and only records merged preservation-only packets; it does not change scores, perform source-map work, inspect raw outputs, call providers, run local models, expose runtime/dashboard/public API behavior, expose `/v1/solve`, mutate Google Sheets, add dependencies, implement a release lane, or authorize broad value/readiness/benchmark/provider/local-model/production/public/security/privacy/partnership/Pi.dev integration/Alpha-superiority claims |
 
 ## Completed post-552 / post-565 / post-568 infrastructure lanes
 
@@ -54,16 +54,19 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 | PR #584 lane | `ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-VALUE-READ-001` | Completes a docs-only next-release selection gate with verdict `NEXT_RELEASE_SELECTION_BLOCKED_PENDING_VALUE_READ_UNBLINDING_AND_FINAL_INTERPRETATION`; selects no implementation lane because locked blind scores remain blinded and uninterpreted. |
 | authorization-preparation lane | `ALPHA-SOLVER-VALUE-READ-UNBLINDING-FINAL-INTERPRETATION-AUTHORIZATION-001` | Completes a docs-only authorization-decision packet for a future unblinding/source-identity review and final interpretation pass. |
 | unblinding-final-interpretation lane | `ALPHA-SOLVER-VALUE-READ-UNBLINDING-FINAL-INTERPRETATION-PASS-001` | Completes source-identity review using the operator-provided map and final bounded interpretation; locked scores were not changed, claims remain bounded to the manual no-provider prompt-contract simulation, and no release implementation lane is selected. |
+| PR #587 lane | `ALPHA-SOLVER-DISCRIMINATION-TASK-BANK-ASSET-001` | Completes a docs-only discrimination task-bank asset feasibility packet with verdict `FEASIBLE_WITH_GUARDED_NEXT_STEP`; no task execution, output generation, scoring, runtime/provider/local-model/API/Sheet work, benchmark, readiness, value, or superiority claim occurs. |
+| PR #588 lane | `ALPHA-SOLVER-DEMO-EVIDENCE-PACKET-TO-DEMO-001` | Completes a docs-only claim-safe demo evidence packet feasibility packet with verdict `FEASIBLE_WITH_STRICT_EVIDENCE_BOUNDARIES`; no runtime demo, provider/local-model/API/Sheet work, product proof, value/readiness/superiority claim, or external-use approval occurs. |
+| group-sync lane | `ALPHA-SOLVER-PARALLEL-FEASIBILITY-GROUP-SYNC-001` | Completes a preservation-only source-of-truth sync after the tabs 13-16 feasibility group settled; PR #581, PR #587, and PR #588 are merged, no open PR is editing the same source-of-truth docs, and deferred follow-up choices require a single operator decision. |
 
 See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for the PR status ledger and [`LANE_REGISTRY.md`](LANE_REGISTRY.md) for lifecycle classification.
 
 ## Selected next state
 
-**`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_UNBLINDING_FINAL_INTERPRETATION_PASS_001`** is the current global selected next state.
+**`OPERATOR_DECISION_REQUIRED_AFTER_PARALLEL_FEASIBILITY_GROUP_SYNC_001`** is the current global selected next state.
 
-This is a review-only state, not an implementation lane. It means the authorized unblinding/source-identity review and final interpretation pass completed, locked scores were preserved, and operator review is required before any separate future next-release selector or implementation lane.
+This is one operator decision state, not an implementation lane. It means the preservation-only feasibility group after tabs 13-16 has settled, the merged packets have been recorded in source-of-truth docs, and the operator must choose at most one future follow-up lane before any additional work proceeds.
 
-This selected state authorizes no score change, raw Alpha output inspection, raw baseline output inspection, provider call, local model call, runtime work, API work, `/v1/solve` exposure, dashboard/public API exposure, Google Sheets mutation, dependency addition, routing behavior, council behavior, benchmark work, readiness claim, broad value claim, provider claim, local-model claim, security/privacy claim, production/public claim, partnership/Pi.dev integration claim, or Alpha-superiority claim.
+This selected state authorizes no new feasibility content, score change, source-map work, raw Alpha output inspection, raw baseline output inspection, provider call, local model call, runtime work, API work, `/v1/solve` exposure, dashboard/public API exposure, Google Sheets mutation, dependency addition, routing behavior, council behavior, benchmark work, readiness claim, broad value claim, provider claim, local-model claim, security/privacy claim, production/public claim, partnership/Pi.dev integration claim, demo external-use approval, discrimination-task execution/scoring, or Alpha-superiority claim.
 
 ## Open deferrals (see [`DEFERRAL_REGISTER.md`](DEFERRAL_REGISTER.md))
 

@@ -1,7 +1,7 @@
 # Lane Registry
 
 > Source-of-truth lane lifecycle registry. Verification date **2026-06-16** for
-> Value Read unblinding final interpretation pass.
+> preservation-only parallel feasibility group sync after tabs 13-16.
 
 ## Lifecycle classes
 
@@ -11,13 +11,13 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Value Read unblinding final interpretation pass | **current control posture** | `ALPHA-SOLVER-VALUE-READ-UNBLINDING-FINAL-INTERPRETATION-PASS-001` completed as a docs-only evidence interpretation lane. Source identities were reviewed using an operator-provided map, locked scores were not changed, final interpretation exists, claims remain bounded to the manual no-provider prompt-contract simulation, and no release implementation lane is selected. |
+| Preservation-only parallel feasibility group sync | **current control posture** | `ALPHA-SOLVER-PARALLEL-FEASIBILITY-GROUP-SYNC-001` completed after tabs 13-16 settled. PR #581, PR #587, and PR #588 are merged; live verification found zero open PRs and no open source-of-truth doc conflict. The sync records merged preservation-only feasibility packets and defers follow-up choice to one operator decision state. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_UNBLINDING_FINAL_INTERPRETATION_PASS_001`** | **selected next state; review-only state, not an implementation lane** | The authorized unblinding/source-identity review and final interpretation pass completed. Locked scores were not changed, claims remain bounded to the manual no-provider prompt-contract simulation, and no release implementation lane is selected. No score change, raw output inspection, provider call, local model call, runtime work, dashboard/public API work, `/v1/solve`, Google Sheets mutation, dependencies, routing, council behavior, benchmark work, readiness/broad-value/provider/local-model/security/privacy/production/public/partnership/Pi.dev integration claim, or Alpha-superiority claim is authorized. |
+| **`OPERATOR_DECISION_REQUIRED_AFTER_PARALLEL_FEASIBILITY_GROUP_SYNC_001`** | **selected next state; operator decision state, not an implementation lane** | The preservation-only feasibility group after tabs 13-16 has settled and source-of-truth docs now record what merged. Operator decision is required before choosing any one future follow-up lane. No new feasibility content, runtime work, providers, local models, dashboard/public API work, `/v1/solve`, Google Sheets mutation, scoring, source-map work, final interpretation, implementation lane, readiness/broad-value/provider/local-model/security/privacy/production/public/partnership/Pi.dev integration/demo external-use/discrimination-scoring claim, or Alpha-superiority claim is authorized. |
 
 ## Completed (kept as evidence)
 
@@ -46,6 +46,9 @@
 - `ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-VALUE-READ-001` (PR #584) — docs-only next-release selector; verdict `NEXT_RELEASE_SELECTION_BLOCKED_PENDING_VALUE_READ_UNBLINDING_AND_FINAL_INTERPRETATION`; selected no implementation lane because locked blind scores remain blinded and uninterpreted.
 - `ALPHA-SOLVER-VALUE-READ-UNBLINDING-FINAL-INTERPRETATION-AUTHORIZATION-001` (stable post-merge state) — docs-only authorization-decision packet; prepared unblinding/source-identity review and final interpretation authorization language and protocols.
 - `ALPHA-SOLVER-VALUE-READ-UNBLINDING-FINAL-INTERPRETATION-PASS-001` (stable post-merge state) — docs-only source-identity review and final bounded interpretation; source identities were reviewed using the operator-provided map, locked scores were not changed, final interpretation exists, claims remain bounded to the manual no-provider prompt-contract simulation, and no release implementation lane is selected.
+- `ALPHA-SOLVER-DISCRIMINATION-TASK-BANK-ASSET-001` (PR #587) — docs-only discrimination task-bank asset feasibility packet; guarded follow-up deferred, no execution/scoring/runtime/provider/local-model/API/Sheet/readiness/value/superiority claim.
+- `ALPHA-SOLVER-DEMO-EVIDENCE-PACKET-TO-DEMO-001` (PR #588) — docs-only claim-safe demo evidence packet feasibility packet; strict evidence-boundary follow-up deferred, no runtime demo/external-use approval/product proof/value/readiness/superiority claim.
+- `ALPHA-SOLVER-PARALLEL-FEASIBILITY-GROUP-SYNC-001` (stable post-merge state) — preservation-only source-of-truth sync after tabs 13-16; records PR #581, #587, and #588 as merged and no open source-of-truth doc conflict.
 
 ## Superseded
 
@@ -129,7 +132,13 @@ ALPHA-SOLVER-VALUE-READ-UNBLINDING-FINAL-INTERPRETATION-AUTHORIZATION-001 ← do
 ALPHA-SOLVER-VALUE-READ-UNBLINDING-FINAL-INTERPRETATION-PASS-001 ← source identities reviewed with operator-provided map; locked scores unchanged; bounded final interpretation exists
         │
         ▼
-OPERATOR_REVIEW_REQUIRED_AFTER_VALUE_READ_UNBLINDING_FINAL_INTERPRETATION_PASS_001 ← selected next state; review-only, not implementation
+#587 / #588 preservation-only feasibility packets ← merged; follow-ups deferred
+        │
+        ▼
+ALPHA-SOLVER-PARALLEL-FEASIBILITY-GROUP-SYNC-001 ← source-of-truth sync; no open PR conflicts
+        │
+        ▼
+OPERATOR_DECISION_REQUIRED_AFTER_PARALLEL_FEASIBILITY_GROUP_SYNC_001 ← selected next state; operator decision, not implementation
 ```
 
 This registry does not authorize any provider call, local model call, score change, Pi.dev install/run/integration, runtime endpoint, dashboard exposure, public API exposure, Google Sheets mutation, benchmark, release implementation lane, or readiness/broad-value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
