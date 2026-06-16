@@ -11,13 +11,13 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Operator review after local/OpenAI smoke results import | **current control posture** | `ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RESULTS-IMPORT-001` imported Operator-provided, redacted smoke-only results. Local/Ollama passed using `qwen2.5:3b`; OpenAI passed using `gpt-4.1-mini-2025-04-14`. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`. |
+| Operator review after local/OpenAI test console | **current control posture** | `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-001` added a local-only Operator smoke test console. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`** | **review-only selected next state** | Operator review is required after the local/OpenAI smoke results import. The evidence is smoke-only: local/Ollama passed using `qwen2.5:3b`, and OpenAI passed using `gpt-4.1-mini-2025-04-14`. No provider/local-model quality claim, readiness claim, benchmark claim, production/public claim, or Alpha-superiority claim is created by this lane. |
+| **`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`** | **review-only selected next state** | Operator review is required after the local-only local/OpenAI test console. The evidence is console implementation only. No provider/local-model quality claim, readiness claim, benchmark claim, production/public claim, security/privacy completion claim, or Alpha-superiority claim is created by this lane. |
 
 ## Completed (kept as evidence)
 
@@ -51,7 +51,7 @@
 - `ALPHA-SOLVER-PARALLEL-FEASIBILITY-GROUP-SYNC-001` (stable post-merge state) - preservation-only source-of-truth sync after tabs 13-16; records PR #581, #587, and #588 as merged and no open source-of-truth doc conflict.
 - `ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-FINAL-INTERPRETATION-001` (stable post-merge state) - docs-only selector after final interpretation and the parallel feasibility group sync; selects `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` for operator review and does not create or implement it.
 - `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` (merged PR #591) - docs-first substantive derivation / no-echo gate packet; defines criteria, fixture planning, heuristic review aids, stop conditions, non-actions, and non-claims, with no implementation or broad claims.
-- `ALPHA-SOLVER-DISCRIMINATION-TASK-BANK-FIRST-CHEAP-TEST-001` (this PR after merge) - docs-only first cheap-test packet with five representative taxonomy task cards for discrimination task-bank preparation; no task execution, output generation, scoring, raw output inspection, unblinding, source-map work, provider/local-model/runtime/API/Sheet work, dependency addition, release implementation, or broad claims.
+- `ALPHA-SOLVER-DISCRIMINATION-TASK-BANK-FIRST-CHEAP-TEST-001` (merged PR #595) - docs-only first cheap-test packet with five representative taxonomy task cards for discrimination task-bank preparation; no task execution, output generation, scoring, raw output inspection, unblinding, source-map work, provider/local-model/runtime/API/Sheet work, dependency addition, release implementation, or broad claims.
 
 ## Superseded
 
@@ -81,7 +81,7 @@
 
 - PR #561 lane as a standalone needs-human protocol PR - closed unmerged and superseded by PR #562.
 - Any merged packet lane verbatim - packets are immutable evidence; create a new lane id instead.
-- Any selected-next pointer that conflicts with `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`. Earlier selected-next pointers, including `OPERATOR_REVIEW_REQUIRED_AFTER_DISCRIMINATION_TASK_BANK_FIRST_CHEAP_TEST_001` and `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`, are prior review states and must not be treated as current.
+- Any selected-next pointer that conflicts with `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`. Earlier selected-next pointers, including `OPERATOR_REVIEW_REQUIRED_AFTER_DISCRIMINATION_TASK_BANK_FIRST_CHEAP_TEST_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`, and `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`, are prior review states and must not be treated as current.
 - Direct Pi.dev integration from PR #574's research lane - the recorded verdict is patterns-only/no-integration.
 
 ## Forward path (single track)
@@ -162,10 +162,14 @@ OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001 ← prior review-on
 ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RESULTS-IMPORT-001 ← smoke-only results imported; local/Ollama and OpenAI passed
         │
         ▼
-OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001 ← current review-only selected next state
+OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001 ← prior review-only selected next state
+        ↓
+ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-001 ← local-only smoke console added
+        ↓
+OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001 ← current review-only selected next state
 ```
 
-This registry does not authorize UI implementation without later reviewed smoke results, public provider exposure, local model validation claims, task execution, output generation, scoring, score change, unblinding, source-map work, raw output inspection, Pi.dev install/run/integration, runtime endpoint, dashboard exposure, public API exposure, Google Sheets mutation, benchmark, dependency addition, release implementation lane, or readiness/broad-value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
+This registry does not authorize production/public UI exposure, dashboard readiness, public provider exposure, local model validation claims, task execution, output generation, scoring, score change, unblinding, source-map work, raw output inspection, Pi.dev install/run/integration, runtime endpoint exposure, public API exposure, `/v1/solve` exposure, Google Sheets mutation, benchmark, dependency addition, release implementation lane, or readiness/broad-value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
 
 ## Local/OpenAI smoke runner lane
 
@@ -175,11 +179,11 @@ This registry does not authorize UI implementation without later reviewed smoke 
 
 Selected next state after runner lane: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`.
 
-Current selected next state after smoke-results import: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`.
+Current selected next state after test console: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`.
 
 Boundary: no provider quality, local model quality, readiness, benchmark success, production readiness, public readiness, security/privacy completion, UI authorization, or Alpha-superiority claim is created.
 
-- `ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RESULTS-IMPORT-001` (this PR) - docs-only import of Operator-provided, redacted smoke-only results: local/Ollama passed using `qwen2.5:3b`, and OpenAI passed using `gpt-4.1-mini-2025-04-14`; no behavior quality, provider quality, local-model quality, readiness, benchmark, production/public, or Alpha-superiority claim.
+- `ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RESULTS-IMPORT-001` (merged PR #598) - docs-only import of Operator-provided, redacted smoke-only results: local/Ollama passed using `qwen2.5:3b`, and OpenAI passed using `gpt-4.1-mini-2025-04-14`; no behavior quality, provider quality, local-model quality, readiness, benchmark, production/public, or Alpha-superiority claim.
 
 ## ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RESULTS-IMPORT-001
 
@@ -189,3 +193,13 @@ Boundary: no provider quality, local model quality, readiness, benchmark success
 - OpenAI smoke: passed using `gpt-4.1-mini-2025-04-14`.
 - Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`.
 - Boundary: smoke-only evidence; no behavior quality, provider quality, local-model quality, readiness, benchmark, production/public, or Alpha-superiority claim.
+
+
+## ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-001
+
+- Purpose: local-only operator smoke testing console.
+- Packet: `docs/evals/runs/alpha-solver-local-openai-test-console-001/`.
+- Implementation: `tools/operator_test_console.py`.
+- Tests: `tests/test_operator_test_console.py`.
+- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`.
+- Evidence boundary: console implementation only, no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim.
