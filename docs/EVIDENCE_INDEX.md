@@ -49,7 +49,7 @@ The entries below are design, documentation, gate, helper, static-checking, meth
 
 ## Current selected next state
 
-`OPERATOR_REVIEW_REQUIRED_AFTER_DISCRIMINATION_TASK_BANK_FIRST_CHEAP_TEST_001` is the selected next state. This is a review-only state after the discrimination task-bank first cheap-test packet, not execution or implementation authorization.
+`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001` is the selected next state. This is a review-only state after the local/OpenAI smoke runner, not smoke execution or UI implementation authorization.
 
 `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` was completed by merged PR #591 as a docs-first gate packet. It defines criteria, fixture planning, heuristic review aids, stop conditions, non-actions, and non-claims for operator review. `ALPHA-SOLVER-DISCRIMINATION-TASK-BANK-FIRST-CHEAP-TEST-001` was completed by merged PR #595 as a docs-only cheap-test packet grounded in that gate and the discrimination task-bank asset.
 
@@ -60,3 +60,12 @@ The selected state authorizes no score change, source-map work, raw Alpha output
 The post-#579 blind scoring packet construction state supports only bounded statements that the repository contains docs/design/static-checking/scaffold/gate/helper/blocked-attempt/research artifacts for no-echo gating, false-premise perturbations, claim-safety linting, calibrated confidence, needs-human protocol guidance, higher-headroom cases, prompt-contract methodology, a local Ollama lab scaffold/helper, blocked Value Read evidence, blocked `/v1/solve` exposure evidence, a failed-closed local Ollama attempt, Pi.dev patterns-only research, a docs-only Value Read execution authorization-decision packet, a manual no-provider Value Read raw-output pilot, a docs-only blinded scorer packet, docs-only scoring-review authorization materials, a scoring-only blinded review pass with locked scores, a docs-only MVP scorecard score-state update preserving the no-interpretation boundary, and a docs-only next-release selector that blocks release-lane selection pending source-identity review and final interpretation, a docs-only authorization-decision packet, a docs-only source-identity review/final interpretation pass that preserves score lock and bounds claims to the manual no-provider prompt-contract simulation, two preservation-only feasibility packets from PR #587 and PR #588, this preservation-only source-of-truth sync after the tabs 13-16 feasibility group settled, and a docs-only selector that selects one substantive derivation check lane for operator review without implementation authorization.
 
 It does **not** support claims of provider validation, local Ollama validation, hosted-model validation, token use, benchmark success, value, readiness, security/privacy completion, public API readiness, `/v1/solve` readiness, dashboard readiness, Pi.dev integration, Google Sheets synchronization, benchmark proof, broad value proof, release implementation authorization, or Alpha superiority.
+
+## ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RUNNER-001
+
+- Artifact: `tools/operator_smoke_runner.py`
+- Packet: `docs/evals/runs/alpha-solver-local-openai-smoke-runner-001/`
+- Evidence type: operator smoke-runner implementation and runbook only.
+- Smoke execution status: not run by this PR.
+- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`.
+- Boundary: does not prove provider quality, local model quality, readiness, benchmark success, production readiness, public readiness, security/privacy completion, buyer validation, traction, partnership/Pi.dev integration, or Alpha superiority.
