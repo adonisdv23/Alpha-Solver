@@ -20,6 +20,7 @@ from urllib.parse import parse_qs
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 
+from alpha import model_router, tool_router
 from tools import operator_smoke_runner as smoke_runner
 
 APP_TITLE = "Alpha Solver local smoke test console"
@@ -71,6 +72,13 @@ OPENAI_SETUP_STEPS = (
     "Set OPENAI_MODEL=gpt-4.1-mini.",
     "Set OPENAI_API_KEY in the local terminal environment.",
     "Never paste API keys into the UI.",
+)
+ROUTE_PREVIEW_BOUNDARY = (
+    "Route preview is metadata-only. Tool recommendation is not tool execution. "
+    "Model recommendation is not model validation. Provider or local model execution is not authorized by preview. "
+    "Smoke results remain smoke-only evidence, and passing smoke does not prove model quality, provider quality, "
+    "local-model quality, readiness, benchmark success, production/public readiness, security/privacy completion, "
+    "or Alpha superiority."
 )
 
 
@@ -248,6 +256,92 @@ def _form_state(
         "prompt": selected_prompt,
     }
 
+
+
+def build_route_preview(task: str, mode: str, model: str) -> dict[str, Any]:
+    """Build a deterministic metadata-only route preview from existing routers."""
+
+    cleaned_task = (task or "").strip()
+    selected_mode = mode if mode in {"local", "openai"} else "local"
+    requested_model = (model or "").strip() or _model_default(selected_mode)
+    model_preview = model_router.preview_route(
+        model_router.RoutingPreviewRequest(
+            requested_mode=selected_mode,
+            requested_model=requested_model,
+            allow_hosted_providers=False,
+            allow_local=True,
+            prompt_length=len(cleaned_task),
+            local_only=True,
+        )
+    ).as_dict()
+    tool_preview = tool_router.recommend_tool(
+        tool_router.ToolRecommendationRequest(task_text=cleaned_task, untrusted_context="operator_console_task")
+    ).as_dict()
+    return {
+        "status": "preview_only",
+        "task": cleaned_task,
+        "task_family": tool_preview.get("recommended_tool_family"),
+        "model_route": model_preview,
+        "tool_route": tool_preview,
+        "fallback_path": model_preview.get("fallbacks", []),
+        "evidence_boundary": ROUTE_PREVIEW_BOUNDARY,
+        "provider_or_local_execution_authorized": False,
+        "tool_execution_authorized": False,
+        "preview_only": True,
+    }
+
+
+def _route_list(values: Any) -> str:
+    if not values:
+        return '<span class="muted-inline">none</span>'
+    if isinstance(values, Mapping):
+        values = [f"{key}={value}" for key, value in values.items()]
+    items = "".join(f"<li>{html.escape(str(value))}</li>" for value in values)
+    return f'<ul class="mini">{items}</ul>'
+
+
+def _route_preview_rows(route_preview: Mapping[str, Any] | None) -> str:
+    rows: list[str] = []
+
+    def add(label: str, value: Any) -> None:
+        if isinstance(value, (list, tuple, dict)):
+            value_html = _route_list(value)
+        else:
+            value_html = html.escape(str(value))
+        rows.append(
+            f'<div class="kv"><div class="kv-k">{html.escape(label)}</div>'
+            f'<div class="kv-v">{value_html}</div></div>'
+        )
+
+    if not route_preview:
+        add("Status", "No route preview yet")
+        add("Evidence boundary", ROUTE_PREVIEW_BOUNDARY)
+        add("Provider/local execution authorized", "false")
+        add("Tool execution authorized", "false")
+        return "".join(rows)
+
+    model_route = route_preview.get("model_route", {}) if isinstance(route_preview.get("model_route"), Mapping) else {}
+    tool_route = route_preview.get("tool_route", {}) if isinstance(route_preview.get("tool_route"), Mapping) else {}
+    add("Status", route_preview.get("status", "preview_only"))
+    add("Task family", route_preview.get("task_family") or "not_available")
+    add(
+        "Recommended model path",
+        f"{model_route.get('recommended_mode') or 'none'} / {model_route.get('recommended_model') or 'none'}",
+    )
+    add(
+        "Recommended tool family",
+        f"{tool_route.get('recommended_tool_family') or 'none'} / {tool_route.get('recommended_tool_id') or 'none'}",
+    )
+    add("Route reasons", list(model_route.get("reasons", [])) + list(tool_route.get("reasons", [])))
+    add("Route warnings", list(model_route.get("warnings", [])) + list(tool_route.get("warnings", [])))
+    add("Fallback path", route_preview.get("fallback_path", []))
+    add("Evidence boundary", route_preview.get("evidence_boundary", ROUTE_PREVIEW_BOUNDARY))
+    add(
+        "Provider/local execution authorized",
+        str(route_preview.get("provider_or_local_execution_authorized", False)).lower(),
+    )
+    add("Tool execution authorized", str(route_preview.get("tool_execution_authorized", False)).lower())
+    return "".join(rows)
 
 def _reason_explanation(reason: str) -> str:
     if reason in REASON_EXPLANATIONS:
@@ -467,6 +561,19 @@ function toggleCustomModel() {
   if (!modelSelect || !row) { return; }
   if (modelSelect.value === CUSTOM_OPTION) { row.removeAttribute("hidden"); }
   else { row.setAttribute("hidden", "hidden"); }
+  syncPreviewInputs();
+}
+
+function syncPreviewInputs() {
+  var modeSelect = document.getElementById("mode-select");
+  var modelSelect = document.getElementById("model-select");
+  var customModel = document.getElementById("custom-model");
+  var previewMode = document.getElementById("preview-mode");
+  var previewModel = document.getElementById("preview-model");
+  var previewCustomModel = document.getElementById("preview-custom-model");
+  if (modeSelect && previewMode) { previewMode.value = modeSelect.value; }
+  if (modelSelect && previewModel) { previewModel.value = modelSelect.value; }
+  if (customModel && previewCustomModel) { previewCustomModel.value = customModel.value; }
 }
 
 function updatePromptCounter() {
@@ -516,12 +623,15 @@ document.addEventListener("DOMContentLoaded", function () {
   var modeSelect = document.getElementById("mode-select");
   var modelSelect = document.getElementById("model-select");
   var promptInput = document.getElementById("prompt-input");
+  var customModel = document.getElementById("custom-model");
   var copyButton = document.getElementById("copy-json");
   if (modeSelect) { modeSelect.addEventListener("change", rebuildModelOptions); }
   if (modelSelect) { modelSelect.addEventListener("change", toggleCustomModel); }
+  if (customModel) { customModel.addEventListener("input", syncPreviewInputs); }
   if (promptInput) { promptInput.addEventListener("input", updatePromptCounter); }
   if (copyButton) { copyButton.addEventListener("click", copySanitizedJson); }
   toggleCustomModel();
+  syncPreviewInputs();
   updatePromptCounter();
 });
 </script>
@@ -535,7 +645,11 @@ def _script_html() -> str:
     )
 
 
-def render_result_html(result: Mapping[str, Any] | None = None, form_state: Mapping[str, str] | None = None) -> str:
+def render_result_html(
+    result: Mapping[str, Any] | None = None,
+    form_state: Mapping[str, str] | None = None,
+    route_preview: Mapping[str, Any] | None = None,
+) -> str:
     display_result = sanitize_result(result) if result else {}
     state = _form_state(**dict(form_state or {}))
 
@@ -573,6 +687,8 @@ def render_result_html(result: Mapping[str, Any] | None = None, form_state: Mapp
 
     local_checklist = _checklist_html("Local / Ollama", LOCAL_SETUP_STEPS)
     openai_checklist = _checklist_html("OpenAI", OPENAI_SETUP_STEPS)
+    route_task = html.escape(str((route_preview or {}).get("task", state["prompt"])))
+    route_rows = _route_preview_rows(route_preview)
 
     return f"""<!doctype html>
 <html lang="en">
@@ -592,6 +708,23 @@ def render_result_html(result: Mapping[str, Any] | None = None, form_state: Mapp
     <div class="notice notice-boundary">
       <strong>Evidence boundary:</strong> {html.escape(LOCAL_ONLY_NOTICE)}
       Run locally with <code>{html.escape(RUN_COMMAND)}</code>.
+    </div>
+
+    <div class="card" id="route-preview-panel">
+      <h2>Route preview (metadata-only)</h2>
+      <div class="notice notice-boundary">{html.escape(ROUTE_PREVIEW_BOUNDARY)}</div>
+      <form method="post" action="/preview">
+        <label class="field">
+          <span class="field-label">Task for route preview</span>
+          <textarea name="task" id="route-task-input" rows="4">{route_task}</textarea>
+        </label>
+        <input type="hidden" name="mode" id="preview-mode" value="{html.escape(state["mode"])}">
+        <input type="hidden" name="model" id="preview-model" value="{html.escape(state["model_option"])}">
+        <input type="hidden" name="custom_model" id="preview-custom-model" value="{html.escape(state["custom_model"])}">
+        <button type="submit" id="preview-route-button" class="secondary">Preview route only</button>
+      </form>
+      <div class="help">Preview does not call providers, run local models, execute tools, validate model quality, or run smoke checks.</div>
+      <div class="route-preview-result">{route_rows}</div>
     </div>
 
     <div class="card">
@@ -658,6 +791,33 @@ app = FastAPI(title=APP_TITLE)
 async def index(request: Request) -> HTMLResponse:
     assert_loopback_request(request)
     return HTMLResponse(render_result_html())
+
+
+@app.post("/preview", response_class=HTMLResponse)
+async def preview_from_form(request: Request) -> HTMLResponse:
+    assert_loopback_request(request)
+    body = (await request.body()).decode("utf-8", errors="replace")
+    form = parse_qs(body, keep_blank_values=True)
+    mode = form.get("mode", ["local"])[0]
+    model_option = form.get("model", [""])[0]
+    custom_model = form.get("custom_model", [""])[0]
+    task = form.get("task", [DEFAULT_PROMPT])[0]
+    effective_model = _resolve_effective_model(mode, model_option, custom_model)
+    preview = build_route_preview(task=task, mode=mode, model=effective_model)
+    form_state = {"mode": mode, "model_option": model_option, "custom_model": custom_model, "prompt": task}
+    return HTMLResponse(render_result_html(form_state=form_state, route_preview=preview))
+
+
+@app.post("/api/preview")
+async def preview_from_api(request: Request) -> JSONResponse:
+    assert_loopback_request(request)
+    payload = await request.json()
+    mode = str(payload.get("mode", "local"))
+    model = str(payload.get("model", ""))
+    custom_model = str(payload.get("custom_model", ""))
+    task = str(payload.get("task", DEFAULT_PROMPT))
+    effective_model = _resolve_effective_model(mode, model, custom_model)
+    return JSONResponse(build_route_preview(task=task, mode=mode, model=effective_model))
 
 
 @app.post("/run", response_class=HTMLResponse)

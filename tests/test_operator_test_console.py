@@ -499,3 +499,160 @@ def test_no_external_assets_or_telemetry_in_rendered_html():
     assert "src=" not in html
     assert "cdn" not in html.lower()
     assert "/v1/solve" not in html
+
+def test_route_preview_panel_renders_and_is_separate_from_smoke_execution():
+    html = console.render_result_html()
+
+    assert 'id="route-preview-panel"' in html
+    assert 'action="/preview"' in html
+    assert 'action="/run"' in html
+    assert html.index('action="/preview"') < html.index('action="/run"')
+    assert 'Preview route only' in html
+    assert 'Run bounded smoke check' in html
+
+
+def test_route_preview_hidden_inputs_stay_synced_with_visible_smoke_controls():
+    html = console.render_result_html()
+
+    assert 'name="mode" id="preview-mode"' in html
+    assert 'name="model" id="preview-model"' in html
+    assert 'name="custom_model" id="preview-custom-model"' in html
+    assert 'function syncPreviewInputs()' in html
+    assert 'previewMode.value = modeSelect.value' in html
+    assert 'previewModel.value = modelSelect.value' in html
+    assert 'previewCustomModel.value = customModel.value' in html
+    assert 'customModel.addEventListener("input", syncPreviewInputs)' in html
+
+
+def test_preview_form_uses_current_changed_model_selection_without_smoke_execution(monkeypatch):
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("smoke execution must not run during preview")
+
+    seen = {}
+
+    def fake_preview(task, mode, model):
+        seen.update({"task": task, "mode": mode, "model": model})
+        return {
+            "status": "preview_only",
+            "task": task,
+            "task_family": "general",
+            "model_route": {
+                "recommended_model": model,
+                "provider_or_local_execution_authorized": False,
+                "reasons": ["test_current_selection"],
+                "warnings": [],
+            },
+            "tool_route": {"recommended_tool_family": "none", "execution_authorized": False},
+            "fallback_path": [],
+            "evidence_boundary": console.ROUTE_PREVIEW_BOUNDARY,
+            "provider_or_local_execution_authorized": False,
+            "tool_execution_authorized": False,
+        }
+
+    monkeypatch.setattr(console.smoke_runner, "run_local", fail_if_called)
+    monkeypatch.setattr(console.smoke_runner, "run_openai", fail_if_called)
+    monkeypatch.setattr(console, "build_route_preview", fake_preview)
+
+    async def run() -> httpx.Response:
+        transport = httpx.ASGITransport(app=console.app, client=("127.0.0.1", 12345))
+        async with httpx.AsyncClient(transport=transport, base_url="http://127.0.0.1") as client:
+            return await client.post(
+                "/preview",
+                headers={"host": "127.0.0.1"},
+                data={
+                    "mode": "openai",
+                    "model": "custom",
+                    "custom_model": "gpt-current-preview",
+                    "task": "preview this current route",
+                },
+            )
+
+    response = asyncio.run(run())
+
+    assert response.status_code == 200
+    assert seen == {
+        "mode": "openai",
+        "model": "gpt-current-preview",
+        "task": "preview this current route",
+    }
+    assert "gpt-current-preview" in response.text
+    assert "Provider/local execution authorized" in response.text
+    assert "Tool execution authorized" in response.text
+    assert ">false<" in response.text
+
+
+def test_route_preview_uses_existing_router_metadata_and_displays_fields():
+    preview = console.build_route_preview("browse repo files and run pytest", "local", "qwen2.5:3b")
+    html = console.render_result_html(route_preview=preview)
+
+    assert preview["model_route"]["recommended_model"] == "qwen2.5:3b"
+    assert preview["tool_route"]["recommended_tool_family"]
+    assert "Recommended model path" in html
+    assert "qwen2.5:3b" in html
+    assert "Recommended tool family" in html
+    assert preview["tool_route"]["recommended_tool_id"] in html
+    assert "Route reasons" in html
+    assert "routing_preview_only" in html
+    assert "tool_recommendation_preview_only" in html
+    assert "Route warnings" in html
+    assert "untrusted_input_cannot_authorize_execution" in html
+    assert "Fallback path" in html
+    assert "Evidence boundary" in html
+    assert "metadata-only" in html
+    assert "Provider/local execution authorized" in html
+    assert ">false<" in html
+    assert "Tool execution authorized" in html
+
+
+def test_route_preview_never_authorizes_provider_local_or_tool_execution():
+    preview = console.build_route_preview("call github and browse", "local", "qwen2.5:3b")
+
+    assert preview["provider_or_local_execution_authorized"] is False
+    assert preview["tool_execution_authorized"] is False
+    assert preview["model_route"]["provider_or_local_execution_authorized"] is False
+    assert preview["tool_route"]["execution_authorized"] is False
+
+
+def test_route_preview_api_does_not_invoke_smoke_provider_or_tools(monkeypatch):
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("smoke execution must not run during preview")
+
+    monkeypatch.setattr(console.smoke_runner, "run_local", fail_if_called)
+    monkeypatch.setattr(console.smoke_runner, "run_openai", fail_if_called)
+
+    response = _api_post(
+        "/api/preview",
+        host="127.0.0.1",
+        peer="127.0.0.1",
+        payload={"mode": "local", "model": "qwen2.5:3b", "task": "run a local smoke check"},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["status"] == "preview_only"
+    assert response.json()["provider_or_local_execution_authorized"] is False
+    assert response.json()["tool_execution_authorized"] is False
+
+
+def test_manual_model_override_still_flows_to_bounded_smoke(monkeypatch):
+    seen = {}
+
+    def fake_run_local(prompt, env=None):
+        seen["model"] = env["ALPHA_LOCAL_LLM_MODEL"]
+        return {"mode": "local", "provider": "ollama", "model": seen["model"], "status": "passed"}
+
+    monkeypatch.setattr(console.smoke_runner, "run_local", fake_run_local)
+    result = console.run_console_smoke("local", "custom-local-model", PROMPT, env={})
+
+    assert seen["model"] == "custom-local-model"
+    assert result["model"] == "custom-local-model"
+    assert result["smoke_evidence_only"] is True
+
+
+def test_route_preview_escapes_untrusted_task_output():
+    task = '<script>alert("x")</script> browse'
+    preview = console.build_route_preview(task, "local", "qwen2.5:3b")
+    html = console.render_result_html(route_preview=preview)
+
+    assert task not in html
+    assert html_lib.escape(task) in html
+    assert "<script>alert" not in html
