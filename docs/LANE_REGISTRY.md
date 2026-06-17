@@ -94,7 +94,7 @@
 
 - PR #561 lane as a standalone needs-human protocol PR - closed unmerged and superseded by PR #562.
 - Any merged packet lane verbatim - packets are immutable evidence; create a new lane id instead.
-- Any selected-next pointer that conflicts with `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUT_COLLECTION_PREP_001`. Earlier selected-next pointers, including `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_DISCRIMINATION_TASK_BANK_FIRST_CHEAP_TEST_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_TOOL_CATALOG_ROUTING_REGISTRY_001`, and `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`, are prior review states and must not be treated as current.
+- Any selected-next pointer that conflicts with `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001`. Earlier selected-next pointers, including `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_DISCRIMINATION_TASK_BANK_FIRST_CHEAP_TEST_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_TOOL_CATALOG_ROUTING_REGISTRY_001`, and `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`, are prior review states and must not be treated as current.
 - Direct Pi.dev integration from PR #574's research lane - the recorded verdict is patterns-only/no-integration.
 
 ## Forward path (single track)
@@ -233,7 +233,13 @@ OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_AUTHORIZATION_001 ← prior
 ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUT-COLLECTION-PREP-001 ← output collection prep completed; no pilot outputs recorded
         │
         ▼
-OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUT_COLLECTION_PREP_001 ← current review-only selected next state
+OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUT_COLLECTION_PREP_001 ← prior review-only selected next state
+        │
+        ▼
+ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001 ← manual prompt-contract simulation outputs recorded; no runtime/provider/local-model/tool/web execution; no scoring/unblinding
+        │
+        ▼
+OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001 ← current review-only selected next state
 ```
 
 This registry does not authorize production/public UI exposure, dashboard readiness, public provider exposure, local model validation claims, further task execution outside this manual simulation packet, scoring, score change, unblinding, source-map work, raw output inspection, Pi.dev install/run/integration, runtime endpoint exposure, public API exposure, `/v1/solve` exposure, Google Sheets mutation, benchmark, dependency addition, release implementation lane, or readiness/broad-value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
@@ -387,3 +393,14 @@ Boundary: no provider quality, local model quality, readiness, benchmark success
 | Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUT_COLLECTION_PREP_001` |
 | Evidence value | Records blank templates for 12 task IDs for `RVP-001` through `RVP-012`, with one plain baseline output, one routed Alpha output, and route metadata per task. |
 | Boundary | Manual simulation only; no Alpha runtime, `/v1/solve`, provider API, hosted model, local model, tool execution, web/current research, scoring, unblinding, Sheet mutation, benchmark, readiness, quality, security/privacy completion, autonomous-readiness, or Alpha-superiority evidence. |
+
+## ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001
+
+| Field | Value |
+|-------|-------|
+| Status | completed manual prompt-contract simulation output packet / review-only selected next |
+| Packet | `docs/evals/runs/alpha-solver-routed-vs-plain-pilot-outputs-001/` |
+| Prior selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUT_COLLECTION_PREP_001` |
+| Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001` |
+| Evidence value | Records one manual plain output, one manual routed Alpha output, and one route metadata record for each `RVP-001` through `RVP-012`. |
+| Boundary | Manual prompt-contract simulation artifacts only; no Alpha runtime, `/v1/solve`, provider API, hosted model, local model, tool execution, web/current research, scoring, unblinding, source-map work, Sheet mutation, benchmark, readiness, production/public, quality, security/privacy completion, autonomous-readiness, or Alpha-superiority evidence. |
