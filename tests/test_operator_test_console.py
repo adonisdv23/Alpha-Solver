@@ -511,6 +511,76 @@ def test_route_preview_panel_renders_and_is_separate_from_smoke_execution():
     assert 'Run bounded smoke check' in html
 
 
+def test_route_preview_hidden_inputs_stay_synced_with_visible_smoke_controls():
+    html = console.render_result_html()
+
+    assert 'name="mode" id="preview-mode"' in html
+    assert 'name="model" id="preview-model"' in html
+    assert 'name="custom_model" id="preview-custom-model"' in html
+    assert 'function syncPreviewInputs()' in html
+    assert 'previewMode.value = modeSelect.value' in html
+    assert 'previewModel.value = modelSelect.value' in html
+    assert 'previewCustomModel.value = customModel.value' in html
+    assert 'customModel.addEventListener("input", syncPreviewInputs)' in html
+
+
+def test_preview_form_uses_current_changed_model_selection_without_smoke_execution(monkeypatch):
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("smoke execution must not run during preview")
+
+    seen = {}
+
+    def fake_preview(task, mode, model):
+        seen.update({"task": task, "mode": mode, "model": model})
+        return {
+            "status": "preview_only",
+            "task": task,
+            "task_family": "general",
+            "model_route": {
+                "recommended_model": model,
+                "provider_or_local_execution_authorized": False,
+                "reasons": ["test_current_selection"],
+                "warnings": [],
+            },
+            "tool_route": {"recommended_tool_family": "none", "execution_authorized": False},
+            "fallback_path": [],
+            "evidence_boundary": console.ROUTE_PREVIEW_BOUNDARY,
+            "provider_or_local_execution_authorized": False,
+            "tool_execution_authorized": False,
+        }
+
+    monkeypatch.setattr(console.smoke_runner, "run_local", fail_if_called)
+    monkeypatch.setattr(console.smoke_runner, "run_openai", fail_if_called)
+    monkeypatch.setattr(console, "build_route_preview", fake_preview)
+
+    async def run() -> httpx.Response:
+        transport = httpx.ASGITransport(app=console.app, client=("127.0.0.1", 12345))
+        async with httpx.AsyncClient(transport=transport, base_url="http://127.0.0.1") as client:
+            return await client.post(
+                "/preview",
+                headers={"host": "127.0.0.1"},
+                data={
+                    "mode": "openai",
+                    "model": "custom",
+                    "custom_model": "gpt-current-preview",
+                    "task": "preview this current route",
+                },
+            )
+
+    response = asyncio.run(run())
+
+    assert response.status_code == 200
+    assert seen == {
+        "mode": "openai",
+        "model": "gpt-current-preview",
+        "task": "preview this current route",
+    }
+    assert "gpt-current-preview" in response.text
+    assert "Provider/local execution authorized" in response.text
+    assert "Tool execution authorized" in response.text
+    assert ">false<" in response.text
+
+
 def test_route_preview_uses_existing_router_metadata_and_displays_fields():
     preview = console.build_route_preview("browse repo files and run pytest", "local", "qwen2.5:3b")
     html = console.render_result_html(route_preview=preview)

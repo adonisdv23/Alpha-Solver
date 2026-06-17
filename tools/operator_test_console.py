@@ -561,6 +561,19 @@ function toggleCustomModel() {
   if (!modelSelect || !row) { return; }
   if (modelSelect.value === CUSTOM_OPTION) { row.removeAttribute("hidden"); }
   else { row.setAttribute("hidden", "hidden"); }
+  syncPreviewInputs();
+}
+
+function syncPreviewInputs() {
+  var modeSelect = document.getElementById("mode-select");
+  var modelSelect = document.getElementById("model-select");
+  var customModel = document.getElementById("custom-model");
+  var previewMode = document.getElementById("preview-mode");
+  var previewModel = document.getElementById("preview-model");
+  var previewCustomModel = document.getElementById("preview-custom-model");
+  if (modeSelect && previewMode) { previewMode.value = modeSelect.value; }
+  if (modelSelect && previewModel) { previewModel.value = modelSelect.value; }
+  if (customModel && previewCustomModel) { previewCustomModel.value = customModel.value; }
 }
 
 function updatePromptCounter() {
@@ -610,12 +623,15 @@ document.addEventListener("DOMContentLoaded", function () {
   var modeSelect = document.getElementById("mode-select");
   var modelSelect = document.getElementById("model-select");
   var promptInput = document.getElementById("prompt-input");
+  var customModel = document.getElementById("custom-model");
   var copyButton = document.getElementById("copy-json");
   if (modeSelect) { modeSelect.addEventListener("change", rebuildModelOptions); }
   if (modelSelect) { modelSelect.addEventListener("change", toggleCustomModel); }
+  if (customModel) { customModel.addEventListener("input", syncPreviewInputs); }
   if (promptInput) { promptInput.addEventListener("input", updatePromptCounter); }
   if (copyButton) { copyButton.addEventListener("click", copySanitizedJson); }
   toggleCustomModel();
+  syncPreviewInputs();
   updatePromptCounter();
 });
 </script>
@@ -702,9 +718,9 @@ def render_result_html(
           <span class="field-label">Task for route preview</span>
           <textarea name="task" id="route-task-input" rows="4">{route_task}</textarea>
         </label>
-        <input type="hidden" name="mode" value="{html.escape(state["mode"])}">
-        <input type="hidden" name="model" value="{html.escape(state["model_option"])}">
-        <input type="hidden" name="custom_model" value="{html.escape(state["custom_model"])}">
+        <input type="hidden" name="mode" id="preview-mode" value="{html.escape(state["mode"])}">
+        <input type="hidden" name="model" id="preview-model" value="{html.escape(state["model_option"])}">
+        <input type="hidden" name="custom_model" id="preview-custom-model" value="{html.escape(state["custom_model"])}">
         <button type="submit" id="preview-route-button" class="secondary">Preview route only</button>
       </form>
       <div class="help">Preview does not call providers, run local models, execute tools, validate model quality, or run smoke checks.</div>
