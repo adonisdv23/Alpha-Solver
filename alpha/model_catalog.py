@@ -25,6 +25,35 @@ DEFAULT_EVIDENCE_BOUNDARY: dict[str, bool] = {
 }
 
 
+def _require_bool(raw: dict[str, Any], field: str) -> bool:
+    value = raw[field]
+    if not isinstance(value, bool):
+        raise ValueError(f"model catalog field must be boolean: {field}")
+    return value
+
+
+def _require_str_list(raw: dict[str, Any], field: str) -> tuple[str, ...]:
+    value = raw[field]
+    if not isinstance(value, list) or not value or not all(isinstance(item, str) and item for item in value):
+        raise ValueError(f"model catalog field must be a non-empty string list: {field}")
+    return tuple(value)
+
+
+def _require_evidence_boundary(value: Any) -> dict[str, bool]:
+    if not isinstance(value, dict):
+        raise ValueError("model catalog evidence_boundary must be an object")
+    boundary = dict(DEFAULT_EVIDENCE_BOUNDARY)
+    for key, flag in value.items():
+        if key not in DEFAULT_EVIDENCE_BOUNDARY:
+            raise ValueError(f"unsupported model catalog evidence boundary flag: {key}")
+        if not isinstance(flag, bool):
+            raise ValueError(f"model catalog evidence boundary flag must be boolean: {key}")
+        boundary[key] = flag
+    if any(boundary.values()):
+        raise ValueError("model catalog entries must not imply validation evidence")
+    return boundary
+
+
 @dataclass(frozen=True)
 class ModelCatalogEntry:
     provider: str
@@ -84,13 +113,10 @@ class ModelCatalogEntry:
         mode = str(raw["mode"])
         if mode not in {"local", "openai"}:
             raise ValueError(f"unsupported model catalog mode: {mode}")
-        quality_claim = bool(raw["quality_claim"])
+        quality_claim = _require_bool(raw, "quality_claim")
         if quality_claim:
             raise ValueError("model catalog entries must not carry quality claims")
-        boundary = dict(DEFAULT_EVIDENCE_BOUNDARY)
-        boundary.update({key: bool(value) for key, value in raw["evidence_boundary"].items()})
-        if any(boundary.values()):
-            raise ValueError("model catalog entries must not imply validation evidence")
+        boundary = _require_evidence_boundary(raw["evidence_boundary"])
         review_status = str(raw["review_status"])
         if review_status not in {"operator_metadata", "smoke_only"}:
             raise ValueError(f"unsupported model catalog review_status: {review_status}")
@@ -103,20 +129,20 @@ class ModelCatalogEntry:
             mode=mode,  # type: ignore[arg-type]
             model_id=str(raw["model_id"]),
             display_name=str(raw["display_name"]),
-            enabled_by_default=bool(raw["enabled_by_default"]),
-            routing_roles=tuple(str(item) for item in raw["routing_roles"]),
-            task_families=tuple(str(item) for item in raw["task_families"]),
-            capability_tags=tuple(str(item) for item in raw["capability_tags"]),
+            enabled_by_default=_require_bool(raw, "enabled_by_default"),
+            routing_roles=_require_str_list(raw, "routing_roles"),
+            task_families=_require_str_list(raw, "task_families"),
+            capability_tags=_require_str_list(raw, "capability_tags"),
             cost_tier=str(raw["cost_tier"]),  # type: ignore[arg-type]
             latency_tier=str(raw["latency_tier"]),  # type: ignore[arg-type]
             context_tier=str(raw["context_tier"]),  # type: ignore[arg-type]
             privacy_tier=str(raw["privacy_tier"]),
-            supports_json=bool(raw["supports_json"]),
-            supports_tools=bool(raw["supports_tools"]),
-            supports_vision=bool(raw["supports_vision"]),
-            smoke_eligible=bool(raw["smoke_eligible"]),
-            requires_network=bool(raw["requires_network"]),
-            requires_credentials=bool(raw["requires_credentials"]),
+            supports_json=_require_bool(raw, "supports_json"),
+            supports_tools=_require_bool(raw, "supports_tools"),
+            supports_vision=_require_bool(raw, "supports_vision"),
+            smoke_eligible=_require_bool(raw, "smoke_eligible"),
+            requires_network=_require_bool(raw, "requires_network"),
+            requires_credentials=_require_bool(raw, "requires_credentials"),
             evidence_boundary=boundary,
             quality_claim=quality_claim,
             last_reviewed=str(raw["last_reviewed"]),
@@ -165,10 +191,10 @@ class ModelCatalog:
         models = tuple(ModelCatalogEntry.from_mapping(item) for item in data.get("models", []))
         if not models:
             raise ValueError("model catalog must contain at least one model")
-        boundary = dict(DEFAULT_EVIDENCE_BOUNDARY)
-        boundary.update({key: bool(value) for key, value in data.get("evidence_boundary", {}).items()})
-        if any(boundary.values()):
-            raise ValueError("model catalog evidence boundary must remain preview-only")
+        model_ids = [model.model_id for model in models]
+        if len(model_ids) != len(set(model_ids)):
+            raise ValueError("model catalog model_id values must be unique")
+        boundary = _require_evidence_boundary(data.get("evidence_boundary", {}))
         return cls(version=str(data.get("version", "unversioned")), models=models, evidence_boundary=boundary)
 
     def enabled(self) -> tuple[ModelCatalogEntry, ...]:

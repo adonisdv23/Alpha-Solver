@@ -1,7 +1,7 @@
 # Alpha Solver - Current State
 
-> Source-of-truth navigation doc. Last verified **2026-06-17** for tool catalog routing registry.
-> This lane adds a metadata-only tool catalog and deterministic recommendation preview. It executes no tools, performs no browsing/provider/local-model/GitHub runtime calls, and creates no quality, readiness, benchmark, production/public, security/privacy, or Alpha-superiority claim.
+> Source-of-truth navigation doc. Last verified **2026-06-17** for model catalog expansion cost tiers.
+> This lane expands metadata-only model catalog fields and deterministic routing preview. It performs no provider/local-model calls, model pulls, benchmarking, dependency additions, `/v1/solve` exposure, dashboard/public API work, Google Sheets mutation, or quality/readiness/Alpha-superiority claim.
 
 ## Current verified phase
 
@@ -137,7 +137,7 @@ This phase does **not** support claims of broad value, OpenAI validation, provid
 - Packet: `docs/evals/runs/alpha-solver-tool-catalog-routing-registry-001/`
 - Evidence type: metadata-only tool catalog and deterministic recommendation preview only.
 - Tool execution status: not run by this lane.
-- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`.
+- Prior selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_TOOL_CATALOG_ROUTING_REGISTRY_001`.
 - Boundary: recommendations such as Python/computation, web/current research, or GitHub/code are metadata-only preview outputs, not execution, browsing, provider calls, GitHub runtime calls, file mutation, readiness evidence, tool-quality evidence, or Alpha-superiority evidence.
 
 

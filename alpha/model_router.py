@@ -98,7 +98,7 @@ def preview_route(request: RoutingPreviewRequest | None = None, catalog: ModelCa
     if req.latency_preference:
         reasons.append("latency_preference_recorded_no_latency_claim")
     if req.required_capability:
-        reasons.append("required_capability_matched_as_metadata_only")
+        reasons.append("required_capability_recorded_metadata_only")
 
     selected: ModelCatalogEntry | None = None
     if req.requested_model:
@@ -110,6 +110,8 @@ def preview_route(request: RoutingPreviewRequest | None = None, catalog: ModelCa
             return _failed("requested_model_disabled", cat, req, reasons, warnings)
         if req.required_capability and req.required_capability not in selected.capability_tags:
             return _failed("requested_model_missing_required_capability", cat, req, reasons, warnings)
+        if req.required_capability:
+            reasons.append("required_capability_matched_as_metadata_only")
         if selected.mode == "openai" and not req.allow_hosted_providers:
             warnings.append("local_fallback_available" if cat.by_mode("local") and req.allow_local else "hosted_execution_disabled")
             return _failed("hosted_provider_not_allowed", cat, req, reasons, warnings)

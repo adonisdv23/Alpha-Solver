@@ -1,7 +1,7 @@
 # Lane Registry
 
 > Source-of-truth lane lifecycle registry. Verification date **2026-06-17** for
-> tool catalog routing registry.
+> model catalog expansion cost tiers.
 
 ## Lifecycle classes
 
@@ -245,7 +245,7 @@ Boundary: no provider quality, local model quality, readiness, benchmark success
 - Artifact: `alpha/tool_catalog.py`, `alpha/tool_router.py`, and `configs/tool_catalog.json`
 - Packet: `docs/evals/runs/alpha-solver-tool-catalog-routing-registry-001/`
 - Purpose: add metadata-only tool catalog and deterministic recommendation preview.
-- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`.
+- Prior selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_TOOL_CATALOG_ROUTING_REGISTRY_001`.
 - Evidence boundary: recommendation preview only, no tool execution, no browsing, no provider/local-model calls, no runtime GitHub calls, no quality/readiness/benchmark/production/public/security/privacy/Alpha-superiority claim.
 
 

@@ -71,6 +71,7 @@ def test_router_includes_metadata_reasons_without_validation_claims():
     assert preview.reasons
     assert "routing_preview_only" in preview.reasons
     assert "openai_requested_by_operator" in preview.reasons
+    assert "required_capability_recorded_metadata_only" in preview.reasons
     assert "required_capability_matched_as_metadata_only" in preview.reasons
     assert preview.evidence_boundary["quality_evidence"] is False
 
@@ -144,6 +145,8 @@ def test_requested_model_missing_required_capability_fails_closed():
     preview = preview_route(RoutingPreviewRequest(requested_model="qwen2.5:3b", required_capability="vision_capable"))
 
     assert preview.status == "failed_closed"
+    assert "required_capability_recorded_metadata_only" in preview.reasons
+    assert "required_capability_matched_as_metadata_only" not in preview.reasons
     assert "requested_model_missing_required_capability" in preview.reasons
 
 

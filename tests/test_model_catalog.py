@@ -109,6 +109,36 @@ def test_entry_evidence_boundary_true_is_rejected():
         ModelCatalogEntry.from_mapping(raw)
 
 
+def test_boolean_metadata_string_false_is_rejected():
+    raw = ModelCatalog.load().models[0].as_dict()
+    raw["quality_claim"] = "false"
+
+    with pytest.raises(ValueError, match="must be boolean"):
+        ModelCatalogEntry.from_mapping(raw)
+
+
+def test_list_metadata_must_be_non_empty_string_list():
+    raw = ModelCatalog.load().models[0].as_dict()
+    raw["routing_roles"] = "local_preview"
+
+    with pytest.raises(ValueError, match="non-empty string list"):
+        ModelCatalogEntry.from_mapping(raw)
+
+
+def test_duplicate_model_ids_are_rejected(tmp_path):
+    catalog = ModelCatalog.load()
+    data = {
+        "version": "test",
+        "evidence_boundary": DEFAULT_EVIDENCE_BOUNDARY,
+        "models": [catalog.models[0].as_dict(), catalog.models[0].as_dict()],
+    }
+    path = tmp_path / "catalog.json"
+    path.write_text(json.dumps(data), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="model_id values must be unique"):
+        ModelCatalog.load(path)
+
+
 def test_catalog_json_uses_required_metadata_names():
     data = json.loads(open("configs/model_catalog.json", encoding="utf-8").read())
 
