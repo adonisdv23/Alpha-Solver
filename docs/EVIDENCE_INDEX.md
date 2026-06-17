@@ -54,7 +54,7 @@ The entries below are design, documentation, gate, helper, static-checking, meth
 
 ## Current selected next state
 
-`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_PACKET_001` is the selected next state. The prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001`. This is a review-only state after the static routed-vs-plain pilot packet lane `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-PACKET-001`: the pilot was not executed; no provider or local-model calls occurred; no tool execution or browsing occurred; no Alpha outputs or baseline outputs were generated; no scoring, unblinding, raw output inspection, or source-map work occurred; no Google Sheets mutation occurred; and `/v1/solve` was not exposed or invoked. The state makes no readiness, benchmark, production/public, provider, local-model, tool-quality, security/privacy, or Alpha-superiority claims. The prior selected next state after UI polish was `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`.
+`OPERATOR_REVIEW_REQUIRED_AFTER_MVP_CUTOVER_REVIEW_001` is the selected next state. The prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_PACKET_001`. This is a review-only state after the MVP cutover review lane `ALPHA-SOLVER-MVP-CUTOVER-REVIEW-001` with verdict `LOCAL_OPERATOR_MVP_CANDIDATE_READY_FOR_MANUAL_REVIEW`: the pilot was not executed; no provider or local-model calls occurred; no tool execution or browsing occurred; no Alpha outputs or baseline outputs were generated; no scoring, unblinding, raw output inspection, or source-map work occurred; no Google Sheets mutation occurred; and `/v1/solve` was not exposed or invoked. The state makes no readiness, benchmark, production/public, provider, local-model, tool-quality, security/privacy, or Alpha-superiority claims. The prior selected next state after UI polish was `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`.
 
 `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` was completed by merged PR #591 as a docs-first gate packet. It defines criteria, fixture planning, heuristic review aids, stop conditions, non-actions, and non-claims for operator review. `ALPHA-SOLVER-DISCRIMINATION-TASK-BANK-FIRST-CHEAP-TEST-001` was completed by merged PR #595 as a docs-only cheap-test packet grounded in that gate and the discrimination task-bank asset.
 
@@ -168,3 +168,15 @@ This entry records Operator-provided, redacted smoke-only evidence. It does not 
 | Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_PACKET_001` |
 | Evidence value | Provides static task cards, route-value rubric, plain-model comparison protocol, blank result capture template, operator runbook, stop conditions, non-actions, and non-claims for later operator review. |
 | Boundary | Does not execute the pilot, call providers, run hosted models, run local models, execute tools, browse, generate Alpha outputs, generate baseline outputs, score outputs, change scores, unblind, inspect raw Alpha or baseline outputs, perform source-map work, mutate Google Sheets, add dependencies, expose `/v1/solve`, expose dashboard/public API behavior, or make readiness, benchmark, production, public, security/privacy, provider, local-model, tool-quality, or Alpha-superiority claims. |
+
+
+## ALPHA-SOLVER-MVP-CUTOVER-REVIEW-001
+
+| Field | Value |
+|-------|-------|
+| Status | completed docs-only STOP / go-no-go review |
+| Packet | `docs/evals/runs/alpha-solver-mvp-cutover-review-001/` |
+| Verdict | `LOCAL_OPERATOR_MVP_CANDIDATE_READY_FOR_MANUAL_REVIEW` |
+| Prior selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_PACKET_001` |
+| Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_MVP_CUTOVER_REVIEW_001` |
+| Boundary | Local operator manual-review candidate only; no provider/local-model/tool/pilot execution, output generation, scoring, unblinding, raw-output inspection, source-map work, dependency addition, Google Sheets mutation, `/v1/solve` exposure, dashboard/public API exposure, deployment, production/public readiness, benchmark, provider/local-model/tool-quality, security/privacy completion, autonomous-readiness, or Alpha-superiority claim. |
