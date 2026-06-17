@@ -11,7 +11,7 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Operator review after MVP cutover review | **current control posture** | `ALPHA-SOLVER-MVP-CUTOVER-REVIEW-001` records verdict `LOCAL_OPERATOR_MVP_CANDIDATE_READY_FOR_MANUAL_REVIEW` for local operator manual review only. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_MVP_PARTIAL_MANUAL_REVIEW_001`. |
+| Partial local MVP manual review | **current control posture** | `ALPHA-SOLVER-LOCAL-MVP-MANUAL-REVIEW-001` records verdict `LOCAL_MVP_MANUAL_REVIEW_PARTIAL_NEEDS_OPERATOR_TEST` from operator-provided screenshot-only evidence. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_MVP_PARTIAL_MANUAL_REVIEW_001`. |
 
 ## Next ready / current selected state
 
@@ -209,6 +209,14 @@ ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-PACKET-001 ← docs-only routed-vs-plain pilo
         ▼
 OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_PACKET_001 ← prior review-only selected next state
 ALPHA-SOLVER-MVP-CUTOVER-REVIEW-001 ← docs-only MVP cutover review completed
+        │
+        ▼
+OPERATOR_REVIEW_REQUIRED_AFTER_MVP_CUTOVER_REVIEW_001 ← prior review-only selected next state
+        │
+        ▼
+ALPHA-SOLVER-LOCAL-MVP-MANUAL-REVIEW-001 ← partial screenshot-only manual review completed
+        │
+        ▼
 OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_MVP_PARTIAL_MANUAL_REVIEW_001 ← current review-only selected next state
 ```
 
@@ -232,7 +240,7 @@ Prior selected next state after model catalog expansion cost tiers: `OPERATOR_RE
 
 Prior selected next state after test console routing preview integration: `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001`.
 
-Current selected next state after MVP cutover review: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_MVP_PARTIAL_MANUAL_REVIEW_001`.
+Current selected next state after partial local MVP manual review: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_MVP_PARTIAL_MANUAL_REVIEW_001`.
 
 Boundary: no provider quality, local model quality, readiness, benchmark success, production readiness, public readiness, security/privacy completion, UI authorization, or Alpha-superiority claim is created.
 
@@ -329,7 +337,7 @@ Boundary: no provider quality, local model quality, readiness, benchmark success
 | Packet | `docs/evals/runs/alpha-solver-mvp-cutover-review-001/` |
 | Verdict | `LOCAL_OPERATOR_MVP_CANDIDATE_READY_FOR_MANUAL_REVIEW` |
 | Prior selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_PACKET_001` |
-| Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_MVP_PARTIAL_MANUAL_REVIEW_001` |
+| Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_MVP_CUTOVER_REVIEW_001` |
 | Boundary | No provider/local-model/tool/pilot execution, output generation, scoring, unblinding, raw-output inspection, source-map work, dependency addition, Google Sheets mutation, `/v1/solve` exposure, dashboard/public API exposure, deployment, production/public readiness, benchmark, provider/local-model/tool-quality, security/privacy completion, autonomous-readiness, or Alpha-superiority claim. |
 
 ## ALPHA-SOLVER-LOCAL-MVP-MANUAL-REVIEW-001

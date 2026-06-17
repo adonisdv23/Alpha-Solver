@@ -110,7 +110,7 @@ This phase does **not** support claims of broad value, OpenAI validation, provid
 - Evidence type: docs-only STOP / go-no-go local operator MVP candidate cutover review.
 - Verdict: `LOCAL_OPERATOR_MVP_CANDIDATE_READY_FOR_MANUAL_REVIEW`.
 - Prior selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_PACKET_001`.
-- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_MVP_PARTIAL_MANUAL_REVIEW_001`.
+- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_MVP_CUTOVER_REVIEW_001`.
 - Boundary: manual-review candidate only; no provider/local-model/tool/pilot execution, output generation, scoring, unblinding, source-map work, dependency addition, `/v1/solve` exposure, dashboard/public API exposure, deployment, production/public readiness, benchmark, provider/local-model/tool-quality, security/privacy completion, autonomous-readiness, or Alpha-superiority evidence.
 
 ## ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RESULTS-IMPORT-001
