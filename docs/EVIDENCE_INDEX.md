@@ -1,6 +1,6 @@
-# Evidence Index - model catalog routing preview
+# Evidence Index - tool catalog routing registry
 
-> Source-of-truth evidence ledger. Verification date **2026-06-16** after merged PR #601 model catalog routing preview.
+> Source-of-truth evidence ledger. Verification date **2026-06-17** after tool catalog routing registry.
 
 ## How to read "evidence value"
 
@@ -54,17 +54,17 @@ The entries below are design, documentation, gate, helper, static-checking, meth
 
 ## Current selected next state
 
-`OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_ROUTING_PREVIEW_001` is the selected next state. This is a review-only state after backend model catalog and deterministic routing-preview support, not production/public readiness authorization.
+`OPERATOR_REVIEW_REQUIRED_AFTER_TOOL_CATALOG_ROUTING_REGISTRY_001` is the selected next state. This is a review-only state after metadata-only tool catalog and deterministic recommendation-preview support, not production/public readiness authorization.
 
 `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` was completed by merged PR #591 as a docs-first gate packet. It defines criteria, fixture planning, heuristic review aids, stop conditions, non-actions, and non-claims for operator review. `ALPHA-SOLVER-DISCRIMINATION-TASK-BANK-FIRST-CHEAP-TEST-001` was completed by merged PR #595 as a docs-only cheap-test packet grounded in that gate and the discrimination task-bank asset.
 
-The selected state records backend catalog and routing-preview implementation only and authorizes no score change, source-map work, raw Alpha output inspection, raw baseline output inspection, dashboard or public API work, `/v1/solve` exposure, Google Sheets mutation, provider/local-model execution, council behavior, benchmark work, release behavior, readiness claim, broad value claim, provider claim, local-model claim, security/privacy claim, production/public claim, demo external-use approval, discrimination-task execution/scoring, partnership/Pi.dev integration claim, or Alpha-superiority claim.
+The selected state records metadata-only tool catalog and recommendation-preview implementation only and authorizes no score change, source-map work, raw Alpha output inspection, raw baseline output inspection, dashboard or public API work, `/v1/solve` exposure, Google Sheets mutation, provider/local-model execution, council behavior, benchmark work, release behavior, readiness claim, broad value claim, provider claim, local-model claim, security/privacy claim, production/public claim, demo external-use approval, discrimination-task execution/scoring, partnership/Pi.dev integration claim, or Alpha-superiority claim.
 
 ## Evidence boundary
 
-The post-#579 blind scoring packet construction state supports only bounded statements that the repository contains docs/design/static-checking/scaffold/gate/helper/blocked-attempt/research artifacts for no-echo gating, false-premise perturbations, claim-safety linting, calibrated confidence, needs-human protocol guidance, higher-headroom cases, prompt-contract methodology, a local Ollama lab scaffold/helper, blocked Value Read evidence, blocked `/v1/solve` exposure evidence, a failed-closed local Ollama attempt, Pi.dev patterns-only research, a docs-only Value Read execution authorization-decision packet, a manual no-provider Value Read raw-output pilot, a docs-only blinded scorer packet, docs-only scoring-review authorization materials, a scoring-only blinded review pass with locked scores, a docs-only MVP scorecard score-state update preserving the no-interpretation boundary, and a docs-only next-release selector that blocks release-lane selection pending source-identity review and final interpretation, a docs-only authorization-decision packet, a docs-only source-identity review/final interpretation pass that preserves score lock and bounds claims to the manual no-provider prompt-contract simulation, two preservation-only feasibility packets from PR #587 and PR #588, this preservation-only source-of-truth sync after the tabs 13-16 feasibility group settled, a docs-only selector that selects one substantive derivation check lane for operator review without implementation authorization, a local/OpenAI smoke runner and runbook, and the docs-only import of Operator-provided redacted smoke results, the local-only test console, the test console UX/redaction refinement, and the metadata-only model catalog routing preview.
+The post-#579 blind scoring packet construction state supports only bounded statements that the repository contains docs/design/static-checking/scaffold/gate/helper/blocked-attempt/research artifacts for no-echo gating, false-premise perturbations, claim-safety linting, calibrated confidence, needs-human protocol guidance, higher-headroom cases, prompt-contract methodology, a local Ollama lab scaffold/helper, blocked Value Read evidence, blocked `/v1/solve` exposure evidence, a failed-closed local Ollama attempt, Pi.dev patterns-only research, a docs-only Value Read execution authorization-decision packet, a manual no-provider Value Read raw-output pilot, a docs-only blinded scorer packet, docs-only scoring-review authorization materials, a scoring-only blinded review pass with locked scores, a docs-only MVP scorecard score-state update preserving the no-interpretation boundary, and a docs-only next-release selector that blocks release-lane selection pending source-identity review and final interpretation, a docs-only authorization-decision packet, a docs-only source-identity review/final interpretation pass that preserves score lock and bounds claims to the manual no-provider prompt-contract simulation, two preservation-only feasibility packets from PR #587 and PR #588, this preservation-only source-of-truth sync after the tabs 13-16 feasibility group settled, a docs-only selector that selects one substantive derivation check lane for operator review without implementation authorization, a local/OpenAI smoke runner and runbook, and the docs-only import of Operator-provided redacted smoke results, the local-only test console, the test console UX/redaction refinement, and the metadata-only tool catalog routing registry.
 
-It does **not** support claims of provider validation, local Ollama validation, hosted-model validation, token use, provider/local execution from the routing preview, benchmark success, value, readiness, security/privacy completion, public API readiness, `/v1/solve` readiness, dashboard readiness, Pi.dev integration, Google Sheets synchronization, benchmark proof, broad value proof, release implementation authorization, or Alpha superiority.
+It does **not** support claims of provider validation, local Ollama validation, hosted-model validation, token use, tool execution or provider/local execution from the routing previews, benchmark success, value, readiness, security/privacy completion, public API readiness, `/v1/solve` readiness, dashboard readiness, Pi.dev integration, Google Sheets synchronization, benchmark proof, broad value proof, release implementation authorization, or Alpha superiority.
 
 ## ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RUNNER-001
 
@@ -115,5 +115,13 @@ This entry records Operator-provided, redacted smoke-only evidence. It does not 
 - Artifact: `alpha/model_catalog.py`, `alpha/model_router.py`, and `configs/model_catalog.json`
 - Packet: `docs/evals/runs/alpha-solver-model-catalog-routing-preview-001/`
 - Purpose: add configurable model catalog and deterministic routing preview backend.
-- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_ROUTING_PREVIEW_001`.
+- Prior selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_ROUTING_PREVIEW_001`.
 - Evidence boundary: routing preview only, no provider/local-model calls, no quality/readiness/benchmark/production/public/security/privacy/Alpha-superiority claim.
+
+## ALPHA-SOLVER-TOOL-CATALOG-ROUTING-REGISTRY-001
+
+- Artifact: `alpha/tool_catalog.py`, `alpha/tool_router.py`, and `configs/tool_catalog.json`
+- Packet: `docs/evals/runs/alpha-solver-tool-catalog-routing-registry-001/`
+- Purpose: add metadata-only tool catalog and deterministic recommendation preview for Python/computation, web/current research, GitHub/code, docs/files, spreadsheets, PDF/file parsing, browser/computer use, specialized math tools, and future provider-specific tools.
+- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_TOOL_CATALOG_ROUTING_REGISTRY_001`.
+- Evidence boundary: recommendation preview only, no tool execution, no browsing, no provider/local-model calls, no runtime GitHub calls, no file or Sheet mutation, no readiness/quality/security/privacy/production/public/provider/local-model/tool-quality/Alpha-superiority claim.
