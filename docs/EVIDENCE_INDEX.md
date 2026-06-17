@@ -56,7 +56,7 @@ The entries below are design, documentation, gate, helper, static-checking, meth
 
 ## Current selected next state
 
-`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_AUTHORIZATION_001` is the selected next state. The prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_MVP_PARTIAL_MANUAL_REVIEW_001`. This is a review-only state after the routed-vs-plain pilot authorization lane `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-AUTHORIZATION-001`. The authorization lane records only protocol decisions for a future output-collection lane; it does not execute the pilot, generate outputs, score, unblind, inspect raw prior outputs, call providers, run hosted/local models, execute tools, browse, mutate Sheets, add dependencies, expose `/v1/solve`, or make readiness, benchmark, quality, production/public, or Alpha-superiority claims. The preceding partial manual review lane was `ALPHA-SOLVER-LOCAL-MVP-MANUAL-REVIEW-001` with verdict `LOCAL_MVP_MANUAL_REVIEW_PARTIAL_NEEDS_OPERATOR_TEST`; it recorded only operator-provided screenshot observations and did not claim a full local MVP manual review pass. Full manual UI testing remains deferred before broader user-testing, production/public readiness, benchmark, provider-quality, local-model-quality, tool-quality, security/privacy completion, autonomous execution readiness, or Alpha-superiority claims.
+`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001` is the selected next state. The prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_AUTHORIZATION_001`. This is a review-only state after the routed-vs-plain manual no-provider prompt-contract simulation output lane `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001`. The outputs lane records 12 manual simulation output pairs and route metadata; it does not run Alpha runtime, invoke `/v1/solve`, call providers, run hosted/local models, execute tools, browse, use current external research, mutate Sheets, add dependencies, score, unblind, or make readiness, benchmark, quality, production/public, security/privacy, autonomous-readiness, or Alpha-superiority claims. The preceding partial manual review lane was `ALPHA-SOLVER-LOCAL-MVP-MANUAL-REVIEW-001` with verdict `LOCAL_MVP_MANUAL_REVIEW_PARTIAL_NEEDS_OPERATOR_TEST`; it recorded only operator-provided screenshot observations and did not claim a full local MVP manual review pass. Full manual UI testing remains deferred before broader user-testing, production/public readiness, benchmark, provider-quality, local-model-quality, tool-quality, security/privacy completion, autonomous execution readiness, or Alpha-superiority claims.
 
 `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` was completed by merged PR #591 as a docs-first gate packet. It defines criteria, fixture planning, heuristic review aids, stop conditions, non-actions, and non-claims for operator review. `ALPHA-SOLVER-DISCRIMINATION-TASK-BANK-FIRST-CHEAP-TEST-001` was completed by merged PR #595 as a docs-only cheap-test packet grounded in that gate and the discrimination task-bank asset.
 
@@ -205,3 +205,18 @@ This entry records Operator-provided, redacted smoke-only evidence. It does not 
 | Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_AUTHORIZATION_001` |
 | Evidence value | Defines future output-collection protocol, task scope, identities, execution permissions, task-id preservation, route metadata capture, blinding, scoring gate, stop conditions, and evidence boundaries. |
 | Boundary | No pilot execution, provider/local/model/tool/web execution, output generation, scoring, unblinding, raw prior-output inspection, Sheets mutation, dependency addition, `/v1/solve` exposure, or readiness/benchmark/quality/superiority claim. |
+
+## ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001
+
+| Field | Value |
+|-------|-------|
+| Status | completed manual no-provider prompt-contract simulation output packet |
+| Packet | `docs/evals/runs/alpha-solver-routed-vs-plain-pilot-outputs-001/` |
+| Task IDs | `RVP-001` through `RVP-012` preserved exactly |
+| Output pairs | 12 plain baseline outputs and 12 routed Alpha outputs |
+| Route metadata | Complete for all 12 routed Alpha outputs, including route reasons |
+| Prior selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_AUTHORIZATION_001` |
+| Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001` |
+| Evidence boundary | Manual no-provider prompt-contract simulation only; not Alpha runtime, `/v1/solve`, provider, hosted-model, local-model, tool, web/current research, scoring, unblinding, benchmark, readiness, quality, security/privacy completion, autonomous-readiness, or Alpha-superiority evidence. |
+
+| PR pending | docs: record routed-vs-plain manual pilot outputs | completed pending PR | `docs/evals/runs/alpha-solver-routed-vs-plain-pilot-outputs-001/`; `docs/CURRENT_STATE.md`; `docs/LANE_REGISTRY.md`; `docs/EVIDENCE_INDEX.md` | Records `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001` as a completed manual no-provider prompt-contract simulation output packet with 12 routed-vs-plain task pairs and complete route metadata. | Does not run Alpha runtime, invoke `/v1/solve`, call providers, run hosted/local models, execute tools, browse, use current external research, mutate Sheets, add dependencies, score, unblind, or claim readiness/benchmark/quality/production/public/security/privacy/autonomous-readiness/Alpha-superiority. | completed manual simulation outputs / review-only selected next |

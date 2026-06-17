@@ -1,11 +1,11 @@
 # Alpha Solver - Current State
 
-> Source-of-truth navigation doc. Last verified **2026-06-17** for routed-vs-plain pilot authorization.
-> This lane records a docs-only routed-vs-plain pilot authorization protocol. It does not run providers, run hosted or local models, execute tools, browse, execute the routed-vs-plain pilot, generate outputs, score outputs, mutate Sheets, expose `/v1/solve`, deploy, or make production/public/benchmark/provider/local-model/tool/security/privacy/autonomous-readiness/Alpha-superiority claims.
+> Source-of-truth navigation doc. Last verified **2026-06-17** for routed-vs-plain manual pilot outputs.
+> This lane records manual no-provider prompt-contract simulation outputs for the routed-vs-plain pilot. It does not run Alpha runtime, invoke `/v1/solve`, call providers, run hosted or local models, execute tools, browse, score outputs, unblind, mutate Sheets, deploy, or make production/public/benchmark/provider/local-model/tool/security/privacy/autonomous-readiness/Alpha-superiority claims.
 
 ## Current verified phase
 
-**Routed-vs-plain pilot authorization recorded: the selected next state is review-only after docs-only pilot authorization.**
+**Routed-vs-plain manual pilot outputs recorded: the selected next state is review-only after manual no-provider output capture.**
 
 The merged #569–#574 wave updated the repository from the post-#568 blocked Value Read state to a broader documentation-and-boundary posture. PR #576 was superseded by PR #577 and should be closed unmerged. PR #577 completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only Alpha-native local operator harness design note.
 
@@ -17,12 +17,12 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 
 | Field | Value |
 |-------|-------|
-| Latest verified completed lane in this wave | **`ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-AUTHORIZATION-001`** |
-| Source-of-truth sync | Current docs record the completed routed-vs-plain pilot authorization lane and a review-only selected next state |
+| Latest verified completed lane in this wave | **`ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001`** |
+| Source-of-truth sync | Current docs record the completed routed-vs-plain manual no-provider pilot outputs lane and a review-only selected next state |
 | Closed-unmerged superseded PR | **#561** - superseded by merged PR #562 |
-| Current controlling posture | Operator review required after routed-vs-plain pilot authorization |
-| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_AUTHORIZATION_001`** |
-| Strategic boundary | This review-only state records a docs-only routed-vs-plain pilot authorization protocol; it does not execute the pilot and does not authorize scoring or unblinding, provider/local-model execution, hosted model execution, tool execution, browsing, output generation, scoring, score changes, unblinding, raw output inspection, source-map work, `/v1/solve` exposure, Google Sheets mutation, dependency addition, dashboard/public API behavior, deployment, or readiness/benchmark/production/public/security/privacy/provider/local-model/tool-quality/autonomous-readiness/Alpha-superiority claims |
+| Current controlling posture | Operator review required after routed-vs-plain manual pilot outputs |
+| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001`** |
+| Strategic boundary | This review-only state records manual no-provider prompt-contract simulation pilot outputs only; it does not prove runtime, `/v1/solve`, provider, hosted-model, local-model, tool, web, benchmark, production/public readiness, security/privacy, quality, autonomous-readiness, or Alpha-superiority claims and does not authorize scoring or unblinding |
 
 ## Completed post-552 / post-565 / post-568 infrastructure lanes
 
@@ -73,14 +73,15 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 | MVP cutover review lane | `ALPHA-SOLVER-MVP-CUTOVER-REVIEW-001` | Records a STOP / go-no-go review with verdict `LOCAL_OPERATOR_MVP_CANDIDATE_READY_FOR_MANUAL_REVIEW`; creates no provider/local-model/tool/pilot execution, output generation, scoring, readiness, benchmark, production/public, security/privacy completion, tool-quality, autonomous-readiness, or Alpha-superiority evidence. |
 | local MVP manual review lane | `ALPHA-SOLVER-LOCAL-MVP-MANUAL-REVIEW-001` | Records operator-provided screenshot-only partial manual review evidence with verdict `LOCAL_MVP_MANUAL_REVIEW_PARTIAL_NEEDS_OPERATOR_TEST`; full manual UI testing remains deferred, and no provider/local-model/tool/pilot execution or quality/readiness claim occurs. |
 | routed-vs-plain pilot authorization lane | `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-AUTHORIZATION-001` | Completes a docs-only authorization packet for a future routed-vs-plain output-collection lane; it defines the task set, output collection method, plain baseline identity, routed Alpha identity, execution permission boundaries, task-id preservation, route metadata capture, blinding, scoring authorization gate, stop conditions, evidence boundaries, non-actions, and non-claims. Provider calls, hosted-model calls, local-model calls, tool execution, and web/current research are not authorized by this packet; later collection must use operator-provided outputs unless separately authorized. |
+| routed-vs-plain manual pilot outputs lane | `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001` | Records 12 manual no-provider prompt-contract simulation output pairs for `RVP-001` through `RVP-012`, including plain baseline outputs, routed Alpha outputs, and route metadata. This is not Alpha runtime, `/v1/solve`, provider, hosted-model, local-model, tool-execution, web/current research, scoring, unblinding, benchmark, readiness, quality, or superiority evidence. |
 
 See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for the PR status ledger and [`LANE_REGISTRY.md`](LANE_REGISTRY.md) for lifecycle classification.
 
 ## Selected next state
 
-**`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_AUTHORIZATION_001`** is the current global selected next state.
+**`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001`** is the current global selected next state.
 
-This is a review-only state after `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-AUTHORIZATION-001`. The prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_MVP_PARTIAL_MANUAL_REVIEW_001`. The lane authorizes only a later operator-reviewed output-collection lane under the documented protocol. It does not execute the pilot, generate outputs, score, unblind, inspect raw prior outputs, call providers, run hosted or local models, execute tools, browse, mutate Sheets, add dependencies, expose `/v1/solve`, deploy, or make readiness, benchmark, production/public, provider-quality, local-model-quality, tool-quality, or Alpha-superiority claims.
+This is a review-only state after `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001`. The prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_AUTHORIZATION_001`. The lane records 12 manual no-provider prompt-contract simulation output pairs and route metadata for the authorized routed-vs-plain pilot task set. It does not run Alpha runtime, invoke `/v1/solve`, call providers, run hosted or local models, execute tools, browse, use current external research, mutate Sheets, add dependencies, score, unblind, deploy, or make readiness, benchmark, production/public, provider-quality, local-model-quality, tool-quality, security/privacy, autonomous-readiness, or Alpha-superiority claims.
 
 The prior state was a review-only state after `ALPHA-SOLVER-LOCAL-MVP-MANUAL-REVIEW-001`. The prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_MVP_CUTOVER_REVIEW_001`. The review verdict is `LOCAL_MVP_MANUAL_REVIEW_PARTIAL_NEEDS_OPERATOR_TEST` based only on operator-provided screenshot observations. It does not claim a full local MVP manual review pass. The next action may proceed to routed-vs-plain pilot authorization because that next lane is docs-only and does not require UI testing to execute. Full manual UI testing remains deferred before any broader user-testing, production/public readiness, benchmark, provider-quality, local-model-quality, tool-quality, security/privacy completion, autonomous execution readiness, or Alpha-superiority claim. This state does not run providers, hosted models, local models, tools, the routed-vs-plain pilot, output generation, scoring, unblinding, raw output inspection, source-map work, dependency installation, Google Sheets mutation, `/v1/solve`, dashboard/public API behavior, or deployment.
 
@@ -100,7 +101,7 @@ This state authorizes no production/public exposure, no task execution outside e
 - New provider calls, hosted model calls, local model calls, token use, credential access, billing inspection, dashboard exposure, `/v1/solve` exposure, public API exposure, Pi.dev installation/execution/integration, package-install experiments, and Google Sheets mutation.
 - Release implementation lanes and broad Alpha-vs-baseline claims. The bounded manual no-provider pilot now has locked blind scores and a final interpretation, but this pass selects no release implementation lane and does not support claims beyond the 10-case manual no-provider prompt-contract simulation.
 - Local Ollama validation claims. PR #573 records a failed-closed local timeout/backend error and no local model answer.
-- Security/privacy completion, production readiness, public MVP readiness, benchmark validation/superiority, broad-user readiness, autonomous readiness, provider validation, local Ollama validation, `/v1/solve` readiness, dashboard readiness, or Alpha superiority.
+- Not authorized: security/privacy completion, production readiness, public MVP readiness, benchmark validation/superiority, broad-user readiness, autonomous readiness, provider validation, local Ollama validation, `/v1/solve` readiness, dashboard readiness, or Alpha superiority.
 
 ## What must not be claimed
 
@@ -207,3 +208,12 @@ This phase does **not** support claims of broad value, OpenAI validation, provid
 | Prior selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_MVP_CUTOVER_REVIEW_001` |
 | Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_MVP_PARTIAL_MANUAL_REVIEW_001` |
 | Boundary | Screenshot-only operator-provided evidence; full manual UI testing remains deferred before broader user-testing, production/public readiness, benchmark, provider-quality, local-model-quality, tool-quality, security/privacy completion, autonomous execution readiness, or Alpha-superiority claims. |
+
+## ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001
+
+- Packet: `docs/evals/runs/alpha-solver-routed-vs-plain-pilot-outputs-001/`
+- Evidence type: manual no-provider prompt-contract simulation output capture.
+- Scope: 12 task pairs for `RVP-001` through `RVP-012`, with one plain baseline output and one routed Alpha output per task plus route metadata.
+- Prior selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_AUTHORIZATION_001`.
+- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001`.
+- Boundary: not Alpha runtime, `/v1/solve`, provider, hosted-model, local-model, tool-execution, web/current research, scoring, unblinding, benchmark, production/public readiness, quality, security/privacy completion, autonomous-readiness, or Alpha-superiority evidence.
