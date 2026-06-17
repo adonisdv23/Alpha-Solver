@@ -1,11 +1,11 @@
 # Alpha Solver - Current State
 
-> Source-of-truth navigation doc. Last verified **2026-06-16** for model catalog routing preview.
-> This lane adds a configurable backend model catalog and deterministic routing preview. It makes no provider/local-model calls and creates no quality, readiness, benchmark, production/public, security/privacy, or Alpha-superiority claim.
+> Source-of-truth navigation doc. Last verified **2026-06-17** for tool catalog routing registry.
+> This lane adds a metadata-only tool catalog and deterministic recommendation preview. It executes no tools, performs no browsing/provider/local-model/GitHub runtime calls, and creates no quality, readiness, benchmark, production/public, security/privacy, or Alpha-superiority claim.
 
 ## Current verified phase
 
-**Model catalog routing preview completed: the selected next state is review-only operator review after backend catalog and routing-preview support.**
+**Tool catalog routing registry completed: the selected next state is review-only operator review after metadata-only tool recommendation preview support.**
 
 The merged #569–#574 wave updated the repository from the post-#568 blocked Value Read state to a broader documentation-and-boundary posture. PR #576 was superseded by PR #577 and should be closed unmerged. PR #577 completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only Alpha-native local operator harness design note.
 
@@ -17,12 +17,12 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 
 | Field | Value |
 |-------|-------|
-| Latest verified completed lane in this wave | **`ALPHA-SOLVER-MODEL-CATALOG-ROUTING-PREVIEW-001`** |
-| Source-of-truth sync | Current docs record the completed backend model catalog routing preview and a review-only selected next state |
+| Latest verified completed lane in this wave | **`ALPHA-SOLVER-TOOL-CATALOG-ROUTING-REGISTRY-001`** |
+| Source-of-truth sync | Current docs record the completed metadata-only tool catalog routing registry and a review-only selected next state |
 | Closed-unmerged superseded PR | **#561** - superseded by merged PR #562 |
-| Current controlling posture | Operator review required after model catalog routing preview |
-| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_ROUTING_PREVIEW_001`** |
-| Strategic boundary | This review-only state records backend-only model catalog and deterministic routing-preview support; it does not expose `/v1/solve`, mutate Google Sheets, generate scores, run CI provider calls, run local models, or support provider/local-model quality, readiness, benchmark, production/public, security/privacy, partnership/Pi.dev integration, or Alpha-superiority claims |
+| Current controlling posture | Operator review required after tool catalog routing registry |
+| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_TOOL_CATALOG_ROUTING_REGISTRY_001`** |
+| Strategic boundary | This review-only state records metadata-only tool catalog and deterministic tool recommendation preview support; it does not execute tools, browse, call providers, call GitHub from runtime code, expose `/v1/solve`, mutate Google Sheets, generate scores, run CI provider calls, run local models, or support tool/model/provider/local-model quality, readiness, benchmark, production/public, security/privacy, partnership/Pi.dev integration, or Alpha-superiority claims |
 
 ## Completed post-552 / post-565 / post-568 infrastructure lanes
 
@@ -65,14 +65,15 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 | test-console lane | `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-001` | Adds a local-only Operator console for bounded local/Ollama and OpenAI smoke checks through the existing smoke runner path; proves no behavior quality, provider quality, local-model quality, readiness, benchmark success, production/public readiness, security/privacy completion, or Alpha superiority. |
 | test-console-ux-redaction lane | `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UX-REDUCTION-001` | Preserves submitted form state after console runs and avoids over-redacting safe numeric usage token counts; proves no behavior quality, provider quality, local-model quality, readiness, benchmark success, production/public readiness, security/privacy completion, or Alpha superiority. |
 | model-catalog-routing-preview lane | `ALPHA-SOLVER-MODEL-CATALOG-ROUTING-PREVIEW-001` | Adds configurable backend model catalog metadata and deterministic routing preview; performs no provider/local-model calls and proves no quality, readiness, benchmark, production/public, security/privacy, or Alpha-superiority claim. |
+| tool-catalog-routing-registry lane | `ALPHA-SOLVER-TOOL-CATALOG-ROUTING-REGISTRY-001` | Adds metadata-only tool catalog and deterministic recommendation preview; performs no tool execution, browsing, provider/local-model calls, runtime GitHub calls, dependency addition, endpoint exposure, scoring, unblinding, source-map work, raw-output inspection, readiness/quality/security/privacy/production/public/provider/local-model/tool-quality/Alpha-superiority claim. |
 
 See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for the PR status ledger and [`LANE_REGISTRY.md`](LANE_REGISTRY.md) for lifecycle classification.
 
 ## Selected next state
 
-**`OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_ROUTING_PREVIEW_001`** is the current global selected next state.
+**`OPERATOR_REVIEW_REQUIRED_AFTER_TOOL_CATALOG_ROUTING_REGISTRY_001`** is the current global selected next state.
 
-This is a review-only state after `ALPHA-SOLVER-MODEL-CATALOG-ROUTING-PREVIEW-001`. It means the backend catalog and deterministic routing preview exist for metadata-only review.
+This is a review-only state after `ALPHA-SOLVER-TOOL-CATALOG-ROUTING-REGISTRY-001`. It means the metadata-only tool catalog and deterministic recommendation preview exist for operator review.
 
 This state authorizes no production/public exposure, no task execution outside explicit local Operator submission, no output generation for evals, scoring, score change, source-map work, unblinding, raw Alpha output inspection, raw baseline output inspection, `/v1/solve` exposure, dashboard/public API exposure, Google Sheets mutation, benchmark work, release behavior, readiness claim, broad value claim, provider claim, local-model claim, security/privacy claim, production/public claim, partnership/Pi.dev integration claim, demo external-use approval, discrimination-task execution/scoring, or Alpha-superiority claim.
 
@@ -127,5 +128,14 @@ This phase does **not** support claims of broad value, OpenAI validation, provid
 - Packet: `docs/evals/runs/alpha-solver-model-catalog-routing-preview-001/`
 - Evidence type: backend metadata and deterministic routing preview only.
 - Provider/local execution status: not run by this lane.
-- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_ROUTING_PREVIEW_001`.
+- Prior selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_ROUTING_PREVIEW_001`.
 - Boundary: does not prove provider quality, local model quality, readiness, benchmark success, production readiness, public readiness, security/privacy completion, buyer validation, traction, partnership/Pi.dev integration, or Alpha superiority.
+
+## ALPHA-SOLVER-TOOL-CATALOG-ROUTING-REGISTRY-001
+
+- Artifact: `alpha/tool_catalog.py`, `alpha/tool_router.py`, and `configs/tool_catalog.json`
+- Packet: `docs/evals/runs/alpha-solver-tool-catalog-routing-registry-001/`
+- Evidence type: metadata-only tool catalog and deterministic recommendation preview only.
+- Tool execution status: not run by this lane.
+- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_TOOL_CATALOG_ROUTING_REGISTRY_001`.
+- Boundary: recommendations such as Python/computation, web/current research, or GitHub/code are metadata-only preview outputs, not execution, browsing, provider calls, GitHub runtime calls, file mutation, readiness evidence, tool-quality evidence, or Alpha-superiority evidence.
