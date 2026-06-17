@@ -251,10 +251,13 @@ def test_ui_result_rendering_handles_local_ollama_shape():
     )
     html = console.render_result_html(result)
 
-    assert "Status: passed" in html
-    assert "Provider: ollama" in html
-    assert "Model: qwen2.5:3b" in html
-    assert "Latency ms: 123" in html
+    # Friendly result display uses readable labels and a clear passed state.
+    assert "Status" in html
+    assert "state-passed" in html
+    assert ">passed<" in html
+    assert ">ollama<" in html
+    assert ">qwen2.5:3b<" in html
+    assert ">123<" in html
 
 
 def test_ui_result_rendering_handles_openai_shape_with_usage_tokens():
@@ -272,7 +275,7 @@ def test_ui_result_rendering_handles_openai_shape_with_usage_tokens():
     )
     html = console.render_result_html(result)
 
-    assert "Provider: openai" in html
+    assert ">openai<" in html
     assert "gpt-4.1-mini-2025-04-14" in html
     assert "input_tokens" in html
     assert "Estimated cost" not in html
@@ -326,3 +329,173 @@ def test_loopback_api_returns_sanitized_json(monkeypatch):
     assert response.status_code == 200
     assert SECRET not in response.text
     assert response.json()["api_key"] == "[REDACTED]"
+
+
+# UI polish coverage: dropdowns, prompt limit, friendly result display, copy JSON.
+
+
+def test_mode_dropdown_exists_with_local_and_openai():
+    html = console.render_result_html()
+
+    assert '<select name="mode" id="mode-select">' in html
+    assert "<option value=\"local\"" in html
+    assert "<option value=\"openai\"" in html
+
+
+def test_model_dropdown_exists_and_is_mode_aware():
+    html = console.render_result_html()
+
+    assert '<select name="model" id="model-select">' in html
+    # The browser-side options map carries both mode lists for mode-aware switching.
+    assert '"local":' in html
+    assert '"openai":' in html
+
+
+def test_local_model_dropdown_options_present():
+    html = console.render_result_html({"mode": "local", "provider": "ollama", "model": "qwen2.5:3b"})
+
+    for option in ("qwen2.5:3b", "gemma3:4b", "llama3.2:1b", "llama3.2:latest"):
+        assert f'"{option}"' in html
+
+
+def test_openai_model_dropdown_options_present():
+    html = console.render_result_html(
+        {"mode": "openai", "provider": "openai", "model": console.DEFAULT_OPENAI_MODEL},
+        form_state={"mode": "openai", "model": console.DEFAULT_OPENAI_MODEL, "prompt": PROMPT},
+    )
+
+    for option in ("gpt-4.1-mini", "gpt-4.1", "gpt-4o-mini"):
+        assert f'"{option}"' in html
+
+
+def test_custom_model_input_is_supported():
+    html = console.render_result_html()
+
+    assert 'name="custom_model"' in html
+    assert '"custom"' in html
+    assert "custom (enter below)" in html
+
+
+def test_custom_model_value_is_preserved_after_submit():
+    html = console.render_result_html(
+        {"mode": "openai", "provider": "openai", "model": "my-private-model"},
+        form_state={"mode": "openai", "model_option": "custom", "custom_model": "my-private-model", "prompt": PROMPT},
+    )
+
+    assert '<option value="custom" selected>' in html
+    assert 'name="custom_model" id="custom-model" value="my-private-model"' in html
+
+
+def test_prompt_length_limit_500_is_visible():
+    html = console.render_result_html()
+
+    assert "/ 500 characters" in html
+    assert "max length: 500" in html
+
+
+def test_prompt_over_limit_warning_copy_is_present():
+    html = console.render_result_html()
+
+    assert "Prompt is over the 500-character smoke-runner limit. Shorten the prompt and retry." in html
+
+
+def test_friendly_result_display_includes_reason():
+    result = console.sanitize_result(
+        {
+            "mode": "openai",
+            "provider": "openai",
+            "model": "gpt-4.1-mini",
+            "status": "failed_closed",
+            "reason": "missing_openai_api_key",
+            "errors": [{"message": "OPENAI_API_KEY required"}],
+        }
+    )
+    html = console.render_result_html(result)
+
+    assert "Reason" in html
+    assert "missing_openai_api_key" in html
+    # The safe reason gets a friendly operator-facing explanation.
+    assert "OPENAI_API_KEY set in the local terminal environment" in html
+    assert "state-failed" in html
+
+
+def test_friendly_result_display_includes_errors():
+    result = console.sanitize_result(
+        {
+            "mode": "local",
+            "provider": "ollama",
+            "model": "qwen2.5:3b",
+            "status": "failed_closed",
+            "reason": "endpoint_not_local_non_evidence",
+            "errors": [{"message": "endpoint_not_local_non_evidence"}],
+        }
+    )
+    html = console.render_result_html(result)
+
+    assert "Errors" in html
+    assert "endpoint_not_local_non_evidence" in html
+
+
+def test_prompt_too_long_result_renders_operator_message():
+    result = console.run_console_smoke("local", "qwen2.5:3b", "x" * 501)
+    html = console.render_result_html(result, form_state={"mode": "local", "model": "qwen2.5:3b", "prompt": "x" * 501})
+
+    assert result["reason"] == "prompt_too_long"
+    assert "Prompt is over the 500-character smoke-runner limit. Shorten the prompt and retry." in html
+    assert "state-failed" in html
+
+
+def test_passed_status_renders_clear_passed_state():
+    result = console.sanitize_result(
+        {"mode": "local", "provider": "ollama", "model": "qwen2.5:3b", "status": "passed", "latency_ms": 12}
+    )
+    html = console.render_result_html(result)
+
+    assert "state-passed" in html
+    assert "Passed (smoke only)" in html
+
+
+def test_copy_json_button_targets_only_sanitized_json():
+    html = console.render_result_html(
+        console.sanitize_result({"status": "passed", "provider": "ollama"})
+    )
+
+    assert 'id="copy-json"' in html
+    assert "copySanitizedJson" in html
+
+    body = html.split("function copySanitizedJson()", 1)[1].split("function ", 1)[0]
+    # The copy routine reads only the sanitized JSON panel text content.
+    assert 'getElementById("sanitized-json")' in body
+    assert ".textContent" in body
+    # It must not read form state (mode, model, custom model, or prompt) when copying.
+    assert "mode-select" not in body
+    assert "model-select" not in body
+    assert "prompt-input" not in body
+    assert "custom-model" not in body
+
+
+def test_secret_and_password_keys_remain_redacted():
+    result = console.sanitize_result(
+        {
+            "secret": SECRET,
+            "password": SECRET,
+            "nested": {"password": SECRET, "secret": SECRET},
+        }
+    )
+    payload = json.dumps(result, sort_keys=True)
+
+    assert SECRET not in payload
+    assert result["secret"] == "[REDACTED]"
+    assert result["password"] == "[REDACTED]"
+    assert result["nested"]["password"] == "[REDACTED]"
+    assert result["nested"]["secret"] == "[REDACTED]"
+
+
+def test_no_external_assets_or_telemetry_in_rendered_html():
+    html = console.render_result_html()
+
+    assert "http://" not in html.replace("http://127.0.0.1:11434/api/chat", "")
+    assert "https://" not in html
+    assert "src=" not in html
+    assert "cdn" not in html.lower()
+    assert "/v1/solve" not in html

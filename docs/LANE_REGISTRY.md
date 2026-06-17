@@ -1,7 +1,7 @@
 # Lane Registry
 
 > Source-of-truth lane lifecycle registry. Verification date **2026-06-17** for
-> model catalog expansion cost tiers.
+> local/OpenAI test console UI polish.
 
 ## Lifecycle classes
 
@@ -11,13 +11,13 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Operator review after model catalog expansion cost tiers | **current control posture** | `ALPHA-SOLVER-MODEL-CATALOG-EXPANSION-COST-TIERS-001` expands metadata-only model catalog fields and deterministic routing preview. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`. |
+| Operator review after local/OpenAI test console UI polish | **current control posture** | `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UI-POLISH-001` polishes the local-only console UI with mode and model dropdowns, a prompt counter and 500-character limit warning, a friendly result display, and a copyable sanitized JSON panel, building on the model catalog expansion baseline. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`** | **review-only selected next state** | Operator review is required after metadata-only model catalog expansion and deterministic routing-preview support. The evidence is metadata-only. No provider/local-model execution, quality claim, readiness claim, benchmark claim, production/public claim, security/privacy completion claim, or Alpha-superiority claim is created by this lane. |
+| **`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`** | **review-only selected next state** | Operator review is required after the local-only local/OpenAI test console UI polish, which builds on the model catalog expansion baseline. The evidence is UI polish only. No model catalog or tool catalog logic change, provider/local-model execution, quality claim, readiness claim, benchmark claim, production/public claim, security/privacy completion claim, or Alpha-superiority claim is created by this lane. The prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`. |
 
 ## Completed (kept as evidence)
 
@@ -58,6 +58,8 @@
 - `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-001` (merged PR #599) - local-only Operator smoke test console; no provider/local-model quality, readiness, benchmark, production/public, security/privacy, or Alpha-superiority claim.
 - `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UX-REDUCTION-001` (merged PR #600) - local-only test console UX/redaction refinement; no quality, readiness, benchmark, production/public, security/privacy, or Alpha-superiority claim.
 - `ALPHA-SOLVER-MODEL-CATALOG-ROUTING-PREVIEW-001` (merged PR #601) - configurable backend model catalog metadata and deterministic routing preview; no provider/local-model execution or quality, readiness, benchmark, production/public, security/privacy, or Alpha-superiority claim.
+- `ALPHA-SOLVER-TOOL-CATALOG-ROUTING-REGISTRY-001` (merged PR #603) - metadata-only tool catalog and deterministic recommendation preview; no tool execution, browsing, provider/local-model calls, runtime GitHub calls, or quality/readiness/benchmark/production/public/security/privacy/Alpha-superiority claim.
+- `ALPHA-SOLVER-MODEL-CATALOG-EXPANSION-COST-TIERS-001` (merged PR #605) - metadata-only model catalog expansion and cost tiers with deterministic routing preview; no provider/local-model execution or quality, readiness, benchmark, production/public, security/privacy, or Alpha-superiority claim.
 
 ## Superseded
 
@@ -87,7 +89,7 @@
 
 - PR #561 lane as a standalone needs-human protocol PR - closed unmerged and superseded by PR #562.
 - Any merged packet lane verbatim - packets are immutable evidence; create a new lane id instead.
-- Any selected-next pointer that conflicts with `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`. Earlier selected-next pointers, including `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`, and `OPERATOR_REVIEW_REQUIRED_AFTER_DISCRIMINATION_TASK_BANK_FIRST_CHEAP_TEST_001`, are prior review states and must not be treated as current.
+- Any selected-next pointer that conflicts with `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`. Earlier selected-next pointers, including `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_DISCRIMINATION_TASK_BANK_FIRST_CHEAP_TEST_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_TOOL_CATALOG_ROUTING_REGISTRY_001`, and `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`, are prior review states and must not be treated as current.
 - Direct Pi.dev integration from PR #574's research lane - the recorded verdict is patterns-only/no-integration.
 
 ## Forward path (single track)
@@ -184,7 +186,15 @@ OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_ROUTING_PREVIEW_001 ← prior revie
         ↓
 ALPHA-SOLVER-TOOL-CATALOG-ROUTING-REGISTRY-001 ← metadata-only tool catalog and recommendation preview completed
         ↓
-OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001 ← current review-only selected next state
+OPERATOR_REVIEW_REQUIRED_AFTER_TOOL_CATALOG_ROUTING_REGISTRY_001 ← prior review-only selected next state
+        ↓
+ALPHA-SOLVER-MODEL-CATALOG-EXPANSION-COST-TIERS-001 ← metadata-only model catalog expansion and cost tiers completed
+        ↓
+OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001 ← prior review-only selected next state
+        ↓
+ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UI-POLISH-001 ← local-only smoke console UI polish
+        ↓
+OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001 ← current review-only selected next state
 ```
 
 This registry does not authorize production/public UI exposure, dashboard readiness, public provider exposure, local model validation claims, task execution, output generation, scoring, score change, unblinding, source-map work, raw output inspection, Pi.dev install/run/integration, runtime endpoint exposure, public API exposure, `/v1/solve` exposure, Google Sheets mutation, benchmark, dependency addition, release implementation lane, or readiness/broad-value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
@@ -203,7 +213,9 @@ Prior selected next state after test console UX/redaction refinement: `OPERATOR_
 
 Prior selected next state after model catalog routing preview: `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_ROUTING_PREVIEW_001`.
 
-Current selected next state after model catalog expansion cost tiers: `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`.
+Prior selected next state after model catalog expansion cost tiers: `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`.
+
+Current selected next state after local/OpenAI test console UI polish: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`.
 
 Boundary: no provider quality, local model quality, readiness, benchmark success, production readiness, public readiness, security/privacy completion, UI authorization, or Alpha-superiority claim is created.
 
@@ -255,5 +267,15 @@ Boundary: no provider quality, local model quality, readiness, benchmark success
 | --- | --- |
 | Status | completed backend metadata implementation / review-only selected next |
 | Evidence packet | `docs/evals/runs/alpha-solver-model-catalog-expansion-cost-tiers-001/` |
-| Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001` |
+| Prior selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001` |
 | Boundary | Metadata-only model catalog and routing preview; no provider/local model execution and no quality/readiness/benchmark claim. |
+
+## ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UI-POLISH-001
+
+- Purpose: improve local-only console usability with model dropdowns, a prompt counter, a friendly result display, and a copyable sanitized JSON panel.
+- Packet: `docs/evals/runs/alpha-solver-local-openai-test-console-ui-polish-001/`.
+- Implementation: `tools/operator_test_console.py`.
+- Tests: `tests/test_operator_test_console.py`.
+- Builds on baseline: `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`.
+- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`.
+- Evidence boundary: UI polish only, no model catalog or tool catalog logic change, and no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim.
