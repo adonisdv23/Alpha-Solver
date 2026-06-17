@@ -1,7 +1,7 @@
 # Lane Registry
 
 > Source-of-truth lane lifecycle registry. Verification date **2026-06-17** for
-> MVP cutover review.
+> routed-vs-plain pilot manual output collection.
 
 ## Lifecycle classes
 
@@ -11,13 +11,14 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Routed-vs-plain pilot output collection prep | **current control posture** | `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUT-COLLECTION-PREP-001` records blank operator-fillable capture templates and route metadata. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUT_COLLECTION_PREP_001`. |
+| Routed-vs-plain pilot manual output collection | **current control posture** | `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001` records manual plain outputs, routed outputs, and route metadata for all 12 task IDs. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001`. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUT_COLLECTION_PREP_001`** | **review-only selected next state** | Blank operator-fillable templates are recorded after `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUT-COLLECTION-PREP-001`; actual pilot outputs remain absent unless operator-provided or separately authorized later; no Alpha runtime, `/v1/solve`, provider/local-model/hosted-model/tool/web execution, current external research, scoring, unblinding, source-map work, Google Sheets mutation, dependency addition, dashboard/public API exposure, deployment, production/public readiness, benchmark, provider/local-model/tool-quality, security/privacy completion, autonomous-readiness, or Alpha-superiority claim is authorized. Prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_AUTHORIZATION_001`. |
+| **`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001`** | **review-only selected next state** | Manual prompt-contract simulation outputs are recorded after `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001`; operator review is required before any blind scoring packet construction; no Alpha runtime, `/v1/solve`, provider/local-model/hosted-model/tool/web execution, current external research, scoring, unblinding, source-map work, Google Sheets mutation, dependency addition, dashboard/public API exposure, deployment, production/public readiness, benchmark, provider/local-model/tool-quality, security/privacy completion, autonomous-readiness, or Alpha-superiority claim is authorized. Prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUT_COLLECTION_PREP_001`. |
+| `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUT_COLLECTION_PREP_001` | prior review-only selected next state | Blank operator-fillable templates were recorded after `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUT-COLLECTION-PREP-001`. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_AUTHORIZATION_001` | prior review-only selected next state | Docs-only routed-vs-plain pilot authorization was recorded after `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-AUTHORIZATION-001`. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_MVP_PARTIAL_MANUAL_REVIEW_001` | prior review-only selected next state | Partial screenshot-only local MVP manual review was recorded after `ALPHA-SOLVER-LOCAL-MVP-MANUAL-REVIEW-001`; verdict was `LOCAL_MVP_MANUAL_REVIEW_PARTIAL_NEEDS_OPERATOR_TEST`. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_PACKET_001` | prior review-only selected next state | Operator review was required after the static routed-vs-plain pilot packet. The pilot was not executed; no provider/local-model calls, tool execution, browsing, Alpha output generation, baseline output generation, scoring, unblinding, raw output inspection, source-map work, Google Sheets mutation, or `/v1/solve` exposure/invocation occurred. No readiness, benchmark, production/public, provider, local-model, tool-quality, security/privacy, or Alpha-superiority claim is created by this lane. The prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001`. |
@@ -63,6 +64,7 @@
 - `ALPHA-SOLVER-MODEL-CATALOG-ROUTING-PREVIEW-001` (merged PR #601) - configurable backend model catalog metadata and deterministic routing preview; no provider/local-model execution or quality, readiness, benchmark, production/public, security/privacy, or Alpha-superiority claim.
 - `ALPHA-SOLVER-TOOL-CATALOG-ROUTING-REGISTRY-001` (merged PR #603) - metadata-only tool catalog and deterministic recommendation preview; no tool execution, browsing, provider/local-model calls, runtime GitHub calls, or quality/readiness/benchmark/production/public/security/privacy/Alpha-superiority claim.
 - `ALPHA-SOLVER-MODEL-CATALOG-EXPANSION-COST-TIERS-001` (merged PR #605) - metadata-only model catalog expansion and cost tiers with deterministic routing preview; no provider/local-model execution or quality, readiness, benchmark, production/public, security/privacy, or Alpha-superiority claim.
+- `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001` (this PR) - docs-only manual prompt-contract simulation outputs for all 12 routed-vs-plain pilot tasks; no runtime, provider/local-model/tool/web execution, scoring, unblinding, readiness, quality, benchmark, or superiority claim.
 
 ## Superseded
 
@@ -254,7 +256,7 @@ Prior selected next state after model catalog expansion cost tiers: `OPERATOR_RE
 
 Prior selected next state after test console routing preview integration: `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001`.
 
-Current selected next state after routed-vs-plain pilot output collection prep: `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUT_COLLECTION_PREP_001`.
+Current selected next state after routed-vs-plain pilot manual output collection: `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001`.
 
 Boundary: no provider quality, local model quality, readiness, benchmark success, production readiness, public readiness, security/privacy completion, UI authorization, or Alpha-superiority claim is created.
 
