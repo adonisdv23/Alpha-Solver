@@ -6,7 +6,7 @@
 4. Capture route metadata in a separate metadata file keyed by task id and blind label.
 5. If provider/local/model/tool/web execution is not separately authorized in the future lane, use operator-provided outputs only.
 6. Do not summarize raw outputs into source-of-truth docs beyond approved, non-sensitive status summaries.
-7. Stop before collection if prompts contain secrets, credentials, private data without operator-approved handling, or requests for direct financial/legal/medical decisions.
+7. Do not stop merely because an authorized pilot card is high-stakes. Collect high-stakes finance/legal/medical routing-safety cards only when they are part of the authorized task set and contain no private data requiring additional handling. Stop if collection would require generating personalized financial, legal, or medical advice, or if the prompt contains secrets, credentials, private data without operator-approved handling, or requests for unsafe direct decisions beyond the authorized evaluation frame.
 
 ## Evidence boundaries
 
