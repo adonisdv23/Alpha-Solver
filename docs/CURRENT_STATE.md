@@ -1,11 +1,11 @@
 # Alpha Solver - Current State
 
-> Source-of-truth navigation doc. Last verified **2026-06-17** for tool catalog routing registry.
-> This lane adds a metadata-only tool catalog and deterministic recommendation preview. It executes no tools, performs no browsing/provider/local-model/GitHub runtime calls, and creates no quality, readiness, benchmark, production/public, security/privacy, or Alpha-superiority claim.
+> Source-of-truth navigation doc. Last verified **2026-06-17** for model catalog expansion cost tiers.
+> This lane expands metadata-only model catalog fields and deterministic routing preview. It performs no provider/local-model calls, model pulls, benchmarking, dependency additions, `/v1/solve` exposure, dashboard/public API work, Google Sheets mutation, or quality/readiness/Alpha-superiority claim.
 
 ## Current verified phase
 
-**Tool catalog routing registry completed: the selected next state is review-only operator review after metadata-only tool recommendation preview support.**
+**Model catalog expansion cost tiers completed: the selected next state is review-only operator review after metadata-only model catalog expansion and routing preview support.**
 
 The merged #569–#574 wave updated the repository from the post-#568 blocked Value Read state to a broader documentation-and-boundary posture. PR #576 was superseded by PR #577 and should be closed unmerged. PR #577 completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only Alpha-native local operator harness design note.
 
@@ -17,12 +17,12 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 
 | Field | Value |
 |-------|-------|
-| Latest verified completed lane in this wave | **`ALPHA-SOLVER-TOOL-CATALOG-ROUTING-REGISTRY-001`** |
-| Source-of-truth sync | Current docs record the completed metadata-only tool catalog routing registry and a review-only selected next state |
+| Latest verified completed lane in this wave | **`ALPHA-SOLVER-MODEL-CATALOG-EXPANSION-COST-TIERS-001`** |
+| Source-of-truth sync | Current docs record the completed metadata-only model catalog expansion cost tiers lane and a review-only selected next state |
 | Closed-unmerged superseded PR | **#561** - superseded by merged PR #562 |
-| Current controlling posture | Operator review required after tool catalog routing registry |
-| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_TOOL_CATALOG_ROUTING_REGISTRY_001`** |
-| Strategic boundary | This review-only state records metadata-only tool catalog and deterministic tool recommendation preview support; it does not execute tools, browse, call providers, call GitHub from runtime code, expose `/v1/solve`, mutate Google Sheets, generate scores, run CI provider calls, run local models, or support tool/model/provider/local-model quality, readiness, benchmark, production/public, security/privacy, partnership/Pi.dev integration, or Alpha-superiority claims |
+| Current controlling posture | Operator review required after model catalog expansion cost tiers |
+| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`** |
+| Strategic boundary | This review-only state records metadata-only model catalog expansion and deterministic routing preview support; it does not call providers, run local models, pull models, expose `/v1/solve`, mutate Google Sheets, generate scores, add dependencies, benchmark models, or support model/provider/local-model quality, readiness, benchmark, production/public, security/privacy, partnership/Pi.dev integration, or Alpha-superiority claims |
 
 ## Completed post-552 / post-565 / post-568 infrastructure lanes
 
@@ -71,9 +71,9 @@ See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for the PR status ledger and [`LANE
 
 ## Selected next state
 
-**`OPERATOR_REVIEW_REQUIRED_AFTER_TOOL_CATALOG_ROUTING_REGISTRY_001`** is the current global selected next state.
+**`OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`** is the current global selected next state.
 
-This is a review-only state after `ALPHA-SOLVER-TOOL-CATALOG-ROUTING-REGISTRY-001`. It means the metadata-only tool catalog and deterministic recommendation preview exist for operator review.
+This is a review-only state after `ALPHA-SOLVER-MODEL-CATALOG-EXPANSION-COST-TIERS-001`. It means the metadata-only model catalog expansion and deterministic routing preview exist for operator review.
 
 This state authorizes no production/public exposure, no task execution outside explicit local Operator submission, no output generation for evals, scoring, score change, source-map work, unblinding, raw Alpha output inspection, raw baseline output inspection, `/v1/solve` exposure, dashboard/public API exposure, Google Sheets mutation, benchmark work, release behavior, readiness claim, broad value claim, provider claim, local-model claim, security/privacy claim, production/public claim, partnership/Pi.dev integration claim, demo external-use approval, discrimination-task execution/scoring, or Alpha-superiority claim.
 
@@ -137,5 +137,13 @@ This phase does **not** support claims of broad value, OpenAI validation, provid
 - Packet: `docs/evals/runs/alpha-solver-tool-catalog-routing-registry-001/`
 - Evidence type: metadata-only tool catalog and deterministic recommendation preview only.
 - Tool execution status: not run by this lane.
-- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_TOOL_CATALOG_ROUTING_REGISTRY_001`.
+- Prior selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_TOOL_CATALOG_ROUTING_REGISTRY_001`.
 - Boundary: recommendations such as Python/computation, web/current research, or GitHub/code are metadata-only preview outputs, not execution, browsing, provider calls, GitHub runtime calls, file mutation, readiness evidence, tool-quality evidence, or Alpha-superiority evidence.
+
+
+## ALPHA-SOLVER-MODEL-CATALOG-EXPANSION-COST-TIERS-001
+
+- Status: completed backend metadata implementation / review-only selected next.
+- Evidence packet: `docs/evals/runs/alpha-solver-model-catalog-expansion-cost-tiers-001/`.
+- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`.
+- Boundary: metadata-only routing preview; no provider or local model execution, no quality/readiness/benchmark claim, no public API or dashboard behavior, no `/v1/solve`, and no Google Sheets mutation.
