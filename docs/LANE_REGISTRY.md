@@ -1,7 +1,7 @@
 # Lane Registry
 
 > Source-of-truth lane lifecycle registry. Verification date **2026-06-16** for
-> local/OpenAI test console UX redaction refinement.
+> local/OpenAI test console UI polish.
 
 ## Lifecycle classes
 
@@ -11,13 +11,13 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Operator review after local/OpenAI test console UX redaction refinement | **current control posture** | `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UX-REDUCTION-001` preserves submitted form state and safe numeric usage token counts. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001`. |
+| Operator review after local/OpenAI test console UI polish | **current control posture** | `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UI-POLISH-001` polishes the local-only console UI with mode and model dropdowns, a prompt counter and 500-character limit warning, a friendly result display, and a copyable sanitized JSON panel. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001`** | **review-only selected next state** | Operator review is required after the local-only local/OpenAI test console UX/redaction refinement. The evidence is UX/redaction refinement only. No provider/local-model quality claim, readiness claim, benchmark claim, production/public claim, security/privacy completion claim, or Alpha-superiority claim is created by this lane. |
+| **`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`** | **review-only selected next state** | Operator review is required after the local-only local/OpenAI test console UI polish. The evidence is UI polish only. No provider/local-model quality claim, readiness claim, benchmark claim, production/public claim, security/privacy completion claim, or Alpha-superiority claim is created by this lane. |
 
 ## Completed (kept as evidence)
 
@@ -170,7 +170,11 @@ OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001 ← prior review-on
         ↓
 ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UX-REDUCTION-001 ← local-only smoke console UX/redaction refinement
         ↓
-OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001 ← current review-only selected next state
+OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001 ← prior review-only selected next state
+        ↓
+ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UI-POLISH-001 ← local-only smoke console UI polish
+        ↓
+OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001 ← current review-only selected next state
 ```
 
 This registry does not authorize production/public UI exposure, dashboard readiness, public provider exposure, local model validation claims, task execution, output generation, scoring, score change, unblinding, source-map work, raw output inspection, Pi.dev install/run/integration, runtime endpoint exposure, public API exposure, `/v1/solve` exposure, Google Sheets mutation, benchmark, dependency addition, release implementation lane, or readiness/broad-value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
@@ -185,7 +189,9 @@ Selected next state after runner lane: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPE
 
 Prior selected next state after test console: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`.
 
-Current selected next state after test console UX/redaction refinement: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001`.
+Prior selected next state after test console UX/redaction refinement: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001`.
+
+Current selected next state after test console UI polish: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`.
 
 Boundary: no provider quality, local model quality, readiness, benchmark success, production readiness, public readiness, security/privacy completion, UI authorization, or Alpha-superiority claim is created.
 
@@ -210,4 +216,13 @@ Boundary: no provider quality, local model quality, readiness, benchmark success
 - Prior selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`.
 - Evidence boundary: console implementation only, no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim.
 
-- `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UX-REDUCTION-001` (this PR) - local-only test console UX/redaction refinement. Purpose: preserve submitted form state after console runs and avoid over-redacting safe usage token counts. Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001`. Boundary: no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim.
+- `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UX-REDUCTION-001` - local-only test console UX/redaction refinement. Purpose: preserve submitted form state after console runs and avoid over-redacting safe usage token counts. Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001`. Boundary: no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim.
+
+## ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UI-POLISH-001
+
+- Purpose: improve local-only console usability with model dropdowns, a prompt counter, a friendly result display, and a copyable sanitized JSON panel.
+- Packet: `docs/evals/runs/alpha-solver-local-openai-test-console-ui-polish-001/`.
+- Implementation: `tools/operator_test_console.py`.
+- Tests: `tests/test_operator_test_console.py`.
+- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`.
+- Evidence boundary: UI polish only, no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim.

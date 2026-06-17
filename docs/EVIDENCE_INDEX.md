@@ -106,3 +106,14 @@ This entry records Operator-provided, redacted smoke-only evidence. It does not 
 | Packet | `docs/evals/runs/alpha-solver-local-openai-test-console-ux-reduction-001/` |
 | Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001` |
 | Evidence boundary | UX/redaction refinement only, no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim |
+
+
+## ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UI-POLISH-001
+
+| Field | Value |
+|-------|-------|
+| Lane ID | `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UI-POLISH-001` |
+| Purpose | improve local-only console usability with model dropdowns, prompt counter, friendly result display, and copyable sanitized JSON |
+| Packet | `docs/evals/runs/alpha-solver-local-openai-test-console-ui-polish-001/` |
+| Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001` |
+| Evidence boundary | UI polish only, no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim |
