@@ -200,7 +200,13 @@ OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001 ← prior
 ALPHA-SOLVER-TEST-CONSOLE-ROUTING-PREVIEW-INTEGRATION-001 ← local-only metadata route preview integration
         │
         ▼
-OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001 ← current review-only selected next state
+OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001 ← prior review-only selected next state
+        │
+        ▼
+ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-PACKET-001 ← docs-only routed-vs-plain pilot packet completed
+        │
+        ▼
+OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_PACKET_001 ← current review-only selected next state
 ```
 
 This registry does not authorize production/public UI exposure, dashboard readiness, public provider exposure, local model validation claims, task execution, output generation, scoring, score change, unblinding, source-map work, raw output inspection, Pi.dev install/run/integration, runtime endpoint exposure, public API exposure, `/v1/solve` exposure, Google Sheets mutation, benchmark, dependency addition, release implementation lane, or readiness/broad-value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
@@ -221,7 +227,9 @@ Prior selected next state after model catalog routing preview: `OPERATOR_REVIEW_
 
 Prior selected next state after model catalog expansion cost tiers: `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`.
 
-Current selected next state after test console routing preview integration: `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001`.
+Prior selected next state after test console routing preview integration: `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001`.
+
+Current selected next state after routed-vs-plain pilot packet: `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_PACKET_001`.
 
 Boundary: no provider quality, local model quality, readiness, benchmark success, production readiness, public readiness, security/privacy completion, UI authorization, or Alpha-superiority claim is created.
 
@@ -296,3 +304,15 @@ Boundary: no provider quality, local model quality, readiness, benchmark success
 | Preserved history | `ALPHA-SOLVER-TOOL-CATALOG-ROUTING-REGISTRY-001`; `ALPHA-SOLVER-MODEL-CATALOG-EXPANSION-COST-TIERS-001`; `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UI-POLISH-001` |
 | Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001` |
 | Boundary | metadata-only route preview; no provider/local-model execution, no tool execution, no browsing, no runtime GitHub calls, no `/v1/solve` exposure, no dependencies, no persistence, no telemetry, and no readiness/quality/benchmark/production/public/security/privacy/provider/local-model/tool-quality/Alpha-superiority claim |
+
+
+## ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-PACKET-001
+
+| Field | Value |
+|-------|-------|
+| Status | completed docs-only pilot packet / review-only selected next |
+| Packet | `docs/evals/runs/alpha-solver-routed-vs-plain-pilot-packet-001/` |
+| Preserved history | `ALPHA-SOLVER-TOOL-CATALOG-ROUTING-REGISTRY-001`; `ALPHA-SOLVER-MODEL-CATALOG-EXPANSION-COST-TIERS-001`; `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UI-POLISH-001`; `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-PREVIEW-INTEGRATION-001` |
+| Prior selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001` |
+| Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_PACKET_001` |
+| Boundary | packet only; no pilot execution, provider/local/hosted model execution, tool execution, browsing, output generation, scoring, score change, unblinding, raw output inspection, source-map work, Google Sheets mutation, dependency addition, `/v1/solve` exposure, dashboard/public API behavior, or readiness/benchmark/production/public/security/privacy/provider/local-model/tool-quality/Alpha-superiority claim |
