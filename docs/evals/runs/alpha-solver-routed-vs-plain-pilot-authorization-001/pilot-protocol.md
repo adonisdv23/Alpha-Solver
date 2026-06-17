@@ -18,7 +18,7 @@ A future authorized lane may collect one plain baseline output and one routed Al
 
 ## Route metadata capture
 
-For each routed Alpha item, capture task id, task family, selected route family, model recommendation, tool recommendation, fallback, warnings, evidence boundary, confidence or answerability note, next action, timestamp, collector identity, and artifact path. Do not place route metadata in scorer-facing blinded answer files unless a scoring protocol explicitly includes route-metadata scoring.
+For each routed Alpha item, capture task id, task family, selected route family, model recommendation, tool recommendation, route reasons, fallback, warnings, evidence boundary, confidence or answerability note, next action, timestamp, collector identity, and artifact path. Do not place route metadata in scorer-facing blinded answer files unless a scoring protocol explicitly includes route-metadata scoring.
 
 ## Task ID preservation
 
