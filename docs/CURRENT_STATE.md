@@ -1,11 +1,11 @@
 # Alpha Solver - Current State
 
-> Source-of-truth navigation doc. Last verified **2026-06-17** for routed-vs-plain pilot packet creation.
-> This lane creates a docs-only routed-vs-plain pilot packet for later operator review. It does not run the pilot, call providers, run hosted or local models, execute tools, browse, generate outputs, score outputs, mutate Sheets, expose `/v1/solve`, or make readiness/benchmark/Alpha-superiority claims.
+> Source-of-truth navigation doc. Last verified **2026-06-17** for MVP cutover review.
+> This lane records a docs-only STOP / go-no-go review for local operator MVP candidate manual review. It does not run providers, run hosted or local models, execute tools, browse, execute the routed-vs-plain pilot, generate outputs, score outputs, mutate Sheets, expose `/v1/solve`, deploy, or make production/public/benchmark/provider/local-model/tool/security/privacy/autonomous-readiness/Alpha-superiority claims.
 
 ## Current verified phase
 
-**Routed-vs-plain pilot packet completed: the selected next state is review-only operator review after creating the static routed-vs-plain pilot packet.**
+**MVP cutover review completed: the selected next state is review-only operator manual review after the local operator MVP candidate check.**
 
 The merged #569–#574 wave updated the repository from the post-#568 blocked Value Read state to a broader documentation-and-boundary posture. PR #576 was superseded by PR #577 and should be closed unmerged. PR #577 completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only Alpha-native local operator harness design note.
 
@@ -17,12 +17,12 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 
 | Field | Value |
 |-------|-------|
-| Latest verified completed lane in this wave | **`ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-PACKET-001`** |
-| Source-of-truth sync | Current docs record the completed routed-vs-plain pilot packet lane and a review-only selected next state |
+| Latest verified completed lane in this wave | **`ALPHA-SOLVER-MVP-CUTOVER-REVIEW-001`** |
+| Source-of-truth sync | Current docs record the completed MVP cutover review lane and a review-only selected next state |
 | Closed-unmerged superseded PR | **#561** - superseded by merged PR #562 |
-| Current controlling posture | Operator review required after routed-vs-plain pilot packet |
-| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_PACKET_001`** |
-| Strategic boundary | This review-only state records a static routed-vs-plain pilot packet; it does not authorize pilot execution, provider/local-model execution, hosted model execution, tool execution, browsing, output generation, scoring, score changes, unblinding, raw output inspection, source-map work, `/v1/solve` exposure, Google Sheets mutation, dependency addition, dashboard/public API behavior, or readiness/benchmark/production/public/security/privacy/provider/local-model/tool-quality/Alpha-superiority claims |
+| Current controlling posture | Operator review required after MVP cutover review |
+| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_MVP_CUTOVER_REVIEW_001`** |
+| Strategic boundary | This review-only state records a docs-only local operator MVP candidate cutover review; it does not authorize pilot execution, provider/local-model execution, hosted model execution, tool execution, browsing, output generation, scoring, score changes, unblinding, raw output inspection, source-map work, `/v1/solve` exposure, Google Sheets mutation, dependency addition, dashboard/public API behavior, deployment, or readiness/benchmark/production/public/security/privacy/provider/local-model/tool-quality/autonomous-readiness/Alpha-superiority claims |
 
 ## Completed post-552 / post-565 / post-568 infrastructure lanes
 
@@ -70,14 +70,17 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 | test-console-ui-polish lane | `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UI-POLISH-001` | Polishes the local-only console UI with mode and model dropdowns, a prompt counter and 500-character limit warning, a friendly result display, and a copyable sanitized JSON panel; modifies no model catalog or tool catalog logic and proves no behavior quality, provider quality, local-model quality, readiness, benchmark success, production/public readiness, security/privacy completion, or Alpha superiority. |
 | test-console-routing-preview lane | `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-PREVIEW-INTEGRATION-001` | Wires the local-only Operator console to metadata-only model/tool route preview before separate smoke execution; proves no provider/local-model/tool quality, readiness, benchmark, production/public, security/privacy, or Alpha superiority. |
 | routed-vs-plain pilot packet lane | `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-PACKET-001` | Creates a docs-only routed-vs-plain pilot packet with task cards, rubric, comparison protocol, blank result template, runbook, stop conditions, non-actions, and non-claims; runs no pilot and generates no outputs or scores. |
+| MVP cutover review lane | `ALPHA-SOLVER-MVP-CUTOVER-REVIEW-001` | Records a STOP / go-no-go review with verdict `LOCAL_OPERATOR_MVP_CANDIDATE_READY_FOR_MANUAL_REVIEW`; creates no provider/local-model/tool/pilot execution, output generation, scoring, readiness, benchmark, production/public, security/privacy completion, tool-quality, autonomous-readiness, or Alpha-superiority evidence. |
 
 See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for the PR status ledger and [`LANE_REGISTRY.md`](LANE_REGISTRY.md) for lifecycle classification.
 
 ## Selected next state
 
-**`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_PACKET_001`** is the current global selected next state.
+**`OPERATOR_REVIEW_REQUIRED_AFTER_MVP_CUTOVER_REVIEW_001`** is the current global selected next state.
 
-This is a review-only state after `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-PACKET-001`. The prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001`. It means the repository now contains a static routed-vs-plain pilot packet for future operator review only: the pilot was not executed; no provider or local-model calls occurred; no tools were executed; no browsing occurred; no Alpha outputs or baseline outputs were generated; no scoring, unblinding, raw output inspection, or source-map work occurred; no Google Sheets mutation occurred; and `/v1/solve` was not exposed or invoked. The state makes no readiness, benchmark, production/public, provider, local-model, tool-quality, security/privacy, or Alpha-superiority claims. The prior selected next state after UI polish was `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`.
+This is a review-only state after `ALPHA-SOLVER-MVP-CUTOVER-REVIEW-001`. The prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_PACKET_001`. The review verdict is `LOCAL_OPERATOR_MVP_CANDIDATE_READY_FOR_MANUAL_REVIEW` for local operator manual review only. It does not run providers, hosted models, local models, tools, the routed-vs-plain pilot, output generation, scoring, unblinding, raw output inspection, source-map work, dependency installation, Google Sheets mutation, `/v1/solve`, dashboard/public API behavior, or deployment, and it creates no production/public readiness, benchmark, provider/local-model/tool-quality, security/privacy completion, autonomous-readiness, or Alpha-superiority claim.
+
+The prior state was a review-only state after `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-PACKET-001`. The prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001`. It means the repository now contains a static routed-vs-plain pilot packet for future operator review only: the pilot was not executed; no provider or local-model calls occurred; no tools were executed; no browsing occurred; no Alpha outputs or baseline outputs were generated; no scoring, unblinding, raw output inspection, or source-map work occurred; no Google Sheets mutation occurred; and `/v1/solve` was not exposed or invoked. The state makes no readiness, benchmark, production/public, provider, local-model, tool-quality, security/privacy, or Alpha-superiority claims. The prior selected next state after UI polish was `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`.
 
 This state authorizes no production/public exposure, no task execution outside explicit local Operator submission, no output generation for evals, scoring, score change, source-map work, unblinding, raw Alpha output inspection, raw baseline output inspection, `/v1/solve` exposure, dashboard/public API exposure, Google Sheets mutation, benchmark work, release behavior, readiness claim, broad value claim, provider claim, local-model claim, security/privacy claim, production/public claim, partnership/Pi.dev integration claim, demo external-use approval, discrimination-task execution/scoring, or Alpha-superiority claim.
 
@@ -98,6 +101,16 @@ This state authorizes no production/public exposure, no task execution outside e
 ## What must not be claimed
 
 This phase does **not** support claims of broad value, OpenAI validation, provider validation, local Ollama validation, Pi.dev integration, runtime readiness, production readiness, public MVP readiness, security/privacy completion, DEF-002 resolved, DEF-003 resolved, benchmark validation, benchmark superiority, broad-user readiness, autonomous readiness, `/v1/solve` readiness, dashboard readiness, Google Sheets synchronization, or Alpha superiority.
+
+
+## ALPHA-SOLVER-MVP-CUTOVER-REVIEW-001
+
+- Packet: `docs/evals/runs/alpha-solver-mvp-cutover-review-001/`
+- Evidence type: docs-only STOP / go-no-go local operator MVP candidate cutover review.
+- Verdict: `LOCAL_OPERATOR_MVP_CANDIDATE_READY_FOR_MANUAL_REVIEW`.
+- Prior selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_PACKET_001`.
+- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_MVP_CUTOVER_REVIEW_001`.
+- Boundary: manual-review candidate only; no provider/local-model/tool/pilot execution, output generation, scoring, unblinding, source-map work, dependency addition, `/v1/solve` exposure, dashboard/public API exposure, deployment, production/public readiness, benchmark, provider/local-model/tool-quality, security/privacy completion, autonomous-readiness, or Alpha-superiority evidence.
 
 ## ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RESULTS-IMPORT-001
 
