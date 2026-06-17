@@ -113,7 +113,7 @@ def preview_route(request: RoutingPreviewRequest | None = None, catalog: ModelCa
         if req.required_capability:
             reasons.append("required_capability_matched_as_metadata_only")
         if selected.mode == "openai" and not req.allow_hosted_providers:
-            warnings.append("local_fallback_available" if cat.by_mode("local") and req.allow_local else "hosted_execution_disabled")
+            warnings.append("local_fallback_available" if _local_fallback_available(cat, req) else "hosted_execution_disabled")
             return _failed("hosted_provider_not_allowed", cat, req, reasons, warnings)
         if selected.mode == "local" and not req.allow_local:
             return _failed("local_model_not_allowed", cat, req, reasons, warnings)
@@ -183,6 +183,12 @@ def _fallbacks(cat: ModelCatalog, *, exclude: str | None, request: RoutingPrevie
         if model.model_id != exclude and model.mode in allowed_modes
     ]
     return tuple(fallbacks[:3])
+
+
+def _local_fallback_available(cat: ModelCatalog, req: RoutingPreviewRequest) -> bool:
+    if not req.allow_local:
+        return False
+    return any(_metadata_filtered(cat.by_mode("local"), req))
 
 
 def _failed(reason: str, cat: ModelCatalog, req: RoutingPreviewRequest, reasons: list[str], warnings: list[str]) -> RoutingPreview:

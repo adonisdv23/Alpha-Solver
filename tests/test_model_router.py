@@ -41,6 +41,23 @@ def test_hosted_disabled_request_for_hosted_model_fails_closed_with_local_fallba
     assert all(fallback.mode == "local" for fallback in preview.fallbacks)
 
 
+def test_hosted_disabled_warning_only_announces_metadata_filtered_local_fallback():
+    preview = preview_route(
+        RoutingPreviewRequest(
+            requested_model="gpt-4.1-mini",
+            required_capability="json_capable",
+            allow_hosted_providers=False,
+            allow_local=True,
+        )
+    )
+
+    assert preview.status == "failed_closed"
+    assert "hosted_provider_not_allowed" in preview.reasons
+    assert "local_fallback_available" not in preview.warnings
+    assert "hosted_execution_disabled" in preview.warnings
+    assert preview.fallbacks == ()
+
+
 def test_router_rejects_local_model_when_local_not_allowed():
     preview = preview_route(RoutingPreviewRequest(requested_model="qwen2.5:3b", allow_hosted_providers=True, allow_local=False))
 
