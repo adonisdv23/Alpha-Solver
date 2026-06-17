@@ -11,13 +11,13 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Operator review after MVP cutover review | **current control posture** | `ALPHA-SOLVER-MVP-CUTOVER-REVIEW-001` records verdict `LOCAL_OPERATOR_MVP_CANDIDATE_READY_FOR_MANUAL_REVIEW` for local operator manual review only. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_MVP_CUTOVER_REVIEW_001`. |
+| Operator review after MVP cutover review | **current control posture** | `ALPHA-SOLVER-MVP-CUTOVER-REVIEW-001` records verdict `LOCAL_OPERATOR_MVP_CANDIDATE_READY_FOR_MANUAL_REVIEW` for local operator manual review only. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_MVP_PARTIAL_MANUAL_REVIEW_001`. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_REVIEW_REQUIRED_AFTER_MVP_CUTOVER_REVIEW_001`** | **review-only selected next state** | Operator manual review is required after `ALPHA-SOLVER-MVP-CUTOVER-REVIEW-001`; verdict is `LOCAL_OPERATOR_MVP_CANDIDATE_READY_FOR_MANUAL_REVIEW`. No provider/local-model/tool/pilot execution, output generation, scoring, unblinding, raw-output inspection, source-map work, Google Sheets mutation, dependency addition, `/v1/solve` exposure, dashboard/public API exposure, deployment, production/public readiness, benchmark, provider/local-model/tool-quality, security/privacy completion, autonomous-readiness, or Alpha-superiority claim is authorized. Prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_PACKET_001`. |
+| **`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_MVP_PARTIAL_MANUAL_REVIEW_001`** | **review-only selected next state** | Partial screenshot-only local MVP manual review is recorded after `ALPHA-SOLVER-LOCAL-MVP-MANUAL-REVIEW-001`; verdict is `LOCAL_MVP_MANUAL_REVIEW_PARTIAL_NEEDS_OPERATOR_TEST`. No provider/local-model/tool/pilot execution, output generation, scoring, unblinding, raw-output inspection, source-map work, Google Sheets mutation, dependency addition, `/v1/solve` exposure, dashboard/public API exposure, deployment, production/public readiness, benchmark, provider/local-model/tool-quality, security/privacy completion, autonomous-readiness, or Alpha-superiority claim is authorized. Prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_MVP_CUTOVER_REVIEW_001`. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_PACKET_001` | prior review-only selected next state | Operator review was required after the static routed-vs-plain pilot packet. The pilot was not executed; no provider/local-model calls, tool execution, browsing, Alpha output generation, baseline output generation, scoring, unblinding, raw output inspection, source-map work, Google Sheets mutation, or `/v1/solve` exposure/invocation occurred. No readiness, benchmark, production/public, provider, local-model, tool-quality, security/privacy, or Alpha-superiority claim is created by this lane. The prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001`. |
 
 ## Completed (kept as evidence)
@@ -90,7 +90,7 @@
 
 - PR #561 lane as a standalone needs-human protocol PR - closed unmerged and superseded by PR #562.
 - Any merged packet lane verbatim - packets are immutable evidence; create a new lane id instead.
-- Any selected-next pointer that conflicts with `OPERATOR_REVIEW_REQUIRED_AFTER_MVP_CUTOVER_REVIEW_001`. Earlier selected-next pointers, including `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_DISCRIMINATION_TASK_BANK_FIRST_CHEAP_TEST_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_TOOL_CATALOG_ROUTING_REGISTRY_001`, and `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`, are prior review states and must not be treated as current.
+- Any selected-next pointer that conflicts with `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_MVP_PARTIAL_MANUAL_REVIEW_001`. Earlier selected-next pointers, including `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_DISCRIMINATION_TASK_BANK_FIRST_CHEAP_TEST_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_TOOL_CATALOG_ROUTING_REGISTRY_001`, and `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`, are prior review states and must not be treated as current.
 - Direct Pi.dev integration from PR #574's research lane - the recorded verdict is patterns-only/no-integration.
 
 ## Forward path (single track)
@@ -209,7 +209,7 @@ ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-PACKET-001 ← docs-only routed-vs-plain pilo
         ▼
 OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_PACKET_001 ← prior review-only selected next state
 ALPHA-SOLVER-MVP-CUTOVER-REVIEW-001 ← docs-only MVP cutover review completed
-OPERATOR_REVIEW_REQUIRED_AFTER_MVP_CUTOVER_REVIEW_001 ← current review-only selected next state
+OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_MVP_PARTIAL_MANUAL_REVIEW_001 ← current review-only selected next state
 ```
 
 This registry does not authorize production/public UI exposure, dashboard readiness, public provider exposure, local model validation claims, task execution, output generation, scoring, score change, unblinding, source-map work, raw output inspection, Pi.dev install/run/integration, runtime endpoint exposure, public API exposure, `/v1/solve` exposure, Google Sheets mutation, benchmark, dependency addition, release implementation lane, or readiness/broad-value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
@@ -232,7 +232,7 @@ Prior selected next state after model catalog expansion cost tiers: `OPERATOR_RE
 
 Prior selected next state after test console routing preview integration: `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001`.
 
-Current selected next state after MVP cutover review: `OPERATOR_REVIEW_REQUIRED_AFTER_MVP_CUTOVER_REVIEW_001`.
+Current selected next state after MVP cutover review: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_MVP_PARTIAL_MANUAL_REVIEW_001`.
 
 Boundary: no provider quality, local model quality, readiness, benchmark success, production readiness, public readiness, security/privacy completion, UI authorization, or Alpha-superiority claim is created.
 
@@ -329,5 +329,16 @@ Boundary: no provider quality, local model quality, readiness, benchmark success
 | Packet | `docs/evals/runs/alpha-solver-mvp-cutover-review-001/` |
 | Verdict | `LOCAL_OPERATOR_MVP_CANDIDATE_READY_FOR_MANUAL_REVIEW` |
 | Prior selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_PACKET_001` |
-| Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_MVP_CUTOVER_REVIEW_001` |
+| Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_MVP_PARTIAL_MANUAL_REVIEW_001` |
 | Boundary | No provider/local-model/tool/pilot execution, output generation, scoring, unblinding, raw-output inspection, source-map work, dependency addition, Google Sheets mutation, `/v1/solve` exposure, dashboard/public API exposure, deployment, production/public readiness, benchmark, provider/local-model/tool-quality, security/privacy completion, autonomous-readiness, or Alpha-superiority claim. |
+
+## ALPHA-SOLVER-LOCAL-MVP-MANUAL-REVIEW-001
+
+| Field | Value |
+|-------|-------|
+| Status | completed partial docs-only manual review |
+| Packet | `docs/evals/runs/alpha-solver-local-mvp-manual-review-001/` |
+| Verdict | `LOCAL_MVP_MANUAL_REVIEW_PARTIAL_NEEDS_OPERATOR_TEST` |
+| Prior selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_MVP_CUTOVER_REVIEW_001` |
+| Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_MVP_PARTIAL_MANUAL_REVIEW_001` |
+| Boundary | Screenshot-only operator-provided evidence; no full manual review pass, provider/local-model/tool/pilot execution, output generation, scoring, unblinding, source-map work, dependency addition, Google Sheets mutation, `/v1/solve` exposure, runtime/router/console/config/test change, production/public readiness, benchmark validation, provider/local-model/tool-quality, security/privacy completion, autonomous-readiness, or Alpha-superiority claim. |
