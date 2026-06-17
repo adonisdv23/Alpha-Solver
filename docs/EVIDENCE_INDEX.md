@@ -54,11 +54,11 @@ The entries below are design, documentation, gate, helper, static-checking, meth
 
 ## Current selected next state
 
-`OPERATOR_REVIEW_REQUIRED_AFTER_TOOL_CATALOG_ROUTING_REGISTRY_001` is the selected next state. This is a review-only state after metadata-only tool catalog and deterministic recommendation-preview support, not production/public readiness authorization.
+`OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001` is the selected next state. This is a review-only state after metadata-only model catalog expansion and deterministic routing-preview support, not production/public readiness authorization.
 
 `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` was completed by merged PR #591 as a docs-first gate packet. It defines criteria, fixture planning, heuristic review aids, stop conditions, non-actions, and non-claims for operator review. `ALPHA-SOLVER-DISCRIMINATION-TASK-BANK-FIRST-CHEAP-TEST-001` was completed by merged PR #595 as a docs-only cheap-test packet grounded in that gate and the discrimination task-bank asset.
 
-The selected state records metadata-only tool catalog and recommendation-preview implementation only and authorizes no score change, source-map work, raw Alpha output inspection, raw baseline output inspection, dashboard or public API work, `/v1/solve` exposure, Google Sheets mutation, provider/local-model execution, council behavior, benchmark work, release behavior, readiness claim, broad value claim, provider claim, local-model claim, security/privacy claim, production/public claim, demo external-use approval, discrimination-task execution/scoring, partnership/Pi.dev integration claim, or Alpha-superiority claim.
+The selected state records metadata-only model catalog expansion and routing-preview implementation only and authorizes no score change, source-map work, raw Alpha output inspection, raw baseline output inspection, dashboard or public API work, `/v1/solve` exposure, Google Sheets mutation, provider/local-model execution, council behavior, benchmark work, release behavior, readiness claim, broad value claim, provider claim, local-model claim, security/privacy claim, production/public claim, demo external-use approval, discrimination-task execution/scoring, partnership/Pi.dev integration claim, or Alpha-superiority claim.
 
 ## Evidence boundary
 
@@ -123,5 +123,13 @@ This entry records Operator-provided, redacted smoke-only evidence. It does not 
 - Artifact: `alpha/tool_catalog.py`, `alpha/tool_router.py`, and `configs/tool_catalog.json`
 - Packet: `docs/evals/runs/alpha-solver-tool-catalog-routing-registry-001/`
 - Purpose: add metadata-only tool catalog and deterministic recommendation preview for Python/computation, web/current research, GitHub/code, docs/files, spreadsheets, PDF/file parsing, browser/computer use, specialized math tools, and future provider-specific tools.
-- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_TOOL_CATALOG_ROUTING_REGISTRY_001`.
+- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`.
 - Evidence boundary: recommendation preview only, no tool execution, no browsing, no provider/local-model calls, no runtime GitHub calls, no file or Sheet mutation, no readiness/quality/security/privacy/production/public/provider/local-model/tool-quality/Alpha-superiority claim.
+
+
+## ALPHA-SOLVER-MODEL-CATALOG-EXPANSION-COST-TIERS-001
+
+- Status: completed backend metadata implementation / review-only selected next.
+- Changed files: `alpha/model_catalog.py`; `alpha/model_router.py`; `configs/model_catalog.json`; `tests/test_model_catalog.py`; `tests/test_model_router.py`; `docs/evals/runs/alpha-solver-model-catalog-expansion-cost-tiers-001/`; `docs/CURRENT_STATE.md`; `docs/LANE_REGISTRY.md`; `docs/EVIDENCE_INDEX.md`.
+- Evidence value: expands metadata-only model catalog fields and deterministic routing preview warnings/fallbacks.
+- Boundary: does not call providers, run local models, pull models, add dependencies, expose `/v1/solve`, mutate Sheets, benchmark, validate model quality, or make readiness/quality/provider/local-model/Alpha-superiority claims.
