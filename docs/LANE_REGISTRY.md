@@ -1,7 +1,7 @@
 # Lane Registry
 
 > Source-of-truth lane lifecycle registry. Verification date **2026-06-17** for
-> local/OpenAI test console UI polish.
+> test console routing preview integration.
 
 ## Lifecycle classes
 
@@ -11,13 +11,13 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Operator review after local/OpenAI test console UI polish | **current control posture** | `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UI-POLISH-001` polishes the local-only console UI with mode and model dropdowns, a prompt counter and 500-character limit warning, a friendly result display, and a copyable sanitized JSON panel, building on the model catalog expansion baseline. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`. |
+| Operator review after test console routing preview integration | **current control posture** | `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-PREVIEW-INTEGRATION-001` wires the local-only console to metadata-only model/tool route preview before separate bounded smoke execution, building on the UI polish baseline. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001`. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`** | **review-only selected next state** | Operator review is required after the local-only local/OpenAI test console UI polish, which builds on the model catalog expansion baseline. The evidence is UI polish only. No model catalog or tool catalog logic change, provider/local-model execution, quality claim, readiness claim, benchmark claim, production/public claim, security/privacy completion claim, or Alpha-superiority claim is created by this lane. The prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`. |
+| **`OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001`** | **review-only selected next state** | Operator review is required after the local-only test console routing preview integration, which builds on the UI polish baseline. The evidence is preview-only UI/backend integration. No provider/local-model execution, tool execution, quality claim, readiness claim, benchmark claim, production/public claim, security/privacy completion claim, or Alpha-superiority claim is created by this lane. The prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`. |
 
 ## Completed (kept as evidence)
 
@@ -89,7 +89,7 @@
 
 - PR #561 lane as a standalone needs-human protocol PR - closed unmerged and superseded by PR #562.
 - Any merged packet lane verbatim - packets are immutable evidence; create a new lane id instead.
-- Any selected-next pointer that conflicts with `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`. Earlier selected-next pointers, including `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_DISCRIMINATION_TASK_BANK_FIRST_CHEAP_TEST_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_TOOL_CATALOG_ROUTING_REGISTRY_001`, and `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`, are prior review states and must not be treated as current.
+- Any selected-next pointer that conflicts with `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001`. Earlier selected-next pointers, including `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_DISCRIMINATION_TASK_BANK_FIRST_CHEAP_TEST_001`, `OPERATOR_REVIEW_REQUIRED_AFTER_TOOL_CATALOG_ROUTING_REGISTRY_001`, and `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`, are prior review states and must not be treated as current.
 - Direct Pi.dev integration from PR #574's research lane - the recorded verdict is patterns-only/no-integration.
 
 ## Forward path (single track)
@@ -194,7 +194,13 @@ OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001 ← prior 
         ↓
 ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UI-POLISH-001 ← local-only smoke console UI polish
         ↓
-OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001 ← current review-only selected next state
+OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001 ← prior review-only selected next state
+        │
+        ▼
+ALPHA-SOLVER-TEST-CONSOLE-ROUTING-PREVIEW-INTEGRATION-001 ← local-only metadata route preview integration
+        │
+        ▼
+OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001 ← current review-only selected next state
 ```
 
 This registry does not authorize production/public UI exposure, dashboard readiness, public provider exposure, local model validation claims, task execution, output generation, scoring, score change, unblinding, source-map work, raw output inspection, Pi.dev install/run/integration, runtime endpoint exposure, public API exposure, `/v1/solve` exposure, Google Sheets mutation, benchmark, dependency addition, release implementation lane, or readiness/broad-value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
@@ -215,7 +221,7 @@ Prior selected next state after model catalog routing preview: `OPERATOR_REVIEW_
 
 Prior selected next state after model catalog expansion cost tiers: `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`.
 
-Current selected next state after local/OpenAI test console UI polish: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`.
+Current selected next state after test console routing preview integration: `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001`.
 
 Boundary: no provider quality, local model quality, readiness, benchmark success, production readiness, public readiness, security/privacy completion, UI authorization, or Alpha-superiority claim is created.
 
@@ -279,3 +285,14 @@ Boundary: no provider quality, local model quality, readiness, benchmark success
 - Builds on baseline: `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`.
 - Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`.
 - Evidence boundary: UI polish only, no model catalog or tool catalog logic change, and no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim.
+
+## ALPHA-SOLVER-TEST-CONSOLE-ROUTING-PREVIEW-INTEGRATION-001
+
+| Field | Value |
+|-------|-------|
+| Status | completed local-only console integration / review-only selected next |
+| Packet | `docs/evals/runs/alpha-solver-test-console-routing-preview-integration-001/` |
+| Changed implementation | `tools/operator_test_console.py`; `tests/test_operator_test_console.py` |
+| Preserved history | `ALPHA-SOLVER-TOOL-CATALOG-ROUTING-REGISTRY-001`; `ALPHA-SOLVER-MODEL-CATALOG-EXPANSION-COST-TIERS-001`; `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UI-POLISH-001` |
+| Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001` |
+| Boundary | metadata-only route preview; no provider/local-model execution, no tool execution, no browsing, no runtime GitHub calls, no `/v1/solve` exposure, no dependencies, no persistence, no telemetry, and no readiness/quality/benchmark/production/public/security/privacy/provider/local-model/tool-quality/Alpha-superiority claim |

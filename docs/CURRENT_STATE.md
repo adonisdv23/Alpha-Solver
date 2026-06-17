@@ -1,11 +1,11 @@
 # Alpha Solver - Current State
 
-> Source-of-truth navigation doc. Last verified **2026-06-17** for local/OpenAI test console UI polish.
+> Source-of-truth navigation doc. Last verified **2026-06-17** for test console routing preview integration.
 > This lane polishes the local-only console UI with mode and model dropdowns, a prompt counter and 500-character limit warning, a friendly result display, and a copyable sanitized JSON panel. It builds on the model catalog expansion baseline, changes no model catalog or tool catalog logic, performs no provider/local-model calls, and makes no quality/readiness/Alpha-superiority claim.
 
 ## Current verified phase
 
-**Local/OpenAI test console UI polish completed: the selected next state is review-only operator review after the local-only console UI polish, which builds on the model catalog expansion baseline.**
+**Test console routing preview integration completed: the selected next state is review-only operator review after the local-only console routing-preview integration, which builds on the model catalog expansion baseline.**
 
 The merged #569–#574 wave updated the repository from the post-#568 blocked Value Read state to a broader documentation-and-boundary posture. PR #576 was superseded by PR #577 and should be closed unmerged. PR #577 completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only Alpha-native local operator harness design note.
 
@@ -17,12 +17,12 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 
 | Field | Value |
 |-------|-------|
-| Latest verified completed lane in this wave | **`ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UI-POLISH-001`** |
-| Source-of-truth sync | Current docs record the completed local-only test console UI polish lane (building on the model catalog expansion baseline) and a review-only selected next state |
+| Latest verified completed lane in this wave | **`ALPHA-SOLVER-TEST-CONSOLE-ROUTING-PREVIEW-INTEGRATION-001`** |
+| Source-of-truth sync | Current docs record the completed local-only test console routing-preview integration lane (building on the UI polish baseline) and a review-only selected next state |
 | Closed-unmerged superseded PR | **#561** - superseded by merged PR #562 |
-| Current controlling posture | Operator review required after local/OpenAI test console UI polish |
-| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`** |
-| Strategic boundary | This review-only state records a local-only Operator smoke test console UI polish; it does not modify model catalog or tool catalog logic, expose `/v1/solve`, mutate Google Sheets, generate scores, run CI provider calls, add dependencies, or support provider/local-model quality, readiness, benchmark, production/public, security/privacy, partnership/Pi.dev integration, or Alpha-superiority claims |
+| Current controlling posture | Operator review required after test console routing preview integration |
+| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001`** |
+| Strategic boundary | This review-only state records a local-only Operator console route-preview integration; it does not authorize provider/local-model execution, tool execution, browsing, runtime GitHub calls, `/v1/solve` exposure, Google Sheets mutation, score generation, dependency addition, persistence, telemetry, or provider/local-model/tool quality, readiness, benchmark, production/public, security/privacy, partnership/Pi.dev integration, or Alpha-superiority claims |
 
 ## Completed post-552 / post-565 / post-568 infrastructure lanes
 
@@ -73,9 +73,9 @@ See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for the PR status ledger and [`LANE
 
 ## Selected next state
 
-**`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`** is the current global selected next state.
+**`OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001`** is the current global selected next state.
 
-This is a review-only state after `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UI-POLISH-001`. It means the local-only Operator console UI was polished with mode and model dropdowns, a prompt counter and 500-character limit warning, a friendly result display, and a copyable sanitized JSON panel, while preserving the existing local-only loopback and redaction boundaries. The prior selected next state after metadata-only model catalog expansion was `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`.
+This is a review-only state after `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-PREVIEW-INTEGRATION-001`. It means the local-only Operator console now shows metadata-only model/tool route preview before a separate bounded smoke action, while preserving the existing local-only loopback and redaction boundaries. The prior selected next state after UI polish was `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`.
 
 This state authorizes no production/public exposure, no task execution outside explicit local Operator submission, no output generation for evals, scoring, score change, source-map work, unblinding, raw Alpha output inspection, raw baseline output inspection, `/v1/solve` exposure, dashboard/public API exposure, Google Sheets mutation, benchmark work, release behavior, readiness claim, broad value claim, provider claim, local-model claim, security/privacy claim, production/public claim, partnership/Pi.dev integration claim, demo external-use approval, discrimination-task execution/scoring, or Alpha-superiority claim.
 
@@ -158,3 +158,12 @@ This phase does **not** support claims of broad value, OpenAI validation, provid
 - Builds on baseline: `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`.
 - Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`.
 - Boundary: UI polish only, no model catalog or tool catalog logic change, and no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim.
+
+## ALPHA-SOLVER-TEST-CONSOLE-ROUTING-PREVIEW-INTEGRATION-001
+
+- Packet: `docs/evals/runs/alpha-solver-test-console-routing-preview-integration-001/`
+- Evidence type: local-only Operator console routing-preview integration.
+- Console: `tools/operator_test_console.py`.
+- Builds on baseline: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`.
+- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001`.
+- Boundary: metadata-only route preview before separate smoke execution; no provider/local-model execution, no tool execution, no browsing, no runtime GitHub calls, no `/v1/solve` exposure, no persistence/telemetry/dependency addition, and no quality/readiness/benchmark/public/production/security/privacy/provider/local-model/tool-quality/Alpha-superiority claim.

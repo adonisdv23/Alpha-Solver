@@ -1,6 +1,6 @@
-# Evidence Index - local/OpenAI test console UI polish
+# Evidence Index - test console routing preview integration
 
-> Source-of-truth evidence ledger. Verification date **2026-06-17** after local/OpenAI test console UI polish.
+> Source-of-truth evidence ledger. Verification date **2026-06-17** after test console routing preview integration.
 
 ## How to read "evidence value"
 
@@ -54,7 +54,7 @@ The entries below are design, documentation, gate, helper, static-checking, meth
 
 ## Current selected next state
 
-`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001` is the selected next state. This is a review-only state after the local-only test console UI polish lane `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UI-POLISH-001`, which builds on the model catalog expansion baseline, not production/public readiness authorization. The prior selected next state after metadata-only model catalog expansion was `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001`.
+`OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001` is the selected next state. This is a review-only state after the local-only test console routing preview integration lane `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-PREVIEW-INTEGRATION-001`, which builds on the UI polish baseline, not production/public readiness authorization. The prior selected next state after UI polish was `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001`.
 
 `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` was completed by merged PR #591 as a docs-first gate packet. It defines criteria, fixture planning, heuristic review aids, stop conditions, non-actions, and non-claims for operator review. `ALPHA-SOLVER-DISCRIMINATION-TASK-BANK-FIRST-CHEAP-TEST-001` was completed by merged PR #595 as a docs-only cheap-test packet grounded in that gate and the discrimination task-bank asset.
 
@@ -144,3 +144,14 @@ This entry records Operator-provided, redacted smoke-only evidence. It does not 
 | Builds on baseline | `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_EXPANSION_COST_TIERS_001` |
 | Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001` |
 | Evidence boundary | UI polish only, no model catalog or tool catalog logic change, no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim |
+
+## ALPHA-SOLVER-TEST-CONSOLE-ROUTING-PREVIEW-INTEGRATION-001
+
+| Field | Value |
+|-------|-------|
+| Lane ID | `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-PREVIEW-INTEGRATION-001` |
+| Purpose | wire the local-only Operator console to metadata-only model/tool route preview before separate smoke execution |
+| Packet | `docs/evals/runs/alpha-solver-test-console-routing-preview-integration-001/` |
+| Builds on baseline | `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UI_POLISH_001` |
+| Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001` |
+| Evidence boundary | preview-only UI/backend integration, no provider/local-model execution, no tool execution, no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim |
