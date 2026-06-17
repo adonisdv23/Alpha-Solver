@@ -1,7 +1,7 @@
 # Lane Registry
 
 > Source-of-truth lane lifecycle registry. Verification date **2026-06-16** for
-> local/OpenAI test console UX redaction refinement.
+> model catalog routing preview.
 
 ## Lifecycle classes
 
@@ -11,13 +11,13 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Operator review after local/OpenAI test console UX redaction refinement | **current control posture** | `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UX-REDUCTION-001` preserves submitted form state and safe numeric usage token counts. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001`. |
+| Operator review after model catalog routing preview | **current control posture** | `ALPHA-SOLVER-MODEL-CATALOG-ROUTING-PREVIEW-001` adds configurable backend model catalog metadata and deterministic routing preview. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_ROUTING_PREVIEW_001`. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001`** | **review-only selected next state** | Operator review is required after the local-only local/OpenAI test console UX/redaction refinement. The evidence is UX/redaction refinement only. No provider/local-model quality claim, readiness claim, benchmark claim, production/public claim, security/privacy completion claim, or Alpha-superiority claim is created by this lane. |
+| **`OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_ROUTING_PREVIEW_001`** | **review-only selected next state** | Operator review is required after backend model catalog metadata and deterministic routing-preview support. The evidence is metadata-only routing preview. No provider/local-model execution, quality claim, readiness claim, benchmark claim, production/public claim, security/privacy completion claim, or Alpha-superiority claim is created by this lane. |
 
 ## Completed (kept as evidence)
 
@@ -52,6 +52,12 @@
 - `ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-FINAL-INTERPRETATION-001` (stable post-merge state) - docs-only selector after final interpretation and the parallel feasibility group sync; selects `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` for operator review and does not create or implement it.
 - `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` (merged PR #591) - docs-first substantive derivation / no-echo gate packet; defines criteria, fixture planning, heuristic review aids, stop conditions, non-actions, and non-claims, with no implementation or broad claims.
 - `ALPHA-SOLVER-DISCRIMINATION-TASK-BANK-FIRST-CHEAP-TEST-001` (merged PR #595) - docs-only first cheap-test packet with five representative taxonomy task cards for discrimination task-bank preparation; no task execution, output generation, scoring, raw output inspection, unblinding, source-map work, provider/local-model/runtime/API/Sheet work, dependency addition, release implementation, or broad claims.
+
+- `ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RUNNER-001` (merged PR #597) - smoke runner and runbook completed; no smoke execution or quality/readiness claim.
+- `ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RESULTS-IMPORT-001` (merged PR #598) - docs-only import of Operator-provided, redacted smoke-only results; no behavior quality, readiness, benchmark, production/public, security/privacy, or Alpha-superiority claim.
+- `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-001` (merged PR #599) - local-only Operator smoke test console; no provider/local-model quality, readiness, benchmark, production/public, security/privacy, or Alpha-superiority claim.
+- `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UX-REDUCTION-001` (merged PR #600) - local-only test console UX/redaction refinement; no quality, readiness, benchmark, production/public, security/privacy, or Alpha-superiority claim.
+- `ALPHA-SOLVER-MODEL-CATALOG-ROUTING-PREVIEW-001` (merged PR #601) - configurable backend model catalog metadata and deterministic routing preview; no provider/local-model execution or quality, readiness, benchmark, production/public, security/privacy, or Alpha-superiority claim.
 
 ## Superseded
 
@@ -170,7 +176,11 @@ OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001 ← prior review-on
         ↓
 ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UX-REDUCTION-001 ← local-only smoke console UX/redaction refinement
         ↓
-OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001 ← current review-only selected next state
+OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001 ← prior review-only selected next state
+        ↓
+ALPHA-SOLVER-MODEL-CATALOG-ROUTING-PREVIEW-001 ← backend metadata and deterministic routing preview completed
+        ↓
+OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_ROUTING_PREVIEW_001 ← current review-only selected next state
 ```
 
 This registry does not authorize production/public UI exposure, dashboard readiness, public provider exposure, local model validation claims, task execution, output generation, scoring, score change, unblinding, source-map work, raw output inspection, Pi.dev install/run/integration, runtime endpoint exposure, public API exposure, `/v1/solve` exposure, Google Sheets mutation, benchmark, dependency addition, release implementation lane, or readiness/broad-value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
@@ -181,11 +191,13 @@ This registry does not authorize production/public UI exposure, dashboard readin
 |------|-------|----------|
 | `ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RUNNER-001` | completed packet / review-only selected next | Adds `tools/operator_smoke_runner.py` and `docs/evals/runs/alpha-solver-local-openai-smoke-runner-001/` so the Operator can explicitly run one local/Ollama smoke check or one OpenAI smoke check with sanitized JSON output. The lane itself does not run smoke checks. |
 
-Selected next state after runner lane: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`.
+Prior selected next state after runner lane: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RUNNER_001`.
 
 Prior selected next state after test console: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`.
 
-Current selected next state after test console UX/redaction refinement: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001`.
+Prior selected next state after test console UX/redaction refinement: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001`.
+
+Current selected next state after model catalog routing preview: `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_ROUTING_PREVIEW_001`.
 
 Boundary: no provider quality, local model quality, readiness, benchmark success, production readiness, public readiness, security/privacy completion, UI authorization, or Alpha-superiority claim is created.
 
@@ -197,7 +209,7 @@ Boundary: no provider quality, local model quality, readiness, benchmark success
 - Lifecycle: completed docs-only evidence import with review-only selected next state.
 - Local/Ollama smoke: passed using `qwen2.5:3b`.
 - OpenAI smoke: passed using `gpt-4.1-mini-2025-04-14`.
-- Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`.
+- Prior selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_SMOKE_RESULTS_IMPORT_001`.
 - Boundary: smoke-only evidence; no behavior quality, provider quality, local-model quality, readiness, benchmark, production/public, or Alpha-superiority claim.
 
 
@@ -210,7 +222,7 @@ Boundary: no provider quality, local model quality, readiness, benchmark success
 - Prior selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_001`.
 - Evidence boundary: console implementation only, no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim.
 
-- `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UX-REDUCTION-001` (this PR) - local-only test console UX/redaction refinement. Purpose: preserve submitted form state after console runs and avoid over-redacting safe usage token counts. Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001`. Boundary: no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim.
+- `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UX-REDUCTION-001` (merged PR #600) - local-only test console UX/redaction refinement. Purpose: preserve submitted form state after console runs and avoid over-redacting safe usage token counts. Prior selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_LOCAL_OPENAI_TEST_CONSOLE_UX_REDUCTION_001`. Boundary: no quality/readiness/benchmark/public/production/security/privacy/Alpha-superiority claim.
 
 ## ALPHA-SOLVER-MODEL-CATALOG-ROUTING-PREVIEW-001
 
