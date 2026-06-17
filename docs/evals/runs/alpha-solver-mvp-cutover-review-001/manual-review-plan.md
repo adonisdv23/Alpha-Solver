@@ -2,7 +2,7 @@
 
 This plan is for a local operator reviewing the MVP candidate manually.
 
-1. Open the local console with the documented local console command, for example `python tools/operator_test_console.py` from the repository root.
+1. Open the local console from the repository root with `python -m uvicorn tools.operator_test_console:app --host 127.0.0.1 --port 8765`. Run this from an environment where project dependencies are installed, for example after activating `.venv` and installing project dependencies.
 2. Click or use the route preview path first; do not submit smoke execution first.
 3. Enter a non-sensitive test task and request route preview without running smoke.
 4. Verify that the preview displays a recommended model path and recommended tool path.
