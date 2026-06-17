@@ -1,5 +1,5 @@
 {
-  "version": "2026-06-16.model-catalog-routing-preview-001",
+  "version": "2026-06-17.model-catalog-expansion-cost-tiers-001",
   "evidence_boundary": {
     "runs_provider": false,
     "runs_local_model": false,
@@ -13,70 +13,278 @@
       "mode": "local",
       "model_id": "qwen2.5:3b",
       "display_name": "Qwen 2.5 3B via Ollama",
-      "enabled_default": true,
+      "enabled_by_default": true,
+      "routing_roles": [
+        "local_preview",
+        "offline_candidate"
+      ],
+      "task_families": [
+        "general",
+        "structured_reasoning_preview"
+      ],
+      "capability_tags": [
+        "local_runtime",
+        "small_context_candidate"
+      ],
+      "cost_tier": "low",
+      "latency_tier": "medium",
+      "context_tier": "low",
+      "privacy_tier": "local_operator_machine",
+      "supports_json": true,
+      "supports_tools": false,
+      "supports_vision": false,
       "smoke_eligible": true,
+      "requires_network": false,
+      "requires_credentials": false,
+      "evidence_boundary": {
+        "runs_provider": false,
+        "runs_local_model": false,
+        "quality_evidence": false,
+        "readiness_evidence": false,
+        "benchmark_evidence": false
+      },
       "quality_claim": false,
-      "notes": "Operator-relevant local/Ollama catalog default. Catalog inclusion is not a quality claim."
+      "last_reviewed": "2026-06-17",
+      "review_status": "smoke_only",
+      "operator_notes": "Catalog inclusion is operator-maintained metadata only; it is not validation, ranking, readiness, or a quality claim."
     },
     {
       "provider": "ollama",
       "mode": "local",
       "model_id": "gemma3:4b",
       "display_name": "Gemma 3 4B via Ollama",
-      "enabled_default": true,
+      "enabled_by_default": true,
+      "routing_roles": [
+        "local_preview",
+        "offline_candidate"
+      ],
+      "task_families": [
+        "general"
+      ],
+      "capability_tags": [
+        "local_runtime",
+        "small_context_candidate"
+      ],
+      "cost_tier": "low",
+      "latency_tier": "medium",
+      "context_tier": "low",
+      "privacy_tier": "local_operator_machine",
+      "supports_json": true,
+      "supports_tools": false,
+      "supports_vision": false,
       "smoke_eligible": true,
+      "requires_network": false,
+      "requires_credentials": false,
+      "evidence_boundary": {
+        "runs_provider": false,
+        "runs_local_model": false,
+        "quality_evidence": false,
+        "readiness_evidence": false,
+        "benchmark_evidence": false
+      },
       "quality_claim": false,
-      "notes": "Operator-relevant local/Ollama catalog default. Catalog inclusion is not a quality claim."
+      "last_reviewed": "2026-06-17",
+      "review_status": "smoke_only",
+      "operator_notes": "Catalog inclusion is operator-maintained metadata only; it is not validation, ranking, readiness, or a quality claim."
     },
     {
       "provider": "ollama",
       "mode": "local",
       "model_id": "llama3.2:1b",
       "display_name": "Llama 3.2 1B via Ollama",
-      "enabled_default": true,
+      "enabled_by_default": true,
+      "routing_roles": [
+        "local_preview",
+        "offline_candidate"
+      ],
+      "task_families": [
+        "general"
+      ],
+      "capability_tags": [
+        "local_runtime",
+        "small_context_candidate"
+      ],
+      "cost_tier": "low",
+      "latency_tier": "low",
+      "context_tier": "low",
+      "privacy_tier": "local_operator_machine",
+      "supports_json": true,
+      "supports_tools": false,
+      "supports_vision": false,
       "smoke_eligible": true,
+      "requires_network": false,
+      "requires_credentials": false,
+      "evidence_boundary": {
+        "runs_provider": false,
+        "runs_local_model": false,
+        "quality_evidence": false,
+        "readiness_evidence": false,
+        "benchmark_evidence": false
+      },
       "quality_claim": false,
-      "notes": "Operator-relevant local/Ollama catalog default. Catalog inclusion is not a quality claim."
+      "last_reviewed": "2026-06-17",
+      "review_status": "smoke_only",
+      "operator_notes": "Catalog inclusion is operator-maintained metadata only; it is not validation, ranking, readiness, or a quality claim."
     },
     {
       "provider": "ollama",
       "mode": "local",
       "model_id": "llama3.2:latest",
       "display_name": "Llama 3.2 latest via Ollama",
-      "enabled_default": true,
+      "enabled_by_default": true,
+      "routing_roles": [
+        "local_preview",
+        "offline_candidate"
+      ],
+      "task_families": [
+        "general"
+      ],
+      "capability_tags": [
+        "local_runtime",
+        "small_context_candidate"
+      ],
+      "cost_tier": "low",
+      "latency_tier": "medium",
+      "context_tier": "low",
+      "privacy_tier": "local_operator_machine",
+      "supports_json": true,
+      "supports_tools": false,
+      "supports_vision": false,
       "smoke_eligible": true,
+      "requires_network": false,
+      "requires_credentials": false,
+      "evidence_boundary": {
+        "runs_provider": false,
+        "runs_local_model": false,
+        "quality_evidence": false,
+        "readiness_evidence": false,
+        "benchmark_evidence": false
+      },
       "quality_claim": false,
-      "notes": "Operator-relevant local/Ollama catalog default. Catalog inclusion is not a quality claim."
+      "last_reviewed": "2026-06-17",
+      "review_status": "smoke_only",
+      "operator_notes": "Catalog inclusion is operator-maintained metadata only; it is not validation, ranking, readiness, or a quality claim."
     },
     {
       "provider": "openai",
       "mode": "openai",
       "model_id": "gpt-4.1-mini",
       "display_name": "GPT-4.1 mini",
-      "enabled_default": true,
+      "enabled_by_default": true,
+      "routing_roles": [
+        "hosted_preview",
+        "json_candidate"
+      ],
+      "task_families": [
+        "general",
+        "structured_output_preview"
+      ],
+      "capability_tags": [
+        "hosted_provider",
+        "json_capable"
+      ],
+      "cost_tier": "medium",
+      "latency_tier": "medium",
+      "context_tier": "high",
+      "privacy_tier": "hosted_provider_boundary",
+      "supports_json": true,
+      "supports_tools": true,
+      "supports_vision": false,
       "smoke_eligible": true,
+      "requires_network": true,
+      "requires_credentials": true,
+      "evidence_boundary": {
+        "runs_provider": false,
+        "runs_local_model": false,
+        "quality_evidence": false,
+        "readiness_evidence": false,
+        "benchmark_evidence": false
+      },
       "quality_claim": false,
-      "notes": "Conservative OpenAI catalog default for operator routing preview. Catalog inclusion is not model validation."
+      "last_reviewed": "2026-06-17",
+      "review_status": "smoke_only",
+      "operator_notes": "Catalog inclusion is operator-maintained metadata only; it is not validation, ranking, readiness, or a quality claim."
     },
     {
       "provider": "openai",
       "mode": "openai",
       "model_id": "gpt-4.1",
       "display_name": "GPT-4.1",
-      "enabled_default": true,
+      "enabled_by_default": true,
+      "routing_roles": [
+        "hosted_preview",
+        "json_candidate"
+      ],
+      "task_families": [
+        "general",
+        "structured_output_preview"
+      ],
+      "capability_tags": [
+        "hosted_provider",
+        "json_capable"
+      ],
+      "cost_tier": "high",
+      "latency_tier": "medium",
+      "context_tier": "high",
+      "privacy_tier": "hosted_provider_boundary",
+      "supports_json": true,
+      "supports_tools": true,
+      "supports_vision": false,
       "smoke_eligible": true,
+      "requires_network": true,
+      "requires_credentials": true,
+      "evidence_boundary": {
+        "runs_provider": false,
+        "runs_local_model": false,
+        "quality_evidence": false,
+        "readiness_evidence": false,
+        "benchmark_evidence": false
+      },
       "quality_claim": false,
-      "notes": "Conservative OpenAI catalog default for operator routing preview. Catalog inclusion is not model validation."
+      "last_reviewed": "2026-06-17",
+      "review_status": "operator_metadata",
+      "operator_notes": "Catalog inclusion is operator-maintained metadata only; it is not validation, ranking, readiness, or a quality claim."
     },
     {
       "provider": "openai",
       "mode": "openai",
       "model_id": "gpt-4o-mini",
       "display_name": "GPT-4o mini",
-      "enabled_default": true,
+      "enabled_by_default": true,
+      "routing_roles": [
+        "hosted_preview",
+        "vision_candidate"
+      ],
+      "task_families": [
+        "general",
+        "vision_preview"
+      ],
+      "capability_tags": [
+        "hosted_provider",
+        "json_capable",
+        "vision_capable"
+      ],
+      "cost_tier": "medium",
+      "latency_tier": "medium",
+      "context_tier": "medium",
+      "privacy_tier": "hosted_provider_boundary",
+      "supports_json": true,
+      "supports_tools": true,
+      "supports_vision": true,
       "smoke_eligible": true,
+      "requires_network": true,
+      "requires_credentials": true,
+      "evidence_boundary": {
+        "runs_provider": false,
+        "runs_local_model": false,
+        "quality_evidence": false,
+        "readiness_evidence": false,
+        "benchmark_evidence": false
+      },
       "quality_claim": false,
-      "notes": "Conservative OpenAI catalog default for operator routing preview. Catalog inclusion is not model validation."
+      "last_reviewed": "2026-06-17",
+      "review_status": "operator_metadata",
+      "operator_notes": "Catalog inclusion is operator-maintained metadata only; it is not validation, ranking, readiness, or a quality claim."
     }
   ]
 }
