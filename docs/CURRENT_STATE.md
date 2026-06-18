@@ -17,11 +17,11 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 
 | Field | Value |
 |-------|-------|
-| Latest verified completed lane in this wave | **`ALPHA-SOLVER-TEST-CONSOLE-ROUTING-METADATA-OPERATOR-REVIEW-PACKET-001`** |
+| Latest verified completed lane in this wave | **`ALPHA-SOLVER-CONSOLE-TARGET-PARITY-PRODUCT-PASS-001`** |
 | Source-of-truth sync | Current docs record the completed test console routing metadata operator review packet and a review-only selected next state for operator execution of that packet |
 | Closed-unmerged superseded PR | **#561** - superseded by merged PR #562 |
 | Current controlling posture | Operator review required after test console routing metadata operator review packet |
-| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_METADATA_OPERATOR_REVIEW_PACKET_001`** |
+| Selected next state | **`OPERATOR_REVIEW_DEFERRED_PENDING_HTML_DIAGRAM_TARGET_PARITY_001`** |
 | Strategic boundary | This docs/test-support state records a manual operator-review packet for local-console route-preview metadata display only; it does not prove runtime, `/v1/solve`, provider, hosted-model, local-model, tool, web, benchmark, production/public readiness, security/privacy, quality, autonomous-readiness, value, or Alpha-superiority claims |
 
 ## Completed post-552 / post-565 / post-568 infrastructure lanes
@@ -70,7 +70,9 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 | test-console-ui-polish lane | `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UI-POLISH-001` | Polishes the local-only console UI with mode and model dropdowns, a prompt counter and 500-character limit warning, a friendly result display, and a copyable sanitized JSON panel; modifies no model catalog or tool catalog logic and proves no behavior quality, provider quality, local-model quality, readiness, benchmark success, production/public readiness, security/privacy completion, or Alpha superiority. |
 | test-console-routing-preview lane | `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-PREVIEW-INTEGRATION-001` | Wires the local-only Operator console to metadata-only model/tool route preview before separate smoke execution; creates no provider/local-model/tool quality, readiness, benchmark, production/public, security/privacy, or Alpha superiority. |
 | test-console-routing-metadata-display lane | `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-METADATA-DISPLAY-001` | Surfaces expanded model route metadata and existing metadata-only tool recommendation preview in the local-only Operator console; creates no provider/local-model/tool quality, readiness, benchmark, production/public, security/privacy, value, or Alpha superiority. |
-| operator-review-packet lane | `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-METADATA-OPERATOR-REVIEW-PACKET-001` | Adds a docs/test-support packet for future manual operator review of route-preview understandability and evidence-boundary safety; it does not perform the review or run the console. |
+
+| console target-parity product pass | `ALPHA-SOLVER-CONSOLE-TARGET-PARITY-PRODUCT-PASS-001` | Adds five-step route-flow, task-interpretation, model-route, tool-route, manual-override, and evidence-boundary cards to the local console while keeping preview separate from bounded smoke execution. |
+| operator-review-packet lane | `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-METADATA-OPERATOR-REVIEW-PACKET-001` | Historical docs/test-support packet for future manual operator review of route-preview understandability and evidence-boundary safety; it did not perform the review or run the console. |
 | routed-vs-plain pilot packet lane | `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-PACKET-001` | Creates a docs-only routed-vs-plain pilot packet with task cards, rubric, comparison protocol, blank result template, runbook, stop conditions, non-actions, and non-claims; runs no pilot and generates no outputs or scores. |
 | MVP cutover review lane | `ALPHA-SOLVER-MVP-CUTOVER-REVIEW-001` | Records a STOP / go-no-go review with verdict `LOCAL_OPERATOR_MVP_CANDIDATE_READY_FOR_MANUAL_REVIEW`; creates no provider/local-model/tool/pilot execution, output generation, scoring, readiness, benchmark, production/public, security/privacy completion, tool-quality, autonomous-readiness, or Alpha-superiority evidence. |
 | local MVP manual review lane | `ALPHA-SOLVER-LOCAL-MVP-MANUAL-REVIEW-001` | Records operator-provided screenshot-only partial manual review evidence with verdict `LOCAL_MVP_MANUAL_REVIEW_PARTIAL_NEEDS_OPERATOR_TEST`; full manual UI testing remains deferred, and no provider/local-model/tool/pilot execution or quality/readiness claim occurs. |
@@ -223,3 +225,8 @@ This phase does **not** support claims of broad value, OpenAI validation, provid
 - Prior selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_AUTHORIZATION_001`.
 - Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUT_COLLECTION_PREP_001`.
 - Boundary: not Alpha runtime, `/v1/solve`, provider, hosted-model, local-model, tool-execution, web/current research, scoring, unblinding, benchmark, production/public readiness, quality, security/privacy completion, autonomous-readiness, or Alpha-superiority evidence.
+
+
+## Console target-parity product pass update - 2026-06-18
+
+`ALPHA-SOLVER-CONSOLE-TARGET-PARITY-PRODUCT-PASS-001` is complete. Selected next state is `OPERATOR_REVIEW_DEFERRED_PENDING_HTML_DIAGRAM_TARGET_PARITY_001`. The next action is another narrow local-console build or gap-closure lane toward HTML/diagram target parity before operator review.
