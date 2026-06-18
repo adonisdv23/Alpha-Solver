@@ -1,3 +1,5 @@
 # Selected next state
 
 `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_ROUTING_METADATA_EXPANSION_001`
+
+This review-only selected next state follows completed lane `ALPHA-SOLVER-MODEL-CATALOG-ROUTING-METADATA-EXPANSION-001`.
