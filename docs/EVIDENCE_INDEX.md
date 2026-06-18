@@ -1,4 +1,4 @@
-# Evidence Index - test console routing metadata display
+# Evidence Index - test console routing metadata operator review packet
 
 > Source-of-truth evidence ledger. Verification date **2026-06-18** after test console routing metadata operator review packet lane `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-METADATA-OPERATOR-REVIEW-PACKET-001`.
 
