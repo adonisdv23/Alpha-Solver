@@ -20,9 +20,11 @@ Status = Literal["preview_only", "failed_closed"]
 class RouteFallback:
     mode: Mode
     model: str
+    backend_type: str
+    fallback_eligible: bool
 
-    def as_dict(self) -> dict[str, str]:
-        return {"mode": self.mode, "model": self.model}
+    def as_dict(self) -> dict[str, str | bool]:
+        return {"mode": self.mode, "model": self.model, "backend_type": self.backend_type, "fallback_eligible": self.fallback_eligible}
 
 
 @dataclass(frozen=True)
@@ -36,6 +38,8 @@ class RoutingPreviewRequest:
     cost_preference: str | None = None
     latency_preference: str | None = None
     required_capability: str | None = None
+    required_context_tier: str | None = None
+    privacy_preference: str | None = None
     local_only: bool = False
 
 
@@ -49,6 +53,15 @@ class RoutingPreview:
     evidence_boundary: dict[str, bool] = field(default_factory=lambda: dict(DEFAULT_EVIDENCE_BOUNDARY))
     warnings: tuple[str, ...] = ()
     provider_or_local_execution_authorized: bool = False
+    selected_backend_type: str | None = None
+    selected_cost_tier: str | None = None
+    selected_latency_tier: str | None = None
+    selected_context_tier: str | None = None
+    selected_privacy_tier: str | None = None
+    selected_smoke_eligible: bool | None = None
+    no_call_evidence: bool = True
+    confidence_label: str = "metadata_only"
+    operator_caveat: str = "Catalog inclusion is not model quality evidence."
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -60,6 +73,15 @@ class RoutingPreview:
             "evidence_boundary": dict(self.evidence_boundary),
             "warnings": list(self.warnings),
             "provider_or_local_execution_authorized": self.provider_or_local_execution_authorized,
+            "selected_backend_type": self.selected_backend_type,
+            "selected_cost_tier": self.selected_cost_tier,
+            "selected_latency_tier": self.selected_latency_tier,
+            "selected_context_tier": self.selected_context_tier,
+            "selected_privacy_tier": self.selected_privacy_tier,
+            "selected_smoke_eligible": self.selected_smoke_eligible,
+            "no_call_evidence": self.no_call_evidence,
+            "confidence_label": self.confidence_label,
+            "operator_caveat": self.operator_caveat,
         }
 
 
@@ -81,6 +103,8 @@ def preview_route(request: RoutingPreviewRequest | None = None, catalog: ModelCa
             cost_preference=req.cost_preference,
             latency_preference=req.latency_preference,
             required_capability=req.required_capability,
+            required_context_tier=req.required_context_tier,
+            privacy_preference=req.privacy_preference,
             local_only=req.local_only,
         )
     if req.prompt_length > MAX_PROMPT_CHARS:
@@ -99,6 +123,10 @@ def preview_route(request: RoutingPreviewRequest | None = None, catalog: ModelCa
         reasons.append("latency_preference_recorded_no_latency_claim")
     if req.required_capability:
         reasons.append("required_capability_recorded_metadata_only")
+    if req.required_context_tier:
+        reasons.append("context_tier_preference_recorded_metadata_only")
+    if req.privacy_preference:
+        reasons.append("privacy_tier_preference_recorded_metadata_only")
 
     selected: ModelCatalogEntry | None = None
     if req.requested_model:
@@ -124,6 +152,7 @@ def preview_route(request: RoutingPreviewRequest | None = None, catalog: ModelCa
         if selected is None:
             return _failed("no_eligible_model", cat, req, reasons, warnings)
 
+    reasons.extend(_selected_metadata_reasons(selected, req))
     if selected.smoke_eligible:
         reasons.append("smoke_eligible")
     else:
@@ -137,6 +166,12 @@ def preview_route(request: RoutingPreviewRequest | None = None, catalog: ModelCa
         reasons=tuple(reasons),
         evidence_boundary=dict(selected.evidence_boundary),
         warnings=tuple(warnings),
+        selected_backend_type=selected.backend_type,
+        selected_cost_tier=selected.cost_tier,
+        selected_latency_tier=selected.latency_tier,
+        selected_context_tier=selected.context_tier,
+        selected_privacy_tier=selected.privacy_tier,
+        selected_smoke_eligible=selected.smoke_eligible,
     )
 
 
@@ -167,8 +202,27 @@ def _metadata_filtered(options: tuple[ModelCatalogEntry, ...], req: RoutingPrevi
     if req.latency_preference:
         filtered = tuple(model for model in filtered if model.latency_tier == req.latency_preference) or filtered
     if req.task_profile:
-        filtered = tuple(model for model in filtered if req.task_profile in model.task_families or req.task_profile in model.routing_roles) or filtered
+        filtered = tuple(model for model in filtered if req.task_profile in model.task_families or req.task_profile in model.routing_roles or req.task_profile in model.route_tags) or filtered
+    if req.required_context_tier:
+        filtered = tuple(model for model in filtered if model.context_tier == req.required_context_tier) or filtered
+    if req.privacy_preference:
+        filtered = tuple(model for model in filtered if model.privacy_tier == req.privacy_preference) or filtered
     return filtered
+
+
+def _selected_metadata_reasons(selected: ModelCatalogEntry, req: RoutingPreviewRequest) -> list[str]:
+    reasons = [
+        f"backend_type:{selected.backend_type}",
+        "local_route_reason:local_only_metadata" if selected.backend_type == "local" else "hosted_route_reason:hosted_provider_metadata",
+        f"cost_tier_reason:{selected.cost_tier}",
+        f"latency_tier_reason:{selected.latency_tier}",
+        f"context_tier_reason:{selected.context_tier}",
+        f"privacy_tier_reason:{selected.privacy_tier}",
+        "catalog_inclusion_not_quality_evidence",
+    ]
+    if req.required_capability and req.required_capability in selected.capability_tags:
+        reasons.append(f"capability_tag_match:{req.required_capability}")
+    return reasons
 
 
 def _fallbacks(cat: ModelCatalog, *, exclude: str | None, request: RoutingPreviewRequest) -> tuple[RouteFallback, ...]:
@@ -178,9 +232,9 @@ def _fallbacks(cat: ModelCatalog, *, exclude: str | None, request: RoutingPrevie
     if request.allow_local:
         allowed_modes.add("local")
     fallbacks = [
-        RouteFallback(model.mode, model.model_id)
+        RouteFallback(model.mode, model.model_id, model.backend_type, model.fallback_eligible)
         for model in _metadata_filtered(cat.enabled(), request)
-        if model.model_id != exclude and model.mode in allowed_modes
+        if model.model_id != exclude and model.mode in allowed_modes and model.fallback_eligible
     ]
     return tuple(fallbacks[:3])
 

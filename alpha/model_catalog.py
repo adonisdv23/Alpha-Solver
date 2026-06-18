@@ -12,8 +12,9 @@ from pathlib import Path
 from typing import Any, Iterable, Literal
 
 Mode = Literal["local", "openai"]
+BackendType = Literal["local", "hosted", "future_provider", "external"]
 Tier = Literal["low", "medium", "high", "unknown"]
-ReviewStatus = Literal["operator_metadata", "smoke_only"]
+ReviewStatus = Literal["operator_metadata", "smoke_only", "not_verified", "catalog_only"]
 
 DEFAULT_CATALOG_PATH = Path(__file__).resolve().parents[1] / "configs" / "model_catalog.json"
 DEFAULT_EVIDENCE_BOUNDARY: dict[str, bool] = {
@@ -32,10 +33,11 @@ def _require_bool(raw: dict[str, Any], field: str) -> bool:
     return value
 
 
-def _require_str_list(raw: dict[str, Any], field: str) -> tuple[str, ...]:
+def _require_str_list(raw: dict[str, Any], field: str, *, allow_empty: bool = False) -> tuple[str, ...]:
     value = raw[field]
-    if not isinstance(value, list) or not value or not all(isinstance(item, str) and item for item in value):
-        raise ValueError(f"model catalog field must be a non-empty string list: {field}")
+    if not isinstance(value, list) or (not allow_empty and not value) or not all(isinstance(item, str) and item for item in value):
+        requirement = "a string list" if allow_empty else "a non-empty string list"
+        raise ValueError(f"model catalog field must be {requirement}: {field}")
     return tuple(value)
 
 
@@ -59,8 +61,14 @@ class ModelCatalogEntry:
     provider: str
     mode: Mode
     model_id: str
+    id: str
     display_name: str
     enabled_by_default: bool
+    backend_type: BackendType
+    model_family: str
+    availability_status: str
+    requires_provider_key: bool
+    local_only: bool
     routing_roles: tuple[str, ...]
     task_families: tuple[str, ...]
     capability_tags: tuple[str, ...]
@@ -72,11 +80,18 @@ class ModelCatalogEntry:
     supports_tools: bool
     supports_vision: bool
     smoke_eligible: bool
+    route_tags: tuple[str, ...]
+    tool_compatibility: tuple[str, ...]
+    best_for: tuple[str, ...]
+    avoid_for: tuple[str, ...]
+    fallback_eligible: bool
     requires_network: bool
     requires_credentials: bool
     evidence_boundary: dict[str, bool]
     quality_claim: bool
     last_reviewed: str
+    reviewed_at: str
+    catalog_reviewed_at: str
     review_status: ReviewStatus
     operator_notes: str
 
@@ -87,7 +102,13 @@ class ModelCatalogEntry:
             "mode",
             "model_id",
             "display_name",
+            "id",
             "enabled_by_default",
+            "backend_type",
+            "model_family",
+            "availability_status",
+            "requires_provider_key",
+            "local_only",
             "routing_roles",
             "task_families",
             "capability_tags",
@@ -99,11 +120,18 @@ class ModelCatalogEntry:
             "supports_tools",
             "supports_vision",
             "smoke_eligible",
+            "route_tags",
+            "tool_compatibility",
+            "best_for",
+            "avoid_for",
+            "fallback_eligible",
             "requires_network",
             "requires_credentials",
             "evidence_boundary",
             "quality_claim",
             "last_reviewed",
+            "reviewed_at",
+            "catalog_reviewed_at",
             "review_status",
             "operator_notes",
         )
@@ -117,8 +145,15 @@ class ModelCatalogEntry:
         if quality_claim:
             raise ValueError("model catalog entries must not carry quality claims")
         boundary = _require_evidence_boundary(raw["evidence_boundary"])
+        backend_type = str(raw["backend_type"])
+        if backend_type not in {"local", "hosted", "future_provider", "external"}:
+            raise ValueError(f"unsupported backend_type: {backend_type}")
+        if mode == "local" and backend_type != "local":
+            raise ValueError("local catalog entries must use backend_type local")
+        if mode == "openai" and backend_type != "hosted":
+            raise ValueError("openai catalog entries must use backend_type hosted")
         review_status = str(raw["review_status"])
-        if review_status not in {"operator_metadata", "smoke_only"}:
+        if review_status not in {"operator_metadata", "smoke_only", "not_verified", "catalog_only"}:
             raise ValueError(f"unsupported model catalog review_status: {review_status}")
         tiers = {"low", "medium", "high", "unknown"}
         for tier_field in ("cost_tier", "latency_tier", "context_tier"):
@@ -128,8 +163,14 @@ class ModelCatalogEntry:
             provider=str(raw["provider"]),
             mode=mode,  # type: ignore[arg-type]
             model_id=str(raw["model_id"]),
+            id=str(raw["id"]),
             display_name=str(raw["display_name"]),
             enabled_by_default=_require_bool(raw, "enabled_by_default"),
+            backend_type=backend_type,  # type: ignore[arg-type]
+            model_family=str(raw["model_family"]),
+            availability_status=str(raw["availability_status"]),
+            requires_provider_key=_require_bool(raw, "requires_provider_key"),
+            local_only=_require_bool(raw, "local_only"),
             routing_roles=_require_str_list(raw, "routing_roles"),
             task_families=_require_str_list(raw, "task_families"),
             capability_tags=_require_str_list(raw, "capability_tags"),
@@ -141,11 +182,18 @@ class ModelCatalogEntry:
             supports_tools=_require_bool(raw, "supports_tools"),
             supports_vision=_require_bool(raw, "supports_vision"),
             smoke_eligible=_require_bool(raw, "smoke_eligible"),
+            route_tags=_require_str_list(raw, "route_tags"),
+            tool_compatibility=_require_str_list(raw, "tool_compatibility", allow_empty=True),
+            best_for=_require_str_list(raw, "best_for", allow_empty=True),
+            avoid_for=_require_str_list(raw, "avoid_for", allow_empty=True),
+            fallback_eligible=_require_bool(raw, "fallback_eligible"),
             requires_network=_require_bool(raw, "requires_network"),
             requires_credentials=_require_bool(raw, "requires_credentials"),
             evidence_boundary=boundary,
             quality_claim=quality_claim,
             last_reviewed=str(raw["last_reviewed"]),
+            reviewed_at=str(raw["reviewed_at"]),
+            catalog_reviewed_at=str(raw["catalog_reviewed_at"]),
             review_status=review_status,  # type: ignore[arg-type]
             operator_notes=str(raw["operator_notes"]),
         )
@@ -155,8 +203,14 @@ class ModelCatalogEntry:
             "provider": self.provider,
             "mode": self.mode,
             "model_id": self.model_id,
+            "id": self.id,
             "display_name": self.display_name,
             "enabled_by_default": self.enabled_by_default,
+            "backend_type": self.backend_type,
+            "model_family": self.model_family,
+            "availability_status": self.availability_status,
+            "requires_provider_key": self.requires_provider_key,
+            "local_only": self.local_only,
             "routing_roles": list(self.routing_roles),
             "task_families": list(self.task_families),
             "capability_tags": list(self.capability_tags),
@@ -168,11 +222,18 @@ class ModelCatalogEntry:
             "supports_tools": self.supports_tools,
             "supports_vision": self.supports_vision,
             "smoke_eligible": self.smoke_eligible,
+            "route_tags": list(self.route_tags),
+            "tool_compatibility": list(self.tool_compatibility),
+            "best_for": list(self.best_for),
+            "avoid_for": list(self.avoid_for),
+            "fallback_eligible": self.fallback_eligible,
             "requires_network": self.requires_network,
             "requires_credentials": self.requires_credentials,
             "evidence_boundary": dict(self.evidence_boundary),
             "quality_claim": self.quality_claim,
             "last_reviewed": self.last_reviewed,
+            "reviewed_at": self.reviewed_at,
+            "catalog_reviewed_at": self.catalog_reviewed_at,
             "review_status": self.review_status,
             "operator_notes": self.operator_notes,
         }

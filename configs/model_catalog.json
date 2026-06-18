@@ -1,5 +1,5 @@
 {
-  "version": "2026-06-17.model-catalog-expansion-cost-tiers-001",
+  "version": "2026-06-18.model-catalog-routing-metadata-expansion-001",
   "evidence_boundary": {
     "runs_provider": false,
     "runs_local_model": false,
@@ -46,7 +46,33 @@
       "quality_claim": false,
       "last_reviewed": "2026-06-17",
       "review_status": "smoke_only",
-      "operator_notes": "Catalog inclusion is operator-maintained metadata only; it is not validation, ranking, readiness, or a quality claim."
+      "operator_notes": "Catalog inclusion is operator-maintained metadata only; it is not validation, ranking, readiness, or a quality claim.",
+      "id": "qwen2.5:3b",
+      "backend_type": "local",
+      "model_family": "qwen2.5",
+      "availability_status": "configured",
+      "requires_provider_key": false,
+      "local_only": true,
+      "route_tags": [
+        "local_preview",
+        "offline_candidate",
+        "general",
+        "structured_reasoning_preview"
+      ],
+      "tool_compatibility": [
+        "json"
+      ],
+      "best_for": [
+        "local_preview",
+        "offline_operator_metadata_preview"
+      ],
+      "avoid_for": [
+        "hosted_only_requests",
+        "large_context_claims"
+      ],
+      "fallback_eligible": true,
+      "catalog_reviewed_at": "2026-06-17",
+      "reviewed_at": "2026-06-17"
     },
     {
       "provider": "ollama",
@@ -85,7 +111,32 @@
       "quality_claim": false,
       "last_reviewed": "2026-06-17",
       "review_status": "smoke_only",
-      "operator_notes": "Catalog inclusion is operator-maintained metadata only; it is not validation, ranking, readiness, or a quality claim."
+      "operator_notes": "Catalog inclusion is operator-maintained metadata only; it is not validation, ranking, readiness, or a quality claim.",
+      "id": "gemma3:4b",
+      "backend_type": "local",
+      "model_family": "gemma3",
+      "availability_status": "configured",
+      "requires_provider_key": false,
+      "local_only": true,
+      "route_tags": [
+        "local_preview",
+        "offline_candidate",
+        "general"
+      ],
+      "tool_compatibility": [
+        "json"
+      ],
+      "best_for": [
+        "local_preview",
+        "offline_operator_metadata_preview"
+      ],
+      "avoid_for": [
+        "hosted_only_requests",
+        "large_context_claims"
+      ],
+      "fallback_eligible": true,
+      "catalog_reviewed_at": "2026-06-17",
+      "reviewed_at": "2026-06-17"
     },
     {
       "provider": "ollama",
@@ -124,7 +175,32 @@
       "quality_claim": false,
       "last_reviewed": "2026-06-17",
       "review_status": "smoke_only",
-      "operator_notes": "Catalog inclusion is operator-maintained metadata only; it is not validation, ranking, readiness, or a quality claim."
+      "operator_notes": "Catalog inclusion is operator-maintained metadata only; it is not validation, ranking, readiness, or a quality claim.",
+      "id": "llama3.2:1b",
+      "backend_type": "local",
+      "model_family": "llama3.2",
+      "availability_status": "configured",
+      "requires_provider_key": false,
+      "local_only": true,
+      "route_tags": [
+        "local_preview",
+        "offline_candidate",
+        "general"
+      ],
+      "tool_compatibility": [
+        "json"
+      ],
+      "best_for": [
+        "local_preview",
+        "offline_operator_metadata_preview"
+      ],
+      "avoid_for": [
+        "hosted_only_requests",
+        "large_context_claims"
+      ],
+      "fallback_eligible": true,
+      "catalog_reviewed_at": "2026-06-17",
+      "reviewed_at": "2026-06-17"
     },
     {
       "provider": "ollama",
@@ -163,7 +239,32 @@
       "quality_claim": false,
       "last_reviewed": "2026-06-17",
       "review_status": "smoke_only",
-      "operator_notes": "Catalog inclusion is operator-maintained metadata only; it is not validation, ranking, readiness, or a quality claim."
+      "operator_notes": "Catalog inclusion is operator-maintained metadata only; it is not validation, ranking, readiness, or a quality claim.",
+      "id": "llama3.2:latest",
+      "backend_type": "local",
+      "model_family": "llama3.2",
+      "availability_status": "configured",
+      "requires_provider_key": false,
+      "local_only": true,
+      "route_tags": [
+        "local_preview",
+        "offline_candidate",
+        "general"
+      ],
+      "tool_compatibility": [
+        "json"
+      ],
+      "best_for": [
+        "local_preview",
+        "offline_operator_metadata_preview"
+      ],
+      "avoid_for": [
+        "hosted_only_requests",
+        "large_context_claims"
+      ],
+      "fallback_eligible": true,
+      "catalog_reviewed_at": "2026-06-17",
+      "reviewed_at": "2026-06-17"
     },
     {
       "provider": "openai",
@@ -203,7 +304,34 @@
       "quality_claim": false,
       "last_reviewed": "2026-06-17",
       "review_status": "smoke_only",
-      "operator_notes": "Catalog inclusion is operator-maintained metadata only; it is not validation, ranking, readiness, or a quality claim."
+      "operator_notes": "Catalog inclusion is operator-maintained metadata only; it is not validation, ranking, readiness, or a quality claim.",
+      "id": "gpt-4.1-mini",
+      "backend_type": "hosted",
+      "model_family": "gpt-4.1",
+      "availability_status": "configured",
+      "requires_provider_key": true,
+      "local_only": false,
+      "route_tags": [
+        "hosted_preview",
+        "json_candidate",
+        "general",
+        "structured_output_preview"
+      ],
+      "tool_compatibility": [
+        "json",
+        "tools"
+      ],
+      "best_for": [
+        "hosted_preview",
+        "structured_output_preview"
+      ],
+      "avoid_for": [
+        "local_only_requests",
+        "no_network_or_no_provider_key_contexts"
+      ],
+      "fallback_eligible": true,
+      "catalog_reviewed_at": "2026-06-17",
+      "reviewed_at": "2026-06-17"
     },
     {
       "provider": "openai",
@@ -243,7 +371,34 @@
       "quality_claim": false,
       "last_reviewed": "2026-06-17",
       "review_status": "operator_metadata",
-      "operator_notes": "Catalog inclusion is operator-maintained metadata only; it is not validation, ranking, readiness, or a quality claim."
+      "operator_notes": "Catalog inclusion is operator-maintained metadata only; it is not validation, ranking, readiness, or a quality claim.",
+      "id": "gpt-4.1",
+      "backend_type": "hosted",
+      "model_family": "gpt-4.1",
+      "availability_status": "configured",
+      "requires_provider_key": true,
+      "local_only": false,
+      "route_tags": [
+        "hosted_preview",
+        "json_candidate",
+        "general",
+        "structured_output_preview"
+      ],
+      "tool_compatibility": [
+        "json",
+        "tools"
+      ],
+      "best_for": [
+        "hosted_preview",
+        "structured_output_preview"
+      ],
+      "avoid_for": [
+        "local_only_requests",
+        "no_network_or_no_provider_key_contexts"
+      ],
+      "fallback_eligible": true,
+      "catalog_reviewed_at": "2026-06-17",
+      "reviewed_at": "2026-06-17"
     },
     {
       "provider": "openai",
@@ -284,7 +439,35 @@
       "quality_claim": false,
       "last_reviewed": "2026-06-17",
       "review_status": "operator_metadata",
-      "operator_notes": "Catalog inclusion is operator-maintained metadata only; it is not validation, ranking, readiness, or a quality claim."
+      "operator_notes": "Catalog inclusion is operator-maintained metadata only; it is not validation, ranking, readiness, or a quality claim.",
+      "id": "gpt-4o-mini",
+      "backend_type": "hosted",
+      "model_family": "gpt-4o",
+      "availability_status": "configured",
+      "requires_provider_key": true,
+      "local_only": false,
+      "route_tags": [
+        "hosted_preview",
+        "vision_candidate",
+        "general",
+        "vision_preview"
+      ],
+      "tool_compatibility": [
+        "json",
+        "tools",
+        "vision"
+      ],
+      "best_for": [
+        "hosted_preview",
+        "structured_output_preview"
+      ],
+      "avoid_for": [
+        "local_only_requests",
+        "no_network_or_no_provider_key_contexts"
+      ],
+      "fallback_eligible": true,
+      "catalog_reviewed_at": "2026-06-17",
+      "reviewed_at": "2026-06-17"
     }
   ]
 }
