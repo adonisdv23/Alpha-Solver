@@ -1,0 +1,1 @@
+Aligns with the target guide sequence by reading the task, previewing a route, explaining route reasons and warnings, recommending a safe next action, and exposing evidence boundaries without execution claims.

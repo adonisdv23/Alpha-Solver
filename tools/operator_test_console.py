@@ -305,7 +305,7 @@ def build_route_preview(task: str, mode: str, model: str) -> dict[str, Any]:
         tool_router.ToolRecommendationRequest(task_text=cleaned_task, untrusted_context="operator_console_task")
     ).as_dict()
     interpretation = _task_signals(cleaned_task, tool_preview)
-    return {
+    preview = {
         "status": "preview_only",
         "task": cleaned_task,
         "task_family": interpretation["task_family"],
@@ -318,7 +318,123 @@ def build_route_preview(task: str, mode: str, model: str) -> dict[str, Any]:
         "tool_execution_authorized": False,
         "preview_only": True,
     }
+    preview["best_path_summary"] = build_best_path_summary(preview)
+    return preview
 
+
+def build_best_path_summary(route_preview: Mapping[str, Any] | None) -> dict[str, Any]:
+    """Build bounded metadata-only best-path recommendation from route preview."""
+
+    if not route_preview:
+        return {
+            "status": "recommend_only",
+            "recommended_route_type": "clarification_needed",
+            "primary_option": "none",
+            "why_this_route": ["No route preview has been requested yet."],
+            "safe_next_action": "preview_only",
+            "fallback_summary": [],
+            "risk_flags": ["unsupported/no eligible route"],
+            "evidence_boundary": "Catalog inclusion is not quality evidence; recommendation is not execution authorization.",
+            "manual_override_summary": "Mode/model controls are available; route/tool overrides are unavailable in this lane.",
+            "metadata_only": True,
+            "provider_or_local_execution_authorized": False,
+            "tool_execution_authorized": False,
+        }
+
+    model_route = route_preview.get("model_route", {}) if isinstance(route_preview.get("model_route"), Mapping) else {}
+    tool_route = route_preview.get("tool_route", {}) if isinstance(route_preview.get("tool_route"), Mapping) else {}
+    interpretation = route_preview.get("task_interpretation", {}) if isinstance(route_preview.get("task_interpretation"), Mapping) else {}
+    model_ok = model_route.get("status") == "preview_only" and bool(model_route.get("recommended_model"))
+    tool_ok = tool_route.get("status") == "preview_only" and bool(tool_route.get("recommended_tool_id"))
+    tool_no_match = (
+        tool_route.get("status") == "failed_closed"
+        and not tool_route.get("recommended_tool_id")
+        and "no_matching_tool_family" in set(map(str, tool_route.get("reasons", [])))
+    )
+    failed = (
+        route_preview.get("status") == "failed_closed"
+        or model_route.get("status") == "failed_closed"
+        or (tool_route.get("status") == "failed_closed" and not tool_no_match)
+    )
+
+    risk_flags: list[str] = []
+    if interpretation.get("privacy_indicator") or "privacy" in " ".join(map(str, tool_route.get("warnings", []))):
+        risk_flags.append("privacy-sensitive")
+    if interpretation.get("current_facts_indicator"):
+        risk_flags.append("current facts")
+    if interpretation.get("repo_indicator") or interpretation.get("tool_indicator"):
+        risk_flags.append("repo/tool action")
+    if interpretation.get("document_indicator") or interpretation.get("spreadsheet_indicator"):
+        risk_flags.append("document/spreadsheet")
+    if len(str(route_preview.get("task", ""))) > 350:
+        risk_flags.append("long context")
+    if failed or not (model_ok or tool_ok or (model_ok and tool_no_match)):
+        risk_flags.append("unsupported/no eligible route")
+    if not risk_flags:
+        risk_flags.append("none detected")
+
+    if failed or not (model_ok or tool_ok):
+        route_type = "no eligible route"
+        primary = "none"
+        status = "failed_closed"
+        safe_next = "do_not_execute"
+    elif tool_ok and (
+        interpretation.get("current_facts_indicator")
+        or tool_route.get("recommended_tool_id") == "web_current_research"
+    ):
+        route_type = "hybrid route" if model_ok else "tool route"
+        primary = str(tool_route.get("recommended_tool_id"))
+        status = "recommend_only"
+        safe_next = "preview_only"
+    elif interpretation.get("computation_indicator") and model_ok and not interpretation.get("tool_indicator"):
+        route_type = "model route"
+        primary = str(model_route.get("recommended_model"))
+        status = "recommend_only"
+        safe_next = "smoke_run_allowed_through_existing_smoke_path" if model_route.get("selected_smoke_eligible") else "preview_only"
+    elif tool_ok and (interpretation.get("tool_indicator") or interpretation.get("repo_indicator") or interpretation.get("document_indicator") or interpretation.get("spreadsheet_indicator")):
+        route_type = "hybrid route" if model_ok else "tool route"
+        primary = str(tool_route.get("recommended_tool_id"))
+        status = "recommend_only"
+        safe_next = "preview_only"
+    elif model_ok:
+        route_type = "model route"
+        primary = str(model_route.get("recommended_model"))
+        status = "recommend_only"
+        safe_next = "smoke_run_allowed_through_existing_smoke_path" if model_route.get("selected_smoke_eligible") else "preview_only"
+    else:
+        route_type = "clarification_needed"
+        primary = "none"
+        status = "recommend_only"
+        safe_next = "ask_operator_to_clarify"
+
+    reasons = list(model_route.get("reasons", []))[:3] + list(tool_route.get("reasons", []))[:3]
+    warnings = list(model_route.get("warnings", []))[:2] + list(tool_route.get("warnings", []))[:2]
+    why = reasons + warnings
+    if interpretation.get("privacy_indicator"):
+        why.insert(0, "local/privacy caveat: privacy-sensitive task signal detected; preview does not prove privacy completion.")
+    if not why:
+        why = ["Metadata preview has insufficient route reasons; keep recommendation preview-only."]
+    fallbacks = []
+    for item in route_preview.get("fallback_path", [])[:2]:
+        if isinstance(item, Mapping):
+            fallbacks.append(f"model:{item.get('model')} ({item.get('mode')})")
+    for item in tool_route.get("candidates", [])[:2]:
+        fallbacks.append(f"tool:{item}")
+
+    return {
+        "status": status,
+        "recommended_route_type": route_type,
+        "primary_option": primary,
+        "why_this_route": why[:8],
+        "safe_next_action": safe_next,
+        "fallback_summary": fallbacks[:4],
+        "risk_flags": risk_flags,
+        "evidence_boundary": "Catalog inclusion is not quality evidence; recommendation is not execution authorization.",
+        "manual_override_summary": "Mode/model controls are reflected in preview; route/tool overrides are unavailable in this lane.",
+        "metadata_only": True,
+        "provider_or_local_execution_authorized": False,
+        "tool_execution_authorized": False,
+    }
 
 def _route_list(values: Any) -> str:
     if not values:
@@ -373,6 +489,25 @@ def _route_kv_rows(items: tuple[tuple[str, Any], ...]) -> str:
     return "".join(rows)
 
 
+def _best_path_summary_html(summary: Mapping[str, Any]) -> str:
+    summary_json = html.escape(json.dumps(dict(summary), indent=2, sort_keys=True))
+    rows = _route_kv_rows((
+        ("Best path status", summary.get("status", "recommend_only")),
+        ("Recommended route type", summary.get("recommended_route_type", "clarification_needed")),
+        ("Primary option", summary.get("primary_option", "none")),
+        ("Why this route", summary.get("why_this_route", [])),
+        ("Safe next action", summary.get("safe_next_action", "preview_only")),
+        ("Fallback summary", summary.get("fallback_summary", [])),
+        ("Risk flags", summary.get("risk_flags", [])),
+        ("Evidence boundary", summary.get("evidence_boundary", "Catalog inclusion is not quality evidence; recommendation is not execution authorization.")),
+        ("Manual override availability", summary.get("manual_override_summary", "Mode/model controls are available; route/tool overrides are unavailable in this lane.")),
+        ("Provider/local execution authorized", str(summary.get("provider_or_local_execution_authorized", False)).lower()),
+        ("Tool execution authorized", str(summary.get("tool_execution_authorized", False)).lower()),
+    ))
+    rows += f'<div class="json-head"><h3>Copyable best-path JSON</h3></div><pre id="best-path-json">{summary_json}</pre>'
+    return _route_section("Best Path Summary", rows, "best-path-summary-card")
+
+
 def _route_preview_rows(route_preview: Mapping[str, Any] | None) -> str:
     if not route_preview:
         empty_rows = _route_kv_rows((
@@ -389,7 +524,8 @@ def _route_preview_rows(route_preview: Mapping[str, Any] | None) -> str:
             ("Tool override", "Unavailable in this lane; metadata-only tool recommendation remains router selected."),
         ))
         return (
-            _route_section("Route flow timeline", _route_flow_html(), "route-flow-card")
+            _best_path_summary_html(build_best_path_summary(None))
+            + _route_section("Route flow timeline", _route_flow_html(), "route-flow-card")
             + _route_section("Manual override controls", override_rows, "manual-override-card")
             + _route_section("Evidence boundary", empty_rows, "route-evidence-card")
         )
@@ -399,6 +535,9 @@ def _route_preview_rows(route_preview: Mapping[str, Any] | None) -> str:
     interpretation = route_preview.get("task_interpretation", {}) if isinstance(route_preview.get("task_interpretation"), Mapping) else {}
     evidence_json = html.escape(json.dumps(route_preview, indent=2, sort_keys=True))
     status = route_preview.get("status", "preview_only")
+    best_path = route_preview.get("best_path_summary")
+    if not isinstance(best_path, Mapping):
+        best_path = build_best_path_summary(route_preview)
 
     task_rows = _route_kv_rows((
         ("Task family", interpretation.get("task_family", route_preview.get("task_family") or "not_available")),
@@ -455,7 +594,8 @@ def _route_preview_rows(route_preview: Mapping[str, Any] | None) -> str:
         fail_closed = _route_section("Friendly fail-closed / no eligible route", _route_kv_rows((("Safe display", "No eligible route preview remains visible and non-executing."),)), "route-fail-closed-card")
 
     return (
-        _route_section("Route flow timeline", _route_flow_html(), "route-flow-card")
+        _best_path_summary_html(best_path)
+        + _route_section("Route flow timeline", _route_flow_html(), "route-flow-card")
         + _route_section("Task interpretation signals", task_rows, "task-interpretation-card")
         + _route_section("Model route card", model_rows, "model-route-card")
         + _route_section("Tool route card", tool_rows, "tool-route-card")
@@ -644,7 +784,7 @@ ul.mini { margin: 0; padding-left: 18px; }
 .route-flow p { margin: 6px 0 0; color: var(--muted); font-size: 0.84rem; }
 .step-num { display: inline-block; width: 1.55rem; height: 1.55rem; border-radius: 999px; background: var(--accent); color: #fff; text-align: center; margin-right: 6px; }
 .json-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-pre#sanitized-json, pre#route-evidence-json {
+pre#sanitized-json, pre#route-evidence-json, pre#best-path-json {
   background: #1f2430; color: #eef0f4; border-radius: 8px; padding: 14px;
   overflow-x: auto; font-size: 0.86rem; margin: 10px 0 0;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
