@@ -11,13 +11,13 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Routed-vs-plain blinded scorer packet construction | **current control posture** | `ALPHA-SOLVER-ROUTED-VS-PLAIN-BLIND-SCORING-PACKET-001` constructs 12 blinded scorer cases with blank scores and no committed source identity map. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLIND_SCORING_PACKET_001`. |
+| Routed-vs-plain blinded scorer packet construction | **current control posture** | `ALPHA-SOLVER-ROUTED-VS-PLAIN-BLINDED-SCORER-PACKET-CONSTRUCTION-001` constructs a source-neutral blinded scorer packet with blank scoring/preference/rationale fields and no committed A/B identity key. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLINDED_SCORER_PACKET_CONSTRUCTION_001`. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLIND_SCORING_PACKET_001`** | **review-only selected next state** | A docs-only blinded scorer packet has been constructed after `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001`; operator review is required before any scoring, score locking, unblinding, interpretation, source-map work, runtime/provider/local-model/hosted-model/tool/web execution, current external research, Google Sheets mutation, dependency addition, dashboard/public API exposure, deployment, production/public readiness, benchmark, provider/local-model/tool-quality, security/privacy completion, autonomous-readiness, or Alpha-superiority claim. Prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001`. |
+| **`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLINDED_SCORER_PACKET_CONSTRUCTION_001`** | **review-only selected next state** | A docs-only blinded scorer packet has been constructed after `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001`; operator review is required before any scoring, score locking, unblinding, interpretation, source-map work, runtime/provider/local-model/hosted-model/tool/web execution, current external research, Google Sheets mutation, dependency addition, dashboard/public API exposure, deployment, production/public readiness, benchmark, provider/local-model/tool-quality, security/privacy completion, autonomous-readiness, or Alpha-superiority claim. Prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001`. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001` | prior review-only selected next state | Manual prompt-contract simulation outputs were recorded before blinded scorer packet construction. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUT_COLLECTION_PREP_001` | prior review-only selected next state | Blank operator-fillable templates were recorded after `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUT-COLLECTION-PREP-001`. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_AUTHORIZATION_001` | prior review-only selected next state | Docs-only routed-vs-plain pilot authorization was recorded after `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-AUTHORIZATION-001`. |
@@ -66,7 +66,7 @@
 - `ALPHA-SOLVER-TOOL-CATALOG-ROUTING-REGISTRY-001` (merged PR #603) - metadata-only tool catalog and deterministic recommendation preview; no tool execution, browsing, provider/local-model calls, runtime GitHub calls, or quality/readiness/benchmark/production/public/security/privacy/Alpha-superiority claim.
 - `ALPHA-SOLVER-MODEL-CATALOG-EXPANSION-COST-TIERS-001` (merged PR #605) - metadata-only model catalog expansion and cost tiers with deterministic routing preview; no provider/local-model execution or quality, readiness, benchmark, production/public, security/privacy, or Alpha-superiority claim.
 - `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001` (stable prior state) - docs-only manual prompt-contract simulation outputs for all 12 routed-vs-plain pilot tasks; no runtime, provider/local-model/tool/web execution, scoring, unblinding, readiness, quality, benchmark, or superiority claim.
-- `ALPHA-SOLVER-ROUTED-VS-PLAIN-BLIND-SCORING-PACKET-001` (this PR) - docs-only blinded scorer packet construction; no scoring, unblinding, source identity map commit, runtime, provider/local-model/tool/web execution, readiness, quality, benchmark, or superiority claim.
+- `ALPHA-SOLVER-ROUTED-VS-PLAIN-BLINDED-SCORER-PACKET-CONSTRUCTION-001` (this PR) - docs-only blinded scorer packet construction; no scoring, unblinding, source identity map commit, runtime, provider/local-model/tool/web execution, readiness, quality, benchmark, or superiority claim.
 
 ## Superseded
 
@@ -239,10 +239,10 @@ OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUT_COLLECTION_PREP_001 
         │
         ▼
 ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001 ← manual prompt-contract simulation outputs recorded; no runtime/provider/local-model/tool/web execution; no scoring/unblinding
-ALPHA-SOLVER-ROUTED-VS-PLAIN-BLIND-SCORING-PACKET-001 ← blinded scorer packet constructed; no scoring/unblinding/source-map commit
+ALPHA-SOLVER-ROUTED-VS-PLAIN-BLINDED-SCORER-PACKET-CONSTRUCTION-001 ← blinded scorer packet constructed; no scoring/unblinding/source-map commit
         │
         ▼
-OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001 ← current review-only selected next state
+OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLINDED_SCORER_PACKET_CONSTRUCTION_001 ← current review-only selected next state after packet construction
 ```
 
 This registry does not authorize production/public UI exposure, dashboard readiness, public provider exposure, local model validation claims, further task execution outside this manual simulation packet, scoring, score change, unblinding, source-map work, raw output inspection, Pi.dev install/run/integration, runtime endpoint exposure, public API exposure, `/v1/solve` exposure, Google Sheets mutation, benchmark, dependency addition, release implementation lane, or readiness/broad-value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
@@ -265,7 +265,7 @@ Prior selected next state after model catalog expansion cost tiers: `OPERATOR_RE
 
 Prior selected next state after test console routing preview integration: `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001`.
 
-Current selected next state after routed-vs-plain blinded scorer packet construction: `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLIND_SCORING_PACKET_001`.
+Current selected next state after routed-vs-plain blinded scorer packet construction: `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLINDED_SCORER_PACKET_CONSTRUCTION_001`.
 
 Boundary: no provider quality, local model quality, readiness, benchmark success, production readiness, public readiness, security/privacy completion, UI authorization, or Alpha-superiority claim is created.
 
@@ -408,10 +408,10 @@ Boundary: no provider quality, local model quality, readiness, benchmark success
 | Evidence value | Records one manual plain output, one manual routed Alpha output, and one route metadata record for each `RVP-001` through `RVP-012`. |
 | Boundary | Manual prompt-contract simulation artifacts only; no Alpha runtime, `/v1/solve`, provider API, hosted model, local model, tool execution, web/current research, scoring, unblinding, source-map work, Sheet mutation, benchmark, readiness, production/public, quality, security/privacy completion, autonomous-readiness, or Alpha-superiority evidence. |
 
-## ALPHA-SOLVER-ROUTED-VS-PLAIN-BLIND-SCORING-PACKET-001
+## ALPHA-SOLVER-ROUTED-VS-PLAIN-BLINDED-SCORER-PACKET-CONSTRUCTION-001
 
 | Field | Value |
 | --- | --- |
-| Packet | `docs/evals/runs/alpha-solver-routed-vs-plain-blind-scoring-packet-001/` |
+| Packet | `docs/evals/runs/alpha-solver-routed-vs-plain-blinded-scorer-packet-construction-001/` |
 | Status | completed pending PR |
 | Boundary | Docs-only blinded scorer packet construction; no scoring, unblinding, source identity map commit, runtime/provider/local-model/tool/web execution, readiness, quality, benchmark, or Alpha-superiority claim. |
