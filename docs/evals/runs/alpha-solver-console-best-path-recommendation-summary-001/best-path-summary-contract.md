@@ -1,0 +1,1 @@
+The summary displays status, recommended route type, primary option, route rationale, safe next action, fallback summary, risk flags, evidence boundary, manual override availability, and copyable bounded metadata JSON.

@@ -1,0 +1,1 @@
+No operator review, providers, hosted models, local models, Ollama, tools, web/current research, runtime GitHub calls, file mutation from preview, /v1/solve, Sheets mutation, scoring, unblinding, source-map work, deployment, or dashboard/API exposure.

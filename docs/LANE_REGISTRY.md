@@ -11,7 +11,7 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Console target-parity product pass | **current control posture** | `ALPHA-SOLVER-CONSOLE-TARGET-PARITY-PRODUCT-PASS-001` adds route-flow, task-interpretation, model-route, tool-route, manual-override, and evidence-boundary cards to the local-only console. Selected next state is `OPERATOR_REVIEW_DEFERRED_PENDING_HTML_DIAGRAM_TARGET_PARITY_001`. |
+| Console best-path recommendation summary | **current control posture** | `ALPHA-SOLVER-CONSOLE-BEST-PATH-RECOMMENDATION-SUMMARY-001` adds a preview-only Best Path Summary above detailed route cards. Selected next state is `OPERATOR_REVIEW_DEFERRED_PENDING_HTML_DIAGRAM_TARGET_PARITY_001`. |
 
 ## Next ready / current selected state
 
@@ -460,3 +460,7 @@ Boundary: no provider quality, local model quality, readiness, benchmark success
 ## ALPHA-SOLVER-CONSOLE-TARGET-PARITY-PRODUCT-PASS-001
 
 Completed local-console product-foundation lane. Evidence packet: `docs/evals/runs/alpha-solver-console-target-parity-product-pass-001/`. Selected next state: `OPERATOR_REVIEW_DEFERRED_PENDING_HTML_DIAGRAM_TARGET_PARITY_001`.
+
+## ALPHA-SOLVER-CONSOLE-BEST-PATH-RECOMMENDATION-SUMMARY-001
+
+Completed local-console product-foundation lane. Evidence packet: `docs/evals/runs/alpha-solver-console-best-path-recommendation-summary-001/`. Selected next state: `OPERATOR_REVIEW_DEFERRED_PENDING_HTML_DIAGRAM_TARGET_PARITY_001`. No provider/local-model/tool execution or quality/readiness/value/superiority claim.

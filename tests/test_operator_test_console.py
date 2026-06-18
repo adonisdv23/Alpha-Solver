@@ -748,3 +748,112 @@ def test_preview_rendering_does_not_call_smoke_or_tools(monkeypatch):
     assert "possible_prompt_injection_or_authority_escalation_text" in html
     assert "Tool execution authorized" in html
     assert ">false<" in html
+
+
+def test_best_path_summary_card_renders_before_detailed_route_cards():
+    preview = console.build_route_preview("summarize repo markdown", "local", "qwen2.5:3b")
+    html = console.render_result_html(route_preview=preview)
+
+    assert 'id="best-path-summary-card"' in html
+    assert html.index('id="best-path-summary-card"') < html.index('id="model-route-card"')
+    assert html.index('id="best-path-summary-card"') < html.index('id="tool-route-card"')
+
+
+def test_best_path_summary_shows_required_fields_and_boundary():
+    preview = console.build_route_preview("summarize repo markdown", "local", "qwen2.5:3b")
+    html = console.render_result_html(route_preview=preview)
+
+    for text in (
+        "Recommended route type",
+        "Primary option",
+        "Safe next action",
+        "Risk flags",
+        "Catalog inclusion is not quality evidence; recommendation is not execution authorization.",
+        "Copyable best-path JSON",
+    ):
+        assert text in html
+    assert 'id="best-path-json"' in html
+    assert preview["best_path_summary"]["metadata_only"] is True
+    assert preview["best_path_summary"]["provider_or_local_execution_authorized"] is False
+    assert preview["best_path_summary"]["tool_execution_authorized"] is False
+
+
+def test_tool_looking_prompt_produces_tool_oriented_summary_without_execution(monkeypatch):
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("preview must not execute tools or smoke runners")
+
+    monkeypatch.setattr(console.smoke_runner, "run_local", fail_if_called)
+    monkeypatch.setattr(console.smoke_runner, "run_openai", fail_if_called)
+    preview = console.build_route_preview("call github tool for repo issue metadata", "local", "qwen2.5:3b")
+
+    assert preview["best_path_summary"]["recommended_route_type"] in {"tool route", "hybrid route"}
+    assert preview["best_path_summary"]["safe_next_action"] == "preview_only"
+    assert preview["tool_execution_authorized"] is False
+
+
+def test_computation_prompt_produces_task_signal_summary_without_quality_claim():
+    preview = console.build_route_preview("compute the average of 2 4 and 6", "local", "qwen2.5:3b")
+    html = console.render_result_html(route_preview=preview)
+
+    assert preview["task_interpretation"]["computation_indicator"] is True
+    assert preview["best_path_summary"]["recommended_route_type"] == "model route"
+    assert "Computation indicator" in html
+    assert "Catalog inclusion is not quality evidence" in html
+
+
+def test_privacy_sensitive_prompt_shows_privacy_risk_and_caveat():
+    preview = console.build_route_preview("summarize this private confidential note", "local", "qwen2.5:3b")
+    html = console.render_result_html(route_preview=preview)
+
+    assert "privacy-sensitive" in preview["best_path_summary"]["risk_flags"]
+    assert "local/privacy caveat" in " ".join(preview["best_path_summary"]["why_this_route"])
+    assert "privacy-sensitive" in html
+    assert "local/privacy caveat" in html
+
+
+def test_no_eligible_route_best_path_fails_closed_with_no_execution_copy():
+    preview = console.build_route_preview("x" * 501, "local", "qwen2.5:3b")
+    html = console.render_result_html(route_preview=preview)
+
+    assert preview["best_path_summary"]["status"] == "failed_closed"
+    assert preview["best_path_summary"]["recommended_route_type"] == "no eligible route"
+    assert preview["best_path_summary"]["safe_next_action"] == "do_not_execute"
+    assert "No eligible route" in html or "no eligible route" in html
+    assert "do_not_execute" in html
+
+
+def test_copyable_best_path_json_contains_only_metadata_fields():
+    preview = console.build_route_preview("browse repo docs", "local", "qwen2.5:3b")
+    summary = preview["best_path_summary"]
+
+    allowed = {
+        "status",
+        "recommended_route_type",
+        "primary_option",
+        "why_this_route",
+        "safe_next_action",
+        "fallback_summary",
+        "risk_flags",
+        "evidence_boundary",
+        "manual_override_summary",
+        "metadata_only",
+        "provider_or_local_execution_authorized",
+        "tool_execution_authorized",
+    }
+    assert set(summary) == allowed
+    assert "task" not in summary
+    assert "output_preview" not in summary
+    assert "usage" not in summary
+
+
+def test_preview_rendering_does_not_call_external_execution_paths(monkeypatch):
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("external execution path must not run during preview")
+
+    monkeypatch.setattr(console.smoke_runner, "run_local", fail_if_called)
+    monkeypatch.setattr(console.smoke_runner, "run_openai", fail_if_called)
+    html = console.render_result_html(route_preview=console.build_route_preview("run a tool-looking task", "local", "qwen2.5:3b"))
+
+    assert "Best Path Summary" in html
+    assert "Tool execution authorized" in html
+    assert ">false<" in html

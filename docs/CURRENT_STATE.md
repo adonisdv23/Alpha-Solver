@@ -17,10 +17,10 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 
 | Field | Value |
 |-------|-------|
-| Latest verified completed lane in this wave | **`ALPHA-SOLVER-CONSOLE-TARGET-PARITY-PRODUCT-PASS-001`** |
-| Source-of-truth sync | Current docs record the completed console target-parity product pass and deferred-review selected next state pending HTML/diagram target-parity gap closure |
+| Latest verified completed lane in this wave | **`ALPHA-SOLVER-CONSOLE-BEST-PATH-RECOMMENDATION-SUMMARY-001`** |
+| Source-of-truth sync | Current docs record the completed console best-path recommendation summary and deferred-review selected next state pending HTML/diagram target-parity gap closure |
 | Closed-unmerged superseded PR | **#561** - superseded by merged PR #562 |
-| Current controlling posture | Deferred operator review pending HTML/diagram target-parity gap closure after console target-parity product pass |
+| Current controlling posture | Deferred operator review pending HTML/diagram target-parity gap closure after console best-path recommendation summary |
 | Selected next state | **`OPERATOR_REVIEW_DEFERRED_PENDING_HTML_DIAGRAM_TARGET_PARITY_001`** |
 | Strategic boundary | This local-console state records target-parity route UI build updates and deferred operator review only; it does not prove runtime, `/v1/solve`, provider, hosted-model, local-model, tool, web, benchmark, production/public readiness, security/privacy, quality, autonomous-readiness, value, or Alpha-superiority claims |
 
@@ -71,6 +71,7 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 | test-console-routing-preview lane | `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-PREVIEW-INTEGRATION-001` | Wires the local-only Operator console to metadata-only model/tool route preview before separate smoke execution; creates no provider/local-model/tool quality, readiness, benchmark, production/public, security/privacy, or Alpha superiority. |
 | test-console-routing-metadata-display lane | `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-METADATA-DISPLAY-001` | Surfaces expanded model route metadata and existing metadata-only tool recommendation preview in the local-only Operator console; creates no provider/local-model/tool quality, readiness, benchmark, production/public, security/privacy, value, or Alpha superiority. |
 | console target-parity product pass | `ALPHA-SOLVER-CONSOLE-TARGET-PARITY-PRODUCT-PASS-001` | Adds five-step route-flow, task-interpretation, model-route, tool-route, manual-override, and evidence-boundary cards to the local console while keeping preview separate from bounded smoke execution. |
+| console best-path recommendation summary | `ALPHA-SOLVER-CONSOLE-BEST-PATH-RECOMMENDATION-SUMMARY-001` | Adds a preview-only, metadata-only Best Path Summary above detailed local-console route cards, including safe next action, risk flags, fallbacks, and evidence boundary. |
 | operator-review-packet lane | `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-METADATA-OPERATOR-REVIEW-PACKET-001` | Historical docs/test-support packet for future manual operator review of route-preview understandability and evidence-boundary safety; it did not perform the review or run the console. |
 | routed-vs-plain pilot packet lane | `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-PACKET-001` | Creates a docs-only routed-vs-plain pilot packet with task cards, rubric, comparison protocol, blank result template, runbook, stop conditions, non-actions, and non-claims; runs no pilot and generates no outputs or scores. |
 | MVP cutover review lane | `ALPHA-SOLVER-MVP-CUTOVER-REVIEW-001` | Records a STOP / go-no-go review with verdict `LOCAL_OPERATOR_MVP_CANDIDATE_READY_FOR_MANUAL_REVIEW`; creates no provider/local-model/tool/pilot execution, output generation, scoring, readiness, benchmark, production/public, security/privacy completion, tool-quality, autonomous-readiness, or Alpha-superiority evidence. |
@@ -221,6 +222,6 @@ This phase does **not** support claims of broad value, OpenAI validation, provid
 - Boundary: not Alpha runtime, `/v1/solve`, provider, hosted-model, local-model, tool-execution, web/current research, scoring, unblinding, benchmark, production/public readiness, quality, security/privacy completion, autonomous-readiness, or Alpha-superiority evidence.
 
 
-## Console target-parity product pass update - 2026-06-18
+## Console best-path recommendation summary update - 2026-06-18
 
-`ALPHA-SOLVER-CONSOLE-TARGET-PARITY-PRODUCT-PASS-001` is complete. Selected next state is `OPERATOR_REVIEW_DEFERRED_PENDING_HTML_DIAGRAM_TARGET_PARITY_001`. The next action is another narrow local-console build or gap-closure lane toward HTML/diagram target parity before operator review.
+`ALPHA-SOLVER-CONSOLE-BEST-PATH-RECOMMENDATION-SUMMARY-001` is complete. Selected next state is `OPERATOR_REVIEW_DEFERRED_PENDING_HTML_DIAGRAM_TARGET_PARITY_001`. The next action is another narrow local-console build or gap-closure lane toward HTML/diagram target parity before operator review.

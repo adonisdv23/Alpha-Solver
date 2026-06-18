@@ -1,0 +1,1 @@
+Implemented a metadata-only Best Path Summary derived from existing route-preview metadata. It adds no provider, local-model, tool, web, GitHub, file-mutation, Sheets, scoring, unblinding, deployment, or /v1/solve capability.
