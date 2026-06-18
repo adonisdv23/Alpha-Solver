@@ -1,7 +1,7 @@
 # Lane Registry
 
 > Source-of-truth lane lifecycle registry. Verification date **2026-06-18** for
-> routed-vs-plain locked blind scoring pass.
+> console target-parity product pass.
 
 ## Lifecycle classes
 
@@ -68,7 +68,8 @@
 - `ALPHA-SOLVER-TOOL-CATALOG-ROUTING-REGISTRY-001` (merged PR #603) - metadata-only tool catalog and deterministic recommendation preview; no tool execution, browsing, provider/local-model calls, runtime GitHub calls, or quality/readiness/benchmark/production/public/security/privacy/Alpha-superiority claim.
 - `ALPHA-SOLVER-MODEL-CATALOG-EXPANSION-COST-TIERS-001` (merged PR #605) - metadata-only model catalog expansion and cost tiers with deterministic routing preview; no provider/local-model execution or quality, readiness, benchmark, production/public, security/privacy, or Alpha-superiority claim.
 - `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-METADATA-DISPLAY-001` (prior state) - local-console route-preview metadata display; no provider/local-model/tool execution or quality/readiness/value/superiority claim.
-- `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-METADATA-OPERATOR-REVIEW-PACKET-001` (current state) - docs/test-support operator review packet; no console execution, operator review performance, provider/local-model/tool execution, or quality/readiness/value/superiority claim.
+- `ALPHA-SOLVER-CONSOLE-TARGET-PARITY-PRODUCT-PASS-001` (current state) - local-console target-parity product pass; selected next state is `OPERATOR_REVIEW_DEFERRED_PENDING_HTML_DIAGRAM_TARGET_PARITY_001`, with no provider/local-model/tool execution or quality/readiness/value/superiority claim.
+- `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-METADATA-OPERATOR-REVIEW-PACKET-001` (prior state) - docs/test-support operator review packet; no console execution, operator review performance, provider/local-model/tool execution, or quality/readiness/value/superiority claim.
 - `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001` (stable prior state) - docs-only manual prompt-contract simulation outputs for all 12 routed-vs-plain pilot tasks; no runtime, provider/local-model/tool/web execution, scoring, unblinding, readiness, quality, benchmark, or superiority claim.
 - `ALPHA-SOLVER-ROUTED-VS-PLAIN-BLINDED-SCORER-PACKET-CONSTRUCTION-001` (stable prior state) - docs-only blinded scorer packet construction; no scoring, unblinding, source identity map commit, runtime, provider/local-model/tool/web execution, readiness, quality, benchmark, or superiority claim.
 
