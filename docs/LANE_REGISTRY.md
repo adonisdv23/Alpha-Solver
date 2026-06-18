@@ -1,7 +1,7 @@
 # Lane Registry
 
 > Source-of-truth lane lifecycle registry. Verification date **2026-06-18** for
-> routed-vs-plain locked blind scoring pass.
+> console target-parity product pass.
 
 ## Lifecycle classes
 
@@ -11,13 +11,13 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Test console routing metadata operator review packet | **current control posture** | `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-METADATA-OPERATOR-REVIEW-PACKET-001` adds a docs/test-support packet for future manual operator review of the local-only console route-preview display. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_METADATA_OPERATOR_REVIEW_PACKET_001`. |
+| Console target-parity product pass | **current control posture** | `ALPHA-SOLVER-CONSOLE-TARGET-PARITY-PRODUCT-PASS-001` adds route-flow, task-interpretation, model-route, tool-route, manual-override, and evidence-boundary cards to the local-only console. Selected next state is `OPERATOR_REVIEW_DEFERRED_PENDING_HTML_DIAGRAM_TARGET_PARITY_001`. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_METADATA_OPERATOR_REVIEW_PACKET_001`** | **review-only selected next state** | Operator execution of the packet is required after the docs/test-support operator review packet before any full operator product test lane. Console execution by Codex, provider/local-model/hosted-model/tool/web execution, runtime GitHub calls, `/v1/solve`, Sheets, scoring, unblinding, readiness/value/superiority claims, and model/tool quality claims remain unauthorized. Prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_METADATA_DISPLAY_001`. |
+| **`OPERATOR_REVIEW_DEFERRED_PENDING_HTML_DIAGRAM_TARGET_PARITY_001`** | **deferred-review selected next state** | Operator review remains deferred while another narrow local-console build or gap-closure lane moves closer to the uploaded HTML capability guide and target diagrams. Provider/local-model/hosted-model/tool/web execution, runtime GitHub calls, `/v1/solve`, Sheets, scoring, unblinding, readiness/value/superiority claims, and model/tool quality claims remain unauthorized. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_METADATA_DISPLAY_001` | prior review-only selected next state | Operator review was required after the local-console route-preview metadata display lane before this packet was prepared. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLINDED_SCORER_PACKET_CONSTRUCTION_001` | prior review-only selected next state | Blinded scorer packet construction was recorded before blind scoring authorization prep. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001` | prior review-only selected next state | Manual prompt-contract simulation outputs were recorded before blinded scorer packet construction. |
@@ -68,7 +68,8 @@
 - `ALPHA-SOLVER-TOOL-CATALOG-ROUTING-REGISTRY-001` (merged PR #603) - metadata-only tool catalog and deterministic recommendation preview; no tool execution, browsing, provider/local-model calls, runtime GitHub calls, or quality/readiness/benchmark/production/public/security/privacy/Alpha-superiority claim.
 - `ALPHA-SOLVER-MODEL-CATALOG-EXPANSION-COST-TIERS-001` (merged PR #605) - metadata-only model catalog expansion and cost tiers with deterministic routing preview; no provider/local-model execution or quality, readiness, benchmark, production/public, security/privacy, or Alpha-superiority claim.
 - `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-METADATA-DISPLAY-001` (prior state) - local-console route-preview metadata display; no provider/local-model/tool execution or quality/readiness/value/superiority claim.
-- `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-METADATA-OPERATOR-REVIEW-PACKET-001` (current state) - docs/test-support operator review packet; no console execution, operator review performance, provider/local-model/tool execution, or quality/readiness/value/superiority claim.
+- `ALPHA-SOLVER-CONSOLE-TARGET-PARITY-PRODUCT-PASS-001` (current state) - local-console target-parity product pass; selected next state is `OPERATOR_REVIEW_DEFERRED_PENDING_HTML_DIAGRAM_TARGET_PARITY_001`, with no provider/local-model/tool execution or quality/readiness/value/superiority claim.
+- `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-METADATA-OPERATOR-REVIEW-PACKET-001` (prior state) - docs/test-support operator review packet; no console execution, operator review performance, provider/local-model/tool execution, or quality/readiness/value/superiority claim.
 - `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001` (stable prior state) - docs-only manual prompt-contract simulation outputs for all 12 routed-vs-plain pilot tasks; no runtime, provider/local-model/tool/web execution, scoring, unblinding, readiness, quality, benchmark, or superiority claim.
 - `ALPHA-SOLVER-ROUTED-VS-PLAIN-BLINDED-SCORER-PACKET-CONSTRUCTION-001` (stable prior state) - docs-only blinded scorer packet construction; no scoring, unblinding, source identity map commit, runtime, provider/local-model/tool/web execution, readiness, quality, benchmark, or superiority claim.
 
@@ -454,3 +455,8 @@ Boundary: no provider quality, local model quality, readiness, benchmark success
 | Prior selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLIND_SCORING_PASS_AUTHORIZATION_001` |
 | Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLIND_SCORING_PASS_001` |
 | Boundary | Blind scoring only; no unblinding, source identity review, source-map review, A/B key inspection, source artifact inspection, route metadata inspection, runtime/provider/local-model/tool/web execution, Google Sheets mutation, final interpretation, readiness/value/benchmark/production/public/provider/local-model/tool/security/privacy/autonomous-readiness/Alpha-superiority claim. |
+
+
+## ALPHA-SOLVER-CONSOLE-TARGET-PARITY-PRODUCT-PASS-001
+
+Completed local-console product-foundation lane. Evidence packet: `docs/evals/runs/alpha-solver-console-target-parity-product-pass-001/`. Selected next state: `OPERATOR_REVIEW_DEFERRED_PENDING_HTML_DIAGRAM_TARGET_PARITY_001`.

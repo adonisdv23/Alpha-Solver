@@ -257,6 +257,33 @@ def _form_state(
     }
 
 
+TASK_SIGNAL_KEYWORDS: dict[str, tuple[str, ...]] = {
+    "privacy": ("private", "secret", "credential", "pii", "confidential"),
+    "current_facts": ("latest", "today", "current", "news", "recent"),
+    "tool": ("tool", "run", "execute", "call", "browse", "github"),
+    "repo": ("repo", "repository", "codebase", "pytest", "file"),
+    "document": ("document", "doc", "pdf", "markdown", "summarize"),
+    "spreadsheet": ("sheet", "spreadsheet", "csv", "excel"),
+    "computation": ("calculate", "compute", "math", "sum", "average"),
+}
+
+
+def _task_signals(task: str, tool_preview: Mapping[str, Any]) -> dict[str, Any]:
+    lowered = task.lower()
+    indicators = {name: any(keyword in lowered for keyword in keywords) for name, keywords in TASK_SIGNAL_KEYWORDS.items()}
+    family = tool_preview.get("recommended_tool_family") or "not_available"
+    return {
+        "task_family": family,
+        "privacy_indicator": indicators["privacy"],
+        "current_facts_indicator": indicators["current_facts"],
+        "tool_indicator": indicators["tool"],
+        "repo_indicator": indicators["repo"],
+        "document_indicator": indicators["document"],
+        "spreadsheet_indicator": indicators["spreadsheet"],
+        "computation_indicator": indicators["computation"],
+        "source": "existing_metadata_router_plus_keyword_signals",
+    }
+
 
 def build_route_preview(task: str, mode: str, model: str) -> dict[str, Any]:
     """Build a deterministic metadata-only route preview from existing routers."""
@@ -277,10 +304,12 @@ def build_route_preview(task: str, mode: str, model: str) -> dict[str, Any]:
     tool_preview = tool_router.recommend_tool(
         tool_router.ToolRecommendationRequest(task_text=cleaned_task, untrusted_context="operator_console_task")
     ).as_dict()
+    interpretation = _task_signals(cleaned_task, tool_preview)
     return {
         "status": "preview_only",
         "task": cleaned_task,
-        "task_family": tool_preview.get("recommended_tool_family"),
+        "task_family": interpretation["task_family"],
+        "task_interpretation": interpretation,
         "model_route": model_preview,
         "tool_route": tool_preview,
         "fallback_path": model_preview.get("fallbacks", []),
@@ -316,56 +345,124 @@ def _grouped_route_reasons(model_route: Mapping[str, Any], tool_route: Mapping[s
     }
 
 
-def _route_preview_rows(route_preview: Mapping[str, Any] | None) -> str:
+def _route_section(title: str, body: str, section_id: str | None = None) -> str:
+    section_attr = f' id="{html.escape(section_id)}"' if section_id else ""
+    return f'<section class="route-card"{section_attr}><h3>{html.escape(title)}</h3>{body}</section>'
+
+
+def _route_flow_html() -> str:
+    steps = (
+        ("1", "Read task", "Use the task text only as untrusted local input."),
+        ("2", "Pick route", "Preview model and tool route metadata without calls."),
+        ("3", "Explain route", "Show reasons, warnings, caveats, and fallbacks."),
+        ("4", "Run or recommend safe path", "Keep preview separate from bounded local/OpenAI smoke execution."),
+        ("5", "Capture evidence", "Copy route evidence JSON with no-call and non-quality boundaries."),
+    )
+    items = "".join(
+        f'<li><span class="step-num">{num}</span><strong>{html.escape(label)}</strong><p>{html.escape(copy)}</p></li>'
+        for num, label, copy in steps
+    )
+    return f'<ol class="route-flow">{items}</ol>'
+
+
+def _route_kv_rows(items: tuple[tuple[str, Any], ...]) -> str:
     rows: list[str] = []
+    for label, value in items:
+        value_html = _route_list(value) if isinstance(value, (list, tuple, dict)) else html.escape(str(value))
+        rows.append(f'<div class="kv"><div class="kv-k">{html.escape(label)}</div><div class="kv-v">{value_html}</div></div>')
+    return "".join(rows)
 
-    def add(label: str, value: Any) -> None:
-        if isinstance(value, (list, tuple, dict)):
-            value_html = _route_list(value)
-        else:
-            value_html = html.escape(str(value))
-        rows.append(
-            f'<div class="kv"><div class="kv-k">{html.escape(label)}</div>'
-            f'<div class="kv-v">{value_html}</div></div>'
-        )
 
+def _route_preview_rows(route_preview: Mapping[str, Any] | None) -> str:
     if not route_preview:
-        add("Status", "No route preview yet")
-        add("Evidence boundary", ROUTE_PREVIEW_BOUNDARY)
-        add("Provider/local execution authorized", "false")
-        add("Tool execution authorized", "false")
-        return "".join(rows)
+        empty_rows = _route_kv_rows((
+            ("Status", "No route preview yet"),
+            ("No eligible route display", "Friendly fail-closed/no-eligible-route preview will render here without execution."),
+            ("Evidence boundary", ROUTE_PREVIEW_BOUNDARY),
+            ("Provider/local execution authorized", "false"),
+            ("Tool execution authorized", "false"),
+        ))
+        override_rows = _route_kv_rows((
+            ("Route override", "Unavailable in this local console lane; route is selected by existing metadata routers."),
+            ("Mode override", "Use the Mode dropdown; preview reads the current selection."),
+            ("Model override", "Use the Model dropdown or custom model input; preview and smoke use existing parameters."),
+            ("Tool override", "Unavailable in this lane; metadata-only tool recommendation remains router selected."),
+        ))
+        return (
+            _route_section("Route flow timeline", _route_flow_html(), "route-flow-card")
+            + _route_section("Manual override controls", override_rows, "manual-override-card")
+            + _route_section("Evidence boundary", empty_rows, "route-evidence-card")
+        )
 
     model_route = route_preview.get("model_route", {}) if isinstance(route_preview.get("model_route"), Mapping) else {}
     tool_route = route_preview.get("tool_route", {}) if isinstance(route_preview.get("tool_route"), Mapping) else {}
-    add("Status", route_preview.get("status", "preview_only"))
-    add("Model route status", model_route.get("status", "not_available"))
-    add("Tool route status", tool_route.get("status", "not_available"))
-    add("Task family", route_preview.get("task_family") or "not_available")
-    add("Recommended mode", model_route.get("recommended_mode") or "none")
-    add("Recommended model", model_route.get("recommended_model") or "none")
-    add("Selected backend type", model_route.get("selected_backend_type") or "not_available")
-    add("Selected cost tier", model_route.get("selected_cost_tier") or "not_available")
-    add("Selected latency tier", model_route.get("selected_latency_tier") or "not_available")
-    add("Selected context tier", model_route.get("selected_context_tier") or "not_available")
-    add("Selected privacy tier", model_route.get("selected_privacy_tier") or "not_available")
-    add("Smoke eligibility", model_route.get("selected_smoke_eligible", "not_available"))
-    add("No-call evidence flag", model_route.get("no_call_evidence", True))
-    add("Confidence label", model_route.get("confidence_label", "metadata_only"))
-    add("Operator caveat", model_route.get("operator_caveat", "Catalog inclusion is not model quality evidence."))
-    add("Route reasons (grouped)", _grouped_route_reasons(model_route, tool_route))
-    add("Fallback candidates", route_preview.get("fallback_path", []))
-    add("Recommended tool route", tool_route.get("recommended_tool_id") or "none")
-    add("Tool category", tool_route.get("recommended_tool_family") or "none")
-    add("Tool execution authorization status", tool_route.get("execution_authorized", False))
-    add("Tool fallback or alternative routes", tool_route.get("candidates", []))
-    add("Evidence boundary", route_preview.get("evidence_boundary", ROUTE_PREVIEW_BOUNDARY))
-    add(
-        "Provider/local execution authorized",
-        str(route_preview.get("provider_or_local_execution_authorized", False)).lower(),
+    interpretation = route_preview.get("task_interpretation", {}) if isinstance(route_preview.get("task_interpretation"), Mapping) else {}
+    evidence_json = html.escape(json.dumps(route_preview, indent=2, sort_keys=True))
+    status = route_preview.get("status", "preview_only")
+
+    task_rows = _route_kv_rows((
+        ("Task family", interpretation.get("task_family", route_preview.get("task_family") or "not_available")),
+        ("Privacy indicator", interpretation.get("privacy_indicator", False)),
+        ("Current-facts indicator", interpretation.get("current_facts_indicator", False)),
+        ("Tool indicator", interpretation.get("tool_indicator", False)),
+        ("Repo indicator", interpretation.get("repo_indicator", False)),
+        ("Document indicator", interpretation.get("document_indicator", False)),
+        ("Spreadsheet indicator", interpretation.get("spreadsheet_indicator", False)),
+        ("Computation indicator", interpretation.get("computation_indicator", False)),
+        ("Signal source", interpretation.get("source", "existing_metadata_router")),
+    ))
+    model_rows = _route_kv_rows((
+        ("Model route status", model_route.get("status", "not_available")),
+        ("Recommended mode", model_route.get("recommended_mode") or "none"),
+        ("Recommended model", model_route.get("recommended_model") or "none"),
+        ("Selected backend type", model_route.get("selected_backend_type") or "not_available"),
+        ("Selected cost tier", model_route.get("selected_cost_tier") or "not_available"),
+        ("Selected latency tier", model_route.get("selected_latency_tier") or "not_available"),
+        ("Selected context tier", model_route.get("selected_context_tier") or "not_available"),
+        ("Selected privacy tier", model_route.get("selected_privacy_tier") or "not_available"),
+        ("Smoke eligibility", model_route.get("selected_smoke_eligible", "not_available")),
+        ("Confidence label", model_route.get("confidence_label", "metadata_only")),
+        ("Operator caveat", model_route.get("operator_caveat", "Catalog inclusion is not model quality evidence.")),
+        ("Fallback candidates", route_preview.get("fallback_path", [])),
+        ("Warnings", model_route.get("warnings", [])),
+    ))
+    tool_rows = _route_kv_rows((
+        ("Tool route status", tool_route.get("status", "not_available")),
+        ("Recommended tool route", tool_route.get("recommended_tool_id") or "none"),
+        ("Tool category", tool_route.get("recommended_tool_family") or "none"),
+        ("Execution authorization status", tool_route.get("execution_authorized", False)),
+        ("Caveats", tool_route.get("warnings", [])),
+        ("Tool fallback or alternative routes", tool_route.get("candidates", [])),
+    ))
+    override_rows = _route_kv_rows((
+        ("Route override", "Unavailable in this local console lane; route is selected by existing metadata routers."),
+        ("Mode override", "Use the Mode dropdown; preview reads the current selection."),
+        ("Model override", "Use the Model dropdown or custom model input; preview and smoke use existing parameters."),
+        ("Tool override", "Unavailable in this lane; metadata-only tool recommendation remains router selected."),
+    ))
+    evidence_rows = _route_kv_rows((
+        ("Status", status),
+        ("No-call evidence flag", model_route.get("no_call_evidence", True)),
+        ("Preview-vs-execution boundary", route_preview.get("evidence_boundary", ROUTE_PREVIEW_BOUNDARY)),
+        ("Catalog-not-quality evidence caveat", "Catalog inclusion is not model/tool quality evidence."),
+        ("Provider/local execution authorized", str(route_preview.get("provider_or_local_execution_authorized", False)).lower()),
+        ("Tool execution authorized", str(route_preview.get("tool_execution_authorized", False)).lower()),
+        ("Route reasons (grouped)", _grouped_route_reasons(model_route, tool_route)),
+    ))
+    evidence_rows += f'<div class="json-head"><h3>Copyable route evidence JSON</h3></div><pre id="route-evidence-json">{evidence_json}</pre>'
+    fail_closed = ""
+    if status == "failed_closed" or model_route.get("status") == "failed_closed" or tool_route.get("status") == "failed_closed":
+        fail_closed = _route_section("Friendly fail-closed / no eligible route", _route_kv_rows((("Safe display", "No eligible route preview remains visible and non-executing."),)), "route-fail-closed-card")
+
+    return (
+        _route_section("Route flow timeline", _route_flow_html(), "route-flow-card")
+        + _route_section("Task interpretation signals", task_rows, "task-interpretation-card")
+        + _route_section("Model route card", model_rows, "model-route-card")
+        + _route_section("Tool route card", tool_rows, "tool-route-card")
+        + _route_section("Manual override controls", override_rows, "manual-override-card")
+        + _route_section("Evidence boundary card", evidence_rows, "route-evidence-card")
+        + fail_closed
     )
-    add("Tool execution authorized", str(route_preview.get("tool_execution_authorized", False)).lower())
-    return "".join(rows)
 
 def _reason_explanation(reason: str) -> str:
     if reason in REASON_EXPLANATIONS:
@@ -541,8 +638,13 @@ button[disabled] { opacity: 0.5; cursor: not-allowed; }
 .kv-v { word-break: break-word; }
 .kv-v .hint { font-size: 0.84rem; color: var(--muted); margin-top: 4px; }
 ul.mini { margin: 0; padding-left: 18px; }
+.route-card { border: 1px solid #eef0f4; border-radius: 8px; padding: 14px; margin-top: 14px; }
+.route-flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 10px; padding-left: 0; list-style: none; }
+.route-flow li { border: 1px solid var(--line); border-radius: 8px; padding: 10px; background: #fbfcff; }
+.route-flow p { margin: 6px 0 0; color: var(--muted); font-size: 0.84rem; }
+.step-num { display: inline-block; width: 1.55rem; height: 1.55rem; border-radius: 999px; background: var(--accent); color: #fff; text-align: center; margin-right: 6px; }
 .json-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-pre#sanitized-json {
+pre#sanitized-json, pre#route-evidence-json {
   background: #1f2430; color: #eef0f4; border-radius: 8px; padding: 14px;
   overflow-x: auto; font-size: 0.86rem; margin: 10px 0 0;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;

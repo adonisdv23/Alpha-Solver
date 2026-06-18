@@ -695,3 +695,56 @@ def test_route_preview_escapes_untrusted_task_output():
     assert task not in html
     assert html_lib.escape(task) in html
     assert "<script>alert" not in html
+
+
+def test_target_parity_five_step_route_flow_and_cards_render():
+    preview = console.build_route_preview("summarize repo markdown and compute average", "local", "qwen2.5:3b")
+    html = console.render_result_html(route_preview=preview)
+
+    for text in ("Read task", "Pick route", "Explain route", "Run or recommend safe path", "Capture evidence"):
+        assert text in html
+    for card_id in (
+        "task-interpretation-card",
+        "model-route-card",
+        "tool-route-card",
+        "manual-override-card",
+        "route-evidence-card",
+    ):
+        assert card_id in html
+    assert "Document indicator" in html
+    assert "Computation indicator" in html
+
+
+def test_evidence_card_has_required_boundary_and_copyable_route_json():
+    preview = console.build_route_preview("browse current repo files", "local", "qwen2.5:3b")
+    html = console.render_result_html(route_preview=preview)
+
+    assert "No-call evidence flag" in html
+    assert "Preview-vs-execution boundary" in html
+    assert "Catalog-not-quality evidence caveat" in html
+    assert "Copyable route evidence JSON" in html
+    assert 'id="route-evidence-json"' in html
+    assert "Provider or local model execution is not authorized by preview" in html
+
+
+def test_manual_override_copy_or_controls_are_visible():
+    html = console.render_result_html()
+
+    assert "Manual override controls" in html
+    assert "Mode dropdown" in html
+    assert "custom model input" in html
+    assert "Tool override" in html
+
+
+def test_preview_rendering_does_not_call_smoke_or_tools(monkeypatch):
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("execution path must not run during preview rendering")
+
+    monkeypatch.setattr(console.smoke_runner, "run_local", fail_if_called)
+    monkeypatch.setattr(console.smoke_runner, "run_openai", fail_if_called)
+    preview = console.build_route_preview("call github and browse", "local", "qwen2.5:3b")
+    html = console.render_result_html(route_preview=preview)
+
+    assert "possible_prompt_injection_or_authority_escalation_text" in html
+    assert "Tool execution authorized" in html
+    assert ">false<" in html
