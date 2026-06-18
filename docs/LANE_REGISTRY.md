@@ -1,7 +1,7 @@
 # Lane Registry
 
 > Source-of-truth lane lifecycle registry. Verification date **2026-06-18** for
-> routed-vs-plain blinded scorer packet construction.
+> routed-vs-plain blind scoring pass authorization prep.
 
 ## Lifecycle classes
 
@@ -11,13 +11,14 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Routed-vs-plain blinded scorer packet construction | **current control posture** | `ALPHA-SOLVER-ROUTED-VS-PLAIN-BLINDED-SCORER-PACKET-CONSTRUCTION-001` constructs a source-neutral blinded scorer packet with blank scoring/preference/rationale fields and no committed A/B identity key. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLINDED_SCORER_PACKET_CONSTRUCTION_001`. |
+| Routed-vs-plain blind scoring pass authorization prep | **current control posture** | `ALPHA-SOLVER-ROUTED-VS-PLAIN-BLIND-SCORING-PASS-AUTHORIZATION-001` prepares operator review materials for a future blind scoring pass using the PR #619 scorer-facing packet. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLIND_SCORING_PASS_AUTHORIZATION_001`. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLINDED_SCORER_PACKET_CONSTRUCTION_001`** | **review-only selected next state** | A docs-only blinded scorer packet has been constructed after `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001`; operator review is required before any scoring, score locking, unblinding, interpretation, source-map work, runtime/provider/local-model/hosted-model/tool/web execution, current external research, Google Sheets mutation, dependency addition, dashboard/public API exposure, deployment, production/public readiness, benchmark, provider/local-model/tool-quality, security/privacy completion, autonomous-readiness, or Alpha-superiority claim. Prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001`. |
+| **`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLIND_SCORING_PASS_AUTHORIZATION_001`** | **review-only selected next state** | A docs-only blind scoring authorization/prep packet has been completed after PR #619 scorer-packet construction; operator review is required before any scoring lane is opened. Scoring, score locking, unblinding, interpretation, source-map work, runtime/provider/local-model/hosted-model/tool/web execution, current external research, Google Sheets mutation, dependency addition, dashboard/public API exposure, deployment, production/public readiness, benchmark, provider/local-model/tool-quality, security/privacy completion, autonomous-readiness, and Alpha-superiority claims remain unauthorized. Prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLINDED_SCORER_PACKET_CONSTRUCTION_001`. |
+| `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLINDED_SCORER_PACKET_CONSTRUCTION_001` | prior review-only selected next state | Blinded scorer packet construction was recorded before blind scoring authorization prep. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001` | prior review-only selected next state | Manual prompt-contract simulation outputs were recorded before blinded scorer packet construction. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUT_COLLECTION_PREP_001` | prior review-only selected next state | Blank operator-fillable templates were recorded after `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUT-COLLECTION-PREP-001`. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_AUTHORIZATION_001` | prior review-only selected next state | Docs-only routed-vs-plain pilot authorization was recorded after `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-AUTHORIZATION-001`. |
@@ -66,7 +67,7 @@
 - `ALPHA-SOLVER-TOOL-CATALOG-ROUTING-REGISTRY-001` (merged PR #603) - metadata-only tool catalog and deterministic recommendation preview; no tool execution, browsing, provider/local-model calls, runtime GitHub calls, or quality/readiness/benchmark/production/public/security/privacy/Alpha-superiority claim.
 - `ALPHA-SOLVER-MODEL-CATALOG-EXPANSION-COST-TIERS-001` (merged PR #605) - metadata-only model catalog expansion and cost tiers with deterministic routing preview; no provider/local-model execution or quality, readiness, benchmark, production/public, security/privacy, or Alpha-superiority claim.
 - `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001` (stable prior state) - docs-only manual prompt-contract simulation outputs for all 12 routed-vs-plain pilot tasks; no runtime, provider/local-model/tool/web execution, scoring, unblinding, readiness, quality, benchmark, or superiority claim.
-- `ALPHA-SOLVER-ROUTED-VS-PLAIN-BLINDED-SCORER-PACKET-CONSTRUCTION-001` (this PR) - docs-only blinded scorer packet construction; no scoring, unblinding, source identity map commit, runtime, provider/local-model/tool/web execution, readiness, quality, benchmark, or superiority claim.
+- `ALPHA-SOLVER-ROUTED-VS-PLAIN-BLINDED-SCORER-PACKET-CONSTRUCTION-001` (stable prior state) - docs-only blinded scorer packet construction; no scoring, unblinding, source identity map commit, runtime, provider/local-model/tool/web execution, readiness, quality, benchmark, or superiority claim.
 
 ## Superseded
 
@@ -415,3 +416,15 @@ Boundary: no provider quality, local model quality, readiness, benchmark success
 | Packet | `docs/evals/runs/alpha-solver-routed-vs-plain-blinded-scorer-packet-construction-001/` |
 | Status | completed pending PR |
 | Boundary | Docs-only blinded scorer packet construction; no scoring, unblinding, source identity map commit, runtime/provider/local-model/tool/web execution, readiness, quality, benchmark, or Alpha-superiority claim. |
+
+
+## ALPHA-SOLVER-ROUTED-VS-PLAIN-BLIND-SCORING-PASS-AUTHORIZATION-001
+
+| Field | Value |
+|-------|-------|
+| Status | completed docs-only authorization/prep packet |
+| Packet | `docs/evals/runs/alpha-solver-routed-vs-plain-blind-scoring-pass-authorization-001/` |
+| Prior selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLINDED_SCORER_PACKET_CONSTRUCTION_001` |
+| Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLIND_SCORING_PASS_AUTHORIZATION_001` |
+| Evidence value | Prepares operator review materials for a future blind scoring pass using the PR #619 scorer-facing packet; includes authorization language, scoring protocol, blank score-entry template, score-lock protocol, custody rules, stop conditions, non-actions, non-claims, and checks documentation. |
+| Boundary | No scoring, score filling, winner selection, aggregate computation, unblinding, interpretation, A/B key inspection or commit, source-map inspection or commit, source artifact inspection for scoring, runtime/provider/local-model/tool/web execution, Sheets mutation, dependencies, deployment, readiness, benchmark, value, or Alpha-superiority claim. |
