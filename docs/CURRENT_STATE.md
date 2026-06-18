@@ -1,11 +1,11 @@
 # Alpha Solver - Current State
 
-> Source-of-truth navigation doc. Last verified **2026-06-17** for routed-vs-plain pilot manual output collection.
-> This lane records manual prompt-contract simulation outputs for the routed-vs-plain pilot task set. It does not run Alpha runtime, invoke `/v1/solve`, call providers, run hosted or local models, execute tools, browse, score outputs, unblind, mutate Sheets, deploy, or make production/public/benchmark/provider/local-model/tool/security/privacy/autonomous-readiness/Alpha-superiority claims.
+> Source-of-truth navigation doc. Last verified **2026-06-18** for routed-vs-plain blinded scorer packet construction.
+> This lane constructs a docs-only blinded scorer packet from the routed-vs-plain manual output collection. It does not run Alpha runtime, invoke `/v1/solve`, call providers, run hosted or local models, execute tools, browse, score outputs, unblind, mutate Sheets, deploy, or make production/public/benchmark/provider/local-model/tool/security/privacy/autonomous-readiness/Alpha-superiority claims.
 
 ## Current verified phase
 
-**Routed-vs-plain pilot manual output collection completed: the selected next state is operator review before any blind scoring packet construction.**
+**Routed-vs-plain blinded scorer packet constructed: the selected next state is operator review before any scoring, unblinding, or interpretation.**
 
 The merged #569–#574 wave updated the repository from the post-#568 blocked Value Read state to a broader documentation-and-boundary posture. PR #576 was superseded by PR #577 and should be closed unmerged. PR #577 completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only Alpha-native local operator harness design note.
 
@@ -17,11 +17,11 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 
 | Field | Value |
 |-------|-------|
-| Latest verified completed lane in this wave | **`ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001`** |
-| Source-of-truth sync | Current docs record the completed routed-vs-plain manual output collection lane and a review-only selected next state |
+| Latest verified completed lane in this wave | **`ALPHA-SOLVER-ROUTED-VS-PLAIN-BLIND-SCORING-PACKET-001`** |
+| Source-of-truth sync | Current docs record the completed routed-vs-plain blinded scorer packet construction lane and a review-only selected next state |
 | Closed-unmerged superseded PR | **#561** - superseded by merged PR #562 |
-| Current controlling posture | Operator review required after routed-vs-plain pilot manual output collection |
-| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001`** |
+| Current controlling posture | Operator review required after routed-vs-plain blinded scorer packet construction |
+| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLIND_SCORING_PACKET_001`** |
 | Strategic boundary | This review-only state records manual prompt-contract simulation outputs only; it does not prove runtime, `/v1/solve`, provider, hosted-model, local-model, tool, web, benchmark, production/public readiness, security/privacy, quality, autonomous-readiness, or Alpha-superiority claims and does not authorize scoring or unblinding |
 
 ## Completed post-552 / post-565 / post-568 infrastructure lanes
@@ -75,14 +75,15 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 | routed-vs-plain pilot authorization lane | `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-AUTHORIZATION-001` | Completes a docs-only authorization packet for a future routed-vs-plain output-collection lane; it defines the task set, output collection method, plain baseline identity, routed Alpha identity, execution permission boundaries, task-id preservation, route metadata capture, blinding, scoring authorization gate, stop conditions, evidence boundaries, non-actions, and non-claims. Provider calls, hosted-model calls, local-model calls, tool execution, and web/current research are not authorized by this packet; later collection must use operator-provided outputs unless separately authorized. |
 | routed-vs-plain pilot output collection prep lane | `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUT-COLLECTION-PREP-001` | Records 12 blank operator-fillable capture templates for `RVP-001` through `RVP-012`, including blank fields for plain baseline outputs, routed Alpha outputs, and route metadata. This is not Alpha runtime, `/v1/solve`, provider, hosted-model, local-model, tool-execution, web/current research, scoring, unblinding, benchmark, readiness, quality, or superiority evidence. |
 | routed-vs-plain pilot manual output collection lane | `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001` | Records manual prompt-contract simulation outputs for all 12 routed-vs-plain pilot tasks, with one plain output, one routed output, and one metadata record per task. This is not runtime, `/v1/solve`, provider, hosted/local-model, tool, web/current research, scoring, unblinding, benchmark, readiness, quality, or superiority evidence. |
+| routed-vs-plain blinded scorer packet lane | `ALPHA-SOLVER-ROUTED-VS-PLAIN-BLIND-SCORING-PACKET-001` | Constructs 12 task-preserving blinded scorer case files from the manual routed-vs-plain outputs, freezes blank rubric rows, and keeps the source identity map out of the repository. This is not scoring, unblinding, runtime, `/v1/solve`, provider/local-model/tool/web execution, benchmark, readiness, quality, or superiority evidence. |
 
 See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for the PR status ledger and [`LANE_REGISTRY.md`](LANE_REGISTRY.md) for lifecycle classification.
 
 ## Selected next state
 
-**`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001`** is the current global selected next state.
+**`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLIND_SCORING_PACKET_001`** is the current global selected next state.
 
-This is a review-only state after `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001`. The prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUT_COLLECTION_PREP_001`. The lane records 12 manual plain outputs, 12 manual routed Alpha outputs, and 12 route metadata records for the authorized routed-vs-plain pilot task set. It does not run Alpha runtime, invoke `/v1/solve`, call providers, run hosted or local models, execute tools, browse, use current external research, mutate Sheets, add dependencies, score, unblind, deploy, or make readiness, benchmark, production/public, provider-quality, local-model-quality, tool-quality, security/privacy, autonomous-readiness, or Alpha-superiority claims.
+This is a review-only state after `ALPHA-SOLVER-ROUTED-VS-PLAIN-BLIND-SCORING-PACKET-001`. The prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001`. The lane constructs 12 task-preserving blinded scorer cases from the manual routed-vs-plain outputs, freezes blank rubric rows, and keeps the source identity map out of the repository. It does not run Alpha runtime, invoke `/v1/solve`, call providers, run hosted or local models, execute tools, browse, use current external research, mutate Sheets, add dependencies, score, lock scores, unblind, commit source maps, deploy, or make readiness, benchmark, production/public, provider-quality, local-model-quality, tool-quality, security/privacy, autonomous-readiness, or Alpha-superiority claims.
 
 The prior state was a review-only state after `ALPHA-SOLVER-LOCAL-MVP-MANUAL-REVIEW-001`. The prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_MVP_CUTOVER_REVIEW_001`. The review verdict is `LOCAL_MVP_MANUAL_REVIEW_PARTIAL_NEEDS_OPERATOR_TEST` based only on operator-provided screenshot observations. It does not claim a full local MVP manual review pass. The next action may proceed to routed-vs-plain pilot authorization because that next lane is docs-only and does not require UI testing to execute. Full manual UI testing remains deferred before any broader user-testing, production/public readiness, benchmark, provider-quality, local-model-quality, tool-quality, security/privacy completion, autonomous execution readiness, or Alpha-superiority claim. This state does not run providers, hosted models, local models, tools, the routed-vs-plain pilot, output generation, scoring, unblinding, raw output inspection, source-map work, dependency installation, Google Sheets mutation, `/v1/solve`, dashboard/public API behavior, or deployment.
 
