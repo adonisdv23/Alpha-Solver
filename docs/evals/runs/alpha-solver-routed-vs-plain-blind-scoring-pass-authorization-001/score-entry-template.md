@@ -2,9 +2,9 @@
 
 All fields below are intentionally blank. Do not fill any score, preference, rationale, caveat, contested-score, scorer, method, or timestamp field in this prep lane.
 
-## RVP-01
+## RVP-001
 
-- Task ID: RVP-01
+- Task ID: RVP-001
 - Response A scores by rubric dimension:
   - Task fidelity:
   - Reasoning quality:
@@ -24,9 +24,9 @@ All fields below are intentionally blank. Do not fill any score, preference, rat
 - Scorer identifier or scorer method:
 - Scoring timestamp:
 
-## RVP-02
+## RVP-002
 
-- Task ID: RVP-02
+- Task ID: RVP-002
 - Response A scores by rubric dimension:
   - Task fidelity:
   - Reasoning quality:
@@ -46,9 +46,9 @@ All fields below are intentionally blank. Do not fill any score, preference, rat
 - Scorer identifier or scorer method:
 - Scoring timestamp:
 
-## RVP-03
+## RVP-003
 
-- Task ID: RVP-03
+- Task ID: RVP-003
 - Response A scores by rubric dimension:
   - Task fidelity:
   - Reasoning quality:
@@ -68,9 +68,9 @@ All fields below are intentionally blank. Do not fill any score, preference, rat
 - Scorer identifier or scorer method:
 - Scoring timestamp:
 
-## RVP-04
+## RVP-004
 
-- Task ID: RVP-04
+- Task ID: RVP-004
 - Response A scores by rubric dimension:
   - Task fidelity:
   - Reasoning quality:
@@ -90,9 +90,9 @@ All fields below are intentionally blank. Do not fill any score, preference, rat
 - Scorer identifier or scorer method:
 - Scoring timestamp:
 
-## RVP-05
+## RVP-005
 
-- Task ID: RVP-05
+- Task ID: RVP-005
 - Response A scores by rubric dimension:
   - Task fidelity:
   - Reasoning quality:
@@ -112,9 +112,9 @@ All fields below are intentionally blank. Do not fill any score, preference, rat
 - Scorer identifier or scorer method:
 - Scoring timestamp:
 
-## RVP-06
+## RVP-006
 
-- Task ID: RVP-06
+- Task ID: RVP-006
 - Response A scores by rubric dimension:
   - Task fidelity:
   - Reasoning quality:
@@ -134,9 +134,9 @@ All fields below are intentionally blank. Do not fill any score, preference, rat
 - Scorer identifier or scorer method:
 - Scoring timestamp:
 
-## RVP-07
+## RVP-007
 
-- Task ID: RVP-07
+- Task ID: RVP-007
 - Response A scores by rubric dimension:
   - Task fidelity:
   - Reasoning quality:
@@ -156,9 +156,9 @@ All fields below are intentionally blank. Do not fill any score, preference, rat
 - Scorer identifier or scorer method:
 - Scoring timestamp:
 
-## RVP-08
+## RVP-008
 
-- Task ID: RVP-08
+- Task ID: RVP-008
 - Response A scores by rubric dimension:
   - Task fidelity:
   - Reasoning quality:
@@ -178,9 +178,9 @@ All fields below are intentionally blank. Do not fill any score, preference, rat
 - Scorer identifier or scorer method:
 - Scoring timestamp:
 
-## RVP-09
+## RVP-009
 
-- Task ID: RVP-09
+- Task ID: RVP-009
 - Response A scores by rubric dimension:
   - Task fidelity:
   - Reasoning quality:
@@ -200,9 +200,9 @@ All fields below are intentionally blank. Do not fill any score, preference, rat
 - Scorer identifier or scorer method:
 - Scoring timestamp:
 
-## RVP-10
+## RVP-010
 
-- Task ID: RVP-10
+- Task ID: RVP-010
 - Response A scores by rubric dimension:
   - Task fidelity:
   - Reasoning quality:
@@ -222,9 +222,9 @@ All fields below are intentionally blank. Do not fill any score, preference, rat
 - Scorer identifier or scorer method:
 - Scoring timestamp:
 
-## RVP-11
+## RVP-011
 
-- Task ID: RVP-11
+- Task ID: RVP-011
 - Response A scores by rubric dimension:
   - Task fidelity:
   - Reasoning quality:
@@ -244,9 +244,9 @@ All fields below are intentionally blank. Do not fill any score, preference, rat
 - Scorer identifier or scorer method:
 - Scoring timestamp:
 
-## RVP-12
+## RVP-012
 
-- Task ID: RVP-12
+- Task ID: RVP-012
 - Response A scores by rubric dimension:
   - Task fidelity:
   - Reasoning quality:
