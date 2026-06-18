@@ -1,6 +1,6 @@
-# Evidence Index - routed-vs-plain blind scoring pass authorization prep
+# Evidence Index - routed-vs-plain blind scoring pass
 
-> Source-of-truth evidence ledger. Verification date **2026-06-18** after routed-vs-plain blind scoring pass authorization prep.
+> Source-of-truth evidence ledger. Verification date **2026-06-18** after routed-vs-plain locked blind scoring pass.
 
 ## How to read "evidence value"
 
@@ -63,13 +63,13 @@ The entries below are design, documentation, gate, helper, static-checking, meth
 
 `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` and `ALPHA-SOLVER-DISCRIMINATION-TASK-BANK-FIRST-CHEAP-TEST-001` remain completed historical docs-only lanes. They are not the current selected state.
 
-The current selected state records only the blind scoring authorization/prep boundary: operator review materials exist for a future blind scoring pass, blank score-entry template fields remain blank, and scoring remains unauthorized until a later operator-authorized scoring lane. It authorizes no scoring, score locking, source-map work, unblinding, raw source-output inspection for scoring, dashboard or public API work, `/v1/solve` exposure, Google Sheets mutation, provider/local-model/tool/web execution, council behavior, benchmark work, release behavior, readiness claim, broad value claim, provider claim, local-model claim, security/privacy claim, production/public claim, demo external-use approval, discrimination-task execution/scoring, partnership/Pi.dev integration claim, or Alpha-superiority claim.
+The current selected state records only the completed locked blind scoring pass boundary: all 12 scorer-facing packet tasks have blind scores, blind preferences, rationales, caveats, contested-score flags, scorer method, timestamps, and score-lock confirmation recorded before any unblinding. It authorizes no source-map work, unblinding, raw source-output inspection for scoring, dashboard or public API work, `/v1/solve` exposure, Google Sheets mutation, provider/local-model/tool/web execution, council behavior, benchmark work, release behavior, readiness claim, broad value claim, provider claim, local-model claim, security/privacy claim, production/public claim, demo external-use approval, discrimination-task execution/scoring outside this locked blind pass, partnership/Pi.dev integration claim, or Alpha-superiority claim.
 
 ## Evidence boundary
 
-The current routed-vs-plain blind scoring authorization prep state supports only bounded statements that the repository contains docs-only operator review materials for a future blind scoring pass using the PR #619 scorer-facing packet. It does not include scores, preferences, rationales, winners, aggregate totals, an A/B identity key, source-arm mapping, unblinding output, final interpretation, provider output, hosted-model output, local-model output, tool output, web/current-research output, Google Sheets mutation, dependency changes, runtime validation, `/v1/solve` evidence, dashboard/public API evidence, readiness evidence, benchmark evidence, quality proof, value proof, security/privacy completion, autonomous-readiness evidence, or Alpha-superiority evidence.
+The current routed-vs-plain blind scoring pass state supports only bounded statements that the repository contains locked blind scores for all 12 scorer-facing packet tasks and that operator review is required before any separately authorized unblinding or final interpretation lane. It does not include final winners, aggregate interpretation, an A/B identity key, source-arm mapping, unblinding output, final interpretation, provider output, hosted-model output, local-model output, tool output, web/current-research output, Google Sheets mutation, dependency changes, runtime validation, `/v1/solve` evidence, dashboard/public API evidence, readiness evidence, benchmark evidence, quality proof, value proof, security/privacy completion, autonomous-readiness evidence, or Alpha-superiority evidence.
 
-Historical lanes remain preserved as historical context only, including Value Read packet construction/scoring/interpretation lanes, gate/helper/static-checking lanes, feasibility lanes, local/OpenAI smoke-runner and smoke-result import lanes, model/tool catalog metadata lanes, and routed-vs-plain pilot authorization/output-collection lanes. Those historical artifacts do not override the current selected state, which is `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLIND_SCORING_PASS_AUTHORIZATION_001`.
+Historical lanes remain preserved as historical context only, including Value Read packet construction/scoring/interpretation lanes, gate/helper/static-checking lanes, feasibility lanes, local/OpenAI smoke-runner and smoke-result import lanes, model/tool catalog metadata lanes, and routed-vs-plain pilot authorization/output-collection lanes. Those historical artifacts do not override the current selected state, which is `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLIND_SCORING_PASS_001`.
 
 ## ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RUNNER-001
 

@@ -1,7 +1,7 @@
 # Lane Registry
 
 > Source-of-truth lane lifecycle registry. Verification date **2026-06-18** for
-> routed-vs-plain blind scoring pass authorization prep.
+> routed-vs-plain locked blind scoring pass.
 
 ## Lifecycle classes
 
