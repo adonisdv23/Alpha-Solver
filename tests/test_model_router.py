@@ -11,6 +11,9 @@ def test_router_selects_requested_enabled_openai_model_when_hosted_allowed():
     assert "model_available_in_catalog" in preview.reasons
     assert "smoke_eligible" in preview.reasons
     assert preview.provider_or_local_execution_authorized is False
+    assert preview.selected_backend_type == "hosted"
+    assert preview.no_call_evidence is True
+    assert preview.operator_caveat == "Catalog inclusion is not model quality evidence."
 
 
 def test_router_selects_requested_enabled_local_model_when_local_allowed():
@@ -19,6 +22,7 @@ def test_router_selects_requested_enabled_local_model_when_local_allowed():
     assert preview.status == "preview_only"
     assert preview.recommended_mode == "local"
     assert preview.recommended_model == "qwen2.5:3b"
+    assert preview.selected_backend_type == "local"
 
 
 def test_local_only_request_avoids_hosted_recommendations_unless_fallback_is_stated():
@@ -141,6 +145,75 @@ def test_router_does_not_call_ollama_or_local_runtime(monkeypatch):
     assert preview.status == "preview_only"
 
 
+def test_route_preview_surfaces_cost_latency_context_privacy_and_capability_reasons():
+    preview = preview_route(
+        RoutingPreviewRequest(
+            requested_model="gpt-4.1-mini",
+            required_capability="json_capable",
+            required_context_tier="high",
+            privacy_preference="hosted_provider_boundary",
+        )
+    )
+
+    assert preview.status == "preview_only"
+    assert "cost_tier_reason:medium" in preview.reasons
+    assert "latency_tier_reason:medium" in preview.reasons
+    assert "context_tier_reason:high" in preview.reasons
+    assert "privacy_tier_reason:hosted_provider_boundary" in preview.reasons
+    assert "capability_tag_match:json_capable" in preview.reasons
+    assert "catalog_inclusion_not_quality_evidence" in preview.reasons
+
+
+def test_fallback_candidates_are_fallback_eligible_and_tag_compatible():
+    preview = preview_route(RoutingPreviewRequest(required_capability="local_runtime", allow_local=True, allow_hosted_providers=True))
+
+    assert preview.fallbacks
+    assert all(fallback.fallback_eligible for fallback in preview.fallbacks)
+    assert all(fallback.mode == "local" for fallback in preview.fallbacks)
+
+
+def test_required_context_tier_is_hard_filter_and_can_route_to_hosted():
+    preview = preview_route(RoutingPreviewRequest(required_context_tier="high"))
+
+    assert preview.status == "preview_only"
+    assert preview.selected_context_tier == "high"
+    assert preview.selected_context_tier != "low"
+    assert preview.recommended_mode == "openai"
+
+
+def test_privacy_preference_is_hard_filter_and_hosted_alias_excludes_local():
+    preview = preview_route(RoutingPreviewRequest(privacy_preference="hosted"))
+
+    assert preview.status == "preview_only"
+    assert preview.recommended_mode == "openai"
+    assert preview.selected_backend_type == "hosted"
+    assert preview.selected_privacy_tier.startswith("hosted")
+
+
+def test_unsatisfied_hard_metadata_filter_fails_closed():
+    preview = preview_route(RoutingPreviewRequest(required_context_tier="ultra"))
+
+    assert preview.status == "failed_closed"
+    assert preview.recommended_model is None
+    assert "no_eligible_model" in preview.reasons
+
+
+def test_requested_model_must_satisfy_hard_metadata_filters():
+    preview = preview_route(RoutingPreviewRequest(requested_model="qwen2.5:3b", required_context_tier="high"))
+
+    assert preview.status == "failed_closed"
+    assert preview.recommended_model is None
+    assert "requested_model_missing_required_context_tier" in preview.reasons
+
+
+def test_requested_model_must_satisfy_hard_privacy_filter():
+    preview = preview_route(RoutingPreviewRequest(requested_model="qwen2.5:3b", privacy_preference="hosted"))
+
+    assert preview.status == "failed_closed"
+    assert preview.recommended_model is None
+    assert "requested_model_missing_required_privacy_tier" in preview.reasons
+
+
 def test_metadata_preferences_keep_routing_deterministic():
     req = RoutingPreviewRequest(cost_preference="low", latency_preference="medium", task_profile="general")
 
@@ -189,3 +262,6 @@ def test_preview_as_dict_is_structured():
     assert isinstance(data["reasons"], list)
     assert data["evidence_boundary"]["runs_provider"] is False
     assert data["provider_or_local_execution_authorized"] is False
+    assert data["selected_backend_type"] == "hosted"
+    assert data["selected_smoke_eligible"] is True
+    assert data["no_call_evidence"] is True

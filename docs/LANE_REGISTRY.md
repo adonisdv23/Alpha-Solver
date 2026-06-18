@@ -266,7 +266,7 @@ Prior selected next state after model catalog expansion cost tiers: `OPERATOR_RE
 
 Prior selected next state after test console routing preview integration: `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_PREVIEW_INTEGRATION_001`.
 
-Current selected next state after routed-vs-plain blinded scorer packet construction: `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLINDED_SCORER_PACKET_CONSTRUCTION_001`.
+Prior selected next state after routed-vs-plain blinded scorer packet construction: `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLINDED_SCORER_PACKET_CONSTRUCTION_001`.
 
 Boundary: no provider quality, local model quality, readiness, benchmark success, production readiness, public readiness, security/privacy completion, UI authorization, or Alpha-superiority claim is created.
 
@@ -429,6 +429,17 @@ Boundary: no provider quality, local model quality, readiness, benchmark success
 | Evidence value | Prepares operator review materials for a future blind scoring pass using the PR #619 scorer-facing packet; includes authorization language, scoring protocol, blank score-entry template, score-lock protocol, custody rules, stop conditions, non-actions, non-claims, and checks documentation. |
 | Boundary | No scoring, score filling, winner selection, aggregate computation, unblinding, interpretation, A/B key inspection or commit, source-map inspection or commit, source artifact inspection for scoring, runtime/provider/local-model/tool/web execution, Sheets mutation, dependencies, deployment, readiness, benchmark, value, or Alpha-superiority claim. |
 
+
+
+## ALPHA-SOLVER-MODEL-CATALOG-ROUTING-METADATA-EXPANSION-001
+
+| Field | Value |
+|---|---|
+| Status | completed product-foundation lane |
+| Packet | `docs/evals/runs/alpha-solver-model-catalog-routing-metadata-expansion-001/` |
+| Prior selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLIND_SCORING_PASS_001` |
+| Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_ROUTING_METADATA_EXPANSION_001` |
+| Boundary | Static catalog metadata and deterministic route preview only; no runtime behavior, `/v1/solve`, providers, hosted/local models, Ollama, tools, browsing, Sheets mutation, scoring, unblinding, A/B key inspection, source-map inspection, readiness/value/benchmark/quality/production/public/security/privacy/autonomous-readiness/Alpha-superiority claim. |
 
 ## ALPHA-SOLVER-ROUTED-VS-PLAIN-BLIND-SCORING-PASS-001
 

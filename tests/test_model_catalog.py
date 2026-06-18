@@ -12,7 +12,13 @@ REQUIRED_METADATA_FIELDS = {
     "provider",
     "model_id",
     "display_name",
+    "id",
     "mode",
+    "backend_type",
+    "model_family",
+    "availability_status",
+    "requires_provider_key",
+    "local_only",
     "enabled_by_default",
     "routing_roles",
     "task_families",
@@ -25,11 +31,18 @@ REQUIRED_METADATA_FIELDS = {
     "supports_tools",
     "supports_vision",
     "smoke_eligible",
+    "route_tags",
+    "tool_compatibility",
+    "best_for",
+    "avoid_for",
+    "fallback_eligible",
     "requires_network",
     "requires_credentials",
     "evidence_boundary",
     "quality_claim",
     "last_reviewed",
+    "reviewed_at",
+    "catalog_reviewed_at",
     "review_status",
     "operator_notes",
 }
@@ -63,6 +76,11 @@ def test_each_model_entry_has_required_no_quality_claim_metadata():
         assert REQUIRED_METADATA_FIELDS <= set(data)
         assert model.provider
         assert model.mode in {"local", "openai"}
+        assert model.id == model.model_id
+        assert model.backend_type in {"local", "hosted", "future_provider", "external"}
+        assert model.model_family
+        assert isinstance(model.requires_provider_key, bool)
+        assert isinstance(model.local_only, bool)
         assert model.model_id
         assert model.routing_roles
         assert model.task_families
@@ -71,6 +89,9 @@ def test_each_model_entry_has_required_no_quality_claim_metadata():
         assert model.latency_tier in {"low", "medium", "high", "unknown"}
         assert model.context_tier in {"low", "medium", "high", "unknown"}
         assert isinstance(model.smoke_eligible, bool)
+        assert model.route_tags
+        assert isinstance(model.tool_compatibility, tuple)
+        assert isinstance(model.fallback_eligible, bool)
         assert model.quality_claim is False
         assert model.evidence_boundary == DEFAULT_EVIDENCE_BOUNDARY
         assert model.review_status in {"operator_metadata", "smoke_only"}
@@ -82,6 +103,14 @@ def test_missing_required_metadata_field_is_rejected():
     raw.pop("cost_tier")
 
     with pytest.raises(ValueError, match="missing required fields"):
+        ModelCatalogEntry.from_mapping(raw)
+
+
+def test_invalid_backend_type_is_rejected():
+    raw = ModelCatalog.load().models[0].as_dict()
+    raw["backend_type"] = "optimistic"
+
+    with pytest.raises(ValueError, match="unsupported backend_type"):
         ModelCatalogEntry.from_mapping(raw)
 
 
