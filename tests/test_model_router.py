@@ -206,6 +206,14 @@ def test_requested_model_must_satisfy_hard_metadata_filters():
     assert "requested_model_missing_required_context_tier" in preview.reasons
 
 
+def test_requested_model_must_satisfy_hard_privacy_filter():
+    preview = preview_route(RoutingPreviewRequest(requested_model="qwen2.5:3b", privacy_preference="hosted"))
+
+    assert preview.status == "failed_closed"
+    assert preview.recommended_model is None
+    assert "requested_model_missing_required_privacy_tier" in preview.reasons
+
+
 def test_metadata_preferences_keep_routing_deterministic():
     req = RoutingPreviewRequest(cost_preference="low", latency_preference="medium", task_profile="general")
 
