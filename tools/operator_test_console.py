@@ -346,7 +346,16 @@ def build_best_path_summary(route_preview: Mapping[str, Any] | None) -> dict[str
     interpretation = route_preview.get("task_interpretation", {}) if isinstance(route_preview.get("task_interpretation"), Mapping) else {}
     model_ok = model_route.get("status") == "preview_only" and bool(model_route.get("recommended_model"))
     tool_ok = tool_route.get("status") == "preview_only" and bool(tool_route.get("recommended_tool_id"))
-    failed = route_preview.get("status") == "failed_closed" or model_route.get("status") == "failed_closed" or tool_route.get("status") == "failed_closed"
+    tool_no_match = (
+        tool_route.get("status") == "failed_closed"
+        and not tool_route.get("recommended_tool_id")
+        and "no_matching_tool_family" in set(map(str, tool_route.get("reasons", [])))
+    )
+    failed = (
+        route_preview.get("status") == "failed_closed"
+        or model_route.get("status") == "failed_closed"
+        or (tool_route.get("status") == "failed_closed" and not tool_no_match)
+    )
 
     risk_flags: list[str] = []
     if interpretation.get("privacy_indicator") or "privacy" in " ".join(map(str, tool_route.get("warnings", []))):
@@ -359,7 +368,7 @@ def build_best_path_summary(route_preview: Mapping[str, Any] | None) -> dict[str
         risk_flags.append("document/spreadsheet")
     if len(str(route_preview.get("task", ""))) > 350:
         risk_flags.append("long context")
-    if failed or not (model_ok or tool_ok):
+    if failed or not (model_ok or tool_ok or (model_ok and tool_no_match)):
         risk_flags.append("unsupported/no eligible route")
     if not risk_flags:
         risk_flags.append("none detected")
@@ -369,6 +378,14 @@ def build_best_path_summary(route_preview: Mapping[str, Any] | None) -> dict[str
         primary = "none"
         status = "failed_closed"
         safe_next = "do_not_execute"
+    elif tool_ok and (
+        interpretation.get("current_facts_indicator")
+        or tool_route.get("recommended_tool_id") == "web_current_research"
+    ):
+        route_type = "hybrid route" if model_ok else "tool route"
+        primary = str(tool_route.get("recommended_tool_id"))
+        status = "recommend_only"
+        safe_next = "preview_only"
     elif interpretation.get("computation_indicator") and model_ok and not interpretation.get("tool_indicator"):
         route_type = "model route"
         primary = str(model_route.get("recommended_model"))

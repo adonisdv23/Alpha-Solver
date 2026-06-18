@@ -822,6 +822,36 @@ def test_no_eligible_route_best_path_fails_closed_with_no_execution_copy():
     assert "do_not_execute" in html
 
 
+def test_optional_tool_no_match_does_not_fail_best_path_when_model_route_is_valid():
+    preview = console.build_route_preview("hello world", "local", "qwen2.5:3b")
+    summary = preview["best_path_summary"]
+
+    assert preview["tool_route"]["status"] == "failed_closed"
+    assert "no_matching_tool_family" in preview["tool_route"]["reasons"]
+    assert preview["model_route"]["status"] == "preview_only"
+    assert summary["status"] == "recommend_only"
+    assert summary["recommended_route_type"] == "model route"
+    assert summary["primary_option"] == preview["model_route"]["recommended_model"]
+    assert summary["safe_next_action"] == "smoke_run_allowed_through_existing_smoke_path"
+    assert "unsupported/no eligible route" not in summary["risk_flags"]
+    assert summary["provider_or_local_execution_authorized"] is False
+    assert summary["tool_execution_authorized"] is False
+
+
+def test_current_facts_prompt_uses_tool_preview_and_keeps_execution_unauthorized():
+    preview = console.build_route_preview("latest news today", "local", "qwen2.5:3b")
+    summary = preview["best_path_summary"]
+
+    assert preview["task_interpretation"]["current_facts_indicator"] is True
+    assert preview["tool_route"]["recommended_tool_id"] == "web_current_research"
+    assert summary["recommended_route_type"] in {"tool route", "hybrid route"}
+    assert summary["primary_option"] == "web_current_research"
+    assert summary["safe_next_action"] == "preview_only"
+    assert "current facts" in summary["risk_flags"]
+    assert summary["provider_or_local_execution_authorized"] is False
+    assert summary["tool_execution_authorized"] is False
+
+
 def test_copyable_best_path_json_contains_only_metadata_fields():
     preview = console.build_route_preview("browse repo docs", "local", "qwen2.5:3b")
     summary = preview["best_path_summary"]

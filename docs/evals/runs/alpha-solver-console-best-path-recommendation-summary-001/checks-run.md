@@ -3,8 +3,8 @@
 | Command | Result | Notes |
 | --- | --- | --- |
 | `git diff --check` | Pass | No whitespace errors. |
-| `pytest -q tests/test_operator_test_console.py -k 'best_path or route_preview or target_parity or evidence_card'` | Pass | 14 passed; warnings were Python/FastAPI/Starlette deprecation warnings. Covers targeted console UI/rendering, best-path summary, route-preview, fail-closed, metadata-only, and no-execution preview checks. |
-| `pytest -q tests/test_operator_test_console.py` | Pass | 58 passed; warnings were Python/FastAPI/Starlette deprecation warnings. |
+| `pytest -q tests/test_operator_test_console.py -k 'best_path or route_preview or target_parity or evidence_card'` | Pass | 15 passed; warnings were Python/FastAPI/Starlette deprecation warnings. Covers targeted console UI/rendering, best-path summary, route-preview, optional tool no-match, current-facts tool preview, fail-closed, metadata-only, and no-execution preview checks. |
+| `pytest -q tests/test_operator_test_console.py` | Pass | 60 passed; warnings were Python/FastAPI/Starlette deprecation warnings. |
 | `python -m py_compile tools/operator_test_console.py tests/test_operator_test_console.py` | Pass | Changed Python files compile. |
 | `python -m pytest -q` | Pass | Full suite passed with 3 skipped tests and deprecation warnings. Skips: live OpenAI smoke requires opt-in/API key; deck smoke disabled in test environment; packaging build module missing/build failed. |
 | `python - <<'PY' ... narrative claim-safety check ... PY` | Pass | Changed Markdown records non-actions/non-claims and does not add readiness/value/quality/superiority assertions. |
