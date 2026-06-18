@@ -8,8 +8,8 @@
 | `git diff --check` | Pass | No whitespace errors. |
 | `python -m py_compile tools/operator_test_console.py tests/test_operator_test_console.py` | Pass | Console and focused tests compile. |
 | `python -m pytest -q tests/test_operator_test_console.py` | Pass | 62 passed; pytest reported existing deprecation warnings from FastAPI/Starlette under Python 3.14. |
-| Source-of-truth consistency review | Pass | New lane and selected next state are present in `docs/CURRENT_STATE.md`, `docs/LANE_REGISTRY.md`, and `docs/EVIDENCE_INDEX.md`. |
-| Changed-Markdown claim-safety review | Pass | Added Markdown lines were reviewed for unsupported broad claims. |
-| Changed-line forbidden-surface review | Pass | Console/test added lines were reviewed for forbidden runtime/web/tool/API/Sheets surfaces. |
+| Source-of-truth consistency review | Pass | Rerun after blocker feedback on 2026-06-18. New lane and selected next state are present in `docs/CURRENT_STATE.md`, `docs/LANE_REGISTRY.md`, and `docs/EVIDENCE_INDEX.md`; `docs/EVIDENCE_INDEX.md` no longer presents `OPERATOR_REVIEW_DEFERRED_PENDING_HTML_DIAGRAM_TARGET_PARITY_001` as the current selected state. |
+| Changed-Markdown claim-safety review | Pass | Rerun after blocker feedback on 2026-06-18. Added Markdown lines were reviewed for unsupported broad claims. |
+| Changed-line forbidden-surface review | Pass | Rerun after blocker feedback on 2026-06-18 using changed-line diff scope. Console/test added lines were reviewed for forbidden runtime/web/tool/API/Sheets surfaces. |
 
 Router tests were not run because router code was not changed.

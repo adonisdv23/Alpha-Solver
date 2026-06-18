@@ -1,6 +1,6 @@
 # Operator Review Notes
 
-Manual operator review should compare the local console against the attached target guide and diagrams. Treat this packet as bounded local-console preview/UI evidence only.
+Manual operator review should compare the local console against the attached target guide and diagrams. Treat the HTML and both PNG diagrams as operator-facing target context only, not repo proof. Treat this packet as bounded local-console preview/UI evidence only.
 
 Review focus:
 
