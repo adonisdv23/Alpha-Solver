@@ -3,7 +3,7 @@
 - `git diff --check` — pass.
 - `python -m json.tool configs/model_catalog.json >/tmp/catalog.json` — pass.
 - `python -m pytest tests/test_model_catalog.py -q` — pass: 13 passed.
-- `python -m pytest tests/test_model_router.py -q` — pass: 20 passed.
+- `python -m pytest tests/test_model_router.py -q` — pass: 24 passed, including hard context/privacy filter regression coverage.
 - `python -m py_compile alpha/model_catalog.py alpha/model_router.py tests/test_model_catalog.py tests/test_model_router.py` — pass.
 - Narrative claim-safety check on changed Markdown files — pass; broad readiness/value/benchmark/quality/superiority terms only appear inside non-claim/boundary statements.
 - No provider/local-model/network/tool/web calls in tests — pass by test design; targeted tests monkeypatch provider/local runtime call paths to fail if invoked and do not invoke `/v1/solve`.

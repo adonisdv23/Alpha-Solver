@@ -138,6 +138,10 @@ def preview_route(request: RoutingPreviewRequest | None = None, catalog: ModelCa
             return _failed("requested_model_disabled", cat, req, reasons, warnings)
         if req.required_capability and req.required_capability not in selected.capability_tags:
             return _failed("requested_model_missing_required_capability", cat, req, reasons, warnings)
+        if req.required_context_tier and selected.context_tier != req.required_context_tier:
+            return _failed("requested_model_missing_required_context_tier", cat, req, reasons, warnings)
+        if req.privacy_preference and not _privacy_matches(selected.privacy_tier, req.privacy_preference):
+            return _failed("requested_model_missing_required_privacy_tier", cat, req, reasons, warnings)
         if req.required_capability:
             reasons.append("required_capability_matched_as_metadata_only")
         if selected.mode == "openai" and not req.allow_hosted_providers:
@@ -204,10 +208,20 @@ def _metadata_filtered(options: tuple[ModelCatalogEntry, ...], req: RoutingPrevi
     if req.task_profile:
         filtered = tuple(model for model in filtered if req.task_profile in model.task_families or req.task_profile in model.routing_roles or req.task_profile in model.route_tags) or filtered
     if req.required_context_tier:
-        filtered = tuple(model for model in filtered if model.context_tier == req.required_context_tier) or filtered
+        filtered = tuple(model for model in filtered if model.context_tier == req.required_context_tier)
     if req.privacy_preference:
-        filtered = tuple(model for model in filtered if model.privacy_tier == req.privacy_preference) or filtered
+        filtered = tuple(model for model in filtered if _privacy_matches(model.privacy_tier, req.privacy_preference))
     return filtered
+
+
+def _privacy_matches(model_privacy_tier: str, requested_privacy: str) -> bool:
+    if model_privacy_tier == requested_privacy:
+        return True
+    if requested_privacy == "hosted":
+        return model_privacy_tier.startswith("hosted")
+    if requested_privacy == "local":
+        return model_privacy_tier.startswith("local")
+    return False
 
 
 def _selected_metadata_reasons(selected: ModelCatalogEntry, req: RoutingPreviewRequest) -> list[str]:

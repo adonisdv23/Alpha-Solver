@@ -172,6 +172,40 @@ def test_fallback_candidates_are_fallback_eligible_and_tag_compatible():
     assert all(fallback.mode == "local" for fallback in preview.fallbacks)
 
 
+def test_required_context_tier_is_hard_filter_and_can_route_to_hosted():
+    preview = preview_route(RoutingPreviewRequest(required_context_tier="high"))
+
+    assert preview.status == "preview_only"
+    assert preview.selected_context_tier == "high"
+    assert preview.selected_context_tier != "low"
+    assert preview.recommended_mode == "openai"
+
+
+def test_privacy_preference_is_hard_filter_and_hosted_alias_excludes_local():
+    preview = preview_route(RoutingPreviewRequest(privacy_preference="hosted"))
+
+    assert preview.status == "preview_only"
+    assert preview.recommended_mode == "openai"
+    assert preview.selected_backend_type == "hosted"
+    assert preview.selected_privacy_tier.startswith("hosted")
+
+
+def test_unsatisfied_hard_metadata_filter_fails_closed():
+    preview = preview_route(RoutingPreviewRequest(required_context_tier="ultra"))
+
+    assert preview.status == "failed_closed"
+    assert preview.recommended_model is None
+    assert "no_eligible_model" in preview.reasons
+
+
+def test_requested_model_must_satisfy_hard_metadata_filters():
+    preview = preview_route(RoutingPreviewRequest(requested_model="qwen2.5:3b", required_context_tier="high"))
+
+    assert preview.status == "failed_closed"
+    assert preview.recommended_model is None
+    assert "requested_model_missing_required_context_tier" in preview.reasons
+
+
 def test_metadata_preferences_keep_routing_deterministic():
     req = RoutingPreviewRequest(cost_preference="low", latency_preference="medium", task_profile="general")
 
