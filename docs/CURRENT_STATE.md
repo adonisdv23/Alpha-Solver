@@ -5,7 +5,7 @@
 
 ## Current verified phase
 
-**Routed-vs-plain pilot manual output collection completed: the selected next state is operator review before any blind scoring packet construction.**
+**Routed-vs-plain pilot blind scoring packet construction completed: the selected next state is operator review before any blind scoring pass.**
 
 The merged #569–#574 wave updated the repository from the post-#568 blocked Value Read state to a broader documentation-and-boundary posture. PR #576 was superseded by PR #577 and should be closed unmerged. PR #577 completes `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` as a docs-only Alpha-native local operator harness design note.
 
@@ -17,11 +17,11 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 
 | Field | Value |
 |-------|-------|
-| Latest verified completed lane in this wave | **`ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001`** |
+| Latest verified completed lane in this wave | **`ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-BLIND-SCORING-PACKET-CONSTRUCTION-001`** |
 | Source-of-truth sync | Current docs record the completed routed-vs-plain manual output collection lane and a review-only selected next state |
 | Closed-unmerged superseded PR | **#561** - superseded by merged PR #562 |
 | Current controlling posture | Operator review required after routed-vs-plain pilot manual output collection |
-| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001`** |
+| Selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_BLIND_SCORING_PACKET_CONSTRUCTION_001`** |
 | Strategic boundary | This review-only state records manual prompt-contract simulation outputs only; it does not prove runtime, `/v1/solve`, provider, hosted-model, local-model, tool, web, benchmark, production/public readiness, security/privacy, quality, autonomous-readiness, or Alpha-superiority claims and does not authorize scoring or unblinding |
 
 ## Completed post-552 / post-565 / post-568 infrastructure lanes
@@ -80,7 +80,7 @@ See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for the PR status ledger and [`LANE
 
 ## Selected next state
 
-**`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001`** is the current global selected next state.
+**`OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_BLIND_SCORING_PACKET_CONSTRUCTION_001`** is the current global selected next state.
 
 This is a review-only state after `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001`. The prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUT_COLLECTION_PREP_001`. The lane records 12 manual plain outputs, 12 manual routed Alpha outputs, and 12 route metadata records for the authorized routed-vs-plain pilot task set. It does not run Alpha runtime, invoke `/v1/solve`, call providers, run hosted or local models, execute tools, browse, use current external research, mutate Sheets, add dependencies, score, unblind, deploy, or make readiness, benchmark, production/public, provider-quality, local-model-quality, tool-quality, security/privacy, autonomous-readiness, or Alpha-superiority claims.
 
@@ -218,3 +218,15 @@ This phase does **not** support claims of broad value, OpenAI validation, provid
 - Prior selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_AUTHORIZATION_001`.
 - Selected next state: `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUT_COLLECTION_PREP_001`.
 - Boundary: not Alpha runtime, `/v1/solve`, provider, hosted-model, local-model, tool-execution, web/current research, scoring, unblinding, benchmark, production/public readiness, quality, security/privacy completion, autonomous-readiness, or Alpha-superiority evidence.
+
+## ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-BLIND-SCORING-PACKET-CONSTRUCTION-001
+
+| Field | Value |
+|-------|-------|
+| Status | completed docs-only blind scoring packet construction |
+| Packet | `docs/evals/runs/alpha-solver-routed-vs-plain-pilot-blind-scoring-packet-001/` |
+| Source lane | `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001` |
+| Blinded comparisons | 12 (`RVP-001` through `RVP-012`) |
+| Selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_BLIND_SCORING_PACKET_CONSTRUCTION_001` |
+| Selected next action | Operator review before any blind scoring pass |
+| Boundary | Constructs blinded packet only; no scoring, unblinding, interpretation, winners, totals, runtime, `/v1/solve`, provider/local-model/tool/web execution, benchmark, readiness, quality, production/public, security/privacy, autonomous-readiness, or Alpha-superiority claim. |
