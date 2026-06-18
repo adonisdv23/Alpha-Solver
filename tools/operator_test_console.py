@@ -268,10 +268,10 @@ def build_route_preview(task: str, mode: str, model: str) -> dict[str, Any]:
         model_router.RoutingPreviewRequest(
             requested_mode=selected_mode,
             requested_model=requested_model,
-            allow_hosted_providers=False,
+            allow_hosted_providers=True,
             allow_local=True,
             prompt_length=len(cleaned_task),
-            local_only=True,
+            local_only=False,
         )
     ).as_dict()
     tool_preview = tool_router.recommend_tool(
@@ -296,8 +296,24 @@ def _route_list(values: Any) -> str:
         return '<span class="muted-inline">none</span>'
     if isinstance(values, Mapping):
         values = [f"{key}={value}" for key, value in values.items()]
-    items = "".join(f"<li>{html.escape(str(value))}</li>" for value in values)
+    rendered: list[str] = []
+    for value in values:
+        if isinstance(value, Mapping):
+            parts = [f"{key}: {item}" for key, item in value.items()]
+            rendered.append("; ".join(parts))
+        else:
+            rendered.append(str(value))
+    items = "".join(f"<li>{html.escape(item)}</li>" for item in rendered)
     return f'<ul class="mini">{items}</ul>'
+
+
+def _grouped_route_reasons(model_route: Mapping[str, Any], tool_route: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        "model route reasons": list(model_route.get("reasons", [])),
+        "model route warnings": list(model_route.get("warnings", [])),
+        "tool route reasons": list(tool_route.get("reasons", [])),
+        "tool route caveats": list(tool_route.get("warnings", [])),
+    }
 
 
 def _route_preview_rows(route_preview: Mapping[str, Any] | None) -> str:
@@ -323,18 +339,26 @@ def _route_preview_rows(route_preview: Mapping[str, Any] | None) -> str:
     model_route = route_preview.get("model_route", {}) if isinstance(route_preview.get("model_route"), Mapping) else {}
     tool_route = route_preview.get("tool_route", {}) if isinstance(route_preview.get("tool_route"), Mapping) else {}
     add("Status", route_preview.get("status", "preview_only"))
+    add("Model route status", model_route.get("status", "not_available"))
+    add("Tool route status", tool_route.get("status", "not_available"))
     add("Task family", route_preview.get("task_family") or "not_available")
-    add(
-        "Recommended model path",
-        f"{model_route.get('recommended_mode') or 'none'} / {model_route.get('recommended_model') or 'none'}",
-    )
-    add(
-        "Recommended tool family",
-        f"{tool_route.get('recommended_tool_family') or 'none'} / {tool_route.get('recommended_tool_id') or 'none'}",
-    )
-    add("Route reasons", list(model_route.get("reasons", [])) + list(tool_route.get("reasons", [])))
-    add("Route warnings", list(model_route.get("warnings", [])) + list(tool_route.get("warnings", [])))
-    add("Fallback path", route_preview.get("fallback_path", []))
+    add("Recommended mode", model_route.get("recommended_mode") or "none")
+    add("Recommended model", model_route.get("recommended_model") or "none")
+    add("Selected backend type", model_route.get("selected_backend_type") or "not_available")
+    add("Selected cost tier", model_route.get("selected_cost_tier") or "not_available")
+    add("Selected latency tier", model_route.get("selected_latency_tier") or "not_available")
+    add("Selected context tier", model_route.get("selected_context_tier") or "not_available")
+    add("Selected privacy tier", model_route.get("selected_privacy_tier") or "not_available")
+    add("Smoke eligibility", model_route.get("selected_smoke_eligible", "not_available"))
+    add("No-call evidence flag", model_route.get("no_call_evidence", True))
+    add("Confidence label", model_route.get("confidence_label", "metadata_only"))
+    add("Operator caveat", model_route.get("operator_caveat", "Catalog inclusion is not model quality evidence."))
+    add("Route reasons (grouped)", _grouped_route_reasons(model_route, tool_route))
+    add("Fallback candidates", route_preview.get("fallback_path", []))
+    add("Recommended tool route", tool_route.get("recommended_tool_id") or "none")
+    add("Tool category", tool_route.get("recommended_tool_family") or "none")
+    add("Tool execution authorization status", tool_route.get("execution_authorized", False))
+    add("Tool fallback or alternative routes", tool_route.get("candidates", []))
     add("Evidence boundary", route_preview.get("evidence_boundary", ROUTE_PREVIEW_BOUNDARY))
     add(
         "Provider/local execution authorized",

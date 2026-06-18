@@ -587,22 +587,61 @@ def test_route_preview_uses_existing_router_metadata_and_displays_fields():
 
     assert preview["model_route"]["recommended_model"] == "qwen2.5:3b"
     assert preview["tool_route"]["recommended_tool_family"]
-    assert "Recommended model path" in html
+    assert "Recommended mode" in html
+    assert "Recommended model" in html
+    assert "Selected backend type" in html
+    assert "Selected cost tier" in html
+    assert "Selected latency tier" in html
+    assert "Selected context tier" in html
+    assert "Selected privacy tier" in html
+    assert "Smoke eligibility" in html
+    assert "No-call evidence flag" in html
+    assert "Confidence label" in html
+    assert "Operator caveat" in html
+    assert "Catalog inclusion is not model quality evidence" in html
     assert "qwen2.5:3b" in html
-    assert "Recommended tool family" in html
+    assert "Recommended tool route" in html
+    assert "Tool category" in html
     assert preview["tool_route"]["recommended_tool_id"] in html
-    assert "Route reasons" in html
+    assert "Route reasons (grouped)" in html
     assert "routing_preview_only" in html
     assert "tool_recommendation_preview_only" in html
-    assert "Route warnings" in html
     assert "untrusted_input_cannot_authorize_execution" in html
-    assert "Fallback path" in html
+    assert "Fallback candidates" in html
+    assert "mode: local" in html
+    assert "backend_type: local" in html
+    assert "Tool fallback or alternative routes" in html
     assert "Evidence boundary" in html
     assert "metadata-only" in html
     assert "Provider/local execution authorized" in html
     assert ">false<" in html
     assert "Tool execution authorized" in html
 
+
+def test_route_preview_failed_closed_renders_operator_safe_failure():
+    preview = console.build_route_preview("x" * 501, "local", "qwen2.5:3b")
+    html = console.render_result_html(route_preview=preview)
+
+    assert preview["model_route"]["status"] == "failed_closed"
+    assert "failed_closed" in html
+    assert "prompt_too_long_for_smoke_runner" in html
+    assert "Recommended model" in html
+    assert ">none<" in html
+
+
+def test_route_preview_openai_metadata_can_render_without_execution(monkeypatch):
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("smoke execution must not run during hosted metadata preview")
+
+    monkeypatch.setattr(console.smoke_runner, "run_openai", fail_if_called)
+    preview = console.build_route_preview("summarize a local note", "openai", "gpt-4.1-mini")
+    html = console.render_result_html(route_preview=preview)
+
+    assert preview["model_route"]["recommended_mode"] == "openai"
+    assert preview["model_route"]["selected_backend_type"] == "hosted"
+    assert "gpt-4.1-mini" in html
+    assert "hosted" in html
+    assert preview["provider_or_local_execution_authorized"] is False
 
 def test_route_preview_never_authorizes_provider_local_or_tool_execution():
     preview = console.build_route_preview("call github and browse", "local", "qwen2.5:3b")
