@@ -11,13 +11,14 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Test console routing metadata display | **current control posture** | `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-METADATA-DISPLAY-001` surfaces expanded metadata-only model route and tool recommendation preview fields in the local-only Operator console. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_METADATA_DISPLAY_001`. |
+| Test console routing metadata operator review packet | **current control posture** | `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-METADATA-OPERATOR-REVIEW-PACKET-001` adds a docs/test-support packet for future manual operator review of the local-only console route-preview display. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_METADATA_OPERATOR_REVIEW_PACKET_001`. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_METADATA_DISPLAY_001`** | **review-only selected next state** | Operator review is required after the local-console route-preview metadata display lane before any full operator product test lane. Provider/local-model/hosted-model/tool/web execution, runtime GitHub calls, `/v1/solve`, Sheets, scoring, unblinding, readiness/value/superiority claims, and model/tool quality claims remain unauthorized. Prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_MODEL_CATALOG_ROUTING_METADATA_EXPANSION_001`. |
+| **`OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_METADATA_OPERATOR_REVIEW_PACKET_001`** | **review-only selected next state** | Operator execution of the packet is required after the docs/test-support operator review packet before any full operator product test lane. Console execution by Codex, provider/local-model/hosted-model/tool/web execution, runtime GitHub calls, `/v1/solve`, Sheets, scoring, unblinding, readiness/value/superiority claims, and model/tool quality claims remain unauthorized. Prior selected next state was `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_METADATA_DISPLAY_001`. |
+| `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_METADATA_DISPLAY_001` | prior review-only selected next state | Operator review was required after the local-console route-preview metadata display lane before this packet was prepared. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLINDED_SCORER_PACKET_CONSTRUCTION_001` | prior review-only selected next state | Blinded scorer packet construction was recorded before blind scoring authorization prep. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001` | prior review-only selected next state | Manual prompt-contract simulation outputs were recorded before blinded scorer packet construction. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUT_COLLECTION_PREP_001` | prior review-only selected next state | Blank operator-fillable templates were recorded after `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUT-COLLECTION-PREP-001`. |
@@ -66,7 +67,8 @@
 - `ALPHA-SOLVER-MODEL-CATALOG-ROUTING-PREVIEW-001` (merged PR #601) - configurable backend model catalog metadata and deterministic routing preview; no provider/local-model execution or quality, readiness, benchmark, production/public, security/privacy, or Alpha-superiority claim.
 - `ALPHA-SOLVER-TOOL-CATALOG-ROUTING-REGISTRY-001` (merged PR #603) - metadata-only tool catalog and deterministic recommendation preview; no tool execution, browsing, provider/local-model calls, runtime GitHub calls, or quality/readiness/benchmark/production/public/security/privacy/Alpha-superiority claim.
 - `ALPHA-SOLVER-MODEL-CATALOG-EXPANSION-COST-TIERS-001` (merged PR #605) - metadata-only model catalog expansion and cost tiers with deterministic routing preview; no provider/local-model execution or quality, readiness, benchmark, production/public, security/privacy, or Alpha-superiority claim.
-- `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-METADATA-DISPLAY-001` (current state) - local-console route-preview metadata display; no provider/local-model/tool execution or quality/readiness/value/superiority claim.
+- `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-METADATA-DISPLAY-001` (prior state) - local-console route-preview metadata display; no provider/local-model/tool execution or quality/readiness/value/superiority claim.
+- `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-METADATA-OPERATOR-REVIEW-PACKET-001` (current state) - docs/test-support operator review packet; no console execution, operator review performance, provider/local-model/tool execution, or quality/readiness/value/superiority claim.
 - `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001` (stable prior state) - docs-only manual prompt-contract simulation outputs for all 12 routed-vs-plain pilot tasks; no runtime, provider/local-model/tool/web execution, scoring, unblinding, readiness, quality, benchmark, or superiority claim.
 - `ALPHA-SOLVER-ROUTED-VS-PLAIN-BLINDED-SCORER-PACKET-CONSTRUCTION-001` (stable prior state) - docs-only blinded scorer packet construction; no scoring, unblinding, source identity map commit, runtime, provider/local-model/tool/web execution, readiness, quality, benchmark, or superiority claim.
 
