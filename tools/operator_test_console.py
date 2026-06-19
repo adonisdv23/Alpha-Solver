@@ -527,6 +527,7 @@ def _route_preview_rows(route_preview: Mapping[str, Any] | None) -> str:
             _best_path_summary_html(build_best_path_summary(None))
             + _route_section("Route flow timeline", _route_flow_html(), "route-flow-card")
             + _route_section("Manual override controls", override_rows, "manual-override-card")
+            + _catalog_snapshot_html({}, {})
             + _target_status_html()
             + _target_difference_html()
             + _improvement_loop_html()

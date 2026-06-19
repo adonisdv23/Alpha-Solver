@@ -919,6 +919,8 @@ def test_default_route_preview_shows_target_context_before_execution():
     html = console.render_result_html()
 
     assert "Built now / next / future" in html
+    assert 'id="catalog-snapshot-card"' in html
+    assert "Model and tool catalog snapshot" in html
     assert "Target parity difference panel" in html
     assert "Improvement loop (review-only)" in html
     assert "No route preview yet" in html
