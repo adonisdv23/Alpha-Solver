@@ -527,6 +527,10 @@ def _route_preview_rows(route_preview: Mapping[str, Any] | None) -> str:
             _best_path_summary_html(build_best_path_summary(None))
             + _route_section("Route flow timeline", _route_flow_html(), "route-flow-card")
             + _route_section("Manual override controls", override_rows, "manual-override-card")
+            + _catalog_snapshot_html({}, {})
+            + _target_status_html()
+            + _target_difference_html()
+            + _improvement_loop_html()
             + _route_section("Evidence boundary", empty_rows, "route-evidence-card")
         )
 
@@ -599,10 +603,62 @@ def _route_preview_rows(route_preview: Mapping[str, Any] | None) -> str:
         + _route_section("Task interpretation signals", task_rows, "task-interpretation-card")
         + _route_section("Model route card", model_rows, "model-route-card")
         + _route_section("Tool route card", tool_rows, "tool-route-card")
+        + _catalog_snapshot_html(model_route, tool_route)
         + _route_section("Manual override controls", override_rows, "manual-override-card")
+        + _target_status_html()
+        + _target_difference_html()
+        + _improvement_loop_html()
         + _route_section("Evidence boundary card", evidence_rows, "route-evidence-card")
         + fail_closed
     )
+
+
+
+def _target_status_html() -> str:
+    groups = (
+        ("Built now", ("smoke runner", "local/OpenAI test console", "model catalog metadata", "routing preview", "best-path summary", "bounded JSON")),
+        ("Next", ("operator review", "additional UI polish", "model cost/capability metadata refinements", "routed-vs-plain eval authorization")),
+        ("Future", ("benchmark-backed routing", "model sync", "full tool execution", "release readiness review")),
+    )
+    columns = []
+    for title, items in groups:
+        body = "".join(f"<li>{html.escape(item)}</li>" for item in items)
+        columns.append(f'<div class="status-column"><h3>{html.escape(title)}</h3><ul class="mini">{body}</ul></div>')
+    return _route_section("Built now / next / future", '<div class="status-grid">' + ''.join(columns) + '</div>', "target-status-card")
+
+
+def _target_difference_html() -> str:
+    rows = _route_kv_rows((
+        ("Closer to target", ("explicit best-path recommendation", "task interpretation signals", "model/tool catalog metadata", "fail-closed safety copy", "copyable bounded JSON")),
+        ("Still bounded", ("no provider/local model execution from preview", "no tool execution", "no public dashboard/API", "no scoring or benchmark claims")),
+        ("Operator review need", "Manual review should compare this local console preview against the target guide/diagrams before any broader product claim."),
+    ))
+    return _route_section("Target parity difference panel", rows, "target-difference-card")
+
+
+def _catalog_snapshot_html(model_route: Mapping[str, Any], tool_route: Mapping[str, Any]) -> str:
+    model_rows = _route_kv_rows((
+        ("Hosted model metadata", "OpenAI-family catalog entries can render as hosted metadata; preview does not call them."),
+        ("Local model metadata", "Ollama/local catalog entries can render as local metadata; preview does not run them."),
+        ("Displayed tiers", (model_route.get("selected_cost_tier", "not_available"), model_route.get("selected_latency_tier", "not_available"), model_route.get("selected_context_tier", "not_available"), model_route.get("selected_privacy_tier", "not_available"))),
+        ("Smoke eligible", model_route.get("selected_smoke_eligible", "not_available")),
+    ))
+    tool_rows = _route_kv_rows((
+        ("Tool families", ("web/current research", "Python/computation", "GitHub/code", "docs/spreadsheets", "file parsing", "specialized tools")),
+        ("Recommended tool", tool_route.get("recommended_tool_id") or "none"),
+        ("Execution authorized", str(tool_route.get("execution_authorized", False)).lower()),
+        ("Catalog caveat", "Tool recommendation is metadata-only and not tool execution."),
+    ))
+    return _route_section("Model and tool catalog snapshot", model_rows + tool_rows, "catalog-snapshot-card")
+
+
+def _improvement_loop_html() -> str:
+    steps = ("operator testing", "compare route evidence", "update catalog metadata", "update routing policy", "review better future routes")
+    body = '<ol class="route-flow">' + ''.join(
+        f'<li><span class="step-num">{idx}</span><strong>{html.escape(step)}</strong><p>review-only loop step; no scoring or benchmark claim.</p></li>'
+        for idx, step in enumerate(steps, 1)
+    ) + '</ol>'
+    return _route_section("Improvement loop (review-only)", body, "improvement-loop-card")
 
 def _reason_explanation(reason: str) -> str:
     if reason in REASON_EXPLANATIONS:
@@ -781,6 +837,8 @@ ul.mini { margin: 0; padding-left: 18px; }
 .route-card { border: 1px solid #eef0f4; border-radius: 8px; padding: 14px; margin-top: 14px; }
 .route-flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 10px; padding-left: 0; list-style: none; }
 .route-flow li { border: 1px solid var(--line); border-radius: 8px; padding: 10px; background: #fbfcff; }
+.status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+.status-column { border: 1px solid var(--line); border-radius: 8px; padding: 10px; background: #fbfcff; }
 .route-flow p { margin: 6px 0 0; color: var(--muted); font-size: 0.84rem; }
 .step-num { display: inline-block; width: 1.55rem; height: 1.55rem; border-radius: 999px; background: var(--accent); color: #fff; text-align: center; margin-right: 6px; }
 .json-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }

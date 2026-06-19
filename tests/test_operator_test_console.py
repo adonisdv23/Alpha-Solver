@@ -887,3 +887,42 @@ def test_preview_rendering_does_not_call_external_execution_paths(monkeypatch):
     assert "Best Path Summary" in html
     assert "Tool execution authorized" in html
     assert ">false<" in html
+
+
+def test_target_parity_gap_closure_cards_render_without_broad_claims():
+    preview = console.build_route_preview("latest private repo spreadsheet summary", "local", "qwen2.5:3b")
+    html = console.render_result_html(route_preview=preview)
+
+    for card_id in (
+        "catalog-snapshot-card",
+        "target-status-card",
+        "target-difference-card",
+        "improvement-loop-card",
+    ):
+        assert card_id in html
+    for text in (
+        "Built now / next / future",
+        "Target parity difference panel",
+        "Improvement loop (review-only)",
+        "Model and tool catalog snapshot",
+        "review-only loop step",
+        "no scoring or benchmark claim",
+    ):
+        assert text in html
+    assert "benchmark-backed routing" in html
+    assert "Future" in html
+    assert "Tool recommendation is metadata-only and not tool execution" in html
+    assert "no provider/local model execution from preview" in html
+
+
+def test_default_route_preview_shows_target_context_before_execution():
+    html = console.render_result_html()
+
+    assert "Built now / next / future" in html
+    assert 'id="catalog-snapshot-card"' in html
+    assert "Model and tool catalog snapshot" in html
+    assert "Target parity difference panel" in html
+    assert "Improvement loop (review-only)" in html
+    assert "No route preview yet" in html
+    assert "Preview route only" in html
+    assert html.index("Preview route only") < html.index("Run bounded smoke check")
