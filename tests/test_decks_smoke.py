@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 DECK_DIR = Path("data/scenarios/decks")
-DECK_FILES = sorted(DECK_DIR.glob("core_*.jsonl"))
+DECK_FILES = sorted(DECK_DIR.glob("*.jsonl"))
 
 
 def _load(path: Path):
