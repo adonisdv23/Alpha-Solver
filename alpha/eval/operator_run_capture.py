@@ -615,10 +615,28 @@ def anchor_preflight_case_packet(
     if not isinstance(cases, list) or not cases:
         raise ValueError("anchor preflight: case packet cases must be a non-empty list")
 
-    findings = [
-        _anchor_preflight_case(case, index, _extract_case_anchors)
-        for index, case in enumerate(cases)
-    ]
+    validation_errors = validate_case_packet(case_packet)
+    if validation_errors:
+        detail = "case packet failed validation: " + "; ".join(validation_errors)
+        findings = []
+        for index, case in enumerate(cases):
+            task_id = f"cases[{index}]"
+            if isinstance(case, dict) and _is_nonempty_str(case.get("task_id")):
+                task_id = case["task_id"]
+            findings.append(
+                {
+                    "task_id": task_id,
+                    "state": "invalid_case",
+                    "anchor_count": 0,
+                    "anchors": [],
+                    "detail": detail,
+                }
+            )
+    else:
+        findings = [
+            _anchor_preflight_case(case, index, _extract_case_anchors)
+            for index, case in enumerate(cases)
+        ]
     counts = {state: 0 for state in ANCHOR_PREFLIGHT_STATES}
     for finding in findings:
         counts[finding["state"]] += 1

@@ -616,6 +616,43 @@ class TestAnchorPreflight:
         assert states == ["invalid_case", "invalid_case"]
         assert report["summary"]["needs_attention"] == ["case-a", "cases[1]"]
 
+
+    def test_malformed_anchor_bearing_packet_is_invalid_not_anchor_bearing(self):
+        packet = _anchor_packet(
+            [{"task_id": "case-a", "prompt": ANCHOR_BEARING_PROMPT}]
+        )
+        del packet["packet_id"]
+        report = orc.anchor_preflight_case_packet(packet)
+        assert [finding["state"] for finding in report["cases"]] == ["invalid_case"]
+        assert report["cases"][0]["anchor_count"] == 0
+        assert report["summary"]["needs_attention"] == ["case-a"]
+        assert "missing required keys" in report["cases"][0]["detail"]
+
+    def test_unknown_prohibited_fields_do_not_pass_anchor_preflight(self):
+        packet = _anchor_packet(
+            [{"task_id": "case-a", "prompt": ANCHOR_BEARING_PROMPT, "winner": "alpha"}]
+        )
+        packet["score"] = 1
+        report = orc.anchor_preflight_case_packet(packet)
+        assert report["cases"][0]["state"] == "invalid_case"
+        assert report["summary"]["needs_attention"] == ["case-a"]
+        assert "unknown keys" in report["cases"][0]["detail"]
+
+    def test_duplicate_task_ids_do_not_pass_anchor_preflight(self):
+        packet = _anchor_packet(
+            [
+                {"task_id": "case-a", "prompt": ANCHOR_BEARING_PROMPT},
+                {"task_id": "case-a", "prompt": ANCHOR_BEARING_PROMPT},
+            ]
+        )
+        report = orc.anchor_preflight_case_packet(packet)
+        assert [finding["state"] for finding in report["cases"]] == [
+            "invalid_case",
+            "invalid_case",
+        ]
+        assert report["summary"]["needs_attention"] == ["case-a", "case-a"]
+        assert "duplicate task_id" in report["cases"][0]["detail"]
+
     def test_pr646_packet_is_fully_anchor_bearing(self):
         packet = json.loads(
             (
@@ -693,6 +730,19 @@ class TestAnchorPreflightCli:
         assert result.returncode == 0, result.stderr
         assert "anchor_bearing" in result.stdout
         assert "Structural anchor-presence preflight only" in result.stdout
+
+
+    def test_malformed_anchor_bearing_packet_exits_one(self, tmp_path: Path):
+        packet = _anchor_packet(
+            [{"task_id": "case-a", "prompt": ANCHOR_BEARING_PROMPT}]
+        )
+        packet["packet_id"] = ""
+        packet_path = tmp_path / "packet.json"
+        packet_path.write_text(json.dumps(packet), encoding="utf-8")
+        result = _run_cli("anchor-preflight", "--case-packet", str(packet_path))
+        assert result.returncode == 1
+        assert "invalid_case" in result.stdout
+        assert "needs attention: case-a" in result.stdout
 
     def test_anchor_free_exits_zero_by_default(self, tmp_path: Path):
         packet_path = self._write_packet(
