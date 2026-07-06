@@ -83,6 +83,44 @@ passing result must not be described as answer quality, benchmark validation,
 readiness, production suitability, or Alpha superiority; it only means the
 checked text satisfied the local structural wording rules for that prompt.
 
+### Running the lift preflight CLI
+
+After filling a capture and before qualitative review, the operator can run
+the read-only preflight over the capture file:
+
+```bash
+python scripts/operator_run_capture.py lift-preflight \
+  --capture local/pr646_substantive_lift_capture.json \
+  --report-out local/pr646_lift_preflight_report.json
+```
+
+The command loads the capture, and for every case that has both a prompt and
+a routed output it runs `check_substantive_lift(routed_output, prompt=prompt)`
+and prints one state per case:
+
+- `structural_pass` / `structural_fail` — the configured structural wording
+  checks held or did not hold for the supplied routed output and prompt. When
+  the prompt has no extractable anchors, the line says the anchor-specific
+  checks were vacuous, so anchor-free prompts do not create false failures.
+- `missing_prompt` / `missing_routed_output` — the case cannot be preflighted
+  yet; fill the capture first.
+- `excluded_case` — excluded cases are skipped, never checked.
+- `safe_out_not_applicable` — the routed output is a bounded `SAFE-OUT:`
+  response; the lift wording contract does not apply to honest non-answers.
+
+Exit code 0 means no case needed attention; exit code 1 means at least one
+case was a structural fail, had missing text, or was malformed. The optional
+`--report-out` file is a local JSON report for the operator's own notes. It
+is not a capture file, not an evidence packet, and not an input to `export`;
+it carries no score, rank, winner, blind-label, source-map, or identity-map
+fields, and writing it never modifies the capture.
+
+The preflight is structural wording only. Its output must not be described
+as answer quality, benchmark validation, readiness, or Alpha superiority; a
+`structural_pass` means only that the configured local structural checks held
+for the supplied text and prompt. Comparative interpretation of baseline
+versus routed outputs remains out of scope for this harness.
+
 ## Packet contents
 
 Every exported packet embeds a `harness_boundaries` block recording, as

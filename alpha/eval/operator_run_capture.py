@@ -310,3 +310,219 @@ def render_json_bytes(payload: Dict[str, Any]) -> bytes:
     """Render a payload as byte-stable, replay-friendly JSON."""
     text = json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
     return (text + "\n").encode("utf-8")
+
+
+# ---------------------------------------------------------------------------
+# Substantive Lift preflight
+# (OPERATOR-RUN-CAPTURE-SUBSTANTIVE-LIFT-PREFLIGHT-CLI-001)
+#
+# Optional, read-only structural preflight over an existing capture file. For
+# each case that has both a prompt and a routed output, it runs the portable
+# Substantive Lift wording checker so the operator can catch lift/case-anchor
+# structure problems before qualitative review. It never mutates the capture,
+# never touches the export packet schema, and never scores, ranks, blinds, or
+# picks winners.
+# ---------------------------------------------------------------------------
+
+LIFT_PREFLIGHT_LANE_ID = "OPERATOR-RUN-CAPTURE-SUBSTANTIVE-LIFT-PREFLIGHT-CLI-001"
+LIFT_PREFLIGHT_REPORT_SCHEMA_VERSION = "operator_lift_preflight_report/v1"
+
+# Boundary statement repeated in every report and rendered output. A preflight
+# pass is a structural wording result only.
+LIFT_PREFLIGHT_BOUNDARY = (
+    "Structural wording preflight only: not answer quality, not benchmark "
+    "validation, not readiness, and not Alpha superiority. A pass means only "
+    "that the configured local structural checks held for the supplied "
+    "routed output text and prompt."
+)
+
+LIFT_PREFLIGHT_STATES = (
+    "invalid_case",
+    "excluded_case",
+    "missing_prompt",
+    "missing_routed_output",
+    "safe_out_not_applicable",
+    "structural_pass",
+    "structural_fail",
+)
+
+# States that mean the capture needs operator attention before qualitative
+# review; the CLI maps any of these to a non-zero exit code.
+LIFT_PREFLIGHT_ATTENTION_STATES = frozenset(
+    {"invalid_case", "missing_prompt", "missing_routed_output", "structural_fail"}
+)
+
+# Bounded SAFE-OUT responses are honest non-answers: the lift wording contract
+# does not apply to them, so the preflight reports them as not applicable
+# instead of failing them. Explicit prefix match only, mirroring the portable
+# honesty guard's explicit-prefix style.
+_LIFT_PREFLIGHT_SAFEOUT_PREFIX = "safe-out:"
+
+
+def _lift_structural_flags(checker_result: Dict[str, Any]) -> List[str]:
+    """Name the structural checks that did not hold, for operator display."""
+    flags: List[str] = []
+    if checker_result.get("missing_moves"):
+        flags.append(f"missing_moves={checker_result['missing_moves']}")
+    if checker_result.get("empty_moves"):
+        flags.append(f"empty_moves={checker_result['empty_moves']}")
+    if not checker_result.get("missing_moves") and not checker_result.get("order_ok"):
+        flags.append("lift_block_out_of_order")
+    if not checker_result.get("opens_with_intent"):
+        flags.append("does_not_open_with_intent")
+    if checker_result.get("generic_flags"):
+        flags.append(f"generic_hedges={checker_result['generic_flags']}")
+    if checker_result.get("weak_next_action"):
+        flags.append("weak_next_action")
+    if checker_result.get("filler_flags"):
+        flags.append(f"filler={checker_result['filler_flags']}")
+    if checker_result.get("unanchored_lift"):
+        flags.append("unanchored_lift")
+    if checker_result.get("weak_anchor_distribution"):
+        flags.append("weak_anchor_distribution")
+    if checker_result.get("intent_restates_prompt"):
+        flags.append("intent_restates_prompt")
+    return flags
+
+
+def _lift_preflight_case(case: Any, index: int, checker: Any) -> Dict[str, Any]:
+    finding: Dict[str, Any] = {
+        "task_id": f"cases[{index}]",
+        "state": "invalid_case",
+        "anchor_checks_vacuous": False,
+        "case_anchor_count": 0,
+        "structural_flags": [],
+        "detail": "",
+    }
+    if not isinstance(case, dict):
+        finding["detail"] = "case is not a JSON object"
+        return finding
+    if _is_nonempty_str(case.get("task_id")):
+        finding["task_id"] = case["task_id"]
+
+    if case.get("validation_status") == "excluded":
+        finding["state"] = "excluded_case"
+        finding["detail"] = "case was excluded during capture; preflight skipped"
+        return finding
+
+    prompt = case.get("prompt")
+    if not _is_nonempty_str(prompt):
+        finding["state"] = "missing_prompt"
+        finding["detail"] = (
+            "prompt is missing or empty; the preflight needs the prompt text"
+        )
+        return finding
+
+    routed_output = case.get("routed_output")
+    if not _is_nonempty_str(routed_output):
+        finding["state"] = "missing_routed_output"
+        finding["detail"] = (
+            "routed_output is missing or empty; there is no text to preflight"
+        )
+        return finding
+
+    if routed_output.strip().lower().startswith(_LIFT_PREFLIGHT_SAFEOUT_PREFIX):
+        finding["state"] = "safe_out_not_applicable"
+        finding["detail"] = (
+            "routed output is a bounded SAFE-OUT response; the Substantive "
+            "Lift wording contract does not apply to honest non-answers"
+        )
+        return finding
+
+    checker_result = checker(routed_output, prompt=prompt)
+    finding["case_anchor_count"] = len(checker_result.get("case_anchors", []))
+    finding["anchor_checks_vacuous"] = finding["case_anchor_count"] == 0
+    finding["checker"] = checker_result
+    if checker_result.get("ok"):
+        finding["state"] = "structural_pass"
+        finding["detail"] = "configured structural wording checks held"
+    else:
+        finding["state"] = "structural_fail"
+        finding["structural_flags"] = _lift_structural_flags(checker_result)
+        finding["detail"] = "; ".join(finding["structural_flags"])
+    return finding
+
+
+def lift_preflight_capture(capture: Any) -> Dict[str, Any]:
+    """Run the read-only Substantive Lift structural preflight over a capture.
+
+    Uses ``check_substantive_lift(routed_output, prompt=prompt)`` from the
+    portable spec monolith for every case that carries both texts. The result
+    is a local report structure, not an evidence packet: it carries no scores,
+    ranks, winners, blind labels, source maps, or identity maps, and the
+    input capture is never modified. A ``structural_pass`` state means only
+    that the configured local structural checks held for the supplied text
+    and prompt; it is not an answer-quality judgment.
+    """
+    # Local import so the harness stays importable on its own; the checker
+    # lives in the repo-root portable spec monolith.
+    from alpha_solver_portable import check_substantive_lift
+
+    if not isinstance(capture, dict):
+        raise ValueError("lift preflight: capture top level must be a JSON object")
+    cases = capture.get("cases")
+    if not isinstance(cases, list) or not cases:
+        raise ValueError("lift preflight: capture cases must be a non-empty list")
+
+    findings = [
+        _lift_preflight_case(case, index, check_substantive_lift)
+        for index, case in enumerate(cases)
+    ]
+    counts = {state: 0 for state in LIFT_PREFLIGHT_STATES}
+    for finding in findings:
+        counts[finding["state"]] += 1
+    needs_attention = [
+        finding["task_id"]
+        for finding in findings
+        if finding["state"] in LIFT_PREFLIGHT_ATTENTION_STATES
+    ]
+    packet_id = (
+        capture["packet_id"] if _is_nonempty_str(capture.get("packet_id")) else None
+    )
+    return {
+        "schema_version": LIFT_PREFLIGHT_REPORT_SCHEMA_VERSION,
+        "lane_id": LIFT_PREFLIGHT_LANE_ID,
+        "packet_id": packet_id,
+        "boundary": LIFT_PREFLIGHT_BOUNDARY,
+        "cases": findings,
+        "summary": {
+            "counts": {**counts, "total": len(findings)},
+            "needs_attention": needs_attention,
+        },
+    }
+
+
+def render_lift_preflight_text(report: Dict[str, Any]) -> str:
+    """Render a preflight report as operator-readable console text."""
+    lines = [
+        (
+            f"Substantive Lift preflight for packet {report['packet_id']!r} "
+            f"({report['summary']['counts']['total']} cases)"
+        ),
+        f"boundary: {report['boundary']}",
+    ]
+    for finding in report["cases"]:
+        line = f"  {finding['task_id']}: {finding['state']}"
+        if finding["state"] in ("structural_pass", "structural_fail"):
+            if finding["anchor_checks_vacuous"]:
+                line += (
+                    " (anchor checks vacuous: prompt has no extractable anchors)"
+                )
+            else:
+                line += f" (anchors={finding['case_anchor_count']})"
+        if finding["state"] not in ("structural_pass",) and finding["detail"]:
+            line += f" — {finding['detail']}"
+        lines.append(line)
+    counts = report["summary"]["counts"]
+    summary_bits = [
+        f"{state}={counts[state]}"
+        for state in LIFT_PREFLIGHT_STATES
+        if counts[state]
+    ]
+    lines.append("summary: " + (" ".join(summary_bits) if summary_bits else "empty"))
+    needs_attention = report["summary"]["needs_attention"]
+    if needs_attention:
+        lines.append("needs attention: " + ", ".join(needs_attention))
+    else:
+        lines.append("needs attention: none")
+    return "\n".join(lines)

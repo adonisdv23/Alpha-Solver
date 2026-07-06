@@ -2,13 +2,17 @@
 """Local-only CLI for the operator run capture harness.
 
 Subcommands:
-  init      Scaffold a capture file from an operator-authored case packet.
-  validate  Check a capture file (add --for-export for export completeness).
-  export    Validate and write the normalized evidence packet.
+  init            Scaffold a capture file from an operator-authored case packet.
+  validate        Check a capture file (add --for-export for export completeness).
+  export          Validate and write the normalized evidence packet.
+  lift-preflight  Read-only Substantive Lift structural preflight over a capture.
 
 This CLI reads and writes local JSON files only. It performs no provider,
 hosted-model, or local-model calls, no tool execution, and no network access,
-and it does not score, blind, or unblind outputs.
+and it does not score, blind, or unblind outputs. The lift-preflight
+subcommand is a structural wording preflight only: it never mutates the
+capture, and a pass is not answer quality, benchmark validation, readiness,
+or Alpha superiority.
 """
 from __future__ import annotations
 
@@ -97,6 +101,24 @@ def cmd_export(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def cmd_lift_preflight(args: argparse.Namespace) -> int:
+    capture = _read_json(Path(args.capture), "capture file")
+    try:
+        report = orc.lift_preflight_capture(capture)
+    except ValueError as exc:
+        print(f"FAIL {exc}")
+        return EXIT_VALIDATION
+    print(orc.render_lift_preflight_text(report))
+    if args.report_out:
+        _write_bytes(
+            Path(args.report_out), orc.render_json_bytes(report), args.force
+        )
+        print(f"OK wrote preflight report -> {args.report_out}")
+    if report["summary"]["needs_attention"]:
+        return EXIT_VALIDATION
+    return EXIT_OK
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="operator_run_capture",
@@ -121,6 +143,22 @@ def build_parser() -> argparse.ArgumentParser:
     export_parser.add_argument("--out", required=True)
     export_parser.add_argument("--force", action="store_true")
     export_parser.set_defaults(func=cmd_export)
+
+    preflight_parser = sub.add_parser(
+        "lift-preflight",
+        help=(
+            "read-only Substantive Lift structural wording preflight "
+            "(not a quality, benchmark, readiness, or superiority check)"
+        ),
+    )
+    preflight_parser.add_argument("--capture", required=True)
+    preflight_parser.add_argument(
+        "--report-out",
+        help="optional path for a local JSON preflight report "
+        "(separate from the capture and export packet)",
+    )
+    preflight_parser.add_argument("--force", action="store_true")
+    preflight_parser.set_defaults(func=cmd_lift_preflight)
     return parser
 
 
