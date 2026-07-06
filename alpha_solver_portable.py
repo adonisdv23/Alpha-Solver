@@ -1010,6 +1010,11 @@ PORTABLE_LOCAL_UNSUPPORTED_SAFEOUT = (
     "or supply supported local context."
 )
 
+PORTABLE_UNSUPPORTED_LOCAL_SAFEOUT_CONFIDENCE = 0.20
+PORTABLE_UNSUPPORTED_LOCAL_SAFEOUT_CONFIDENCE_REASON = (
+    "confidence_adjusted_due_to_unsupported_local_synthesis"
+)
+
 
 def portable_local_output_honesty(answer: Any, query: str) -> Dict[str, Any]:
     """Flag prompt echo / template artifacts from the portable local path.
@@ -1170,22 +1175,43 @@ class PortableAlphaSolver:
         )
         tot_honesty = portable_local_output_honesty(tot_result.get("answer", ""), query)
         if honesty["artifact_detected"]:
+            confidence_before_adjustment = float(
+                safe_out_state.get("confidence", tot_result.get("confidence", 0.0))
+            )
             safe_out_state["final_answer"] = honesty["bounded_answer"]
             safe_out_state["reason"] = "local_unsupported_safeout"
             safe_out_state["answer_kind"] = "local_unsupported_safeout"
             safe_out_state["artifact_kind"] = honesty["artifact_kind"]
             safe_out_state["synthesis_available"] = False
+            safe_out_state["confidence_before_adjustment"] = confidence_before_adjustment
+            safe_out_state["confidence"] = PORTABLE_UNSUPPORTED_LOCAL_SAFEOUT_CONFIDENCE
+            safe_out_state["confidence_adjustment_reason"] = (
+                PORTABLE_UNSUPPORTED_LOCAL_SAFEOUT_CONFIDENCE_REASON
+            )
+            safe_out_state["notes"] = (
+                f"{safe_out_state.get('notes', '')} | confidence adjusted to "
+                f"{PORTABLE_UNSUPPORTED_LOCAL_SAFEOUT_CONFIDENCE:.2f} because "
+                "local deterministic synthesis is unavailable"
+            )
             if tot_honesty["artifact_detected"]:
                 tot_result["raw_artifact_answer"] = tot_result.get("answer", "")
                 tot_result["answer"] = honesty["bounded_answer"]
                 tot_result["answer_kind"] = "local_unsupported_safeout"
                 tot_result["artifact_kind"] = tot_honesty["artifact_kind"]
                 tot_result["synthesis_available"] = False
+                tot_result["confidence_before_adjustment"] = confidence_before_adjustment
+                tot_result["confidence"] = PORTABLE_UNSUPPORTED_LOCAL_SAFEOUT_CONFIDENCE
+                tot_result["confidence_adjustment_reason"] = (
+                    PORTABLE_UNSUPPORTED_LOCAL_SAFEOUT_CONFIDENCE_REASON
+                )
             self.observability.log_event(
                 "local_output_honesty_replacement",
                 event_type="policy",
                 stage="post_safe_out",
                 artifact_kind=honesty["artifact_kind"],
+                confidence_adjustment_reason=(
+                    PORTABLE_UNSUPPORTED_LOCAL_SAFEOUT_CONFIDENCE_REASON
+                ),
             )
 
         shortlist = [
