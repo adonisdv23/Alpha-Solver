@@ -1,0 +1,19 @@
+{
+  "packet_id": "ORC-FIXTURE-001",
+  "description": "Synthetic fixture case packet for the operator run capture harness tests. All content is invented; no provider or model output is included.",
+  "cases": [
+    {
+      "task_id": "ORC-SIM-001",
+      "prompt": "A dashboard shows zero provider calls but a transcript mentions live provider output. What should the operator check before drawing any conclusion?",
+      "notes": "Synthetic evidence-reconciliation case."
+    },
+    {
+      "task_id": "ORC-SIM-002",
+      "prompt": "An evidence packet is missing route metadata for one task. How should the gap be recorded without overclaiming?"
+    },
+    {
+      "task_id": "ORC-SIM-003",
+      "prompt": "Two capture files disagree on a task ID. Describe a deterministic way to detect and report the mismatch."
+    }
+  ]
+}
