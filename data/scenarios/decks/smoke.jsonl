@@ -1,6 +1,6 @@
-{"id": "deck-smoke-0001", "intent": "plan", "prompt": "List three quick wins for improving focus during remote work.", "route_expected": "llm_only", "notes": "focus"}
-{"id": "deck-smoke-0002", "intent": "plan", "prompt": "Outline steps to prepare a simple weeknight pasta dinner.", "route_expected": "llm_only", "notes": "cooking"}
-{"id": "deck-smoke-0003", "intent": "plan", "prompt": "Give tips for organising a shared study session with friends.", "route_expected": "llm_only", "notes": "study"}
-{"id": "deck-smoke-0004", "intent": "plan", "prompt": "Describe how to set up a weekend hiking day pack checklist.", "route_expected": "llm_only", "notes": "outdoors"}
-{"id": "deck-smoke-0005", "intent": "plan", "prompt": "List daily habits that help maintain healthy sleep routines.", "route_expected": "llm_only", "notes": "sleep"}
-{"id": "deck-smoke-0006", "intent": "plan", "prompt": "Summarise how to welcome a new teammate on their first day.", "route_expected": "llm_only", "notes": "onboarding"}
+{"id": "deck-smoke-0001", "intent": "plan", "prompt": "List three quick wins for improving focus during remote work.", "route_expected": "llm_only", "notes": "focus", "expected": "plan=direct | tokens=10 | cost=0.10 | budget=within"}
+{"id": "deck-smoke-0002", "intent": "plan", "prompt": "Outline steps to prepare a simple weeknight pasta dinner.", "route_expected": "llm_only", "notes": "cooking", "expected": "plan=direct | tokens=9 | cost=0.09 | budget=within"}
+{"id": "deck-smoke-0003", "intent": "plan", "prompt": "Give tips for organising a shared study session with friends.", "route_expected": "llm_only", "notes": "study", "expected": "plan=direct | tokens=10 | cost=0.10 | budget=within"}
+{"id": "deck-smoke-0004", "intent": "plan", "prompt": "Describe how to set up a weekend hiking day pack checklist.", "route_expected": "llm_only", "notes": "outdoors", "expected": "plan=direct | tokens=11 | cost=0.11 | budget=within"}
+{"id": "deck-smoke-0005", "intent": "plan", "prompt": "List daily habits that help maintain healthy sleep routines.", "route_expected": "llm_only", "notes": "sleep", "expected": "plan=direct | tokens=9 | cost=0.09 | budget=within"}
+{"id": "deck-smoke-0006", "intent": "plan", "prompt": "Summarise how to welcome a new teammate on their first day.", "route_expected": "llm_only", "notes": "onboarding", "expected": "plan=direct | tokens=11 | cost=0.11 | budget=within"}

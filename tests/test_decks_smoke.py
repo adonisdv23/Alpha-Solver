@@ -1,5 +1,7 @@
 import json
 import random
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -35,3 +37,22 @@ def test_deck_smoke(path):
         }
         assert output["text"]
         assert "route_explain" in output and "chosen" in output["route_explain"]
+
+
+def test_smoke_deck_replay_command():
+    result = subprocess.run(
+        [
+            sys.executable,
+            "cli/alpha_solver_cli.py",
+            "replay",
+            "data/scenarios/decks/smoke.jsonl",
+            "--max-tokens",
+            "120",
+            "--min-budget-tokens",
+            "60",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert result.stdout.strip() == "replay ok"
