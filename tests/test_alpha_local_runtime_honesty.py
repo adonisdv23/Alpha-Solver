@@ -56,6 +56,12 @@ def _normalized(text: str) -> str:
     return " ".join(text.strip().lower().split())
 
 
+def _section(rendered: str, header: str, next_marker: str) -> str:
+    start = rendered.index(f"{header}:\n") + len(f"{header}:\n")
+    end = rendered.index(next_marker, start)
+    return rendered[start:end]
+
+
 def _solve_unsupported(**kwargs) -> dict:
     return _tree_of_thought(
         UNSUPPORTED_HIGH_HEADROOM, cache_path=None, enable_cache=False, **kwargs
@@ -208,6 +214,28 @@ def test_portable_local_path_never_surfaces_artifacts():
                     prompt,
                     answer,
                 )
+
+
+def test_portable_rendered_solution_and_shortlist_scrub_honesty_artifacts():
+    envelope = portable.PortableAlphaSolver(seed=7).solve(UNSUPPORTED_HIGH_HEADROOM)
+    rendered = envelope.to_llm_response()
+    solution = _section(rendered, "SOLUTION", "\n\nCONFIDENCE:")
+    shortlist = _section(rendered, "SHORTLIST", "\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+
+    for answer_like_section in (solution, shortlist):
+        assert _normalized(UNSUPPORTED_HIGH_HEADROOM) not in _normalized(
+            answer_like_section
+        )
+        for artifact in (
+            "Rephrase:",
+            "Decompose:",
+            "Edge cases:",
+            "Counterpoints:",
+            "Summarize:",
+            "To proceed, consider:",
+            "Clarify and refine:",
+        ):
+            assert artifact not in answer_like_section
 
 
 def test_portable_honesty_helper_is_standalone_and_explicit():

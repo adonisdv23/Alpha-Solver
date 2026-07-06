@@ -998,6 +998,8 @@ PORTABLE_LOCAL_ARTIFACT_PREFIXES: Tuple[str, ...] = (
     "edge cases:",
     "counterpoints:",
     "summarize:",
+    "to proceed, consider:",
+    "to proceed, clarify:",
     "clarify and refine:",
 )
 
@@ -1166,12 +1168,19 @@ class PortableAlphaSolver:
         honesty = portable_local_output_honesty(
             safe_out_state.get("final_answer", ""), query
         )
+        tot_honesty = portable_local_output_honesty(tot_result.get("answer", ""), query)
         if honesty["artifact_detected"]:
             safe_out_state["final_answer"] = honesty["bounded_answer"]
             safe_out_state["reason"] = "local_unsupported_safeout"
             safe_out_state["answer_kind"] = "local_unsupported_safeout"
             safe_out_state["artifact_kind"] = honesty["artifact_kind"]
             safe_out_state["synthesis_available"] = False
+            if tot_honesty["artifact_detected"]:
+                tot_result["raw_artifact_answer"] = tot_result.get("answer", "")
+                tot_result["answer"] = honesty["bounded_answer"]
+                tot_result["answer_kind"] = "local_unsupported_safeout"
+                tot_result["artifact_kind"] = tot_honesty["artifact_kind"]
+                tot_result["synthesis_available"] = False
             self.observability.log_event(
                 "local_output_honesty_replacement",
                 event_type="policy",
