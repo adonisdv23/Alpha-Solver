@@ -27,9 +27,14 @@ validator, blind-scoring bridge) needs that substrate first.
   (routed Alpha), `route_metadata` (non-empty object), `validation_status`
   (`pending` / `captured` / `excluded`, with `exclusion_reason` required for
   excluded cases).
-- Strict validation before export: unknown fields are rejected at every level,
-  so score, rank, winner, blind-label, or identity-map fields cannot enter a
-  packet; export additionally requires no pending cases and at least one
+- Strict validation before export: unknown schema-level fields are rejected in
+  the case-packet and capture structures, so score, rank, winner, blind-label,
+  source-map, or identity-map fields are invalid as schema fields. The
+  `route_metadata` field intentionally remains a schema-light non-empty object
+  for MVP route facts and is exported verbatim; it must not be interpreted as
+  scoring, ranking, blinding, unblinding, source-map, identity-map, winner,
+  benchmark, readiness, quality, production, public-MVP, or Alpha-superiority
+  evidence. Export additionally requires no pending cases and at least one
   captured case.
 - Deterministic export: keys sorted, cases ordered by `task_id`, LF endings,
   no timestamps, byte-identical re-export, and a `content_digest` (SHA-256
