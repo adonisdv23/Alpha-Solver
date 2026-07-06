@@ -140,6 +140,19 @@ six labeled lines, one line each, before any supporting detail:
 Supporting analysis follows the block and must go deep on the controlling
 constraint rather than shallowly enumerating every consideration.
 
+CASE-ANCHORING RULES (apply when prompt context contains case objects):
+1. A lift block must be written for this case, not reusable under any prompt.
+2. Reference case-specific objects from the task when such objects exist: files,
+   PR numbers, issue numbers, metrics, constraints, artifacts, named options,
+   or explicit implementation lanes.
+3. Intent must identify the decision beneath the question, not merely repeat the
+   user's wording.
+4. Recommendation must commit to one concrete path.
+5. Fails if must name an observable condition, event, threshold, or repo fact
+   that would invalidate the recommendation.
+6. Next must name a concrete object or action in the task context.
+A lift block that could be pasted under a different question unchanged is non-compliant.
+
 ANTI-GENERIC RULES (apply to the whole SOLUTION on applicable tasks):
 1. Commit: exactly one primary recommendation. Rank alternatives against it
    in SHORTLIST instead of presenting an unranked menu inside SOLUTION.
@@ -460,6 +473,69 @@ SUBSTANTIVE_LIFT_ANTI_GENERIC_RULES: Tuple[str, ...] = (
     "instead of touching every dimension superficially.",
 )
 
+SUBSTANTIVE_LIFT_CASE_ANCHOR_RULES: Tuple[str, ...] = (
+    "A lift block must be written for this case, not reusable under any prompt.",
+    "Reference case-specific objects from the task when such objects exist: "
+    "files, PR numbers, issue numbers, metrics, constraints, artifacts, named "
+    "options, or explicit implementation lanes.",
+    "Intent must identify the decision beneath the question, not merely repeat "
+    "the user's wording.",
+    "Recommendation must commit to one concrete path.",
+    "Fails if must name an observable condition, event, threshold, or repo fact "
+    "that would invalidate the recommendation.",
+    "Next must name a concrete object or action in the task context.",
+    "A lift block that could be pasted under a different question unchanged is non-compliant.",
+)
+
+GENERIC_LIFT_FILLER_PATTERNS: Tuple[str, ...] = (
+    r"\bbest practices\b",
+    r"\bholistic approach\b",
+    r"\bcarefully consider\b",
+    r"\bvarious stakeholders\b",
+    r"\bleverage synergies\b",
+    r"\brobust solution\b",
+    r"\bthoughtful approach\b",
+)
+
+
+def _extract_case_anchors(prompt: str) -> Tuple[str, ...]:
+    """Extract explicit case objects from a prompt with conservative regexes."""
+
+    if not prompt:
+        return ()
+    patterns = (
+        r"`([^`\n]{2,120})`",
+        r"\b(?:PR|pr)\s*#\d+\b",
+        r"\b(?:issue|Issue)\s*#\d+\b",
+        r"(?<![\w/.-])#\d+\b",
+        r"\b[A-Z][A-Z0-9]+(?:-[A-Z0-9]+){2,}\b",
+        r"\b(?:[A-Za-z0-9_.-]+/)+[A-Za-z0-9_.-]+\.[A-Za-z0-9]+\b",
+        r"\b[A-Za-z0-9_-]+\.(?:py|md|json|yaml|yml|toml|txt|csv|xlsx)\b",
+        r"\b[A-Za-z][A-Za-z0-9_-]*\d+[A-Za-z0-9_-]*\b",
+    )
+    anchors: List[str] = []
+    seen: set[str] = set()
+    for pattern in patterns:
+        for match in re.finditer(pattern, prompt):
+            anchor = match.group(1) if match.groups() else match.group(0)
+            anchor = anchor.strip("`.,;:()[]{}<>")
+            if not anchor:
+                continue
+            key = anchor.lower()
+            if key not in seen:
+                anchors.append(anchor)
+                seen.add(key)
+    return tuple(anchors)
+
+
+def _line_contains_anchor(text: str, anchors: Sequence[str]) -> bool:
+    lowered = text.lower()
+    return any(anchor.lower() in lowered for anchor in anchors)
+
+
+def _normalize_lift_text(text: str) -> str:
+    return re.sub(r"[^a-z0-9]+", " ", text.lower()).strip()
+
 
 def substantive_lift_contract_summary() -> str:
     """Return the portable prompt/protocol wording for the substantive lift contract.
@@ -488,10 +564,14 @@ def substantive_lift_contract_summary() -> str:
     )
     lines.append("Anti-generic rules:")
     lines.extend(f"  - {rule}" for rule in SUBSTANTIVE_LIFT_ANTI_GENERIC_RULES)
+    lines.append("Case-anchoring rules:")
+    lines.extend(f"  - {rule}" for rule in SUBSTANTIVE_LIFT_CASE_ANCHOR_RULES)
     return "\n".join(lines)
 
 
-def check_substantive_lift(solution_text: str) -> Dict[str, Any]:
+def check_substantive_lift(
+    solution_text: str, prompt: Optional[str] = None
+) -> Dict[str, Any]:
     """Deterministically check a SOLUTION's wording against the lift contract.
 
     This is a structural wording check only: it verifies the six-move lift
@@ -535,6 +615,66 @@ def check_substantive_lift(solution_text: str) -> Dict[str, Any]:
             next_content.startswith(opener) for opener in WEAK_NEXT_ACTION_OPENERS
         )
 
+    filler_flags = [
+        pattern
+        for pattern in GENERIC_LIFT_FILLER_PATTERNS
+        if re.search(pattern, lowered)
+    ]
+
+    case_anchors: Tuple[str, ...] = ()
+    anchored_lift_lines: Dict[str, List[str]] = {}
+    unanchored_lift = False
+    weak_anchor_distribution = False
+    intent_restates_prompt = False
+    if prompt is not None:
+        case_anchors = _extract_case_anchors(prompt)
+        anchored_lift_lines = {
+            label: [
+                anchor
+                for anchor in case_anchors
+                if label in found and anchor.lower() in found[label].lower()
+            ]
+            for label in labels
+        }
+        if case_anchors:
+            anchored_labels = [
+                label for label, anchors in anchored_lift_lines.items() if anchors
+            ]
+            key_labels = ("Recommendation:", "Fails if:", "Next:")
+            key_line_anchored = any(
+                anchored_lift_lines.get(label) for label in key_labels
+            )
+            unanchored_lift = not anchored_labels
+            weak_anchor_distribution = not (
+                len(anchored_labels) >= 2 or key_line_anchored
+            )
+
+        intent_content = found.get("Intent:", "")
+        normalized_intent = _normalize_lift_text(intent_content)
+        normalized_prompt = _normalize_lift_text(prompt)
+        generic_restatements = {
+            "answer the question",
+            "decide what to do",
+            "decide how to proceed",
+            "address the request",
+            "handle the task",
+        }
+        intent_has_anchor = _line_contains_anchor(intent_content, case_anchors)
+        restatement_prefix = re.match(
+            r"^(?:answer|address|respond to|handle|decide about)\s+"
+            r"(?:the|this)\s+(?:question|request|prompt|task)\b",
+            intent_content.strip(),
+            flags=re.IGNORECASE,
+        )
+        intent_restates_prompt = bool(
+            normalized_intent
+            and (
+                normalized_intent == normalized_prompt
+                or normalized_intent in generic_restatements
+                or (restatement_prefix and not intent_has_anchor)
+            )
+        )
+
     has_lift_block = not missing_moves
     ok = (
         has_lift_block
@@ -543,6 +683,10 @@ def check_substantive_lift(solution_text: str) -> Dict[str, Any]:
         and opens_with_intent
         and not generic_flags
         and not weak_next_action
+        and not (prompt is not None and filler_flags)
+        and not unanchored_lift
+        and not weak_anchor_distribution
+        and not intent_restates_prompt
     )
     return {
         "ok": ok,
@@ -553,6 +697,12 @@ def check_substantive_lift(solution_text: str) -> Dict[str, Any]:
         "opens_with_intent": opens_with_intent,
         "generic_flags": generic_flags,
         "weak_next_action": weak_next_action,
+        "case_anchors": list(case_anchors),
+        "anchored_lift_lines": anchored_lift_lines,
+        "unanchored_lift": unanchored_lift,
+        "weak_anchor_distribution": weak_anchor_distribution,
+        "intent_restates_prompt": intent_restates_prompt,
+        "filler_flags": filler_flags,
         "lane": SUBSTANTIVE_LIFT_LANE,
     }
 

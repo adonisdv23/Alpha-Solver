@@ -17,6 +17,10 @@ import alpha_solver_portable as portable
 FIXTURE = Path("tests/fixtures/alpha_substantive_lift_cases.json")
 PORTABLE_CONTRACT = Path("alpha_solver_portable.py")
 SPEC = Path(".specs/ALPHA-SOLVER-SUBSTANTIVE-LIFT-ANSWER-CONTRACT-001.md")
+ANCHOR_SPEC = Path(
+    ".specs/ALPHA-SOLVER-SUBSTANTIVE-LIFT-CASE-ANCHOR-HARDENING-001.md"
+)
+SPEC_INDEX = Path(".specs/INDEX.md")
 
 EXPECTED_LABELS = [
     "Intent:",
@@ -96,7 +100,10 @@ class TestContractConstants:
             assert label in summary
         for rule in portable.SUBSTANTIVE_LIFT_ANTI_GENERIC_RULES:
             assert rule in summary
+        for rule in portable.SUBSTANTIVE_LIFT_CASE_ANCHOR_RULES:
+            assert rule in summary
         assert "SOLUTION wording requirements only" in summary
+        assert "A lift block that could be pasted under a different question unchanged is non-compliant." in summary
 
 
 class TestChecker:
@@ -115,9 +122,129 @@ class TestChecker:
         for case in _cases():
             if not case["lift_required"]:
                 continue
-            result = portable.check_substantive_lift(case["non_compliant_solution"])
+            result = portable.check_substantive_lift(
+                case["non_compliant_solution"], prompt=case["prompt"]
+            )
             assert not result["ok"], (case["case_id"], result)
-            assert result["missing_moves"], case["case_id"]
+            assert (
+                result["missing_moves"]
+                or result["generic_flags"]
+                or result["unanchored_lift"]
+                or result["weak_anchor_distribution"]
+                or result["filler_flags"]
+                or result["intent_restates_prompt"]
+            ), case["case_id"]
+
+    def test_generic_cosplay_fixture_proves_old_shape_only_gap(self):
+        case = next(c for c in _cases() if c["case_id"] == "LIFT-COSPLAY-PR651-001")
+        result = portable.check_substantive_lift(case["non_compliant_solution"])
+        assert result["ok"], result
+        assert result["case_anchors"] == []
+        assert not result["unanchored_lift"]
+
+    def test_prompt_aware_checker_rejects_generic_cosplay_fixture(self):
+        case = next(c for c in _cases() if c["case_id"] == "LIFT-COSPLAY-PR651-001")
+        result = portable.check_substantive_lift(
+            case["non_compliant_solution"], prompt=case["prompt"]
+        )
+        assert not result["ok"], result
+        assert "alpha_solver_portable.py" in result["case_anchors"]
+        assert "PR #651" in result["case_anchors"]
+        assert result["unanchored_lift"]
+
+    def test_prompt_aware_checker_accepts_anchored_counterpart(self):
+        case = next(c for c in _cases() if c["case_id"] == "LIFT-COSPLAY-PR651-001")
+        result = portable.check_substantive_lift(
+            case["compliant_solution"], prompt=case["prompt"]
+        )
+        assert result["ok"], result
+        assert result["anchored_lift_lines"]["Recommendation:"]
+        assert not result["unanchored_lift"]
+
+    def test_prompt_none_preserves_shape_only_compatibility_for_cosplay(self):
+        case = next(c for c in _cases() if c["case_id"] == "LIFT-COSPLAY-PR651-001")
+        result = portable.check_substantive_lift(case["non_compliant_solution"])
+        assert result["ok"], result
+        assert result["case_anchors"] == []
+        assert result["anchored_lift_lines"] == {}
+
+    def test_anchor_extraction_covers_explicit_case_objects(self):
+        prompt = (
+            "Use `alpha_solver_portable.py`, docs/OPERATING_GUIDE.md, PR #646, "
+            "#651, issue #650, ALPHA-SOLVER-SUBSTANTIVE-LIFT-CASE-ANCHOR-HARDENING-001, "
+            "and run2_packet.json."
+        )
+        anchors = portable._extract_case_anchors(prompt)
+        assert "alpha_solver_portable.py" in anchors
+        assert "docs/OPERATING_GUIDE.md" in anchors
+        assert "PR #646" in anchors
+        assert "#651" in anchors
+        assert "issue #650" in anchors
+        assert "ALPHA-SOLVER-SUBSTANTIVE-LIFT-CASE-ANCHOR-HARDENING-001" in anchors
+        assert "run2_packet.json" in anchors
+        assert "2" not in anchors
+
+    def test_anchor_free_prompt_is_vacuous(self):
+        text = (
+            "Intent: Decide the safest rollout path for the requested change.\n"
+            "Assumes: The main risk is disrupting existing behavior.\n"
+            "Tradeoff: Faster delivery versus more regression confidence.\n"
+            "Recommendation: Ship the smallest reversible patch first.\n"
+            "Fails if: Review finds a required behavior outside the patch scope.\n"
+            "Next: Write the focused regression test before changing code.\n"
+        )
+        result = portable.check_substantive_lift(text, prompt="How should we proceed?")
+        assert result["ok"], result
+        assert result["case_anchors"] == []
+        assert not result["unanchored_lift"]
+
+    def test_intent_restatement_flag(self):
+        text = (
+            "Intent: Decide what to do.\n"
+            "Assumes: The repo change should stay narrow.\n"
+            "Tradeoff: Simplicity versus coverage for future cases.\n"
+            "Recommendation: Update alpha_solver_portable.py with the smallest checker change.\n"
+            "Fails if: PR #651 behavior changes unexpectedly.\n"
+            "Next: Run tests/test_alpha_substantive_lift_contract.py today.\n"
+        )
+        result = portable.check_substantive_lift(
+            text,
+            prompt="Update alpha_solver_portable.py after PR #651.",
+        )
+        assert not result["ok"]
+        assert result["intent_restates_prompt"]
+
+    def test_intent_restatement_false_positive_guard(self):
+        text = (
+            "Intent: Decide whether alpha_solver_portable.py should add prompt-aware anchors without touching /v1/solve.\n"
+            "Assumes: PR #651 is already present on main.\n"
+            "Tradeoff: Rejecting reusable lift scaffolds versus avoiding name-dropping on every line.\n"
+            "Recommendation: Add the anchor rule in alpha_solver_portable.py only.\n"
+            "Fails if: PR #651 diagnostics parity changes.\n"
+            "Next: Run tests/test_alpha_substantive_lift_contract.py.\n"
+        )
+        result = portable.check_substantive_lift(
+            text,
+            prompt="Update alpha_solver_portable.py after PR #651.",
+        )
+        assert result["ok"], result
+        assert not result["intent_restates_prompt"]
+
+    def test_filler_word_boundary_false_positive_guard(self):
+        text = (
+            "Intent: Decide whether robust_solution_notes.md belongs in the portable docs update.\n"
+            "Assumes: robust_solution_notes.md is a filename, not filler wording.\n"
+            "Tradeoff: Documenting the file versus widening the implementation surface.\n"
+            "Recommendation: Leave robust_solution_notes.md untouched and update alpha_solver_portable.py only.\n"
+            "Fails if: robust_solution_notes.md is named by the accepted spec.\n"
+            "Next: Check alpha_solver_portable.py before editing robust_solution_notes.md.\n"
+        )
+        result = portable.check_substantive_lift(
+            text,
+            prompt="Decide whether robust_solution_notes.md affects alpha_solver_portable.py.",
+        )
+        assert result["ok"], result
+        assert result["filler_flags"] == []
 
     def test_hedge_phrasing_is_flagged_even_with_lift_block(self):
         text = (
@@ -206,3 +333,10 @@ class TestFixtureShape:
         text = _read(SPEC)
         assert "ALPHA-ANSWER-STRUCTURE-V2-001" in text
         assert "ALPHA-SOLVER-SUBSTANTIVE-LIFT-ANSWER-CONTRACT-001" in text
+
+    def test_anchor_hardening_spec_exists_and_is_indexed(self):
+        text = _read(ANCHOR_SPEC)
+        index = _read(SPEC_INDEX)
+        assert "ALPHA-SOLVER-SUBSTANTIVE-LIFT-CASE-ANCHOR-HARDENING-001" in text
+        assert "Explicit non-claims" in text
+        assert ANCHOR_SPEC.name in index
