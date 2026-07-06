@@ -1,0 +1,19 @@
+{
+  "capture_mode": "operator_manual",
+  "cases": [
+    {
+      "baseline_output": "Synthetic baseline placeholder retained only to satisfy the capture schema for this smoke fixture.",
+      "prompt": "Decide whether `tests/fixtures/demo_plan.json` gains a rollback step before the PR #701 review.",
+      "route_metadata": {
+        "contains_solution_label": true,
+        "source": "post-655 smoke fixture derived from realistic pasted Alpha routed output shape"
+      },
+      "routed_output": "SOLUTION:\nIntent: Choose whether the rollback step lands in tests/fixtures/demo_plan.json before the PR #701 review window.\nAssumes: The packet in tests/fixtures/demo_plan.json is the only artifact reviewers exercise before PR #701.\nTradeoff: Adding rollback coverage to tests/fixtures/demo_plan.json now versus keeping PR #701 small enough to review in one pass.\nRecommendation: Add the rollback step to tests/fixtures/demo_plan.json now and keep PR #701 limited to that packet change.\nFails if: The rollback step needs fields that tests/fixtures/demo_plan.json cannot carry without breaking the packet loader.\nNext: Draft the rollback entry in tests/fixtures/demo_plan.json and attach it to the PR #701 description today.",
+      "task_id": "post655-full-solution-envelope-smoke",
+      "validation_status": "captured"
+    }
+  ],
+  "description": "Small post-655 lift-preflight smoke capture with a realistic pasted routed output that includes a SOLUTION envelope label.",
+  "packet_id": "POST655-PREFLIGHT-SMOKE-RUN-001",
+  "schema_version": "operator_run_capture/v1"
+}

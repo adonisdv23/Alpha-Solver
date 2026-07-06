@@ -1,0 +1,86 @@
+{
+  "boundary": "Structural wording preflight only: not answer quality, not benchmark validation, not readiness, and not Alpha superiority. A pass means only that the configured local structural checks held for the supplied routed output text and prompt.",
+  "cases": [
+    {
+      "anchor_checks_vacuous": false,
+      "case_anchor_count": 4,
+      "checker": {
+        "anchored_lift_lines": {
+          "Assumes:": [
+            "tests/fixtures/demo_plan.json",
+            "PR #701",
+            "#701",
+            "demo_plan.json"
+          ],
+          "Fails if:": [
+            "tests/fixtures/demo_plan.json",
+            "demo_plan.json"
+          ],
+          "Intent:": [
+            "tests/fixtures/demo_plan.json",
+            "PR #701",
+            "#701",
+            "demo_plan.json"
+          ],
+          "Next:": [
+            "tests/fixtures/demo_plan.json",
+            "PR #701",
+            "#701",
+            "demo_plan.json"
+          ],
+          "Recommendation:": [
+            "tests/fixtures/demo_plan.json",
+            "PR #701",
+            "#701",
+            "demo_plan.json"
+          ],
+          "Tradeoff:": [
+            "tests/fixtures/demo_plan.json",
+            "PR #701",
+            "#701",
+            "demo_plan.json"
+          ]
+        },
+        "case_anchors": [
+          "tests/fixtures/demo_plan.json",
+          "PR #701",
+          "#701",
+          "demo_plan.json"
+        ],
+        "empty_moves": [],
+        "filler_flags": [],
+        "generic_flags": [],
+        "has_lift_block": true,
+        "intent_restates_prompt": false,
+        "lane": "ALPHA-SOLVER-SUBSTANTIVE-LIFT-ANSWER-CONTRACT-001",
+        "missing_moves": [],
+        "ok": true,
+        "opens_with_intent": true,
+        "order_ok": true,
+        "unanchored_lift": false,
+        "weak_anchor_distribution": false,
+        "weak_next_action": false
+      },
+      "detail": "configured structural wording checks held",
+      "state": "structural_pass",
+      "structural_flags": [],
+      "task_id": "post655-full-solution-envelope-smoke"
+    }
+  ],
+  "lane_id": "OPERATOR-RUN-CAPTURE-SUBSTANTIVE-LIFT-PREFLIGHT-CLI-001",
+  "packet_id": "POST655-PREFLIGHT-SMOKE-RUN-001",
+  "schema_version": "operator_lift_preflight_report/v1",
+  "summary": {
+    "counts": {
+      "excluded_case": 0,
+      "invalid_case": 0,
+      "missing_prompt": 0,
+      "missing_routed_output": 0,
+      "safe_out_not_applicable": 0,
+      "structural_fail": 0,
+      "structural_pass": 1,
+      "total": 1
+    },
+    "needs_attention": []
+  }
+}
