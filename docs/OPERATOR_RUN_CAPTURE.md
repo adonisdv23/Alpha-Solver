@@ -31,8 +31,12 @@ all outputs; the harness only scaffolds, validates, and exports.
    - `validation_status` — `captured`, or `excluded` with a non-empty
      `exclusion_reason` when a task is dropped
 
-   Task IDs and prompts are preserved from the case packet; unknown fields are
-   rejected, so score, rank, winner, or blind-label fields cannot be added.
+   Task IDs and prompts are preserved from the case packet. Unknown keys are
+   rejected on the case-packet and capture schema fields, so schema-level
+   score, rank, winner, blind-label, source-map, or identity-map fields are
+   invalid. `route_metadata` is intentionally schema-light in this MVP: it is
+   accepted as a non-empty JSON object and exported verbatim, and operators
+   must use it only for route facts they observed.
 
 4. **Validate** at any time (structural), or with `--for-export`
    (completeness: no `pending` cases, at least one `captured`):
@@ -69,6 +73,10 @@ own docs.
   `/v1/solve`, dashboards, or any external service.
 - No scoring, ranking, blinding, or unblinding. Blind scoring is a separate
   lane; no source map or A/B identity key is ever written by this harness.
+- `route_metadata` remains schema-light for this MVP. Its keys are route-fact
+  notes only and must not be interpreted as scoring, ranking, winner,
+  blinding, unblinding, source-map, identity-map, benchmark, readiness,
+  quality, production, public-MVP, or Alpha-superiority evidence.
 - A passing validation means only that the configured structural rules held
   for that capture file. It does not claim readiness, benchmark results,
   provider or local-model quality, or that routed output is better than the

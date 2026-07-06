@@ -124,6 +124,29 @@ class TestCaptureValidation:
             "unknown keys" in error and "blind_label" in error for error in errors
         )
 
+    def test_schema_level_unknown_boundary_keys_rejected(self):
+        capture = _filled_capture()
+        capture["rank"] = 1
+        capture["cases"][0]["source_map"] = {"A": "baseline"}
+        errors = orc.validate_capture(capture)
+        assert any("unknown keys" in error and "rank" in error for error in errors)
+        assert any(
+            "unknown keys" in error and "source_map" in error for error in errors
+        )
+
+    def test_route_metadata_remains_schema_light_for_route_facts(self):
+        capture = _filled_capture()
+        capture["cases"][0]["route_metadata"] = {
+            "selected_route": "portable",
+            "fallbacks_observed": [],
+            "operator_note": "route facts recorded during manual capture",
+        }
+        assert orc.validate_capture(capture, for_export=True) == []
+        packet = orc.build_evidence_packet(capture)
+        exported_metadata = packet["cases"][0]["route_metadata"]
+        assert exported_metadata["selected_route"] == "portable"
+        assert exported_metadata["fallbacks_observed"] == []
+
     def test_wrong_schema_version_rejected(self):
         capture = _filled_capture()
         capture["schema_version"] = "operator_run_capture/v0"
