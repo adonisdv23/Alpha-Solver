@@ -1,0 +1,36 @@
+{
+  "packet_id": "PR646-SUBSTANTIVE-LIFT-MANUAL-EVAL-PREP-001",
+  "description": "Local-only PR #646 manual capture prep packet for qualitative plain-vs-Alpha review; capture only, with no scoring, ranking, blinding, source maps, provider calls, local model calls, readiness claims, benchmark claims, or Alpha-superiority claims.",
+  "cases": [
+    {
+      "task_id": "pr646-case-001-next-bottleneck",
+      "prompt": "In the Alpha Solver repo after PR #646, PR #647, and PR #648, identify the next answer-quality bottleneck that should be addressed before any broader evaluation lane. Ground the answer in alpha_solver_portable.py, tests/test_alpha_substantive_lift_contract.py, tests/test_alpha_local_runtime_honesty.py, and docs/OPERATOR_RUN_CAPTURE.md. Include intent diagnosis, hidden assumption, dominant tradeoff, committed recommendation, failure condition, and same-day next action.",
+      "notes": "Targets the post-#646/#647/#648 bottleneck question while asking for the six PR #646 substantive-lift moves. Capture only; do not score or rank outputs."
+    },
+    {
+      "task_id": "pr646-case-002-runtime-vs-manual",
+      "prompt": "Decide whether Alpha Solver should next wire runtime lift behavior into /v1/solve or keep testing PR #646 manually through alpha_solver_portable.py and the operator capture harness. Use alpha/eval/operator_run_capture.py, scripts/operator_run_capture.py, alpha_solver_portable.py, and .specs/ALPHA-SOLVER-SUBSTANTIVE-LIFT-ANSWER-CONTRACT-001.md as constraints. Include intent diagnosis, hidden assumption, dominant tradeoff, committed recommendation, failure condition, and same-day next action.",
+      "notes": "Targets runtime lift wiring versus manual portable testing without changing provider/runtime behavior."
+    },
+    {
+      "task_id": "pr646-case-003-route-persona-causality",
+      "prompt": "Recommend how to investigate whether route/persona metadata helps answer quality or merely adds bloat in Alpha Solver, without activating new routes or changing persona behavior. Ground the recommendation in docs/OPERATOR_RUN_CAPTURE.md, alpha/eval/operator_run_capture.py, and the existing route-metadata boundary. Include intent diagnosis, hidden assumption, dominant tradeoff, committed recommendation, failure condition, and same-day next action.",
+      "notes": "Targets route/persona causality versus bloat while preserving the capture-harness boundary."
+    },
+    {
+      "task_id": "pr646-case-004-local-tot-honesty-boundary",
+      "prompt": "Assess the safest next repo task for local ToT honesty after PR #647 and PR #648, given that unsupported local synthesis must SAFE-OUT rather than fabricate or echo templates. Ground the answer in tests/test_alpha_local_runtime_honesty.py, tests/test_safeout_confidence_honesty.py if present, and alpha_solver_portable.py. Include intent diagnosis, hidden assumption, dominant tradeoff, committed recommendation, failure condition, and same-day next action.",
+      "notes": "Targets local ToT honesty and unsupported synthesis boundary."
+    },
+    {
+      "task_id": "pr646-case-005-manual-eval-no-scoring",
+      "prompt": "Design a manual evaluation workflow for checking whether PR #646 creates an operator-visible answer-quality difference, but do not score, rank, blind, unblind, or claim superiority. Ground the plan in docs/OPERATOR_RUN_CAPTURE.md, scripts/operator_run_capture.py, and alpha/eval/operator_run_capture.py. Include intent diagnosis, hidden assumption, dominant tradeoff, committed recommendation, failure condition, and same-day next action.",
+      "notes": "Targets manual evaluation design while preserving all non-scoring and non-claim boundaries."
+    },
+    {
+      "task_id": "pr646-case-006-implementation-lane-selection",
+      "prompt": "Choose exactly one constrained implementation lane Alpha Solver should do after this manual-eval prep packet: strengthen portable prompt wording, add more local structural checks, improve capture documentation, or defer implementation until qualitative review. Ground the choice in .specs/INDEX.md, .specs/ALPHA-SOLVER-SUBSTANTIVE-LIFT-ANSWER-CONTRACT-001.md, tests/test_alpha_substantive_lift_contract.py, and docs/OPERATOR_RUN_CAPTURE.md. Include intent diagnosis, hidden assumption, dominant tradeoff, committed recommendation, failure condition, and same-day next action.",
+      "notes": "Targets a constrained implementation-lane selection without starting the lane."
+    }
+  ]
+}
