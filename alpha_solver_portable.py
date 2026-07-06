@@ -1199,9 +1199,7 @@ class PortableAlphaSolver:
                 tot_result["answer_kind"] = "local_unsupported_safeout"
                 tot_result["artifact_kind"] = tot_honesty["artifact_kind"]
                 tot_result["synthesis_available"] = False
-                tot_result["confidence_before_adjustment"] = float(
-                    tot_result.get("confidence", 0.0)
-                )
+                tot_result["confidence_before_adjustment"] = confidence_before_adjustment
                 tot_result["confidence"] = PORTABLE_UNSUPPORTED_LOCAL_SAFEOUT_CONFIDENCE
                 tot_result["confidence_adjustment_reason"] = (
                     PORTABLE_UNSUPPORTED_LOCAL_SAFEOUT_CONFIDENCE_REASON

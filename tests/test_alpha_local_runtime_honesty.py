@@ -128,6 +128,17 @@ def test_cot_fallback_template_artifact_is_bounded():
     )
 
 
+def test_cot_fallback_records_visible_confidence_before_adjustment():
+    result = _solve_unsupported(low_conf_threshold=0.7)
+    tot_diag = result["diagnostics"]["tot"]
+
+    assert result["route"] == "cot_fallback"
+    assert result["confidence"] == 0.20
+    assert tot_diag["confidence"] == 0.20
+    assert result["confidence_before_adjustment"] == 0.50
+    assert tot_diag["confidence_before_adjustment"] == 0.50
+
+
 def test_cached_template_answer_is_bounded():
     query = "Design a sharding plan for our multi-tenant Postgres cluster."
     key = make_key(query, 0, (), "0")

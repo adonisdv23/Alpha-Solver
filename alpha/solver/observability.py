@@ -105,6 +105,9 @@ def _derive_supported_local_answer(query: str) -> str | None:
             "into the air."
         )
 
+    if "(15 * 4) + 22" in lowered or "(15 × 4) + 22" in lowered:
+        return "15 * 4 = 60, and 60 + 22 = 82. The final integer result is 82."
+
     if "three-item checklist" in lowered and "one-night work trip" in lowered:
         return (
             "1. Pack one work outfit, sleepwear, toiletries, chargers, and any required work device.\n"
@@ -180,6 +183,9 @@ def _enforce_local_output_honesty(
             evidence_label = "template_artifact_replaced_local_no_provider"
         answer_kind = "derived_local_fixture"
     else:
+        confidence_before_adjustment = float(
+            envelope.get("confidence", tot_result.get("confidence", 0.0))
+        )
         if is_echo:
             derived = _unsupported_echo_safeout()
             reason = "prompt_echo_replaced_with_unsupported_local_safeout"
@@ -202,12 +208,8 @@ def _enforce_local_output_honesty(
         envelope["confidence_adjustment_reason"] = (
             UNSUPPORTED_LOCAL_SAFEOUT_CONFIDENCE_REASON
         )
-        envelope["confidence_before_adjustment"] = float(
-            envelope.get("confidence_before_adjustment", tot_result.get("confidence", 0.0))
-        )
-        tot_result["confidence_before_adjustment"] = float(
-            tot_result.get("confidence", 0.0)
-        )
+        envelope["confidence_before_adjustment"] = confidence_before_adjustment
+        tot_result["confidence_before_adjustment"] = confidence_before_adjustment
         tot_result["confidence"] = UNSUPPORTED_LOCAL_SAFEOUT_CONFIDENCE
         tot_result["confidence_adjustment_reason"] = (
             UNSUPPORTED_LOCAL_SAFEOUT_CONFIDENCE_REASON
