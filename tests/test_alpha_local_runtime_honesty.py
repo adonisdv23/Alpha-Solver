@@ -311,3 +311,22 @@ def test_portable_honesty_helper_is_standalone_and_explicit():
     )
     assert clean["artifact_detected"] is False
     assert clean["bounded_answer"] is None
+
+
+def test_portable_diagnostics_tot_matches_safeout_honesty_adjustment():
+    envelope = portable.PortableAlphaSolver(seed=7).solve(UNSUPPORTED_HIGH_HEADROOM)
+    diagnostics_tot = envelope.diagnostics.tot
+
+    assert envelope.solution.startswith("SAFE-OUT:")
+    assert diagnostics_tot["answer_kind"] == "local_unsupported_safeout"
+    assert diagnostics_tot["synthesis_available"] is False
+    assert diagnostics_tot["confidence"] == envelope.safe_out_state["confidence"]
+    assert (
+        diagnostics_tot["confidence_before_adjustment"]
+        == envelope.safe_out_state["confidence_before_adjustment"]
+    )
+    assert (
+        diagnostics_tot["confidence_adjustment_reason"]
+        == envelope.safe_out_state["confidence_adjustment_reason"]
+    )
+    assert diagnostics_tot["artifact_kind"] in {"prompt_echo", "template_branch"}

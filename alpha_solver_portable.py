@@ -1230,7 +1230,17 @@ class PortableAlphaSolver:
         diagnostics = SolverDiagnostics(
             router={"stage": route_decision.stage, "rationale": route_decision.rationale, "escalations": route_decision.escalations},
             safe_out={"config": asdict(getattr(safe_out, "config", PortableSOConfig()))},
-            tot={"steps": tot_result.get("steps", []), "best_path": tot_result.get("best_path", []), "timed_out": tot_result.get("timed_out", False)},
+            tot={
+                "steps": tot_result.get("steps", []),
+                "best_path": tot_result.get("best_path", []),
+                "timed_out": tot_result.get("timed_out", False),
+                "answer_kind": tot_result.get("answer_kind"),
+                "artifact_kind": tot_result.get("artifact_kind"),
+                "synthesis_available": tot_result.get("synthesis_available"),
+                "confidence": tot_result.get("confidence"),
+                "confidence_before_adjustment": tot_result.get("confidence_before_adjustment"),
+                "confidence_adjustment_reason": tot_result.get("confidence_adjustment_reason"),
+            },
             expert_selection={"lead": expert_team.lead["id"], "team_size": 5, "synergy": expert_team.synergy_score, "domains": expert_team.domain_classification},
             observability_events=self.observability.export(),
         )
