@@ -1,0 +1,36 @@
+{
+  "packet_id": "POST657-QUALITATIVE-RUN-PACKET-001",
+  "description": "Post-#657 qualitative manual-review case packet for capture with the current operator_run_capture init, validate, lift-preflight, and export flow. This fixture contains prompts only: no outputs, expected answers, scores, ranks, winners, benchmark statements, readiness claims, provider validation, local validation, or superiority claims.",
+  "cases": [
+    {
+      "task_id": "post657-case-001-preflight-signal",
+      "prompt": "After PR #655 and PR #657, decide what the new `lift-preflight` CLI should help the operator detect before a qualitative Alpha Solver review. Ground the answer in `docs/OPERATOR_RUN_CAPTURE.md`, `alpha/eval/operator_run_capture.py`, `tests/test_operator_run_capture.py`, `tests/fixtures/operator_run_capture/post655_lift_preflight_smoke_capture.json`, and `.specs/OPERATOR-RUN-CAPTURE-SUBSTANTIVE-LIFT-PREFLIGHT-CLI-001.md`. Include Intent, Assumes, Tradeoff, Recommendation, Fails if, and Next.",
+      "notes": "Capture prompt only; asks for a committed recommendation about structural preflight signal boundaries without requesting any score, rank, winner, benchmark, readiness, validation, or superiority claim."
+    },
+    {
+      "task_id": "post657-case-002-safeout-lift-boundary",
+      "prompt": "Choose the safest manual-review interpretation when a routed Alpha output is a bounded SAFE-OUT instead of a Substantive Lift answer. Ground the answer in `alpha_solver_portable.py`, `tests/test_alpha_local_runtime_honesty.py`, `tests/test_operator_run_capture.py`, PR #647, PR #648, PR #654, and PR #655. Include Intent, Assumes, Tradeoff, Recommendation, Fails if, and Next.",
+      "notes": "Capture prompt only; targets the SAFE-OUT versus lift-contract boundary while preserving the local structural-only interpretation of preflight."
+    },
+    {
+      "task_id": "post657-case-003-solution-envelope-capture",
+      "prompt": "Decide whether operators should paste full routed Alpha responses, including a leading `SOLUTION:` label, or manually trim to the six-move answer body before running `lift-preflight`. Ground the answer in PR #657, `alpha/eval/operator_run_capture.py`, `docs/OPERATOR_RUN_CAPTURE.md`, `tests/test_operator_run_capture.py`, and `tests/fixtures/operator_run_capture/post655_lift_preflight_smoke_report.json`. Include Intent, Assumes, Tradeoff, Recommendation, Fails if, and Next.",
+      "notes": "Capture prompt only; targets the post-#657 response-envelope handling guidance without changing capture or preflight behavior."
+    },
+    {
+      "task_id": "post657-case-004-route-metadata-minimality",
+      "prompt": "Define what belongs in `route_metadata` versus qualitative reviewer notes for a post-#657 manual run packet. Ground the answer in `docs/OPERATOR_RUN_CAPTURE.md`, `alpha/eval/operator_run_capture.py`, PR #644, PR #654, PR #655, and `docs/evals/runs/pr646-substantive-lift-manual-eval/OBSERVATION_MEMO.md`. Include Intent, Assumes, Tradeoff, Recommendation, Fails if, and Next.",
+      "notes": "Capture prompt only; keeps route metadata limited to route and provenance facts and leaves reviewer interpretation outside the capture schema."
+    },
+    {
+      "task_id": "post657-case-005-reviewer-instruction-boundary",
+      "prompt": "Write the operating boundary for a human reviewer who will read post-#657 routed outputs after `lift-preflight` passes, without turning the review into scoring or ranking. Ground the answer in `docs/evals/runbooks/PR646_SUBSTANTIVE_LIFT_MANUAL_EVAL.md`, `docs/evals/runs/pr646-substantive-lift-manual-eval/OBSERVATION_MEMO.md`, `docs/OPERATOR_RUN_CAPTURE.md`, PR #649, PR #655, and PR #657. Include Intent, Assumes, Tradeoff, Recommendation, Fails if, and Next.",
+      "notes": "Capture prompt only; asks for reviewer operating boundaries and explicitly excludes score/rank framing."
+    },
+    {
+      "task_id": "post657-case-006-next-fork-after-run",
+      "prompt": "After a post-#657 qualitative run is captured and preflighted, choose exactly one next fork for Alpha Solver: stop and lock the current portable/capture layer, run another qualitative packet, investigate route/persona causality, explore runtime `/v1/solve` wiring, or investigate model-backed synthesis requirements. Ground the choice in `.specs/INDEX.md`, `alpha_solver_portable.py`, `docs/OPERATOR_RUN_CAPTURE.md`, `docs/evals/runs/pr646-substantive-lift-manual-eval/OBSERVATION_MEMO.md`, PR #652, PR #655, and PR #657. Include Intent, Assumes, Tradeoff, Recommendation, Fails if, and Next.",
+      "notes": "Capture prompt only; forces one next-fork recommendation after the manual run is captured, without executing that follow-up lane."
+    }
+  ]
+}
