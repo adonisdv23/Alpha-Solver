@@ -37,6 +37,24 @@
       "compliant_solution": "We are evaluating the proposal.",
       "non_compliant_solution": "Intent: Shorten a sentence while preserving meaning.\nAssumes: Formal register should be kept.\nTradeoff: Brevity versus completeness.\nRecommendation: Use 'We are evaluating the proposal.'\nFails if: The original legal phrasing was required verbatim.\nNext: Replace the sentence in the source document.\n\nWe are evaluating the proposal.",
       "non_compliant_reason": "lift block forced onto a low-headroom task; restraint rules take precedence and require the direct rewrite first with no scaffolding"
+    },
+    {
+      "case_id": "LIFT-COSPLAY-PR651-001",
+      "task_family": "implementation lane hardening",
+      "lift_required": true,
+      "prompt": "For lane ALPHA-SOLVER-SUBSTANTIVE-LIFT-CASE-ANCHOR-HARDENING-001, update alpha_solver_portable.py and tests/test_alpha_substantive_lift_contract.py after PR #651 so generic lift blocks are rejected.",
+      "compliant_solution": "Intent: Decide how to harden ALPHA-SOLVER-SUBSTANTIVE-LIFT-CASE-ANCHOR-HARDENING-001 without changing non-portable behavior.\nAssumes: PR #651 is already present on main and the allowed code target is alpha_solver_portable.py.\nTradeoff: Catching reusable lift scaffolding versus avoiding a rule that forces every line to repeat file names.\nRecommendation: Add prompt-aware anchor extraction in alpha_solver_portable.py and require anchors in multiple key lift lines only when the prompt yields anchors.\nFails if: tests/test_alpha_substantive_lift_contract.py shows prompt=None behavior changed or PR #651 diagnostics parity is no longer present.\nNext: Add the cosplay fixture to tests/fixtures/alpha_substantive_lift_cases.json and assert it fails only with the lane prompt.\n",
+      "non_compliant_solution": "Intent: Decide the underlying approach for the request.\nAssumes: The main constraint is to avoid unnecessary complexity.\nTradeoff: Speed of action versus confidence from additional analysis.\nRecommendation: Use the simplest concrete path that satisfies the constraints.\nFails if: A required constraint makes the simple path invalid.\nNext: Draft the first implementation step and review it today.\n",
+      "non_compliant_reason": "structurally valid lift block with no prompt anchors; reusable under a different implementation request unchanged"
+    },
+    {
+      "case_id": "LIFT-COSPLAY-ISSUE650-001",
+      "task_family": "planning under repo constraints",
+      "lift_required": true,
+      "prompt": "Plan the bounded follow-up for issue #650 using docs/evals/runbooks/PR646_SUBSTANTIVE_LIFT_MANUAL_EVAL.md and tests/fixtures/operator_run_capture/pr646_substantive_lift_case_packet.json without making quality claims.",
+      "compliant_solution": "Intent: Decide the bounded follow-up for issue #650 using the PR646 manual-eval artifacts without claiming answer quality.\nAssumes: docs/evals/runbooks/PR646_SUBSTANTIVE_LIFT_MANUAL_EVAL.md and tests/fixtures/operator_run_capture/pr646_substantive_lift_case_packet.json remain the source artifacts.\nTradeoff: Improving wording checks versus accidentally turning the runbook into a benchmark claim.\nRecommendation: Keep the follow-up limited to portable contract checks tied to issue #650 and the PR646 fixture packet.\nFails if: The change requires provider capture data beyond tests/fixtures/operator_run_capture/pr646_substantive_lift_case_packet.json.\nNext: Cross-check docs/evals/runbooks/PR646_SUBSTANTIVE_LIFT_MANUAL_EVAL.md against the new spec before editing code.\n",
+      "non_compliant_solution": "Intent: Decide what to do.\nAssumes: The task needs a thoughtful approach with clear constraints.\nTradeoff: Acting quickly versus preserving flexibility for future changes.\nRecommendation: Apply best practices and choose a robust solution for the situation.\nFails if: Important facts change in a way that invalidates the direction.\nNext: Create an action item and complete it today.\n",
+      "non_compliant_reason": "generic filler and no concrete case anchors despite a prompt with issue, file, and fixture anchors"
     }
   ]
 }

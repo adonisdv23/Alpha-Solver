@@ -101,3 +101,4 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 | `UI-KEYS-001.md` | UI-KEYS-001 · Dashboard: API Keys Management | ✅ `SPEC_OK` |
 | `UI-REQ-001.md` | UI-REQ-001 · Dashboard Request Submission UI | ✅ `SPEC_OK` |
 | `UI-RUN-001.md` | UI-RUN-001 · Dashboard One-click Demo Run | ✅ `SPEC_OK` |
+| `ALPHA-SOLVER-SUBSTANTIVE-LIFT-CASE-ANCHOR-HARDENING-001.md` | ALPHA-SOLVER-SUBSTANTIVE-LIFT-CASE-ANCHOR-HARDENING-001 · Substantive Lift Case Anchor Hardening | ✅ `SPEC_OK` |
