@@ -296,6 +296,9 @@ class TreeOfThoughtSolver:
                     "config": self._config_dict(),
                     "reason": "ok",
                     "cache_hit": True,
+                    # Cached deterministic search output; never model synthesis.
+                    "answer_kind": "cached_search_artifact",
+                    "synthesis_available": False,
                 }
 
         root = Node(content=query, path=(query,), depth=0, id=self._next_id())
@@ -336,6 +339,10 @@ class TreeOfThoughtSolver:
             "config": self._config_dict(),
             "reason": reason,
             "cache_hit": False,
+            # Deterministic search output: the root is the prompt itself and
+            # children are TEMPLATE_FUNCS wrappers. Neither is synthesis.
+            "answer_kind": "prompt_echo" if best.depth == 0 else "template_branch",
+            "synthesis_available": False,
         }
 
         if cache is not None:

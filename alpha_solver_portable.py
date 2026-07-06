@@ -988,6 +988,62 @@ class PortableSafeOut:
 
 
 # ---------------------------------------------------------------------------
+# Local-output honesty boundary (standalone; no repo imports)
+# ---------------------------------------------------------------------------
+# Deterministic wrappers this file itself can produce: ToT branch templates
+# and the portable CoT fallback. Final answers must never surface them.
+PORTABLE_LOCAL_ARTIFACT_PREFIXES: Tuple[str, ...] = (
+    "rephrase:",
+    "decompose:",
+    "edge cases:",
+    "counterpoints:",
+    "summarize:",
+    "clarify and refine:",
+)
+
+PORTABLE_LOCAL_UNSUPPORTED_SAFEOUT = (
+    "SAFE-OUT: The portable local deterministic path cannot synthesize a "
+    "substantive answer without a model; its search output is template "
+    "scaffolding, not an answer. Run this prompt on a model-backed surface "
+    "or supply supported local context."
+)
+
+
+def portable_local_output_honesty(answer: Any, query: str) -> Dict[str, Any]:
+    """Flag prompt echo / template artifacts from the portable local path.
+
+    Standalone wording check for this file's own deterministic outputs. It
+    detects only the explicit wrappers above plus exact normalized prompt
+    echo; it does not judge answer quality and cannot make the local path
+    smarter — it only stops non-answers from masquerading as answers.
+    """
+
+    def _norm(text: str) -> str:
+        return " ".join(text.strip().lower().split())
+
+    result: Dict[str, Any] = {
+        "artifact_detected": False,
+        "artifact_kind": None,
+        "bounded_answer": None,
+        "synthesis_available": False,
+    }
+    if not isinstance(answer, str) or not answer.strip():
+        return result
+    if _norm(answer) == _norm(query):
+        result["artifact_detected"] = True
+        result["artifact_kind"] = "prompt_echo"
+    elif any(
+        answer.strip().lower().startswith(prefix)
+        for prefix in PORTABLE_LOCAL_ARTIFACT_PREFIXES
+    ):
+        result["artifact_detected"] = True
+        result["artifact_kind"] = "template_branch"
+    if result["artifact_detected"]:
+        result["bounded_answer"] = PORTABLE_LOCAL_UNSUPPORTED_SAFEOUT
+    return result
+
+
+# ---------------------------------------------------------------------------
 # Portable solver orchestration
 # ---------------------------------------------------------------------------
 @dataclass
@@ -1106,6 +1162,22 @@ class PortableAlphaSolver:
         expert_team = self.expert_selector.select_team(query)
         safe_out = self._make_safe_out(seed=seed)
         safe_out_state = safe_out.run(tot_result, query)
+
+        honesty = portable_local_output_honesty(
+            safe_out_state.get("final_answer", ""), query
+        )
+        if honesty["artifact_detected"]:
+            safe_out_state["final_answer"] = honesty["bounded_answer"]
+            safe_out_state["reason"] = "local_unsupported_safeout"
+            safe_out_state["answer_kind"] = "local_unsupported_safeout"
+            safe_out_state["artifact_kind"] = honesty["artifact_kind"]
+            safe_out_state["synthesis_available"] = False
+            self.observability.log_event(
+                "local_output_honesty_replacement",
+                event_type="policy",
+                stage="post_safe_out",
+                artifact_kind=honesty["artifact_kind"],
+            )
 
         shortlist = [
             {"answer": tot_result.get("answer", ""), "confidence": float(tot_result.get("confidence", 0.0))},

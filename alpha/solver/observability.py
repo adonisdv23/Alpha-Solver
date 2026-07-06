@@ -26,6 +26,63 @@ def _is_prompt_echo(answer: object, query: str) -> bool:
     return _normalize_for_echo_detection(answer) == _normalize_for_echo_detection(query)
 
 
+# Deterministic branch-generator prefixes from alpha.reasoning.tot.TEMPLATE_FUNCS.
+# An answer starting with one of these is search scaffolding, never synthesis.
+TOT_TEMPLATE_PREFIXES = (
+    "rephrase:",
+    "decompose:",
+    "edge cases:",
+    "counterpoints:",
+    "summarize:",
+)
+
+# Deterministic CoT fallback wrappers from alpha.reasoning.cot / safe_out_sm.
+COT_FALLBACK_PREFIXES = (
+    "to proceed, consider:",
+    "to proceed, clarify:",
+)
+
+
+def _strip_artifact_prefixes(answer: str) -> tuple[str, bool]:
+    """Strip chained template/fallback prefixes; return (core, any_stripped)."""
+
+    core = answer.strip()
+    stripped_any = False
+    changed = True
+    while changed:
+        changed = False
+        lowered = core.lower()
+        for prefix in TOT_TEMPLATE_PREFIXES + COT_FALLBACK_PREFIXES:
+            if lowered.startswith(prefix):
+                core = core[len(prefix):].strip()
+                stripped_any = True
+                changed = True
+                break
+    return core, stripped_any
+
+
+def _classify_local_artifact(answer: object, query: str) -> str | None:
+    """Classify a local deterministic answer as a non-substantive artifact.
+
+    Returns "prompt_echo", "template_branch", "cot_template", or None for
+    text this explicit detector cannot call an artifact. Only known
+    deterministic wrappers are matched; no fuzzy heuristics.
+    """
+
+    if not isinstance(answer, str):
+        return None
+    if _is_prompt_echo(answer, query):
+        return "prompt_echo"
+    lowered = answer.strip().lower()
+    if any(lowered.startswith(prefix) for prefix in TOT_TEMPLATE_PREFIXES):
+        return "template_branch"
+    if any(lowered.startswith(prefix) for prefix in COT_FALLBACK_PREFIXES):
+        core, _ = _strip_artifact_prefixes(answer)
+        if _is_prompt_echo(core, query):
+            return "cot_template"
+    return None
+
+
 def _derive_supported_local_answer(query: str) -> str | None:
     """Return a bounded deterministic answer for supported echo fixtures only.
 
@@ -77,30 +134,79 @@ def _unsupported_echo_safeout() -> str:
     )
 
 
-def _replace_echo_answer(
+def _unsupported_template_safeout() -> str:
+    return (
+        "SAFE-OUT: The deterministic local path produced a non-substantive "
+        "template artifact instead of an answer, and local deterministic "
+        "synthesis is unavailable without a model for this request. "
+        "Please provide a supported fixture shape or run this prompt on a "
+        "model-backed surface."
+    )
+
+
+def _enforce_local_output_honesty(
     envelope: Dict[str, Any], tot_result: Dict[str, Any], query: str
 ) -> None:
-    if not _is_prompt_echo(envelope.get("final_answer"), query):
+    """Replace non-substantive local artifacts with bounded honest output.
+
+    Broadens the previous exact-echo guard: exact/normalized prompt echo,
+    ToT template-prefixed answers, and CoT fallback wrappers around the
+    prompt are never surfaced as final answers. Supported fixture
+    derivations are preserved; everything else gets a bounded SAFE-OUT with
+    diagnostics. This guard cannot make the local path smarter — it only
+    stops non-answers from masquerading as answers.
+    """
+
+    artifact_kind = _classify_local_artifact(envelope.get("final_answer"), query)
+    if artifact_kind is None:
         return
 
+    is_echo = artifact_kind == "prompt_echo"
+    raw_answer = envelope.get("final_answer", "")
     derived = _derive_supported_local_answer(query)
-    if derived is None:
-        derived = _unsupported_echo_safeout()
-        reason = "prompt_echo_replaced_with_unsupported_local_safeout"
-        note = "prompt echo replaced by unsupported-local SAFE-OUT clarification"
-        evidence_label = "prompt_echo_replaced_unsupported_local_safeout_no_provider"
+    if derived is not None:
+        if is_echo:
+            reason = "prompt_echo_replaced_with_local_derived_answer"
+            note = "prompt echo replaced by deterministic local answer"
+            evidence_label = "prompt_echo_replaced_local_no_provider"
+        else:
+            reason = "template_artifact_replaced_with_local_derived_answer"
+            note = "template artifact replaced by deterministic local answer"
+            evidence_label = "template_artifact_replaced_local_no_provider"
+        answer_kind = "derived_local_fixture"
     else:
-        reason = "prompt_echo_replaced_with_local_derived_answer"
-        note = "prompt echo replaced by deterministic local answer"
-        evidence_label = "prompt_echo_replaced_local_no_provider"
+        if is_echo:
+            derived = _unsupported_echo_safeout()
+            reason = "prompt_echo_replaced_with_unsupported_local_safeout"
+            note = "prompt echo replaced by unsupported-local SAFE-OUT clarification"
+            evidence_label = (
+                "prompt_echo_replaced_unsupported_local_safeout_no_provider"
+            )
+        else:
+            derived = _unsupported_template_safeout()
+            reason = "template_artifact_replaced_with_unsupported_local_safeout"
+            note = (
+                "template artifact replaced by unsupported-local SAFE-OUT "
+                "clarification"
+            )
+            evidence_label = (
+                "template_artifact_replaced_unsupported_local_safeout_no_provider"
+            )
+        answer_kind = "local_unsupported_safeout"
 
     envelope["final_answer"] = derived
     envelope["solution"] = derived
     envelope["reason"] = reason
     envelope["notes"] = f"{envelope.get('notes', '')} | {note}"
     envelope.setdefault("evidence", []).append(evidence_label)
-    tot_result["echo_detected"] = True
-    tot_result["raw_echo_answer"] = tot_result.get("answer", "")
+    tot_result["echo_detected"] = is_echo
+    tot_result["template_branch_detected"] = not is_echo
+    tot_result["answer_kind"] = answer_kind
+    tot_result["synthesis_available"] = False
+    if is_echo:
+        tot_result["raw_echo_answer"] = tot_result.get("answer", "")
+    else:
+        tot_result["raw_template_answer"] = raw_answer
     tot_result["answer"] = derived
 
 
@@ -190,7 +296,7 @@ class AlphaSolver:
         )
         sm = SafeOutStateMachine(cfg)
         envelope = sm.run(tot_result, query)
-        _replace_echo_answer(envelope, tot_result, query)
+        _enforce_local_output_honesty(envelope, tot_result, query)
 
         router_stage = router.stage if router else "basic"
         if (
