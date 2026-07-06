@@ -57,6 +57,32 @@ all outputs; the harness only scaffolds, validates, and exports.
    canonical body) so replay or review lanes can detect any post-export edit.
    Re-exporting the same capture yields byte-identical output.
 
+## Substantive Lift capture preflight
+
+Before reviewing a PR646/post-652 qualitative capture packet, operators should
+confirm the packet preserves the evidence needed to evaluate the run without
+turning the harness into a scorer:
+
+- Preserve prompt/context parity between baseline and Alpha threads, including
+  the same task wording, constraints, and any operator-provided context used to
+  generate each pasted output.
+- Preserve raw export provenance when available, such as the raw exported
+  transcript or capture artifact that the pasted fields came from.
+- Preserve explicit high-headroom prompt anchors when the prompt expects
+  case-specific reasoning, including files, PR numbers, issue numbers, named
+  artifacts, implementation lanes, or other concrete task objects.
+- Keep `route_metadata` limited to route and provenance facts. It is not a
+  place for quality judgments, comparative conclusions, or reviewer scoring.
+- Do not add score, rank, winner, blind label, source map, identity map, A/B
+  identity key, readiness, benchmark, or superiority fields to the capture,
+  export, `route_metadata`, or surrounding packet notes.
+
+`check_substantive_lift(solution, prompt=prompt)` may be used only as a
+non-scoring structural preflight for the Substantive Lift wording contract. A
+passing result must not be described as answer quality, benchmark validation,
+readiness, production suitability, or Alpha superiority; it only means the
+checked text satisfied the local structural wording rules for that prompt.
+
 ## Packet contents
 
 Every exported packet embeds a `harness_boundaries` block recording, as

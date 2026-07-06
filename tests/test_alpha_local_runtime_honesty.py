@@ -330,3 +330,51 @@ def test_portable_diagnostics_tot_matches_safeout_honesty_adjustment():
         == envelope.safe_out_state["confidence_adjustment_reason"]
     )
     assert diagnostics_tot["artifact_kind"] in {"prompt_echo", "template_branch"}
+
+
+def test_unsupported_local_safeout_is_not_lift_cosplay_for_anchored_prompt():
+    prompt = (
+        "For alpha_solver_portable.py after PR #652, decide whether "
+        "ALPHA-SOLVER-SUBSTANTIVE-LIFT-CASE-ANCHOR-HARDENING-001 proves "
+        "local deterministic synthesis can produce a case-anchored Substantive "
+        "Lift answer. Include concrete file and PR anchors."
+    )
+
+    envelope = portable.PortableAlphaSolver(seed=7).solve(prompt)
+
+    assert envelope.solution.startswith("SAFE-OUT:"), envelope.solution
+    assert envelope.confidence == 0.20
+    assert envelope.safe_out_state["answer_kind"] == "local_unsupported_safeout"
+    assert envelope.safe_out_state["synthesis_available"] is False
+    assert (
+        envelope.safe_out_state["confidence_adjustment_reason"]
+        == "confidence_adjusted_due_to_unsupported_local_synthesis"
+    )
+    assert envelope.diagnostics.tot["answer_kind"] == "local_unsupported_safeout"
+    assert envelope.diagnostics.tot["synthesis_available"] is False
+    assert _normalized(envelope.solution) != _normalized(prompt)
+    for prefix in BLOCKED_TEMPLATE_PREFIXES + COT_ARTIFACT_PREFIXES:
+        assert not envelope.solution.lower().startswith(prefix.lower())
+    for label in LIFT_LABELS:
+        assert not envelope.solution.startswith(label)
+    assert "Recommendation:" not in envelope.solution
+    assert "Fails if:" not in envelope.solution
+    assert "Next:" not in envelope.solution
+
+    generic_lift_block = "\n".join(
+        [
+            "Intent: Address the request with a thoughtful approach.",
+            "Assumes: The team wants a robust solution for the situation.",
+            "Tradeoff: Balance quality against speed for the best outcome.",
+            "Recommendation: Use best practices and carefully consider options.",
+            "Fails if: Various stakeholders disagree with the approach.",
+            "Next: Consider the available choices and decide how to proceed.",
+        ]
+    )
+    lift_check = portable.check_substantive_lift(generic_lift_block, prompt=prompt)
+
+    assert lift_check["ok"] is False
+    assert lift_check["unanchored_lift"] is True
+    assert lift_check["weak_anchor_distribution"] is True
+    assert lift_check["filler_flags"]
+    assert lift_check["weak_next_action"] is True

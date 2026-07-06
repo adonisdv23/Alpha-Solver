@@ -82,6 +82,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 | `PROVIDER-OPENAI-001.md` | PROVIDER-OPENAI-001 · Real OpenAI Provider Execution | ✅ `SPEC_OK` |
 | `PROVIDER-SAFEOUT-001.md` | PROVIDER-SAFEOUT-001 · Structured Provider SAFE-OUT Responses | ✅ `SPEC_OK` |
 | `POST-551-NO-ECHO-WIRING-FIX-001.md` | POST-551-NO-ECHO-WIRING-FIX-001 · Local Alpha No-Echo Wiring Fix | ✅ `SPEC_OK` |
+| `POST652-CAPTURE-PREFLIGHT-AND-LIFT-HONESTY-BOUNDARY-001.md` | POST652-CAPTURE-PREFLIGHT-AND-LIFT-HONESTY-BOUNDARY-001 · Capture Preflight and Lift Honesty Boundary | ✅ `SPEC_OK` |
 | `RES-03.md` | CODE SPEC — RES-03 · Decision Rules & Scoring (RES) | ✅ `SPEC_RECONSTRUCTED_FROM_SOURCE` |
 | `RES-04.md` | CODE SPEC — RES-04 · Confidence & Budget Gates (RES) | ✅ `SPEC_RECONSTRUCTED_FROM_SOURCE` |
 | `RES-05.md` | CODE SPEC — RES-05 · Tool Adapters (Playwright, GSheets) — MVP stubs (RES) | ✅ `SPEC_RECONSTRUCTED_FROM_SOURCE` |
