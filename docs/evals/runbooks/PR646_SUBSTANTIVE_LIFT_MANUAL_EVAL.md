@@ -16,13 +16,29 @@ answer-quality difference. It is preparation and capture guidance only.
 
 ## Manual workflow
 
-1. Open a normal ChatGPT thread without Alpha Solver loaded and generate the
+1. Prepare the shared repo/source context before generating either output.
+   Supply the same context to both the plain/baseline thread and the Alpha
+   Solver thread before asking any case-packet prompt, so the comparison uses
+   the same repo facts rather than measuring missing-context behavior. Attach or
+   paste these exact sources from the current repo state:
+   - `alpha_solver_portable.py` from current `main` after PR #648.
+   - `.specs/ALPHA-SOLVER-SUBSTANTIVE-LIFT-ANSWER-CONTRACT-001.md`.
+   - `.specs/ALPHA-SOLVER-TOT-ECHO-HONESTY-HOTFIX-001.md`.
+   - `.specs/ALPHA-SOLVER-SAFEOUT-CONFIDENCE-HONESTY-001.md`.
+   - `alpha/eval/operator_run_capture.py`.
+   - `docs/OPERATOR_RUN_CAPTURE.md`.
+   - `tests/fixtures/operator_run_capture/pr646_substantive_lift_case_packet.json`.
+   If file attachment is unavailable, paste the relevant excerpts or use an
+   equivalent repo-aware context source. Record the context method in
+   `route_metadata`.
+2. Open a normal ChatGPT thread without Alpha Solver loaded, provide the shared
+   repo/source context from step 1, and generate the
    plain/baseline answer for each prompt in
    `tests/fixtures/operator_run_capture/pr646_substantive_lift_case_packet.json`.
-2. Open a fresh thread using the latest `alpha_solver_portable.py` after PR #648
-   as the Alpha Solver instruction surface and generate the Alpha answer for the
-   same prompt.
-3. Scaffold a local capture file with the existing CLI:
+3. Open a fresh thread using the latest `alpha_solver_portable.py` after PR #648
+   as the Alpha Solver instruction surface, provide the same shared repo/source
+   context from step 1, and generate the Alpha answer for the same prompt.
+4. Scaffold a local capture file with the existing CLI:
 
    ```bash
    python scripts/operator_run_capture.py init \
@@ -30,20 +46,20 @@ answer-quality difference. It is preparation and capture guidance only.
      --out local/pr646_substantive_lift_capture.json
    ```
 
-4. Manually paste both outputs into the capture file:
+5. Manually paste both outputs into the capture file:
    - `baseline_output` receives the plain ChatGPT output.
    - `routed_output` receives the Alpha Solver output.
    - `route_metadata` records only observed route/capture facts.
    - `validation_status` is `captured`, or `excluded` with an
      `exclusion_reason`.
-5. Validate the capture using the existing CLI only:
+6. Validate the capture using the existing CLI only:
 
    ```bash
    python scripts/operator_run_capture.py validate \
      --capture local/pr646_substantive_lift_capture.json --for-export
    ```
 
-6. Export the local evidence packet using the existing CLI only:
+7. Export the local evidence packet using the existing CLI only:
 
    ```bash
    python scripts/operator_run_capture.py export \
@@ -51,7 +67,7 @@ answer-quality difference. It is preparation and capture guidance only.
      --out local/pr646_substantive_lift_packet.json
    ```
 
-7. Review qualitatively only. Look for operator-visible differences in whether
+8. Review qualitatively only. Look for operator-visible differences in whether
    each answer surfaces intent diagnosis, hidden assumption, dominant tradeoff,
    committed recommendation, failure condition, and same-day next action.
 

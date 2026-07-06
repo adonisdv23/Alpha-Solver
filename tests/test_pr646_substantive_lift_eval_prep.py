@@ -54,6 +54,16 @@ REQUIRED_LIFT_MOVES = (
     "same-day next action",
 )
 
+REQUIRED_SOURCE_CONTEXT_FILES = (
+    "alpha_solver_portable.py",
+    ".specs/ALPHA-SOLVER-SUBSTANTIVE-LIFT-ANSWER-CONTRACT-001.md",
+    ".specs/ALPHA-SOLVER-TOT-ECHO-HONESTY-HOTFIX-001.md",
+    ".specs/ALPHA-SOLVER-SAFEOUT-CONFIDENCE-HONESTY-001.md",
+    "alpha/eval/operator_run_capture.py",
+    "docs/OPERATOR_RUN_CAPTURE.md",
+    "tests/fixtures/operator_run_capture/pr646_substantive_lift_case_packet.json",
+)
+
 
 def _packet() -> dict:
     return json.loads(PACKET_PATH.read_text(encoding="utf-8"))
@@ -144,6 +154,25 @@ def test_runbook_references_existing_cli_flow_only():
     assert "existing CLI only" in text
     assert "operator_run_capture.py" in text
     assert "score" not in text.lower().replace("do not score", "")
+
+
+def test_runbook_requires_equal_source_context_for_baseline_and_alpha_threads():
+    text = RUNBOOK_PATH.read_text(encoding="utf-8")
+    normalized_text = " ".join(text.split())
+    assert "same context to both the plain/baseline thread and the Alpha" in text
+    assert "before asking any case-packet prompt" in text
+    assert "provide the shared repo/source context from step 1" in normalized_text
+    assert "provide the same shared repo/source context from step 1" in normalized_text
+    assert "Record the context method in" in text
+    assert "route_metadata" in text
+    assert "paste the relevant excerpts" in text
+    assert "equivalent repo-aware context source" in text
+
+
+def test_runbook_names_required_source_context_files():
+    text = RUNBOOK_PATH.read_text(encoding="utf-8")
+    for source_file in REQUIRED_SOURCE_CONTEXT_FILES:
+        assert source_file in text
 
 
 def test_spec_is_indexed():
