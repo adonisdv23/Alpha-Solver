@@ -106,6 +106,61 @@ allows.
    provider payloads, or other source artifacts are missing or unavailable,
    start with "Stop:" and do not reconstruct, rescore, rerun capture, call live
    providers, update Sheets, or make proof/readiness claims.
+
+SUBSTANTIVE LIFT CONTRACT (HIGH-HEADROOM TASKS)
+-----------------------------------------------
+Runtime implementation of the ALPHA-ANSWER-STRUCTURE-V2-001 planning lane for
+this portable surface (lane: ALPHA-SOLVER-SUBSTANTIVE-LIFT-ANSWER-CONTRACT-001).
+
+Purpose: on substantive tasks the SOLUTION itself must contain Alpha-specific
+reasoning moves, not just envelope scaffolding. Envelope structure alone is
+not lift; these moves are what the answer must DO.
+
+Applies when the task is high-headroom: choosing between options; an
+architecture, design, or tooling decision; root-cause diagnosis; planning or
+prioritization under constraints; a strategy or approach question; or an
+ambiguous request where the real goal must be inferred before answering.
+
+Does NOT apply to low-headroom tasks (simple rewrites, formatting, direct
+extraction, short confirmations, reviewer-facing edits, one-step admin tasks,
+simple factual lookups). Precedence: the COMPACT-ENVELOPE EXCEPTION and
+low-headroom restraint rules override this contract; never force the lift
+block onto a task the restraint rules classify as low-headroom.
+
+On applicable tasks, the SOLUTION must OPEN with this compact lift block —
+six labeled lines, one line each, before any supporting detail:
+
+  Intent: <what the user is actually deciding beneath the literal question>
+  Assumes: <the strongest hidden assumption or missing constraint, made explicit>
+  Tradeoff: <the dominant tradeoff that controls this decision>
+  Recommendation: <one committed recommendation under the stated assumptions>
+  Fails if: <the concrete condition that would make the recommendation wrong>
+  Next: <one concrete action executable today, naming its object>
+
+Supporting analysis follows the block and must go deep on the controlling
+constraint rather than shallowly enumerating every consideration.
+
+ANTI-GENERIC RULES (apply to the whole SOLUTION on applicable tasks):
+1. Commit: exactly one primary recommendation. Rank alternatives against it
+   in SHORTLIST instead of presenting an unranked menu inside SOLUTION.
+2. No hedge phrasing: never write "it depends", "there are several factors",
+   "both options have pros and cons", "no one-size-fits-all", "the choice is
+   yours", or equivalents. State the controlling condition instead: "Under
+   <assumption>, do <X>."
+3. Caveats must name triggers: every caveat states the condition that
+   activates it ("Fails if p95 latency exceeds 400ms", never "there are risks").
+4. Executable next action: "Next:" names a specific object and is doable
+   within one day; "consider evaluating options" is non-compliant.
+5. Depth over coverage: analyze the one constraint that controls the outcome
+   instead of touching every dimension superficially.
+
+If you produce a SOLUTION for an applicable task without the lift block, or
+with hedge phrasing in place of a commitment, you have FAILED the protocol.
+
+Boundary: this contract constrains SOLUTION wording on this portable surface
+only. It does not change providers, models, routing, SAFE-OUT, the
+SolverEnvelope shape, or /v1/solve, and it makes no benchmark, readiness,
+production, or superiority claims.
 """
 
 from __future__ import annotations
@@ -114,6 +169,7 @@ import argparse
 import json
 import os
 import random
+import re
 import time
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
@@ -159,7 +215,13 @@ Tree-of-Thought execution guidance for LLMs:
 """
 
 ENVELOPE_OUTPUT_EXAMPLE: str = """
-solution: Provide a concise comparison of carbon taxes vs cap-and-trade with pros/cons and real-world examples.
+solution: |
+  Intent: Choose a carbon-pricing instrument for a specific jurisdiction and audience.
+  Assumes: Policymaker audience; jurisdiction not yet specified.
+  Tradeoff: Price certainty (tax) versus emissions-quantity certainty (cap-and-trade).
+  Recommendation: Under an administrative-simplicity constraint, favor a carbon tax with border adjustments.
+  Fails if: Political durability is the binding constraint; allowance markets survive repeal pressure better.
+  Next: Confirm the target jurisdiction so revenue-recycling options can be compared concretely.
 confidence: 72%
 route: SAFE-OUT (applied CoT fallback)
 shortlist: [
@@ -322,6 +384,179 @@ def minimal_behavior_contract_summary() -> str:
     return "\n".join(lines)
 
 
+# ---------------------------------------------------------------------------
+# Substantive lift contract (ANSWER-STRUCTURE-V2 runtime for this surface)
+# ---------------------------------------------------------------------------
+SUBSTANTIVE_LIFT_LANE = "ALPHA-SOLVER-SUBSTANTIVE-LIFT-ANSWER-CONTRACT-001"
+
+# Ordered lift moves: (line label, what the line must contain). On applicable
+# high-headroom tasks the SOLUTION must open with these six lines in order.
+SUBSTANTIVE_LIFT_MOVES: Tuple[Tuple[str, str], ...] = (
+    ("Intent:", "what the user is actually deciding beneath the literal question"),
+    ("Assumes:", "the strongest hidden assumption or missing constraint, made explicit"),
+    ("Tradeoff:", "the dominant tradeoff that controls this decision"),
+    ("Recommendation:", "one committed recommendation under the stated assumptions"),
+    ("Fails if:", "the concrete condition that would make the recommendation wrong"),
+    ("Next:", "one concrete action executable today, naming its object"),
+)
+
+SUBSTANTIVE_LIFT_TRIGGERS: Tuple[str, ...] = (
+    "choosing between options",
+    "architecture, design, or tooling decision",
+    "root-cause diagnosis",
+    "planning or prioritization under constraints",
+    "strategy or approach question",
+    "ambiguous request where the real goal must be inferred",
+)
+
+# Low-headroom task families where the lift block must NOT be forced; the
+# COMPACT-ENVELOPE EXCEPTION and low-headroom restraint rules take precedence.
+SUBSTANTIVE_LIFT_EXEMPT: Tuple[str, ...] = (
+    "simple rewrites",
+    "formatting",
+    "direct extraction",
+    "short confirmations",
+    "reviewer-facing edits",
+    "one-step admin tasks",
+    "simple factual lookups",
+)
+
+# Hedge phrasings that mark a generic non-committal answer. Matched with word
+# boundaries, case-insensitively, after apostrophe normalization.
+GENERIC_HEDGE_PATTERNS: Tuple[str, ...] = (
+    r"\bit depends\b",
+    r"\bthere are (?:several|many|various) factors\b",
+    r"\bboth (?:options|approaches|choices) have (?:pros and cons|merit|merits)\b",
+    r"\bpros and cons of each\b",
+    r"\bno one-size-fits-all\b",
+    r"\bthe choice is yours\b",
+    r"\bit is up to you\b",
+    r"\bit's up to you\b",
+    r"\bultimately,? (?:the|your) (?:choice|decision)\b",
+)
+
+# A "Next:" line that starts with one of these verbs is deliberation, not an
+# executable action, and fails anti-generic rule 4.
+WEAK_NEXT_ACTION_OPENERS: Tuple[str, ...] = (
+    "consider",
+    "explore",
+    "think about",
+    "look into",
+    "reflect on",
+    "evaluate your options",
+    "weigh",
+)
+
+SUBSTANTIVE_LIFT_ANTI_GENERIC_RULES: Tuple[str, ...] = (
+    "Commit: exactly one primary recommendation; rank alternatives against it "
+    "in SHORTLIST instead of presenting an unranked menu inside SOLUTION.",
+    "No hedge phrasing: state the controlling condition ('Under <assumption>, "
+    "do <X>') instead of 'it depends' or equivalents.",
+    "Caveats must name triggers: every caveat states the condition that "
+    "activates it, never a vague 'there are risks'.",
+    "Executable next action: 'Next:' names a specific object and is doable "
+    "within one day.",
+    "Depth over coverage: analyze the one constraint that controls the outcome "
+    "instead of touching every dimension superficially.",
+)
+
+
+def substantive_lift_contract_summary() -> str:
+    """Return the portable prompt/protocol wording for the substantive lift contract.
+
+    Like :func:`minimal_behavior_contract_summary`, this exposes the active
+    contract for offline tests and prompt-loading workflows. It constrains
+    SOLUTION wording on this portable surface only; it does not alter provider,
+    model, routing, SAFE-OUT, envelope-shape, or /v1/solve behavior, and it
+    makes no benchmark, readiness, production, or superiority claims.
+    """
+
+    lines = [
+        f"Substantive lift contract ({SUBSTANTIVE_LIFT_LANE}):",
+        "Boundary: SOLUTION wording requirements only; does not alter provider, "
+        "model, routing, SAFE-OUT, envelope shape, or /v1/solve behavior.",
+        "Applies to high-headroom tasks:",
+    ]
+    lines.extend(f"  - {trigger}" for trigger in SUBSTANTIVE_LIFT_TRIGGERS)
+    lines.append(
+        "Does not apply to low-headroom tasks (restraint rules take precedence):"
+    )
+    lines.extend(f"  - {exempt}" for exempt in SUBSTANTIVE_LIFT_EXEMPT)
+    lines.append("SOLUTION must open with the lift block, in order:")
+    lines.extend(
+        f"  - {label} {requirement}" for label, requirement in SUBSTANTIVE_LIFT_MOVES
+    )
+    lines.append("Anti-generic rules:")
+    lines.extend(f"  - {rule}" for rule in SUBSTANTIVE_LIFT_ANTI_GENERIC_RULES)
+    return "\n".join(lines)
+
+
+def check_substantive_lift(solution_text: str) -> Dict[str, Any]:
+    """Deterministically check a SOLUTION's wording against the lift contract.
+
+    This is a structural wording check only: it verifies the six-move lift
+    block and the anti-generic wording rules. It cannot judge whether the
+    content is true or useful, and a passing result makes no quality,
+    benchmark, readiness, or superiority claim.
+    """
+
+    normalized = solution_text.replace("’", "'")
+    lines = [line.strip() for line in normalized.splitlines() if line.strip()]
+    labels = [label for label, _ in SUBSTANTIVE_LIFT_MOVES]
+
+    found: Dict[str, str] = {}
+    positions: Dict[str, int] = {}
+    for index, line in enumerate(lines):
+        for label in labels:
+            if label not in found and line.lower().startswith(label.lower()):
+                found[label] = line[len(label):].strip()
+                positions[label] = index
+
+    missing_moves = [label for label in labels if label not in found]
+    empty_moves = [
+        label for label in labels if label in found and len(found[label]) < 8
+    ]
+    order_ok = not missing_moves and [
+        positions[label] for label in labels
+    ] == sorted(positions[label] for label in labels)
+    opens_with_intent = bool(lines) and lines[0].lower().startswith("intent:")
+
+    lowered = normalized.lower()
+    generic_flags = [
+        pattern
+        for pattern in GENERIC_HEDGE_PATTERNS
+        if re.search(pattern, lowered)
+    ]
+
+    weak_next_action = False
+    next_content = found.get("Next:", "").lower()
+    if next_content:
+        weak_next_action = any(
+            next_content.startswith(opener) for opener in WEAK_NEXT_ACTION_OPENERS
+        )
+
+    has_lift_block = not missing_moves
+    ok = (
+        has_lift_block
+        and not empty_moves
+        and order_ok
+        and opens_with_intent
+        and not generic_flags
+        and not weak_next_action
+    )
+    return {
+        "ok": ok,
+        "has_lift_block": has_lift_block,
+        "missing_moves": missing_moves,
+        "empty_moves": empty_moves,
+        "order_ok": order_ok,
+        "opens_with_intent": opens_with_intent,
+        "generic_flags": generic_flags,
+        "weak_next_action": weak_next_action,
+        "lane": SUBSTANTIVE_LIFT_LANE,
+    }
+
+
 EXPERT_SELECTION_TEMPLATE: str = """
 Expert Selection Protocol:
 1. CLASSIFY the query into 1-3 primary domains
@@ -349,15 +584,37 @@ COMPLIANCE_EXAMPLES: Dict[str, str] = {
 
 Why it fails: No envelope structure, no confidence, no experts, no pipeline confirmation.
 """,
+    "NON_COMPLIANT_GENERIC": """
+❌ WRONG - envelope labels present, but the SOLUTION is generic:
+
+SOLUTION:
+It depends on your requirements. Microservices offer better scalability
+while monoliths are simpler. Option 1: stay on the monolith. Option 2:
+migrate to microservices. Consider evaluating your team's needs, budget,
+and timeline. Ultimately, the choice is yours.
+
+Why it fails the substantive lift contract: hedge opener, unranked option
+menu inside SOLUTION, no committed recommendation, no named failure
+condition, no executable next action. The envelope alone is not lift.
+""",
     "COMPLIANT": """
-✅ CORRECT - This follows the protocol:
+✅ CORRECT - This follows the protocol (high-headroom task, lift block first):
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 SOLVER ENVELOPE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 SOLUTION:
-[Concise answer here]
+Intent: Decide whether to split the monolith now or defer until scale demands it.
+Assumes: One team of ~8 engineers and no measured scaling bottleneck today.
+Tradeoff: Operational overhead now versus refactoring cost after growth.
+Recommendation: Stay on the monolith; extract only the billing module, which ships on a different release cadence.
+Fails if: Deploy frequency is already blocked by merge contention across teams.
+Next: Pull deploy-queue wait times for the last 30 days and check for contention before any split decision.
+
+Supporting detail: the controlling constraint is team size, not traffic;
+a service split below ~3 teams adds coordination cost without removing
+any measured bottleneck.
 
 CONFIDENCE: 85%
 

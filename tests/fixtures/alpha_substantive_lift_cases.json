@@ -1,0 +1,42 @@
+{
+  "lane": "ALPHA-SOLVER-SUBSTANTIVE-LIFT-ANSWER-CONTRACT-001",
+  "description": "Synthetic fixture cases for the substantive lift answer contract. All prompts and answers are invented operator-authored examples for structural wording checks only; none are provider or model outputs, and none carry quality, benchmark, readiness, or superiority claims.",
+  "cases": [
+    {
+      "case_id": "LIFT-DECISION-001",
+      "task_family": "choosing between options",
+      "lift_required": true,
+      "prompt": "We're a 12-person startup heading into a Series B. Should we migrate our monolith to microservices before the raise, or after?",
+      "compliant_solution": "Intent: Decide whether an architecture migration belongs before or after the Series B raise.\nAssumes: The monolith is not currently failing under load and diligence is 4-6 months away.\nTradeoff: Engineering capacity spent on migration now versus feature velocity and diligence-ready metrics for the raise.\nRecommendation: Defer the migration until after the raise; carve out only the one module with a measured scaling problem, if any.\nFails if: A signed enterprise deal already requires isolation or compliance boundaries the monolith cannot provide.\nNext: List the three slowest endpoints from last month's traces and check whether any is a genuine architectural limit rather than a query or cache fix.\n\nSupporting detail: with 12 engineers, the controlling constraint is capacity, not architecture. A migration consumes roughly a quarter of team throughput for two quarters, which lands exactly in the diligence window when growth metrics matter most.",
+      "non_compliant_solution": "It depends on your specific situation. There are several factors to consider, including team size, timeline, and technical debt. Microservices offer better scalability and independent deployments, while monoliths are simpler to operate. Option 1: migrate now to get ahead of scale. Option 2: wait until after the raise. Both options have pros and cons, so you should weigh them carefully against your goals. Ultimately, the choice is yours.",
+      "non_compliant_reason": "hedge opener, unranked option menu, no committed recommendation, no failure condition, no executable next action"
+    },
+    {
+      "case_id": "LIFT-DIAGNOSIS-001",
+      "task_family": "root-cause diagnosis",
+      "lift_required": true,
+      "prompt": "Our p95 latency doubled right after we added a Redis cache in front of the primary database. What is going on?",
+      "compliant_solution": "Intent: Find why adding a cache made tail latency worse instead of better.\nAssumes: The doubling is measured at the same traffic level and the cache sits in the synchronous request path.\nTradeoff: Keeping the cache warm for hit-rate versus adding a serial network hop that every miss now pays twice.\nRecommendation: Instrument hit-rate first; a cold or low-hit cache turns every miss into cache-check plus database read, which alone explains a doubled p95.\nFails if: Hit-rate is above ~90 percent, in which case look at connection-pool exhaustion or synchronous cache writes on the hot path instead.\nNext: Log cache hit/miss per request for one hour and split p95 by hit versus miss before touching any configuration.\n\nSupporting detail: the controlling variable is the miss path, not Redis speed. A serial miss path costs cache RTT plus database RTT plus serialization; under 50 percent hit-rate that is strictly worse than no cache at the tail.",
+      "non_compliant_solution": "There are many factors that could cause increased latency after adding a cache. Caching is complex and performance can vary. You might have cache misses, network issues, serialization overhead, or configuration problems. Consider reviewing your cache configuration, monitoring your metrics, and evaluating whether Redis is set up correctly. It may also be worth exploring alternative caching strategies.",
+      "non_compliant_reason": "hedge phrasing, shallow enumeration with no controlling constraint, no committed diagnosis, deliberative next steps only"
+    },
+    {
+      "case_id": "LIFT-PLAN-001",
+      "task_family": "planning or prioritization under constraints",
+      "lift_required": true,
+      "prompt": "We have 2 engineers and 6 weeks to deliver SSO, audit logging, and RBAC for an enterprise deal. How should we sequence this?",
+      "compliant_solution": "Intent: Sequence three security features so the deal closes with two engineers in six weeks.\nAssumes: The buyer's security review gates the signature and accepts a documented roadmap for items in progress.\nTradeoff: Building all three shallowly versus landing the one contractual blocker completely and negotiating the rest.\nRecommendation: Ship SSO via an identity library in weeks 1-3, structured audit logging in weeks 3-5, and deliver coarse two-role RBAC plus a dated roadmap for fine-grained roles.\nFails if: The contract names fine-grained RBAC as an acceptance criterion rather than a roadmap item.\nNext: Ask the buyer's security contact today which of the three items are contractual blockers versus review checkboxes.\n\nSupporting detail: the controlling constraint is the security review, not engineering scope. SSO is usually the only hard gate; audit logging is a schema-plus-middleware task; RBAC granularity is the piece most often negotiable to a roadmap.",
+      "non_compliant_solution": "This is a challenging timeline, and there is no one-size-fits-all approach to sequencing security features. All three features are important for enterprise readiness. You could start with SSO since many enterprises require it, or begin with RBAC as a foundation. Audit logging is also valuable. Consider breaking each feature into smaller milestones and evaluating your options each week. Both parallel and serial approaches have merit.",
+      "non_compliant_reason": "no committed sequence, unranked alternatives, no failure condition, deliberative guidance instead of an executable next action"
+    },
+    {
+      "case_id": "LOW-HEADROOM-REWRITE-001",
+      "task_family": "simple rewrites",
+      "lift_required": false,
+      "prompt": "Rewrite this sentence to be shorter: 'We are currently in the process of conducting an evaluation of the proposal.'",
+      "compliant_solution": "We are evaluating the proposal.",
+      "non_compliant_solution": "Intent: Shorten a sentence while preserving meaning.\nAssumes: Formal register should be kept.\nTradeoff: Brevity versus completeness.\nRecommendation: Use 'We are evaluating the proposal.'\nFails if: The original legal phrasing was required verbatim.\nNext: Replace the sentence in the source document.\n\nWe are evaluating the proposal.",
+      "non_compliant_reason": "lift block forced onto a low-headroom task; restraint rules take precedence and require the direct rewrite first with no scaffolding"
+    }
+  ]
+}
