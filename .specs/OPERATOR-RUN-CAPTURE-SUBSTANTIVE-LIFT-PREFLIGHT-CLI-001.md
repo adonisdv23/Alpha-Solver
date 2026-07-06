@@ -26,8 +26,10 @@ already-approved guidance; it adds no new evaluation semantics.
   `LIFT_PREFLIGHT_STATES` (`invalid_case`, `excluded_case`, `missing_prompt`,
   `missing_routed_output`, `safe_out_not_applicable`, `structural_pass`,
   `structural_fail`), calling
-  `check_substantive_lift(routed_output, prompt=prompt)` from
-  `alpha_solver_portable.py` only for cases that carry both texts;
+  `check_substantive_lift(solution_text, prompt=prompt)` from
+  `alpha_solver_portable.py` only for cases that carry both texts. If a
+  pasted routed output starts with a full-response `SOLUTION:` label, the
+  preflight strips that narrow leading envelope label before checking;
   `render_lift_preflight_text(report)` renders operator-readable console
   output. Every report embeds `LIFT_PREFLIGHT_BOUNDARY`, the structural-only
   boundary statement.

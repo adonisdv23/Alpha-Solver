@@ -357,6 +357,22 @@ LIFT_PREFLIGHT_ATTENTION_STATES = frozenset(
 # instead of failing them. Explicit prefix match only, mirroring the portable
 # honesty guard's explicit-prefix style.
 _LIFT_PREFLIGHT_SAFEOUT_PREFIX = "safe-out:"
+_LIFT_PREFLIGHT_SOLUTION_LABEL = "solution:"
+
+
+def _lift_preflight_solution_text(routed_output: str) -> str:
+    """Return the SOLUTION body when an operator pasted a full envelope.
+
+    Capture docs ask operators to paste the routed Alpha output they collected,
+    which can be a full ChatGPT/Alpha Solver response that begins with a
+    ``SOLUTION:`` label before the six Substantive Lift moves. The portable
+    checker intentionally checks the six-move solution text itself, so the
+    preflight peels only that narrow leading label when it is present.
+    """
+    stripped = routed_output.strip()
+    if stripped.lower().startswith(_LIFT_PREFLIGHT_SOLUTION_LABEL):
+        return stripped[len(_LIFT_PREFLIGHT_SOLUTION_LABEL) :].lstrip()
+    return routed_output
 
 
 def _lift_structural_flags(checker_result: Dict[str, Any]) -> List[str]:
@@ -445,7 +461,9 @@ def _lift_preflight_case(case: Any, index: int, checker: Any) -> Dict[str, Any]:
         )
         return finding
 
-    if routed_output.strip().lower().startswith(_LIFT_PREFLIGHT_SAFEOUT_PREFIX):
+    solution_text = _lift_preflight_solution_text(routed_output)
+
+    if solution_text.strip().lower().startswith(_LIFT_PREFLIGHT_SAFEOUT_PREFIX):
         finding["state"] = "safe_out_not_applicable"
         finding["detail"] = (
             "routed output is a bounded SAFE-OUT response; the Substantive "
@@ -453,7 +471,7 @@ def _lift_preflight_case(case: Any, index: int, checker: Any) -> Dict[str, Any]:
         )
         return finding
 
-    checker_result = checker(routed_output, prompt=prompt)
+    checker_result = checker(solution_text, prompt=prompt)
     finding["case_anchor_count"] = len(checker_result.get("case_anchors", []))
     finding["anchor_checks_vacuous"] = finding["case_anchor_count"] == 0
     finding["checker"] = checker_result

@@ -263,6 +263,9 @@ Recommendation: Add the rollback step to tests/fixtures/demo_plan.json now and k
 Fails if: The rollback step needs fields that tests/fixtures/demo_plan.json cannot carry without breaking the packet loader.
 Next: Draft the rollback entry in tests/fixtures/demo_plan.json and attach it to the PR #701 description today."""
 
+FULL_ENVELOPE_PASS_BLOCK = f"""SOLUTION:
+{ANCHORED_PASS_BLOCK}"""
+
 # Structurally shaped six-move block with no case objects at all: fails the
 # prompt-aware checker for an anchored prompt, but is a legitimate pass when
 # the prompt itself has no extractable anchors (vacuous anchor checks).
@@ -328,6 +331,21 @@ class TestLiftPreflight:
         assert finding["anchor_checks_vacuous"] is False
         assert finding["case_anchor_count"] >= 2
         assert finding["structural_flags"] == []
+        assert report["summary"]["needs_attention"] == []
+
+    def test_full_solution_envelope_is_checked_as_solution_body(self):
+        capture = _preflight_capture(
+            [
+                _preflight_case(
+                    "case-full-envelope", ANCHORED_PROMPT, FULL_ENVELOPE_PASS_BLOCK
+                )
+            ]
+        )
+        report = orc.lift_preflight_capture(capture)
+        finding = report["cases"][0]
+        assert finding["state"] == "structural_pass"
+        assert finding["structural_flags"] == []
+        assert finding["checker"]["opens_with_intent"] is True
         assert report["summary"]["needs_attention"] == []
 
     def test_generic_block_fails_for_anchored_prompt(self):
@@ -542,6 +560,16 @@ class TestLiftPreflightCli:
         assert "structural_pass" in result.stdout
         assert "Structural wording preflight only" in result.stdout
         assert "not answer quality" in result.stdout
+
+    def test_post655_smoke_fixture_with_solution_label_exits_zero(self):
+        result = _run_cli(
+            "lift-preflight",
+            "--capture",
+            str(FIXTURES / "post655_lift_preflight_smoke_capture.json"),
+        )
+        assert result.returncode == 0, result.stderr
+        assert "post655-full-solution-envelope-smoke: structural_pass" in result.stdout
+        assert "needs attention: none" in result.stdout
 
     def test_malformed_compliant_case_exits_one(self, tmp_path: Path):
         capture_path = self._write_capture(
