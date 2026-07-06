@@ -162,6 +162,40 @@ def test_supported_fixture_prompts_preserve_prior_behavior():
     assert "cannot substantiate" in answers["false_premise"]["final_answer"].lower()
 
 
+
+def test_unsupported_safeout_confidence_is_low_and_diagnostic():
+    result = _solve_unsupported()
+    tot_diag = result["diagnostics"]["tot"]
+
+    assert result["final_answer"].startswith("SAFE-OUT:")
+    assert result["confidence"] == 0.20
+    assert tot_diag["confidence"] == 0.20
+    assert result["confidence_before_adjustment"] > result["confidence"]
+    assert tot_diag["confidence_before_adjustment"] > tot_diag["confidence"]
+    assert (
+        result["confidence_adjustment_reason"]
+        == "confidence_adjusted_due_to_unsupported_local_synthesis"
+    )
+    assert (
+        tot_diag["confidence_adjustment_reason"]
+        == "confidence_adjusted_due_to_unsupported_local_synthesis"
+    )
+    assert "confidence adjusted" in result["notes"]
+
+
+def test_supported_fixture_confidence_stays_inherited_without_adjustment():
+    result = _tree_of_thought(
+        SUPPORTED_FIXTURE_PROMPTS["photosynthesis"],
+        cache_path=None,
+        enable_cache=False,
+    )
+
+    assert result["reason"] == "prompt_echo_replaced_with_local_derived_answer"
+    assert result["confidence"] == 1.0
+    assert result["diagnostics"]["tot"]["confidence"] == 1.0
+    assert "confidence_adjustment_reason" not in result
+    assert "confidence_adjustment_reason" not in result["diagnostics"]["tot"]
+
 def test_honesty_guard_does_not_inject_lift_block():
     # Low-headroom/compact behavior stays outside the PR #646 lift contract:
     # the bounded SAFE-OUT replacement must not fabricate lift-block labels.
@@ -207,6 +241,12 @@ def test_portable_local_path_never_surfaces_artifacts():
         for prompt in prompts:
             envelope = portable.PortableAlphaSolver(seed=seed).solve(prompt)
             answer = envelope.solution.strip()
+            assert envelope.confidence == 0.20
+            assert (
+                envelope.safe_out_state["confidence_adjustment_reason"]
+                == "confidence_adjusted_due_to_unsupported_local_synthesis"
+            )
+            assert "confidence adjusted" in envelope.safe_out_state["notes"]
             assert _normalized(answer) != _normalized(prompt), (seed, prompt)
             for prefix in BLOCKED_TEMPLATE_PREFIXES + ("Clarify and refine:",):
                 assert not answer.lower().startswith(prefix.lower()), (
