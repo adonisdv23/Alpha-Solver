@@ -385,6 +385,29 @@ def _lift_structural_flags(checker_result: Dict[str, Any]) -> List[str]:
     return flags
 
 
+def _lift_preflight_capture_case_shape_errors(case: Any, index: int) -> List[str]:
+    """Validate capture-case shape before Substantive Lift preflight.
+
+    The preflight has separate states for empty prompt and empty routed output,
+    so this helper reuses the capture-case validator while allowing those two
+    text fields to be blank when their keys are present. Missing keys, unknown
+    keys, invalid statuses, invalid metadata, and malformed excluded cases stay
+    schema errors and must never be reported as structural lift results.
+    """
+    if not isinstance(case, dict):
+        return _validate_capture_case(case, index)
+    validation_case = dict(case)
+    if "prompt" in validation_case and not _is_nonempty_str(
+        validation_case.get("prompt")
+    ):
+        validation_case["prompt"] = "preflight prompt placeholder"
+    if "routed_output" in validation_case and not _is_nonempty_str(
+        validation_case.get("routed_output")
+    ):
+        validation_case["routed_output"] = "preflight routed output placeholder"
+    return _validate_capture_case(validation_case, index)
+
+
 def _lift_preflight_case(case: Any, index: int, checker: Any) -> Dict[str, Any]:
     finding: Dict[str, Any] = {
         "task_id": f"cases[{index}]",
@@ -394,8 +417,9 @@ def _lift_preflight_case(case: Any, index: int, checker: Any) -> Dict[str, Any]:
         "structural_flags": [],
         "detail": "",
     }
-    if not isinstance(case, dict):
-        finding["detail"] = "case is not a JSON object"
+    shape_errors = _lift_preflight_capture_case_shape_errors(case, index)
+    if shape_errors:
+        finding["detail"] = "; ".join(shape_errors)
         return finding
     if _is_nonempty_str(case.get("task_id")):
         finding["task_id"] = case["task_id"]
