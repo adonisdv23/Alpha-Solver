@@ -98,6 +98,75 @@ GATE_BOUNDARY_TEXTS = (
     GATE_LIVE_BLOCKED_TEXT,
 )
 
+# ---------------------------------------------------------------------------
+# Dry-run preview boundary text. The dry-run preview panel is a display-only
+# read of what a *future* dry-run execution lane would prepare or require. It
+# executes nothing. These strings are asserted by tests and rendered verbatim so
+# an operator sees that this is a preview of readiness, not a dry-run run, and
+# that preview readiness is local metadata completeness only.
+# ---------------------------------------------------------------------------
+DRY_RUN_PREVIEW_DISPLAY_ONLY_TEXT = "Dry-run preview is display-only."
+DRY_RUN_NO_SOLVE_TEXT = (
+    "This console does not execute a solve from this panel."
+)
+DRY_RUN_NO_V1_SOLVE_TEXT = "This console does not call /v1/solve."
+DRY_RUN_NO_PROVIDER_TEXT = (
+    "This console does not call providers, models, MCP, browser automation, "
+    "network, CLI, or subprocesses."
+)
+DRY_RUN_NO_ARTIFACT_MUTATION_TEXT = (
+    "This console does not create, edit, delete, upload, save, or mutate "
+    "artifacts."
+)
+DRY_RUN_NO_OUTPUT_TEXT = (
+    "This console does not generate route, confidence, SAFE-OUT, expert trace, "
+    "shortlist, diagnostics, answer text, model output, provider result, "
+    "billing result, benchmark result, or readiness result."
+)
+DRY_RUN_READINESS_MEANING_TEXT = (
+    "Preview readiness is local metadata completeness only."
+)
+DRY_RUN_NOT_EVIDENCE_TEXT = (
+    "A preview-ready state is not answer-quality, validation, production, "
+    "provider readiness, benchmark evidence, billing accuracy, or superiority "
+    "evidence."
+)
+DRY_RUN_FUTURE_LANE_TEXT = (
+    "A future dry-run execution lane must be separately authorized."
+)
+
+DRY_RUN_BOUNDARY_TEXTS = (
+    DRY_RUN_PREVIEW_DISPLAY_ONLY_TEXT,
+    DRY_RUN_NO_SOLVE_TEXT,
+    DRY_RUN_NO_V1_SOLVE_TEXT,
+    DRY_RUN_NO_PROVIDER_TEXT,
+    DRY_RUN_NO_ARTIFACT_MUTATION_TEXT,
+    DRY_RUN_NO_OUTPUT_TEXT,
+    DRY_RUN_READINESS_MEANING_TEXT,
+    DRY_RUN_NOT_EVIDENCE_TEXT,
+    DRY_RUN_FUTURE_LANE_TEXT,
+)
+DRY_RUN_BOUNDARY_NOTE = (
+    "display-only; no solve, provider call, CLI, artifact mutation, or "
+    "generated output"
+)
+
+# Safe labels naming the existing local metadata a future dry-run would read.
+# These are display-only names for surfaces this console already assembles; the
+# preview never reads or synthesizes any runtime output.
+DRY_RUN_WOULD_USE = (
+    "local_capture_summary",
+    "local_artifact_status",
+    "artifact_freshness_metadata",
+    "provider_cost_gate_status",
+)
+
+# Safe freshness-warning labels (mismatch flags surfaced from the existing
+# sequence-coherence metadata, not ordering states).
+_DRY_RUN_MISMATCH_FLAGS = frozenset(
+    {"packet_id_mismatch", "counts_mismatch", "digest_invalid", "digest_unverifiable"}
+)
+
 # Portable behavior-contract file. We only check for its presence and list
 # well-known high-level surface labels. We never parse or expose private
 # chain-of-thought or the file's internal prompt content.
@@ -361,6 +430,196 @@ def _build_provider_gate(provider: str) -> Dict[str, Any]:
     }
 
 
+# ---------------------------------------------------------------------------
+# Dry-run preview. A display-only read over the *already assembled* local
+# artifact status and provider-gate status. It maps that existing safe metadata
+# to bounded labels that answer "what would a future dry-run prepare, and what is
+# still missing before a separate dry-run execution lane could be considered?".
+#
+# It executes nothing. It never reads raw artifact content, never calls a
+# provider, never runs a solve or CLI, never mutates an artifact, and never
+# synthesizes any Alpha Solver runtime field. Every value is derived from the
+# two safe sub-payloads passed in.
+# ---------------------------------------------------------------------------
+def _dry_run_input_source_status(capture_state: Any) -> str:
+    """Map the local capture state to a bounded input-source label."""
+
+    if capture_state == "export_ready":
+        return "capture_export_ready"
+    if capture_state == "structurally_valid":
+        return "capture_structurally_valid"
+    if capture_state in {"invalid_json", "invalid_structure"}:
+        return "capture_invalid"
+    return "capture_missing"
+
+
+def _dry_run_preflight_status(anchor_state: Any, lift_state: Any) -> Dict[str, str]:
+    """Map anchor/lift preflight states to bounded present/missing/invalid labels."""
+
+    def _one(prefix: str, state: Any) -> str:
+        if state == "present":
+            return f"{prefix}_present"
+        if state == "missing":
+            return f"{prefix}_missing"
+        return f"{prefix}_invalid"
+
+    return {
+        "anchor": _one("anchor", anchor_state),
+        "lift": _one("lift", lift_state),
+    }
+
+
+def _dry_run_freshness_warnings(sequence_coherence: Mapping[str, Any]) -> List[str]:
+    """Derive safe freshness warnings from the existing sequence-coherence data.
+
+    Only bounded labels are emitted, drawn solely from the ordering ``state`` and
+    the already-safe mismatch ``flags`` in ``local_artifacts.freshness``. The
+    always-present ``metadata_only_no_claim`` marker is dropped, and no raw
+    artifact content is read.
+    """
+
+    warnings: List[str] = []
+
+    def _add(label: str) -> None:
+        if label not in warnings:
+            warnings.append(label)
+
+    older_labels = {
+        "evidence_packet_vs_capture": "evidence_packet_older_than_capture",
+        "anchor_preflight_vs_capture": "anchor_preflight_older_than_capture",
+        "lift_preflight_vs_capture": "lift_preflight_older_than_capture",
+    }
+    for key, older_label in older_labels.items():
+        entry = sequence_coherence.get(key) or {}
+        if entry.get("state") == "older_than_capture":
+            _add(older_label)
+        for flag in entry.get("flags", []):
+            if flag in _DRY_RUN_MISMATCH_FLAGS:
+                _add(flag)
+    return warnings
+
+
+def _dry_run_preview_blockers(
+    *,
+    capture_state: Any,
+    packet_state: Any,
+    anchor_state: Any,
+    lift_state: Any,
+    freshness_warnings: List[str],
+) -> List[str]:
+    """Return safe labels naming what is missing before a future dry-run lane.
+
+    ``provider_live_execution_blocked`` and ``display_only_lane`` are always
+    present: provider/live execution is always blocked from this console and this
+    is a display-only lane, regardless of how complete the local metadata is.
+    """
+
+    blockers: List[str] = []
+    if capture_state == "missing":
+        blockers.append("missing_capture")
+    elif capture_state in {"invalid_json", "invalid_structure"}:
+        blockers.append("invalid_capture")
+    if packet_state == "missing":
+        blockers.append("missing_evidence_packet")
+    elif packet_state in {
+        "invalid_json",
+        "invalid_structure",
+        "digest_invalid",
+        "digest_unverifiable",
+    }:
+        blockers.append("invalid_or_unverified_evidence_packet")
+    if anchor_state == "missing" or lift_state == "missing":
+        blockers.append("missing_preflight_reports")
+    if any(w.endswith("_older_than_capture") for w in freshness_warnings):
+        blockers.append("stale_derived_artifacts")
+    blockers.append("provider_live_execution_blocked")
+    blockers.append("display_only_lane")
+    return blockers
+
+
+def _dry_run_preview_readiness(
+    *,
+    capture_state: Any,
+    packet_state: Any,
+    anchor_state: Any,
+    lift_state: Any,
+    freshness_warnings: List[str],
+) -> str:
+    """Return a bounded local-metadata-completeness label.
+
+    This means only whether the preview has enough local metadata to explain the
+    next step. It is never answer quality, route readiness, provider readiness,
+    production readiness, validation, benchmark evidence, or superiority.
+    """
+
+    if capture_state in {"invalid_json", "invalid_structure"}:
+        return "unavailable"
+    capture_ok = capture_state in {"structurally_valid", "export_ready"}
+    packet_ok = packet_state == "digest_valid"
+    preflight_ok = anchor_state == "present" and lift_state == "present"
+    stale = any(w.endswith("_older_than_capture") for w in freshness_warnings)
+    mismatch = any(w in _DRY_RUN_MISMATCH_FLAGS for w in freshness_warnings)
+    if capture_ok and packet_ok and preflight_ok and not stale and not mismatch:
+        return "preview_ready"
+    return "needs_artifacts"
+
+
+def _build_dry_run_preview(
+    local_artifacts: Mapping[str, Any], provider_gate: Mapping[str, Any]
+) -> Dict[str, Any]:
+    """Assemble the display-only dry-run preview payload.
+
+    Pure function over the already-safe ``local_artifacts`` and ``provider_gate``
+    sub-payloads. Executes nothing and synthesizes no runtime field.
+    """
+
+    capture_state = (local_artifacts.get("capture") or {}).get("state")
+    packet_state = (local_artifacts.get("evidence_packet") or {}).get("state")
+    anchor_state = (local_artifacts.get("anchor_preflight") or {}).get("state")
+    lift_state = (local_artifacts.get("lift_preflight") or {}).get("state")
+    sequence_coherence = (local_artifacts.get("freshness") or {}).get(
+        "sequence_coherence", {}
+    )
+
+    freshness_warnings = _dry_run_freshness_warnings(sequence_coherence)
+    preview_blockers = _dry_run_preview_blockers(
+        capture_state=capture_state,
+        packet_state=packet_state,
+        anchor_state=anchor_state,
+        lift_state=lift_state,
+        freshness_warnings=freshness_warnings,
+    )
+    preview_readiness = _dry_run_preview_readiness(
+        capture_state=capture_state,
+        packet_state=packet_state,
+        anchor_state=anchor_state,
+        lift_state=lift_state,
+        freshness_warnings=freshness_warnings,
+    )
+
+    return {
+        "preview_mode": "display_only",
+        "dry_run_execution": "not_enabled",
+        "would_use": list(DRY_RUN_WOULD_USE),
+        "input_source_status": _dry_run_input_source_status(capture_state),
+        "evidence_packet_status": packet_state or "missing",
+        "preflight_status": _dry_run_preflight_status(anchor_state, lift_state),
+        "freshness_warnings": freshness_warnings,
+        "provider_gate_summary": {
+            "live_execution_gate": provider_gate.get("live_execution_gate"),
+            "provider_key_status": provider_gate.get("provider_key_status"),
+            "cap_completeness": provider_gate.get("cap_completeness"),
+            "live_execution_blockers": list(
+                provider_gate.get("live_execution_blockers", [])
+            ),
+        },
+        "preview_readiness": preview_readiness,
+        "preview_blockers": preview_blockers,
+        "boundary": DRY_RUN_BOUNDARY_NOTE,
+        "boundary_notes": list(DRY_RUN_BOUNDARY_TEXTS),
+    }
+
+
 def build_console_status() -> Dict[str, Any]:
     """Assemble the read-only operator console status payload.
 
@@ -371,6 +630,8 @@ def build_console_status() -> Dict[str, Any]:
 
     provider = os.getenv(_PROVIDER_ENV, "local").strip().lower() or "local"
     local_artifacts = artifacts.build_artifact_status()
+    provider_gate = _build_provider_gate(provider)
+    dry_run_preview = _build_dry_run_preview(local_artifacts, provider_gate)
 
     return {
         "console": {
@@ -420,7 +681,8 @@ def build_console_status() -> Dict[str, Any]:
             "diagnostics": "not run yet",
             "note": "No solve has run from this console; fields are placeholders.",
         },
-        "provider_gate": _build_provider_gate(provider),
+        "provider_gate": provider_gate,
+        "dry_run_preview": dry_run_preview,
         "preflight_capture": {
             "workflows": [
                 {
@@ -497,6 +759,7 @@ def _render_page(status: Mapping[str, Any]) -> str:
     run_setup = status["run_setup"]
     trace = status["route_trace"]
     gate = status["provider_gate"]
+    dry_run = status["dry_run_preview"]
     capture = status["preflight_capture"]
     receipt = status["evidence_receipt"]
 
@@ -673,6 +936,26 @@ def _render_page(status: Mapping[str, Any]) -> str:
         f"<li>{_escape(text)}</li>" for text in freshness["boundaries"]
     )
 
+    # Dry-Run Preview card (display-only). Every value comes from the already-safe
+    # dry_run_preview payload; nothing here executes, mutates, or synthesizes
+    # runtime output.
+    dr_would_use_html = "".join(
+        f"<li>{_escape(item)}</li>" for item in dry_run["would_use"]
+    )
+    dr_warnings = dry_run["freshness_warnings"]
+    dr_warnings_html = (
+        "".join(f"<li>{_escape(w)}</li>" for w in dr_warnings)
+        if dr_warnings
+        else "<li>none</li>"
+    )
+    dr_blockers_html = "".join(
+        f"<li>{_escape(b)}</li>" for b in dry_run["preview_blockers"]
+    )
+    dr_boundary_html = "".join(
+        f"<li>{_escape(text)}</li>" for text in dry_run["boundary_notes"]
+    )
+    dr_gate = dry_run["provider_gate_summary"]
+
     return f"""<!doctype html>
 <html lang="en">
   <head>
@@ -750,6 +1033,35 @@ def _render_page(status: Mapping[str, Any]) -> str:
           <ul class="modes">{run_mode_rows}</ul>
           <button type="button" class="disabled-btn" disabled aria-disabled="true">Live run (disabled)</button>
           <p class="note">{_escape(run_setup["note"])}</p>
+        </article>
+
+        <article class="card" id="card-dry-run-preview">
+          <h2>Dry-Run Preview</h2>
+          <p class="note">Display-only preview of what a future dry-run would prepare and require. Nothing on this panel starts a dry-run.</p>
+          {_kv_rows({
+              "preview mode": dry_run["preview_mode"],
+              "dry-run execution": dry_run["dry_run_execution"],
+              "preview readiness": dry_run["preview_readiness"],
+              "input source": dry_run["input_source_status"],
+              "evidence packet": dry_run["evidence_packet_status"],
+              "anchor preflight": dry_run["preflight_status"]["anchor"],
+              "lift preflight": dry_run["preflight_status"]["lift"],
+          })}
+          <p class="note">Would use (existing local metadata only):</p>
+          <ul class="surfaces">{dr_would_use_html}</ul>
+          <p class="note">Freshness warnings (local metadata only):</p>
+          <ul class="surfaces">{dr_warnings_html}</ul>
+
+          <h3 class="subhead">Provider gate summary (live execution stays blocked)</h3>
+          {_kv_rows({
+              "live execution gate": dr_gate["live_execution_gate"],
+              "provider key (configured provider)": dr_gate["provider_key_status"],
+              "cap completeness": dr_gate["cap_completeness"],
+          })}
+          <p class="note">Preview blockers (what is missing before a future dry-run lane):</p>
+          <ul class="surfaces">{dr_blockers_html}</ul>
+          <p class="note">{_escape(dry_run["boundary"])}.</p>
+          <ul class="surfaces">{dr_boundary_html}</ul>
         </article>
 
         <article class="card" id="card-route-trace">
