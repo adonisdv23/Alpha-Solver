@@ -715,7 +715,12 @@ def _chatgpt_capture_stage(local_artifacts: Mapping[str, Any]) -> str:
         return "capture_export_ready"
     if capture_state == "structurally_valid":
         counts = capture.get("counts") or {}
-        if counts.get("captured", 0) or counts.get("excluded", 0):
+        captured = counts.get("captured", 0)
+        excluded = counts.get("excluded", 0)
+        pending = counts.get("pending", 0)
+        if captured == 0 and excluded > 0 and pending == 0:
+            return "capture_all_excluded"
+        if captured or excluded:
             return "capture_in_progress"
         return "capture_scaffolded"
     return "no_capture"
@@ -747,6 +752,12 @@ def _chatgpt_next_manual_steps(stage: str) -> List[str]:
         return [
             "finish_pending_capture_slots",
             "record_observed_route_metadata",
+            "validate_capture_from_terminal",
+        ]
+    if stage == "capture_all_excluded":
+        return [
+            "add_at_least_one_captured_case",
+            "revise_case_packet_or_capture_file",
             "validate_capture_from_terminal",
         ]
     if stage == "capture_export_ready":

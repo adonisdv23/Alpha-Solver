@@ -2497,6 +2497,13 @@ def _pending_capture() -> dict:
     return capture_lib.scaffold_capture(packet)
 
 
+def _all_excluded_capture() -> dict:
+    capture = _pending_capture()
+    capture["cases"][0]["validation_status"] = "excluded"
+    capture["cases"][0]["exclusion_reason"] = "manual exclusion"
+    return capture
+
+
 def test_chatgpt_copy_paste_status_defaults_manual_only(client: TestClient) -> None:
     _login(client)
     payload = client.get(STATUS_ROUTE).json()
@@ -2535,13 +2542,48 @@ def test_chatgpt_pending_capture_stage_from_safe_counts(tmp_path: Path, monkeypa
 
 
 def test_chatgpt_in_progress_capture_stage_from_safe_counts(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    capture = _pending_capture()
-    capture["cases"][0]["validation_status"] = "excluded"
-    capture["cases"][0]["exclusion_reason"] = "manual exclusion"
+    packet = {
+        "packet_id": "ORC-INPROGRESS-001",
+        "cases": [
+            {"task_id": "t1", "prompt": RAW_PROMPT},
+            {"task_id": "t2", "prompt": RAW_PROMPT},
+        ],
+    }
+    capture = capture_lib.scaffold_capture(packet)
+    capture["cases"][1]["validation_status"] = "excluded"
+    capture["cases"][1]["exclusion_reason"] = "manual exclusion"
     _write(tmp_path, "capture.json", capture)
     section = _chatgpt_capture_status(tmp_path, monkeypatch)
     assert section["current_capture_stage"] == "capture_in_progress"
     assert "finish_pending_capture_slots" in section["next_manual_steps"]
+
+
+def test_chatgpt_all_excluded_capture_stage_and_steps_safe(
+    client: TestClient, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _write(tmp_path, "capture.json", _all_excluded_capture())
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+    payload = client.get(STATUS_ROUTE).json()
+    section = payload["chatgpt_copy_paste_capture"]
+    assert section["current_capture_stage"] == "capture_all_excluded"
+    assert "finish_pending_capture_slots" not in section["next_manual_steps"]
+    assert "add_at_least_one_captured_case" in section["next_manual_steps"]
+    assert "revise_case_packet_or_capture_file" in section["next_manual_steps"]
+
+    html_text = client.get(PAGE_ROUTE).text
+    body = json.dumps(section)
+    for raw in (
+        RAW_PROMPT,
+        RAW_BASELINE,
+        RAW_ROUTED,
+        RAW_ROUTE_META,
+        RAW_SYSTEM_PROMPT,
+        RAW_PROVIDER_PAYLOAD,
+        FAKE_SECRET,
+    ):
+        assert raw not in body
+        assert raw not in html_text
 
 
 def test_chatgpt_export_ready_and_evidence_packet_stages(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -2564,6 +2606,8 @@ def test_chatgpt_stage_derived_only_from_safe_summary(monkeypatch: pytest.Monkey
     assert operator_console._chatgpt_capture_stage(local) == "capture_scaffolded"
     local["capture"] = {"state": "structurally_valid", "counts": {"captured": 1, "excluded": 0, "pending": 1}}
     assert operator_console._chatgpt_capture_stage(local) == "capture_in_progress"
+    local["capture"] = {"state": "structurally_valid", "counts": {"captured": 0, "excluded": 2, "pending": 0}}
+    assert operator_console._chatgpt_capture_stage(local) == "capture_all_excluded"
     local["evidence_packet"] = {"state": "digest_valid"}
     assert operator_console._chatgpt_capture_stage(local) == "evidence_packet_available"
 

@@ -38,6 +38,7 @@ The capture harness remains a local lab notebook, not a runner. The operator gen
 - `capture_invalid` — safe artifact summary reports invalid JSON or invalid structure.
 - `capture_scaffolded` — capture is structurally valid and all slots are still pending.
 - `capture_in_progress` — capture is structurally valid with captured or excluded slots plus remaining pending work.
+- `capture_all_excluded` — capture is structurally valid but has `captured == 0`, `excluded > 0`, and `pending == 0`; it is not export-ready and needs at least one captured case or a revised case packet/capture file.
 - `capture_export_ready` — capture is export-ready and no digest-valid evidence packet is present.
 - `evidence_packet_available` — evidence packet summary reports a digest-valid packet.
 
@@ -68,7 +69,7 @@ Route metadata is for observed route/provenance facts only. It is not scoring, r
 ## Test plan
 
 - Verify the status JSON includes `chatgpt_copy_paste_capture` and all disabled/manual-only boundary fields.
-- Verify missing, invalid, scaffolded, in-progress, export-ready, and evidence-available stages.
+- Verify missing, invalid, scaffolded, in-progress, all-excluded, export-ready, and evidence-available stages.
 - Verify the stage mapper consumes only safe artifact summaries.
 - Verify checklist, template, route metadata guidance, unsafe-action labels, terminal command snippets, and boundary text render safely.
 - Verify no raw prompts, raw outputs, raw route metadata, provider payloads, fake secrets, or raw environment sentinels appear in HTML or JSON.
