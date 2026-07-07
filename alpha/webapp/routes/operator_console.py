@@ -25,7 +25,7 @@ from __future__ import annotations
 import html
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Mapping
+from typing import Any, Dict, List, Mapping, Tuple
 
 from fastapi import APIRouter
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -54,6 +54,50 @@ CLAIM_BOUNDARY_TEXT = (
     "superiority evidence is presented here"
 )
 
+# ---------------------------------------------------------------------------
+# Provider and cost gate boundary text. The provider/cost gate panel is a
+# display-only view of configuration and safety-gate state. These strings are
+# asserted by tests and rendered verbatim so an operator sees that gate status
+# is visibility only: no credential validation, no provider call, no billing
+# truth, and no authorization of live execution.
+# ---------------------------------------------------------------------------
+GATE_CONFIG_VISIBILITY_TEXT = (
+    "Provider and cost gate status is configuration visibility only."
+)
+GATE_NO_CREDENTIAL_VALIDATION_TEXT = "This console does not validate credentials."
+GATE_NO_EXECUTION_TEXT = (
+    "This console does not call providers, models, /v1/solve, MCP, tools, "
+    "browser automation, network, CLI, or subprocesses."
+)
+GATE_CAPS_NOT_BILLING_TEXT = (
+    "Cost caps are configured limits, not billing accuracy or spend verification."
+)
+GATE_KEY_CATEGORICAL_TEXT = (
+    "Key status is present/missing only; no raw or partial key values are "
+    "displayed."
+)
+GATE_NOT_READINESS_TEXT = (
+    "A complete display-only gate is not provider readiness, production "
+    "readiness, validation, benchmark evidence, or superiority evidence."
+)
+GATE_LIVE_BLOCKED_TEXT = (
+    "Live execution remains blocked unless a separate future live-provider lane "
+    "explicitly authorizes it."
+)
+GATE_BOUNDARY_NOTE = (
+    "display-only; no provider call or credential validation performed"
+)
+
+GATE_BOUNDARY_TEXTS = (
+    GATE_CONFIG_VISIBILITY_TEXT,
+    GATE_NO_CREDENTIAL_VALIDATION_TEXT,
+    GATE_NO_EXECUTION_TEXT,
+    GATE_CAPS_NOT_BILLING_TEXT,
+    GATE_KEY_CATEGORICAL_TEXT,
+    GATE_NOT_READINESS_TEXT,
+    GATE_LIVE_BLOCKED_TEXT,
+)
+
 # Portable behavior-contract file. We only check for its presence and list
 # well-known high-level surface labels. We never parse or expose private
 # chain-of-thought or the file's internal prompt content.
@@ -78,9 +122,41 @@ _COST_CAP_ENVS = (
     "ALPHA_PROVIDER_MAX_OUTPUT_TOKENS",
     "ALPHA_PROVIDER_MAX_REQUESTS",
 )
+# Safe per-cap labels (env name -> stable payload key). Only presence/absence of
+# each cap is ever surfaced; the configured value itself is never read.
+_CAP_LABELS = {
+    "ALPHA_PROVIDER_MAX_COST_USD": "max_cost_usd",
+    "ALPHA_PROVIDER_MAX_INPUT_TOKENS": "max_input_tokens",
+    "ALPHA_PROVIDER_MAX_OUTPUT_TOKENS": "max_output_tokens",
+    "ALPHA_PROVIDER_MAX_REQUESTS": "max_requests",
+}
+_COST_CAP_ENV = "ALPHA_PROVIDER_MAX_COST_USD"
+_TOKEN_REQUEST_CAP_ENVS = (
+    "ALPHA_PROVIDER_MAX_INPUT_TOKENS",
+    "ALPHA_PROVIDER_MAX_OUTPUT_TOKENS",
+    "ALPHA_PROVIDER_MAX_REQUESTS",
+)
 # Provider credential env var names surfaced as present/missing only. The names
-# are shown; the values never are.
-_KEY_ENVS = ("OPENAI_API_KEY", "ANTHROPIC_API_KEY")
+# are shown; the values never are. GOOGLE_API_KEY is included so google/gemini
+# provider gating can reason about its required key categorically.
+_KEY_ENVS = ("OPENAI_API_KEY", "ANTHROPIC_API_KEY", "GOOGLE_API_KEY")
+
+# Provider -> required credential env var(s), mirroring the categorical
+# provider-key requirements in ``scripts/check_env.py``
+# (``_required_keys_for_provider`` + ``_NO_KEY_PROVIDERS``). This is a small,
+# display-only copy: it reasons about env *presence* categories only, never reads
+# or validates a key value, and is intentionally not imported from that CLI
+# script to avoid coupling the console route to CLI code. ``local`` and ``none``
+# require no key; ``local_llm`` is handled separately below (it must never be
+# satisfied by a hosted-provider key).
+_NO_KEY_PROVIDERS = frozenset({"local", "none"})
+_LOCAL_LLM_PROVIDER = "local_llm"
+_PROVIDER_REQUIRED_KEYS = {
+    "openai": ("OPENAI_API_KEY",),
+    "anthropic": ("ANTHROPIC_API_KEY",),
+    "gemini": ("GOOGLE_API_KEY",),
+    "google": ("GOOGLE_API_KEY",),
+}
 
 _TRUTHY = {"1", "true", "yes", "on"}
 
@@ -114,6 +190,175 @@ def _cost_caps_status() -> str:
     if present == len(_COST_CAP_ENVS):
         return "configured"
     return "partially configured"
+
+
+def _cap_present(name: str) -> str:
+    """Return only a categorical presence marker for a cap, never its value."""
+
+    return "present" if os.getenv(name, "").strip() else "missing"
+
+
+def _cap_status() -> Dict[str, str]:
+    """Per-cap present/missing status (no configured value is ever read)."""
+
+    return {label: _cap_present(env) for env, label in _CAP_LABELS.items()}
+
+
+def _cap_completeness() -> str:
+    """Overall cap completeness across the four cost/token/request caps."""
+
+    present = sum(1 for name in _COST_CAP_ENVS if os.getenv(name, "").strip())
+    if present == 0:
+        return "none_configured"
+    if present == len(_COST_CAP_ENVS):
+        return "configured"
+    return "partially_configured"
+
+
+def _cost_cap_status() -> str:
+    """present/missing for the spend cap only (a configured limit, not billing)."""
+
+    return "present" if os.getenv(_COST_CAP_ENV, "").strip() else "missing"
+
+
+def _token_request_cap_status() -> str:
+    """missing/partial/present across the token and request caps."""
+
+    present = sum(
+        1 for name in _TOKEN_REQUEST_CAP_ENVS if os.getenv(name, "").strip()
+    )
+    if present == 0:
+        return "missing"
+    if present == len(_TOKEN_REQUEST_CAP_ENVS):
+        return "present"
+    return "partial"
+
+
+def _provider_mode_label(provider: str) -> str:
+    """Human-readable mode label; never implies live execution is enabled."""
+
+    return f"{provider} (live provider execution not enabled from this console)"
+
+
+def _required_key_envs_for_provider(provider: str) -> Tuple[str, ...]:
+    """Return the credential env var(s) the configured provider would require.
+
+    Mirrors ``scripts/check_env.py`` categorically (presence only). ``local`` and
+    ``none`` need no key; ``local_llm`` is handled separately (it must not be
+    satisfied by any hosted-provider key). Unknown providers declare no required
+    key here — live execution stays blocked by the always-on blockers regardless.
+    """
+
+    return _PROVIDER_REQUIRED_KEYS.get(provider, ())
+
+
+def _provider_key_status(provider: str, key_status: Mapping[str, str]) -> str:
+    """Categorical status of the *configured provider's* required key(s).
+
+    Returns ``not_required`` (local/none), ``not_evaluated`` (local_llm, whose
+    local runtime configuration this display-only gate does not assess),
+    ``present`` (all required keys present), or ``missing`` (a required key is
+    absent). Reasoning is over ``key_status`` presence categories only; no key
+    value is read or validated.
+    """
+
+    if provider == _LOCAL_LLM_PROVIDER:
+        return "not_evaluated"
+    if provider in _NO_KEY_PROVIDERS:
+        return "not_required"
+    required = _required_key_envs_for_provider(provider)
+    if not required:
+        # Unknown provider: no known required key here. Live execution stays
+        # blocked by the always-on blockers regardless.
+        return "not_required"
+    if all(key_status.get(env) == "present" for env in required):
+        return "present"
+    return "missing"
+
+
+def _live_execution_blockers(
+    *,
+    emergency_stop_engaged: bool,
+    provider_key_status: str,
+    cost_cap_status: str,
+    token_request_cap_status: str,
+    live_preview_enabled: bool,
+) -> List[str]:
+    """Return safe blocker labels explaining why live execution stays blocked.
+
+    ``display_only_lane`` and ``live_provider_calls_disabled`` are always
+    present: this console is display-only and never enables live calls,
+    regardless of configuration. The remaining labels describe what a future,
+    separately authorized live-provider lane would still need in place. The
+    provider-key blocker is derived from the *configured provider's* required
+    key, not from any key. No credential is validated and no provider is
+    contacted to derive these.
+    """
+
+    blockers = ["display_only_lane", "live_provider_calls_disabled"]
+    if emergency_stop_engaged:
+        blockers.append("emergency_stop_engaged")
+    if provider_key_status == "not_evaluated":
+        # local_llm: keep the gate blocked with a specific, safe label rather
+        # than treating any hosted-provider key as satisfying it.
+        blockers.append("local_llm_configuration_not_evaluated")
+    elif provider_key_status == "missing":
+        blockers.append("missing_provider_key")
+    if cost_cap_status != "present":
+        blockers.append("missing_cost_cap")
+    if token_request_cap_status != "present":
+        blockers.append("missing_token_or_request_cap")
+    if not live_preview_enabled:
+        blockers.append("live_preview_surface_disabled")
+    return blockers
+
+
+def _build_provider_gate(provider: str) -> Dict[str, Any]:
+    """Assemble the display-only provider / model / cost gate status.
+
+    Pure function over environment *presence* and truthiness only. It never
+    reads a secret value, never validates a credential, and never contacts a
+    provider. ``live_execution_gate`` is always ``blocked`` because this console
+    is display-only; the blockers list explains why.
+    """
+
+    emergency_stop_engaged = _truthy_env(_EMERGENCY_STOP_ENV)
+    live_preview_enabled = _truthy_env(_LIVE_PREVIEW_ENV)
+    key_status = {name: _key_presence(name) for name in _KEY_ENVS}
+    provider_key_status = _provider_key_status(provider, key_status)
+    cost_cap_status = _cost_cap_status()
+    token_request_cap_status = _token_request_cap_status()
+    blockers = _live_execution_blockers(
+        emergency_stop_engaged=emergency_stop_engaged,
+        provider_key_status=provider_key_status,
+        cost_cap_status=cost_cap_status,
+        token_request_cap_status=token_request_cap_status,
+        live_preview_enabled=live_preview_enabled,
+    )
+
+    return {
+        "configured_provider": provider,
+        "provider_mode_label": _provider_mode_label(provider),
+        "live_provider_calls": "disabled",
+        "console_calls_providers": False,
+        "emergency_stop": "engaged" if emergency_stop_engaged else "not engaged",
+        "live_preview_surface": "enabled" if live_preview_enabled else "disabled",
+        "key_status": key_status,
+        # Required key(s) for the configured provider (env var names only) and the
+        # categorical status of that specific requirement.
+        "required_provider_keys": list(_required_key_envs_for_provider(provider)),
+        "provider_key_status": provider_key_status,
+        # ``cost_caps`` retains the prior categorical summary for compatibility.
+        "cost_caps": _cost_caps_status(),
+        "cap_status": _cap_status(),
+        "cap_completeness": _cap_completeness(),
+        "cost_cap_status": cost_cap_status,
+        "token_request_cap_status": token_request_cap_status,
+        "live_execution_gate": "blocked",
+        "live_execution_blockers": blockers,
+        "gate_boundary": GATE_BOUNDARY_NOTE,
+        "note": NO_KEYS_TEXT + ". Key status is present/missing only.",
+    }
 
 
 def build_console_status() -> Dict[str, Any]:
@@ -175,20 +420,7 @@ def build_console_status() -> Dict[str, Any]:
             "diagnostics": "not run yet",
             "note": "No solve has run from this console; fields are placeholders.",
         },
-        "provider_gate": {
-            "configured_provider": provider,
-            "live_provider_calls": "disabled",
-            "console_calls_providers": False,
-            "emergency_stop": (
-                "engaged" if _truthy_env(_EMERGENCY_STOP_ENV) else "not engaged"
-            ),
-            "cost_caps": _cost_caps_status(),
-            "live_preview_surface": (
-                "enabled" if _truthy_env(_LIVE_PREVIEW_ENV) else "disabled"
-            ),
-            "key_status": {name: _key_presence(name) for name in _KEY_ENVS},
-            "note": NO_KEYS_TEXT + ". Key status is present/missing only.",
-        },
+        "provider_gate": _build_provider_gate(provider),
         "preflight_capture": {
             "workflows": [
                 {
@@ -282,6 +514,22 @@ def _render_page(status: Mapping[str, Any]) -> str:
         f'<dd><span class="badge {"ok" if state == "present" else "muted"}">'
         f"{_escape(state)}</span></dd></div>"
         for name, state in gate["key_status"].items()
+    )
+
+    # Per-cap presence rows (configured limits only; the value is never read).
+    cap_rows = "".join(
+        f'<div class="kv"><dt>{_escape(label)}</dt>'
+        f'<dd><span class="badge {"ok" if state == "present" else "muted"}">'
+        f"{_escape(state)}</span></dd></div>"
+        for label, state in gate["cap_status"].items()
+    )
+    # Safe blocker labels explaining why live execution stays blocked.
+    blocker_rows = "".join(
+        f"<li>{_escape(blocker)}</li>"
+        for blocker in gate["live_execution_blockers"]
+    )
+    gate_boundary_html = "".join(
+        f"<li>{_escape(text)}</li>" for text in GATE_BOUNDARY_TEXTS
     )
 
     workflow_rows = "".join(
@@ -523,14 +771,29 @@ def _render_page(status: Mapping[str, Any]) -> str:
           <h2>Provider and Cost Gate</h2>
           {_kv_rows({
               "configured provider": gate["configured_provider"],
+              "provider mode": gate["provider_mode_label"],
               "live provider calls": gate["live_provider_calls"],
               "console calls providers": gate["console_calls_providers"],
               "emergency stop": gate["emergency_stop"],
-              "cost caps": gate["cost_caps"],
               "live preview surface": gate["live_preview_surface"],
           })}
+
+          <h3 class="subhead">Live Execution Gate (display-only)</h3>
+          {_kv_rows({
+              "gate result": gate["live_execution_gate"],
+              "provider key (configured provider)": gate["provider_key_status"],
+              "cap completeness": gate["cap_completeness"],
+              "cost cap": gate["cost_cap_status"],
+              "token/request caps": gate["token_request_cap_status"],
+          })}
+          <p class="note">Blockers (why live execution stays blocked):</p>
+          <ul class="surfaces">{blocker_rows}</ul>
+          <p class="note">Cap presence (configured limits only, not billing truth):</p>
+          {cap_rows}
           <p class="note">Key presence (categorical only):</p>
           {key_rows}
+          <p class="note">{_escape(gate["gate_boundary"])}.</p>
+          <ul class="surfaces">{gate_boundary_html}</ul>
           <p class="note">{_escape(gate["note"])}</p>
         </article>
 
