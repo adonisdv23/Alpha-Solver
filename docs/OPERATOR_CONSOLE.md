@@ -529,3 +529,51 @@ separate future lane that must be separately authorized.
   it does not claim any answer-quality result. This page is not a benchmark,
   readiness, production, or superiority claim, and it does not validate the
   product.
+
+## ChatGPT Copy/Paste Capture card
+
+The `ChatGPT Copy/Paste Capture` card explains the `chatgpt-copy-paste` run mode as a manual-only workflow. The operator generates plain ChatGPT output and routed Alpha output outside the console, then pastes those outputs into the operator-owned local `capture.json` lab notebook outside this panel. Pasted outputs belong in the local capture file, not in the console card.
+
+The card adds a `chatgpt_copy_paste_capture` status section with fixed boundary fields: `mode=manual_only`, automation disabled, browser automation disabled, provider calls disabled, live execution disabled, `capture_storage=external_capture_file_only`, `console_writes_capture=false`, and `console_stores_pasted_outputs=false`.
+
+### Capture stages and next manual steps
+
+The current capture stage is derived only from safe local artifact summaries that the console already exposes. It does not read or display raw prompts, raw baseline output, raw routed output, or raw route metadata.
+
+- `no_capture` means the safe capture summary reports no local capture file. Suggested manual steps are to author the case packet, run anchor preflight from a terminal, and scaffold the capture from a terminal.
+- `capture_invalid` means the safe capture summary reports invalid JSON or invalid structure. Suggested manual steps are to inspect/repair the local file outside the console and validate from a terminal.
+- `capture_scaffolded` means a structurally valid capture exists with pending slots. Suggested manual steps are to manually collect plain ChatGPT output, manually collect routed Alpha output, paste outputs into the local capture file, and record observed route/provenance facts.
+- `capture_in_progress` means the safe counts show captured or excluded slots while more work remains. Suggested manual steps are to finish pending slots, record observed route/provenance facts, and validate from a terminal.
+- `capture_export_ready` means the safe summary reports an export-ready capture and no digest-valid evidence packet. Suggested manual steps are to run lift preflight from a terminal, export the evidence packet from a terminal, and optionally save a local receipt snapshot through the existing receipt store.
+- `evidence_packet_available` means the evidence packet summary reports a digest-valid packet. This is packet self-integrity only, not answer quality, validation, readiness, benchmark, production, billing, or superiority evidence.
+
+### Placeholder-only capture slot template
+
+The card shows placeholders only:
+
+- `task_id: <task_id>`
+- `baseline_output: <paste plain ChatGPT output into local capture file>`
+- `routed_output: <paste routed Alpha output into local capture file>`
+- `route_metadata: <observed route/provenance facts only>`
+- `validation_status: captured or excluded`
+- `exclusion_reason: <required only when excluded>`
+
+The card does not provide a paste textarea, capture editor, upload form, save button, or artifact mutation route.
+
+### Copy/paste checklist
+
+The checklist is made of bounded safe labels only: author the case packet, run anchor preflight from a terminal, scaffold capture from a terminal, collect plain ChatGPT output manually, collect routed Alpha output manually, paste outputs into the local capture file, record observed route metadata, validate capture from a terminal, run lift preflight from a terminal, export the evidence packet from a terminal, and optionally save a local receipt snapshot through the existing B006 receipt store.
+
+### Route metadata guidance
+
+Route metadata is for observed route/provenance facts only. Route metadata is not scoring, ranking, winner selection, quality judgment, readiness, benchmark, validation, production, billing, or superiority evidence. The console does not use route metadata to select a winner, compare models, score answers, rank outputs, validate quality, or claim production readiness.
+
+### Terminal command snippets are text only
+
+The card repeats the existing local harness command snippets for anchor preflight, init capture, validate capture, lift preflight, and export evidence packet. These snippets are terminal instructions only. The console does not execute them, start a subprocess, call the CLI, call network, call providers, call ChatGPT, call models, call MCP, automate a browser, submit prompts, call `/v1/solve`, or call internal solve functions.
+
+### Manual-only boundaries
+
+ChatGPT copy/paste capture is manual-only. This console does not call ChatGPT. This console does not call providers, models, `/v1/solve`, MCP, browser automation, network, CLI, or subprocesses. This console does not automate a browser. This console does not submit prompts. This console does not store pasted model outputs in this lane. This console does not create, edit, delete, upload, save, or mutate `capture.json`, evidence packets, preflight reports, or receipts from this panel.
+
+The capture harness remains a local lab notebook, not a runner. Receipts may be saved separately through the existing local receipt store, but the ChatGPT Copy/Paste Capture card does not auto-save receipts and does not mutate receipts. Any future paste-storage, capture-editor, browser-automation, or API-automation behavior must be separately authorized.

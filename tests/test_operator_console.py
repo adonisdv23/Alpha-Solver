@@ -2482,3 +2482,156 @@ def test_receipt_ui_boundary_text_and_no_misleading_receipt_language(client: Tes
         "estimated spend",
     ):
         assert forbidden not in receipt_card
+
+# ---------------------------------------------------------------------------
+# ChatGPT Copy/Paste Capture panel (manual-only guidance)
+# ---------------------------------------------------------------------------
+
+def _chatgpt_capture_status(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dict:
+    _use_root(monkeypatch, tmp_path)
+    return operator_console.build_console_status()["chatgpt_copy_paste_capture"]
+
+
+def _pending_capture() -> dict:
+    packet = {"packet_id": "ORC-PENDING-001", "cases": [{"task_id": "t1", "prompt": RAW_PROMPT}]}
+    return capture_lib.scaffold_capture(packet)
+
+
+def test_chatgpt_copy_paste_status_defaults_manual_only(client: TestClient) -> None:
+    _login(client)
+    payload = client.get(STATUS_ROUTE).json()
+    section = payload["chatgpt_copy_paste_capture"]
+    assert section["mode"] == "manual_only"
+    assert section["automation"] == "disabled"
+    assert section["browser_automation"] == "disabled"
+    assert section["provider_calls"] == "disabled"
+    assert section["live_execution"] == "disabled"
+    assert section["console_writes_capture"] is False
+    assert section["console_stores_pasted_outputs"] is False
+
+
+def test_chatgpt_missing_capture_stage_and_steps(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    section = _chatgpt_capture_status(tmp_path, monkeypatch)
+    assert section["current_capture_stage"] == "no_capture"
+    assert section["next_manual_steps"] == [
+        "author_case_packet",
+        "run_anchor_preflight_from_terminal",
+        "scaffold_capture_from_terminal",
+    ]
+
+
+def test_chatgpt_invalid_capture_stage_and_steps(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    (tmp_path / "capture.json").write_text("{ nope", encoding="utf-8")
+    section = _chatgpt_capture_status(tmp_path, monkeypatch)
+    assert section["current_capture_stage"] == "capture_invalid"
+    assert "validate_capture_from_terminal" in section["next_manual_steps"]
+
+
+def test_chatgpt_pending_capture_stage_from_safe_counts(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    _write(tmp_path, "capture.json", _pending_capture())
+    section = _chatgpt_capture_status(tmp_path, monkeypatch)
+    assert section["current_capture_stage"] == "capture_scaffolded"
+    assert "paste_outputs_into_capture_file" in section["next_manual_steps"]
+
+
+def test_chatgpt_in_progress_capture_stage_from_safe_counts(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    capture = _pending_capture()
+    capture["cases"][0]["validation_status"] = "excluded"
+    capture["cases"][0]["exclusion_reason"] = "manual exclusion"
+    _write(tmp_path, "capture.json", capture)
+    section = _chatgpt_capture_status(tmp_path, monkeypatch)
+    assert section["current_capture_stage"] == "capture_in_progress"
+    assert "finish_pending_capture_slots" in section["next_manual_steps"]
+
+
+def test_chatgpt_export_ready_and_evidence_packet_stages(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    capture = _valid_capture()
+    _write(tmp_path, "capture.json", capture)
+    section = _chatgpt_capture_status(tmp_path, monkeypatch)
+    assert section["current_capture_stage"] == "capture_export_ready"
+
+    _write(tmp_path, "evidence_packet.json", capture_lib.build_evidence_packet(capture))
+    section = _chatgpt_capture_status(tmp_path, monkeypatch)
+    assert section["current_capture_stage"] == "evidence_packet_available"
+    assert section["next_manual_steps"] == ["save_local_receipt_snapshot"]
+
+
+def test_chatgpt_stage_derived_only_from_safe_summary(monkeypatch: pytest.MonkeyPatch) -> None:
+    local = {
+        "capture": {"state": "structurally_valid", "counts": {"captured": 0, "excluded": 0, "pending": 2}},
+        "evidence_packet": {"state": "missing"},
+    }
+    assert operator_console._chatgpt_capture_stage(local) == "capture_scaffolded"
+    local["capture"] = {"state": "structurally_valid", "counts": {"captured": 1, "excluded": 0, "pending": 1}}
+    assert operator_console._chatgpt_capture_stage(local) == "capture_in_progress"
+    local["evidence_packet"] = {"state": "digest_valid"}
+    assert operator_console._chatgpt_capture_stage(local) == "evidence_packet_available"
+
+
+def test_chatgpt_checklist_template_and_commands_are_safe(client: TestClient) -> None:
+    _login(client)
+    payload = client.get(STATUS_ROUTE).json()
+    section = payload["chatgpt_copy_paste_capture"]
+    assert "copy_paste_checklist" in section
+    assert "collect_plain_chatgpt_output_manually" in section["copy_paste_checklist"]
+    template = section["capture_slot_template"]
+    assert template["task_id"] == "<task_id>"
+    assert "<paste plain ChatGPT output into local capture file>" in template.values()
+    assert all("python scripts/operator_run_capture.py" in c["command"] for c in section["terminal_commands"])
+    assert client.get(PAGE_ROUTE).status_code == 200
+    html_text = client.get(PAGE_ROUTE).text
+    assert html.escape("<task_id>") in html_text
+    assert "Terminal command snippets (text only; not executed)" in html_text
+    body = json.dumps(section)
+    for raw in (RAW_PROMPT, RAW_BASELINE, RAW_ROUTED, RAW_ROUTE_META, RAW_SYSTEM_PROMPT, RAW_PROVIDER_PAYLOAD, FAKE_SECRET):
+        assert raw not in body
+        assert raw not in html_text
+
+
+def test_chatgpt_ui_boundary_route_metadata_and_buttons(client: TestClient) -> None:
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    assert "card-chatgpt-copy-paste-capture" in html_text
+    for text in operator_console.CHATGPT_CAPTURE_BOUNDARY_TEXTS:
+        assert text in html_text
+    for label in operator_console.CHATGPT_CAPTURE_ROUTE_METADATA_GUIDANCE:
+        assert label in html_text
+    assert "no_scoring" in html_text
+    assert "no_rank_ordering" in html_text
+    assert "no_selected_output" in html_text
+    assert "no_quality_judgment" in html_text
+    assert "no_readiness_or_benchmark_claim" in html_text
+    assert "Live run (disabled)" in html_text
+    button_text = " ".join(__import__("re").findall(r"<button[^>]*>(.*?)</button>", html_text, flags=__import__("re").S))
+    for forbidden in ("Run", "Execute", "Solve", "Submit to provider", "Generate", "Validate", "Benchmark", "Start", "Automate"):
+        if forbidden == "Run":
+            assert "Live run (disabled)" in button_text
+        else:
+            assert forbidden not in button_text
+
+
+def test_chatgpt_no_new_post_route_and_receipt_route_unchanged() -> None:
+    post_paths = {getattr(route, "path", None) for route in app.routes if "POST" in getattr(route, "methods", set())}
+    assert RECEIPTS_ROUTE in post_paths
+    assert not any("copy" in str(path).lower() or "paste" in str(path).lower() for path in post_paths)
+
+
+def test_chatgpt_provider_client_patched_raise_routes_ok(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
+    import alpha.providers.openai as openai_provider
+
+    def _boom(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("provider client must not be used by operator console")
+
+    monkeypatch.setattr(openai_provider.OpenAIProviderClient, "__init__", _boom)
+    monkeypatch.setattr(openai_provider.OpenAIProviderClient, "execute", _boom)
+    _login(client)
+    assert client.get(PAGE_ROUTE).status_code == 200
+    assert client.get(STATUS_ROUTE).status_code == 200
+
+
+def test_chatgpt_source_scan_no_execution_imports() -> None:
+    source = Path(operator_console.__file__).read_text(encoding="utf-8")
+    import_lines = [line for line in source.splitlines() if line.strip().startswith(("import ", "from "))]
+    joined = "\n".join(import_lines).lower()
+    for token in ("chatgpt", "provider", "mcp", "httpx", "requests", "subprocess", "socket", "urllib", "playwright", "selenium", "webdriver", "webbrowser", "pexpect", "solve"):
+        assert token not in joined, token

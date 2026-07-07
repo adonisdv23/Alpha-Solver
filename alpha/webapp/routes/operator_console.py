@@ -100,6 +100,81 @@ GATE_BOUNDARY_TEXTS = (
     GATE_LIVE_BLOCKED_TEXT,
 )
 
+
+# ---------------------------------------------------------------------------
+# ChatGPT copy/paste capture boundary text. This panel is manual guidance only:
+# it summarizes existing safe artifact metadata and never stores pasted content,
+# mutates capture files, executes commands, calls providers, or synthesizes
+# Alpha Solver runtime output.
+# ---------------------------------------------------------------------------
+CHATGPT_CAPTURE_BOUNDARY_TEXTS = (
+    "ChatGPT copy/paste capture is manual-only.",
+    "The operator generates outputs outside the console and pastes them into the local capture file.",
+    "This console does not call ChatGPT.",
+    "This console does not call providers, models, /v1/solve, MCP, browser automation, network, CLI, or subprocesses.",
+    "This console does not automate a browser.",
+    "This console does not submit prompts.",
+    "This console does not store pasted model outputs in this lane.",
+    "This console does not create, edit, delete, upload, save, or mutate capture.json, evidence packets, preflight reports, or receipts from this panel.",
+    "Route metadata is for observed route/provenance facts only.",
+    "Route metadata is not scoring, rank ordering, selected-output choice, quality judgment, readiness, benchmark, validation, production, billing, or superiority evidence.",
+    "The capture harness remains a local lab notebook, not a runner.",
+    "Any future paste-storage or capture-editor behavior must be separately authorized.",
+)
+CHATGPT_CAPTURE_BOUNDARY_NOTE = (
+    "manual copy/paste guidance only; no automation, no provider call, no "
+    "capture mutation, no raw output storage"
+)
+CHATGPT_CAPTURE_WOULD_USE = (
+    "operator_run_capture_harness",
+    "local_capture_json",
+    "baseline_output_slot",
+    "routed_output_slot",
+    "route_metadata_slot",
+    "validation_status_slot",
+    "local_receipts_optional",
+)
+CHATGPT_CAPTURE_CHECKLIST = (
+    "author_case_packet",
+    "run_anchor_preflight_from_terminal",
+    "scaffold_capture_from_terminal",
+    "collect_plain_chatgpt_output_manually",
+    "collect_routed_alpha_output_manually",
+    "paste_outputs_into_capture_file",
+    "record_observed_route_metadata",
+    "validate_capture_from_terminal",
+    "run_lift_preflight_from_terminal",
+    "export_evidence_packet_from_terminal",
+    "save_local_receipt_snapshot_optional",
+)
+CHATGPT_CAPTURE_SLOT_TEMPLATE = {
+    "task_id": "<task_id>",
+    "baseline_output": "<paste plain ChatGPT output into local capture file>",
+    "routed_output": "<paste routed Alpha output into local capture file>",
+    "route_metadata": "<observed route/provenance facts only>",
+    "validation_status": "captured or excluded",
+    "exclusion_reason": "<required only when excluded>",
+}
+CHATGPT_CAPTURE_UNSAFE_ACTIONS_BLOCKED = (
+    "no_chatgpt_api_call",
+    "no_browser_automation",
+    "no_provider_call",
+    "no_v1_solve",
+    "no_cli_execution_from_console",
+    "no_capture_mutation_from_console",
+    "no_raw_output_storage",
+    "no_scoring",
+    "no_readiness_claim",
+)
+CHATGPT_CAPTURE_ROUTE_METADATA_GUIDANCE = (
+    "observed_route_provenance_facts_only",
+    "no_scoring",
+    "no_rank_ordering",
+    "no_selected_output",
+    "no_quality_judgment",
+    "no_readiness_or_benchmark_claim",
+)
+
 # ---------------------------------------------------------------------------
 # Dry-run preview boundary text. The dry-run preview panel is a display-only
 # read of what a *future* dry-run execution lane would prepare or require. It
@@ -622,6 +697,95 @@ def _build_dry_run_preview(
     }
 
 
+
+def _chatgpt_capture_stage(local_artifacts: Mapping[str, Any]) -> str:
+    """Map safe artifact summaries to the manual copy/paste capture stage."""
+
+    packet_state = (local_artifacts.get("evidence_packet") or {}).get("state")
+    if packet_state == "digest_valid":
+        return "evidence_packet_available"
+
+    capture = local_artifacts.get("capture") or {}
+    capture_state = capture.get("state")
+    if capture_state == "missing":
+        return "no_capture"
+    if capture_state in {"invalid_json", "invalid_structure"}:
+        return "capture_invalid"
+    if capture_state == "export_ready":
+        return "capture_export_ready"
+    if capture_state == "structurally_valid":
+        counts = capture.get("counts") or {}
+        if counts.get("captured", 0) or counts.get("excluded", 0):
+            return "capture_in_progress"
+        return "capture_scaffolded"
+    return "no_capture"
+
+
+def _chatgpt_next_manual_steps(stage: str) -> List[str]:
+    """Return bounded manual step labels for the current copy/paste stage."""
+
+    if stage == "no_capture":
+        return [
+            "author_case_packet",
+            "run_anchor_preflight_from_terminal",
+            "scaffold_capture_from_terminal",
+        ]
+    if stage == "capture_invalid":
+        return [
+            "inspect_local_capture_file_outside_console",
+            "repair_or_rescaffold_capture_from_terminal",
+            "validate_capture_from_terminal",
+        ]
+    if stage == "capture_scaffolded":
+        return [
+            "collect_plain_chatgpt_output_manually",
+            "collect_routed_alpha_output_manually",
+            "paste_outputs_into_capture_file",
+            "record_observed_route_metadata",
+        ]
+    if stage == "capture_in_progress":
+        return [
+            "finish_pending_capture_slots",
+            "record_observed_route_metadata",
+            "validate_capture_from_terminal",
+        ]
+    if stage == "capture_export_ready":
+        return [
+            "run_lift_preflight_from_terminal",
+            "export_evidence_packet_from_terminal",
+            "save_local_receipt_snapshot",
+        ]
+    return ["save_local_receipt_snapshot"]
+
+
+def _build_chatgpt_copy_paste_capture(
+    local_artifacts: Mapping[str, Any], preflight_capture: Mapping[str, Any]
+) -> Dict[str, Any]:
+    """Assemble the display-only manual ChatGPT copy/paste payload."""
+
+    stage = _chatgpt_capture_stage(local_artifacts)
+    return {
+        "mode": "manual_only",
+        "automation": "disabled",
+        "browser_automation": "disabled",
+        "provider_calls": "disabled",
+        "live_execution": "disabled",
+        "capture_storage": "external_capture_file_only",
+        "console_writes_capture": False,
+        "console_stores_pasted_outputs": False,
+        "would_use": list(CHATGPT_CAPTURE_WOULD_USE),
+        "current_capture_stage": stage,
+        "next_manual_steps": _chatgpt_next_manual_steps(stage),
+        "copy_paste_checklist": list(CHATGPT_CAPTURE_CHECKLIST),
+        "capture_slot_template": dict(CHATGPT_CAPTURE_SLOT_TEMPLATE),
+        "terminal_commands": list(preflight_capture.get("workflows", [])),
+        "route_metadata_guidance": list(CHATGPT_CAPTURE_ROUTE_METADATA_GUIDANCE),
+        "unsafe_actions_blocked": list(CHATGPT_CAPTURE_UNSAFE_ACTIONS_BLOCKED),
+        "boundary": CHATGPT_CAPTURE_BOUNDARY_NOTE,
+        "boundary_notes": list(CHATGPT_CAPTURE_BOUNDARY_TEXTS),
+    }
+
+
 def build_console_status() -> Dict[str, Any]:
     """Assemble the read-only operator console status payload.
 
@@ -634,6 +798,50 @@ def build_console_status() -> Dict[str, Any]:
     local_artifacts = artifacts.build_artifact_status()
     provider_gate = _build_provider_gate(provider)
     dry_run_preview = _build_dry_run_preview(local_artifacts, provider_gate)
+    preflight_capture = {
+        "workflows": [
+            {
+                "id": "anchor-preflight",
+                "command": (
+                    "python scripts/operator_run_capture.py anchor-preflight "
+                    "--case-packet <case_packet.json>"
+                ),
+            },
+            {
+                "id": "lift-preflight",
+                "command": (
+                    "python scripts/operator_run_capture.py lift-preflight "
+                    "--capture <capture.json>"
+                ),
+            },
+            {
+                "id": "init-capture",
+                "command": (
+                    "python scripts/operator_run_capture.py init "
+                    "--case-packet <case_packet.json> --out <capture.json>"
+                ),
+            },
+            {
+                "id": "validate-capture",
+                "command": (
+                    "python scripts/operator_run_capture.py validate "
+                    "--capture <capture.json>"
+                ),
+            },
+            {
+                "id": "export-evidence-packet",
+                "command": (
+                    "python scripts/operator_run_capture.py export "
+                    "--capture <capture.json> --out <packet.json>"
+                ),
+            },
+        ],
+        "docs": "docs/OPERATOR_RUN_CAPTURE.md",
+        "note": ARTIFACT_BOUNDARY_TEXT + ".",
+    }
+    chatgpt_copy_paste_capture = _build_chatgpt_copy_paste_capture(
+        local_artifacts, preflight_capture
+    )
 
     return {
         "console": {
@@ -685,47 +893,8 @@ def build_console_status() -> Dict[str, Any]:
         },
         "provider_gate": provider_gate,
         "dry_run_preview": dry_run_preview,
-        "preflight_capture": {
-            "workflows": [
-                {
-                    "id": "anchor-preflight",
-                    "command": (
-                        "python scripts/operator_run_capture.py anchor-preflight "
-                        "--case-packet <case_packet.json>"
-                    ),
-                },
-                {
-                    "id": "lift-preflight",
-                    "command": (
-                        "python scripts/operator_run_capture.py lift-preflight "
-                        "--capture <capture.json>"
-                    ),
-                },
-                {
-                    "id": "init-capture",
-                    "command": (
-                        "python scripts/operator_run_capture.py init "
-                        "--case-packet <case_packet.json> --out <capture.json>"
-                    ),
-                },
-                {
-                    "id": "validate-capture",
-                    "command": (
-                        "python scripts/operator_run_capture.py validate "
-                        "--capture <capture.json>"
-                    ),
-                },
-                {
-                    "id": "export-evidence-packet",
-                    "command": (
-                        "python scripts/operator_run_capture.py export "
-                        "--capture <capture.json> --out <packet.json>"
-                    ),
-                },
-            ],
-            "docs": "docs/OPERATOR_RUN_CAPTURE.md",
-            "note": ARTIFACT_BOUNDARY_TEXT + ".",
-        },
+        "chatgpt_copy_paste_capture": chatgpt_copy_paste_capture,
+        "preflight_capture": preflight_capture,
         "evidence_receipt": {
             "receipt_id": "not generated yet",
             "export_digest": "not generated yet",
@@ -767,6 +936,7 @@ def _render_page(status: Mapping[str, Any]) -> str:
     trace = status["route_trace"]
     gate = status["provider_gate"]
     dry_run = status["dry_run_preview"]
+    chatgpt_capture = status["chatgpt_copy_paste_capture"]
     capture = status["preflight_capture"]
     receipt = status["evidence_receipt"]
     receipt_store = status["local_receipts"]
@@ -964,6 +1134,24 @@ def _render_page(status: Mapping[str, Any]) -> str:
     )
     dr_gate = dry_run["provider_gate_summary"]
 
+
+    chatgpt_would_use_html = _list_items(chatgpt_capture["would_use"])
+    chatgpt_steps_html = _list_items(chatgpt_capture["next_manual_steps"])
+    chatgpt_checklist_html = _list_items(chatgpt_capture["copy_paste_checklist"])
+    chatgpt_template_html = _kv_rows(chatgpt_capture["capture_slot_template"])
+    chatgpt_commands_html = "".join(
+        "<li class=\"workflow\">"
+        f'<code class="wf-id">{_escape(item["id"])}</code>'
+        f'<pre class="wf-cmd">{_escape(item["command"])}</pre>'
+        "</li>"
+        for item in chatgpt_capture["terminal_commands"]
+    )
+    chatgpt_route_guidance_html = _list_items(
+        chatgpt_capture["route_metadata_guidance"]
+    )
+    chatgpt_unsafe_html = _list_items(chatgpt_capture["unsafe_actions_blocked"])
+    chatgpt_boundary_html = _list_items(chatgpt_capture["boundary_notes"])
+
     receipt_items = receipt_store["recent"]
     receipt_rows = (
         "".join(
@@ -1147,6 +1335,39 @@ def _render_page(status: Mapping[str, Any]) -> str:
           {preflight_artifact_html}
         </article>
 
+
+
+        <article class="card" id="card-chatgpt-copy-paste-capture">
+          <h2>ChatGPT Copy/Paste Capture</h2>
+          <p class="note">Manual-only guidance for the operator-owned local capture file. The console shows safe labels and placeholders only.</p>
+          {_kv_rows({
+              "mode": chatgpt_capture["mode"],
+              "automation": chatgpt_capture["automation"],
+              "browser automation": chatgpt_capture["browser_automation"],
+              "provider calls": chatgpt_capture["provider_calls"],
+              "live execution": chatgpt_capture["live_execution"],
+              "capture storage": chatgpt_capture["capture_storage"],
+              "console writes capture": chatgpt_capture["console_writes_capture"],
+              "console stores pasted outputs": chatgpt_capture["console_stores_pasted_outputs"],
+              "current capture stage": chatgpt_capture["current_capture_stage"],
+          })}
+          <p class="note">Would use (safe local workflow labels only):</p>
+          <ul class="surfaces">{chatgpt_would_use_html}</ul>
+          <p class="note">Next recommended manual steps:</p>
+          <ul class="surfaces">{chatgpt_steps_html}</ul>
+          <h3 class="subhead">Copy/paste field checklist</h3>
+          <ul class="surfaces">{chatgpt_checklist_html}</ul>
+          <h3 class="subhead">Placeholder-only capture slot template</h3>
+          {chatgpt_template_html}
+          <h3 class="subhead">Terminal command snippets (text only; not executed)</h3>
+          <ul class="workflows">{chatgpt_commands_html}</ul>
+          <h3 class="subhead">Route metadata guidance</h3>
+          <ul class="surfaces">{chatgpt_route_guidance_html}</ul>
+          <h3 class="subhead">Unsafe actions blocked</h3>
+          <ul class="surfaces">{chatgpt_unsafe_html}</ul>
+          <p class="note">{_escape(chatgpt_capture["boundary"])}.</p>
+          <ul class="surfaces">{chatgpt_boundary_html}</ul>
+        </article>
 
 
         <article class="card" id="card-local-receipt-store">
