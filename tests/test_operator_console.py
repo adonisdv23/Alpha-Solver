@@ -1628,3 +1628,511 @@ def test_provider_gating_does_not_call_provider_clients(
     _login(client)
     assert client.get(PAGE_ROUTE).status_code == 200
     assert client.get(STATUS_ROUTE).status_code == 200
+
+
+# ---------------------------------------------------------------------------
+# Dry-Run Preview panel
+# (AOC-B005-DRY-RUN-PREVIEW-001 /
+# UI-ALPHA-OPERATOR-CONSOLE-DRY-RUN-PREVIEW-001). The panel is a display-only
+# read of what a *future* dry-run would prepare or require, derived only from the
+# existing local artifact status and provider-gate status. It executes nothing:
+# no solve, no provider call, no /v1/solve, no CLI/subprocess, no artifact
+# mutation, and no synthesized runtime output.
+# ---------------------------------------------------------------------------
+# Additional recognizable raw content that must never surface in HTML or JSON.
+RAW_SYS_PROMPT = "RAW-SYSTEM-PROMPT-must-not-render-zzz"
+RAW_PROVIDER_PAYLOAD = "RAW-PROVIDER-PAYLOAD-must-not-render-zzz"
+
+
+def _dry_run(client: TestClient) -> dict:
+    return client.get(STATUS_ROUTE).json()["dry_run_preview"]
+
+
+def _dry_run_card_html(html_text: str) -> str:
+    start = html_text.index('id="card-dry-run-preview"')
+    end = html_text.index("</article>", start)
+    return html_text[start:end]
+
+
+def _scaffold_capture() -> dict:
+    """A structurally valid (but not export-ready) capture with a raw prompt."""
+
+    packet = {
+        "packet_id": "ORC-TEST-001",
+        "cases": [{"task_id": "t1", "prompt": RAW_PROMPT}],
+    }
+    return capture_lib.scaffold_capture(packet)
+
+
+def _capture_with_sensitive_metadata() -> dict:
+    """An export-ready capture whose route_metadata carries extra raw sentinels."""
+
+    capture = _valid_capture()
+    capture["cases"][0]["route_metadata"] = {
+        "route": RAW_ROUTE_META,
+        "system_prompt": RAW_SYS_PROMPT,
+        "provider_payload": RAW_PROVIDER_PAYLOAD,
+    }
+    return capture
+
+
+# 1. Status JSON includes the new dry-run preview section.
+def test_dry_run_preview_section_in_status(client: TestClient) -> None:
+    _login(client)
+    payload = client.get(STATUS_ROUTE).json()
+    assert "dry_run_preview" in payload
+    dr = payload["dry_run_preview"]
+    for field in (
+        "preview_mode",
+        "dry_run_execution",
+        "would_use",
+        "input_source_status",
+        "evidence_packet_status",
+        "preflight_status",
+        "freshness_warnings",
+        "provider_gate_summary",
+        "preview_readiness",
+        "preview_blockers",
+        "boundary",
+        "boundary_notes",
+    ):
+        assert field in dr, field
+    assert dr["would_use"] == list(operator_console.DRY_RUN_WOULD_USE)
+    assert set(dr["preflight_status"].keys()) == {"anchor", "lift"}
+
+
+# 2. Dry-run preview mode is display-only.
+def test_dry_run_preview_mode_display_only(client: TestClient) -> None:
+    _login(client)
+    assert _dry_run(client)["preview_mode"] == "display_only"
+
+
+# 3. Dry-run execution is not enabled.
+def test_dry_run_execution_not_enabled(client: TestClient) -> None:
+    _login(client)
+    assert _dry_run(client)["dry_run_execution"] == "not_enabled"
+
+
+# 4. Live-run button remains disabled with the dry-run preview panel present.
+def test_dry_run_live_run_button_remains_disabled(client: TestClient) -> None:
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    assert "Live run (disabled)" in html_text
+    assert 'class="disabled-btn" disabled' in html_text
+    assert (
+        client.get(STATUS_ROUTE).json()["run_setup"]["live_run_button_enabled"]
+        is False
+    )
+
+
+# 5. No POST/action route (or any non-GET route) is added for dry-run preview.
+def test_dry_run_no_post_or_extra_console_routes() -> None:
+    console_routes = [
+        route
+        for route in app.routes
+        if getattr(route, "path", "").startswith("/dashboard/operator-console")
+    ]
+    for route in console_routes:
+        methods = getattr(route, "methods", set()) or set()
+        assert "POST" not in methods
+        assert "PUT" not in methods
+        assert "DELETE" not in methods
+        assert "PATCH" not in methods
+    assert {getattr(route, "path", None) for route in console_routes} == {
+        PAGE_ROUTE,
+        STATUS_ROUTE,
+    }
+
+
+# 6. Missing capture produces safe preview blockers and still renders.
+def test_dry_run_missing_capture_blockers_and_renders(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+    dr = _dry_run(client)
+    assert dr["input_source_status"] == "capture_missing"
+    assert "missing_capture" in dr["preview_blockers"]
+    assert "missing_evidence_packet" in dr["preview_blockers"]
+    assert "missing_preflight_reports" in dr["preview_blockers"]
+    assert dr["preview_readiness"] == "needs_artifacts"
+    assert client.get(PAGE_ROUTE).status_code == 200
+
+
+# 7. Invalid capture produces safe preview blockers and still renders.
+def test_dry_run_invalid_capture_blockers_and_renders(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    (tmp_path / "capture.json").write_text("{ not valid json", encoding="utf-8")
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+    dr = _dry_run(client)
+    assert dr["input_source_status"] == "capture_invalid"
+    assert "invalid_capture" in dr["preview_blockers"]
+    assert dr["preview_readiness"] == "unavailable"
+    assert client.get(PAGE_ROUTE).status_code == 200
+
+
+# 8. Structurally valid capture -> local input status, no raw prompt/output.
+def test_dry_run_structurally_valid_capture_no_raw(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _write(tmp_path, "capture.json", _scaffold_capture())
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+    dr = _dry_run(client)
+    assert dr["input_source_status"] == "capture_structurally_valid"
+
+    html_text = client.get(PAGE_ROUTE).text
+    body = client.get(STATUS_ROUTE).text
+    for raw in (RAW_PROMPT, RAW_BASELINE, RAW_ROUTED, RAW_ROUTE_META):
+        assert raw not in html_text
+        assert raw not in body
+
+
+# 9. Export-ready capture -> local input status, no raw prompt/output.
+def test_dry_run_export_ready_capture_no_raw(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _write(tmp_path, "capture.json", _valid_capture())
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+    dr = _dry_run(client)
+    assert dr["input_source_status"] == "capture_export_ready"
+
+    html_text = client.get(PAGE_ROUTE).text
+    body = client.get(STATUS_ROUTE).text
+    for raw in (RAW_PROMPT, RAW_BASELINE, RAW_ROUTED, RAW_ROUTE_META):
+        assert raw not in html_text
+        assert raw not in body
+
+
+# 10. Missing evidence packet produces a safe preview blocker.
+def test_dry_run_missing_evidence_packet_blocker(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _write(tmp_path, "capture.json", _valid_capture())
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+    dr = _dry_run(client)
+    assert dr["evidence_packet_status"] == "missing"
+    assert "missing_evidence_packet" in dr["preview_blockers"]
+
+
+# 11. Digest-valid evidence packet is self-integrity only, not readiness/quality.
+def test_dry_run_digest_valid_is_self_integrity_only(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    capture = _valid_capture()
+    _write(tmp_path, "capture.json", capture)
+    _write(
+        tmp_path, "evidence_packet.json", capture_lib.build_evidence_packet(capture)
+    )
+    # No preflight reports written, so the packet's valid digest alone must not
+    # promote the preview to preview_ready.
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+    dr = _dry_run(client)
+    assert dr["evidence_packet_status"] == "digest_valid"
+    assert dr["preview_readiness"] == "needs_artifacts"
+    assert "missing_preflight_reports" in dr["preview_blockers"]
+    # The boundary that a preview-ready state is not evidence appears in the UI.
+    assert operator_console.DRY_RUN_NOT_EVIDENCE_TEXT in client.get(PAGE_ROUTE).text
+
+
+# 12. Digest-invalid and digest-unverifiable states produce safe warnings/blockers.
+def test_dry_run_digest_invalid_and_unverifiable_states(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    capture = _valid_capture()
+
+    # digest_invalid: tamper the packet body after the digest was computed.
+    invalid = capture_lib.build_evidence_packet(capture)
+    invalid["packet_id"] = "tampered-after-digest"
+    _write(tmp_path, "capture.json", capture)
+    _write(tmp_path, "evidence_packet.json", invalid)
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+    dr = _dry_run(client)
+    assert dr["evidence_packet_status"] == "digest_invalid"
+    assert "invalid_or_unverified_evidence_packet" in dr["preview_blockers"]
+    assert "digest_invalid" in dr["freshness_warnings"]
+
+    # digest_unverifiable: remove the recorded digest entirely.
+    unverifiable = capture_lib.build_evidence_packet(capture)
+    del unverifiable["content_digest"]
+    _write(tmp_path, "evidence_packet.json", unverifiable)
+    dr = _dry_run(client)
+    assert dr["evidence_packet_status"] == "digest_unverifiable"
+    assert "invalid_or_unverified_evidence_packet" in dr["preview_blockers"]
+    assert "digest_unverifiable" in dr["freshness_warnings"]
+
+
+# 13. Missing anchor/lift preflight reports produce a safe preview blocker.
+def test_dry_run_missing_preflight_reports_blocker(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _write(tmp_path, "capture.json", _valid_capture())
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+    dr = _dry_run(client)
+    assert dr["preflight_status"] == {"anchor": "anchor_missing", "lift": "lift_missing"}
+    assert "missing_preflight_reports" in dr["preview_blockers"]
+
+
+# 14. Present anchor/lift reports are shown as local metadata only; a complete,
+#     fresh, digest-valid set reaches preview_ready (metadata completeness only).
+def test_dry_run_present_preflight_reports_metadata_only(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _write_all_four(tmp_path)
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+    dr = _dry_run(client)
+    assert dr["preflight_status"] == {"anchor": "anchor_present", "lift": "lift_present"}
+    assert dr["preview_readiness"] == "preview_ready"
+    assert "missing_preflight_reports" not in dr["preview_blockers"]
+    # Even preview_ready never authorizes execution or leaks raw content.
+    assert dr["dry_run_execution"] == "not_enabled"
+    body = client.get(STATUS_ROUTE).text
+    html_text = client.get(PAGE_ROUTE).text
+    for raw in (RAW_PROMPT, RAW_BASELINE, RAW_ROUTED, RAW_ROUTE_META):
+        assert raw not in body
+        assert raw not in html_text
+
+
+# 15. Stale evidence packet vs capture produces a safe freshness warning.
+def test_dry_run_stale_evidence_packet_warning(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    capture = _valid_capture()
+    _write(tmp_path, "capture.json", capture)
+    _write(
+        tmp_path, "evidence_packet.json", capture_lib.build_evidence_packet(capture)
+    )
+    _set_age(tmp_path / "capture.json", 10)
+    _set_age(tmp_path / "evidence_packet.json", 3600)
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+    dr = _dry_run(client)
+    assert "evidence_packet_older_than_capture" in dr["freshness_warnings"]
+    assert "stale_derived_artifacts" in dr["preview_blockers"]
+
+
+# 16. Stale anchor preflight vs capture produces a safe freshness warning.
+def test_dry_run_stale_anchor_preflight_warning(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _write(tmp_path, "capture.json", _valid_capture())
+    _write(tmp_path, "anchor_preflight_report.json", _anchor_report())
+    _set_age(tmp_path / "capture.json", 10)
+    _set_age(tmp_path / "anchor_preflight_report.json", 3600)
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+    dr = _dry_run(client)
+    assert "anchor_preflight_older_than_capture" in dr["freshness_warnings"]
+    assert "stale_derived_artifacts" in dr["preview_blockers"]
+
+
+# 17. Stale lift preflight vs capture produces a safe freshness warning.
+def test_dry_run_stale_lift_preflight_warning(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _write(tmp_path, "capture.json", _valid_capture())
+    _write(tmp_path, "lift_preflight_report.json", _lift_report())
+    _set_age(tmp_path / "capture.json", 10)
+    _set_age(tmp_path / "lift_preflight_report.json", 3600)
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+    dr = _dry_run(client)
+    assert "lift_preflight_older_than_capture" in dr["freshness_warnings"]
+    assert "stale_derived_artifacts" in dr["preview_blockers"]
+
+
+# 18. Provider gate summary is included but live execution remains blocked.
+def test_dry_run_provider_gate_summary_blocked(client: TestClient) -> None:
+    _login(client)
+    dr = _dry_run(client)
+    summary = dr["provider_gate_summary"]
+    for field in (
+        "live_execution_gate",
+        "provider_key_status",
+        "cap_completeness",
+        "live_execution_blockers",
+    ):
+        assert field in summary
+    assert summary["live_execution_gate"] == "blocked"
+    assert "provider_live_execution_blocked" in dr["preview_blockers"]
+    assert "display_only_lane" in dr["preview_blockers"]
+
+
+# 19. Complete provider/cap configuration does not enable dry-run execution.
+def test_dry_run_complete_config_does_not_enable_execution(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _clear_gate_env(monkeypatch)
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    monkeypatch.setenv("OPENAI_API_KEY", FAKE_SECRET)
+    for env in (
+        "ALPHA_PROVIDER_MAX_COST_USD",
+        "ALPHA_PROVIDER_MAX_INPUT_TOKENS",
+        "ALPHA_PROVIDER_MAX_OUTPUT_TOKENS",
+        "ALPHA_PROVIDER_MAX_REQUESTS",
+    ):
+        monkeypatch.setenv(env, "5")
+    _login(client)
+    dr = _dry_run(client)
+    assert dr["dry_run_execution"] == "not_enabled"
+    summary = dr["provider_gate_summary"]
+    assert summary["cap_completeness"] == "configured"
+    assert summary["provider_key_status"] == "present"
+    assert summary["live_execution_gate"] == "blocked"
+    assert "provider_live_execution_blocked" in dr["preview_blockers"]
+    assert "display_only_lane" in dr["preview_blockers"]
+
+
+# 20. Fake API keys never appear in HTML, JSON, or reprs with the panel present.
+def test_dry_run_fake_secret_never_leaks(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", FAKE_SECRET)
+    _write_all_four(tmp_path)
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+    assert FAKE_SECRET not in client.get(PAGE_ROUTE).text
+    assert FAKE_SECRET not in client.get(STATUS_ROUTE).text
+    assert FAKE_SECRET not in repr(operator_console.build_console_status())
+
+
+# 21. Raw prompt/baseline/routed/route-metadata/system-prompt/provider-payload
+#     sentinels never appear in HTML or JSON.
+def test_dry_run_raw_sentinels_never_leak(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    capture = _capture_with_sensitive_metadata()
+    _write(tmp_path, "capture.json", capture)
+    _write(
+        tmp_path, "evidence_packet.json", capture_lib.build_evidence_packet(capture)
+    )
+    _write(tmp_path, "anchor_preflight_report.json", _anchor_report())
+    _write(tmp_path, "lift_preflight_report.json", _lift_report())
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    body = client.get(STATUS_ROUTE).text
+    for raw in (
+        RAW_PROMPT,
+        RAW_BASELINE,
+        RAW_ROUTED,
+        RAW_ROUTE_META,
+        RAW_SYS_PROMPT,
+        RAW_PROVIDER_PAYLOAD,
+    ):
+        assert raw not in html_text
+        assert raw not in body
+
+
+# 22. Provider client constructors patched to raise still allow both routes.
+def test_dry_run_provider_client_patched_raise_routes_ok(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    import alpha.providers.openai as openai_provider
+
+    def _boom(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("provider client must not be used by operator console")
+
+    monkeypatch.setattr(openai_provider.OpenAIProviderClient, "__init__", _boom)
+    monkeypatch.setattr(openai_provider.OpenAIProviderClient, "execute", _boom)
+    _write_all_four(tmp_path)
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+    assert client.get(PAGE_ROUTE).status_code == 200
+    assert client.get(STATUS_ROUTE).status_code == 200
+
+
+# 23. Source-scan: no provider client / httpx / requests / subprocess / socket /
+#     browser / MCP / CLI / solve imports are introduced in the route module.
+def test_dry_run_console_route_has_no_execution_or_solve_imports() -> None:
+    source = Path(operator_console.__file__).read_text(encoding="utf-8")
+    import_lines = [
+        line
+        for line in source.splitlines()
+        if line.strip().startswith(("import ", "from "))
+    ]
+    joined = "\n".join(import_lines).lower()
+    for token in (
+        "solve",
+        "provider",
+        "mcp",
+        "httpx",
+        "requests",
+        "subprocess",
+        "socket",
+        "urllib",
+        "playwright",
+        "selenium",
+        "webdriver",
+        "webbrowser",
+        "pexpect",
+        "openai",
+        "anthropic",
+    ):
+        assert token not in joined, token
+
+
+# 24. UI text contains the dry-run preview boundary text.
+def test_dry_run_boundary_text_in_ui(client: TestClient) -> None:
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    for text in operator_console.DRY_RUN_BOUNDARY_TEXTS:
+        assert text in html_text
+    assert operator_console.DRY_RUN_BOUNDARY_NOTE in html_text
+
+
+# 25. UI does not contain misleading dry-run execution/claim language.
+def test_dry_run_no_misleading_execution_language(client: TestClient) -> None:
+    _login(client)
+    card = _dry_run_card_html(client.get(PAGE_ROUTE).text).lower()
+    for forbidden in (
+        "run now",
+        "execute now",
+        "submit to provider",
+        "generate answer",
+        "solve now",
+        "start solve",
+        "production ready",
+        "ready for production",
+        "estimated spend",
+        "estimated cost",
+        "winner",
+        "leaderboard",
+        "outperforms",
+        "model comparison",
+    ):
+        assert forbidden not in card, forbidden
+
+
+# 26/27. Existing provider gate, artifact status, and freshness surfaces persist
+#        alongside the dry-run preview panel.
+def test_dry_run_preview_coexists_with_existing_sections(client: TestClient) -> None:
+    _login(client)
+    payload = client.get(STATUS_ROUTE).json()
+    for section in (
+        "console",
+        "portable_contract",
+        "run_setup",
+        "route_trace",
+        "provider_gate",
+        "dry_run_preview",
+        "preflight_capture",
+        "evidence_receipt",
+        "local_artifacts",
+    ):
+        assert section in payload
+    assert payload["provider_gate"]["live_execution_gate"] == "blocked"
+    local = payload["local_artifacts"]
+    assert "freshness" in local
+    assert "status_generated_at_utc" in local
+    html_text = client.get(PAGE_ROUTE).text
+    for card_id in ("card-provider-gate", "card-dry-run-preview", "card-evidence-receipt"):
+        assert card_id in html_text

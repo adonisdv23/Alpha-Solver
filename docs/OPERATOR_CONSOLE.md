@@ -46,20 +46,23 @@ return 404. When mounted, an unauthenticated `GET` redirects to `/login`.
 3. **Run Setup** — a disabled prompt input and the visible run modes (dry-run,
    local-only, ChatGPT copy/paste, and live-provider shown disabled). The
    live-run button is disabled; this MVP does not enable live API execution.
-4. **Route and Trace** — placeholder fields for route, confidence, SAFE-OUT
+4. **Dry-Run Preview** — a display-only read of what a future dry-run would
+   prepare or require, derived only from the local artifact status and provider
+   gate below. It runs no dry-run and enables none (see below).
+5. **Route and Trace** — placeholder fields for route, confidence, SAFE-OUT
    state, expert/team, shortlist, and diagnostics. They read "not run yet"; the
    console does not invent route output or imply a solve ran.
-5. **Provider and Cost Gate** — the configured provider and mode label, that the
+6. **Provider and Cost Gate** — the configured provider and mode label, that the
    console does not call providers, emergency-stop and live-preview surface
    state, API key **presence** only (`present` / `missing`), and a display-only
    Live Execution Gate that reports whether live execution is blocked, the
    blockers, and cap completeness (see below). No raw or partial key values are
    shown.
-6. **Preflight and Capture Entry** — the local workflows (anchor-preflight,
+7. **Preflight and Capture Entry** — the local workflows (anchor-preflight,
    lift-preflight, init capture, validate capture, export evidence packet) with
    command snippets and a docs pointer. These run from a terminal, not from the
    console.
-7. **Evidence and Receipt** — placeholders for a future receipt id, export
+8. **Evidence and Receipt** — placeholders for a future receipt id, export
    digest, and validation status, plus local artifact status and a read-only
    artifact freshness / sequence-coherence subsection (see below).
 
@@ -273,6 +276,118 @@ estimation.
 Environment presence is not credential validity: a key reported `present` may
 still be invalid, and the console does not check. A cap reported `present` is a
 configured limit only, not proof of billing behavior.
+
+## Dry-Run Preview panel
+
+Lane: `UI-ALPHA-OPERATOR-CONSOLE-DRY-RUN-PREVIEW-001`
+
+The Run Setup card lists `dry-run` as an available mode, but it does not explain
+what dry-run readiness means or what a dry-run would need. The **Dry-Run Preview**
+card answers that one cockpit question: what would a future dry-run prepare, and
+what is missing before a separate dry-run execution lane could be considered? It is
+**display-only**. It runs no dry-run and enables none: `preview_mode` is always
+`display_only` and `dry_run_execution` is always `not_enabled`. Every value is
+derived from the local artifact status and provider gate described above; nothing
+here executes, submits, mutates, or generates output.
+
+### What the panel reports
+
+- `preview_mode` / `dry_run_execution` — always `display_only` and `not_enabled`.
+- `would_use` — safe names of the existing local metadata a dry-run would read
+  (`local_capture_summary`, `local_artifact_status`, `artifact_freshness_metadata`,
+  `provider_cost_gate_status`). These are surface names only, not contents.
+- `input_source_status` — the local capture's readiness as an input source:
+  `capture_missing`, `capture_invalid`, `capture_structurally_valid`, or
+  `capture_export_ready`, mapped from the existing capture summary.
+- `evidence_packet_status` — the existing evidence-packet state (`missing`,
+  `invalid_json`, `invalid_structure`, `digest_valid`, `digest_invalid`,
+  `digest_unverifiable`).
+- `preflight_status` — whether the anchor and lift preflight reports are
+  `*_present`, `*_missing`, or `*_invalid`, as local metadata only.
+- `freshness_warnings` — safe labels drawn only from the existing
+  `local_artifacts.freshness.sequence_coherence` (for example
+  `evidence_packet_older_than_capture`, `anchor_preflight_older_than_capture`,
+  `lift_preflight_older_than_capture`, `packet_id_mismatch`, `counts_mismatch`,
+  `digest_invalid`, `digest_unverifiable`).
+- `provider_gate_summary` — the existing gate's `live_execution_gate` (always
+  `blocked`), `provider_key_status`, `cap_completeness`, and
+  `live_execution_blockers`.
+- `preview_readiness` — `unavailable`, `needs_artifacts`, or `preview_ready`.
+- `preview_blockers` — safe labels naming what is missing before a future dry-run
+  lane (for example `missing_capture`, `invalid_capture`,
+  `missing_evidence_packet`, `invalid_or_unverified_evidence_packet`,
+  `stale_derived_artifacts`, `missing_preflight_reports`,
+  `provider_live_execution_blocked`, `display_only_lane`).
+
+### What preview readiness means
+
+Preview readiness is local metadata completeness only: whether the panel has enough
+local metadata to explain the operator's next step. `preview_ready` requires that
+local capture is structurally valid or export-ready, the evidence packet's own
+digest is valid, both preflight reports are present, and no stale-or-mismatched
+freshness warnings apply. If capture is missing or a prerequisite is absent the
+panel reports `needs_artifacts` and still renders; if capture cannot be read it
+reports `unavailable` and still renders.
+
+A preview-ready state does not claim answer quality, route readiness, provider
+readiness, production readiness, validation, benchmark evidence, billing accuracy,
+or superiority, and it does not authorize execution. It is not a readiness claim
+about the product.
+
+### Input source status
+
+`input_source_status` reflects only the local capture file already summarized by
+the artifact status card. `capture_structurally_valid` and `capture_export_ready`
+expose local counts that the artifact summary already surfaces; they never expose
+raw prompts or raw outputs. `capture_missing` and `capture_invalid` mean the local
+capture is absent or cannot be read; the panel says so and does not invent input.
+
+### Evidence packet digest status is self-integrity only
+
+`digest_valid` means the evidence packet's recorded digest matches its own body. It
+is packet self-integrity only. It is not freshness, not answer quality, and not a
+readiness or validation claim, and it does not prove the packet reflects the latest
+capture file. `digest_invalid` and `digest_unverifiable` are surfaced as safe
+warnings and blockers, never as failure claims about answer quality.
+
+### Freshness warnings are local metadata only
+
+Freshness warnings come only from local filesystem modified-time metadata and the
+existing sequence-coherence flags. They are hints, not guarantees: copied or
+restored files can carry misleading modified times. A stale warning is not a
+failure claim and does not validate or invalidate any answer; it just flags that a
+derived file's timestamp appears older than capture on disk.
+
+### Provider gate summary blocks live execution
+
+The provider gate summary reuses the existing display-only gate. `live_execution_gate`
+is always `blocked` and `provider_live_execution_blocked` is always a preview
+blocker. Provider/live execution stays blocked regardless of preview readiness: a
+`preview_ready` panel does not authorize live execution, and complete provider or
+cap configuration does not authorize it either. The summary validates no credential
+and contacts no provider.
+
+### Dry-Run Preview boundaries
+
+The following boundary statements appear in the panel:
+
+- Dry-run preview is display-only.
+- This console does not execute a solve from this panel.
+- This console does not call /v1/solve.
+- This console does not call providers, models, MCP, browser automation, network,
+  CLI, or subprocesses.
+- This console does not create, edit, delete, upload, save, or mutate artifacts.
+- This console does not generate route, confidence, SAFE-OUT, expert trace,
+  shortlist, diagnostics, answer text, model output, provider result, billing
+  result, benchmark result, or readiness result.
+- Preview readiness is local metadata completeness only.
+- A preview-ready state is not answer-quality, validation, production, provider
+  readiness, benchmark evidence, billing accuracy, or superiority evidence.
+- A future dry-run execution lane must be separately authorized.
+
+A preview-ready panel is not a readiness, validation, benchmark, production, or
+superiority claim. This lane does not enable dry-run execution; that remains a
+separate future lane that must be separately authorized.
 
 ## Secret handling
 
