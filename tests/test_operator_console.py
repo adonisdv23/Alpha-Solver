@@ -14,6 +14,7 @@ They mirror the wiring/auth style of ``tests/ui/test_expert_preview_real_app.py`
 from __future__ import annotations
 
 import html
+import json
 import sys
 from pathlib import Path
 
@@ -25,7 +26,9 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from alpha.webapp import operator_console_artifacts as artifacts  # noqa: E402
 from alpha.webapp.routes import auth, operator_console  # noqa: E402
+from alpha.eval import operator_run_capture as capture_lib  # noqa: E402
 from service.app import app, _mount_dashboard  # noqa: E402
 
 PAGE_ROUTE = operator_console.ROUTE
@@ -308,3 +311,358 @@ def test_console_module_does_not_import_provider_clients() -> None:
     source = Path(operator_console.__file__).read_text(encoding="utf-8")
     for forbidden in ("ProviderClient", "OpenAIProviderClient", "httpx", "requests."):
         assert forbidden not in source
+
+
+# ---------------------------------------------------------------------------
+# Local artifact status (AOC-B002-LOCAL-ARTIFACT-STATUS-001)
+# ---------------------------------------------------------------------------
+# Recognizable raw content that must never surface in HTML or JSON.
+RAW_PROMPT = "RAW-PROMPT-must-not-render-zzz"
+RAW_BASELINE = "RAW-BASELINE-must-not-render-zzz"
+RAW_ROUTED = "RAW-ROUTED-must-not-render-zzz"
+RAW_ROUTE_META = "RAW-ROUTE-META-must-not-render-zzz"
+
+
+def _valid_capture() -> dict:
+    """A structurally valid, export-ready capture with recognizable raw fields."""
+
+    packet = {
+        "packet_id": "ORC-TEST-001",
+        "cases": [
+            {"task_id": "t1", "prompt": RAW_PROMPT},
+            {"task_id": "t2", "prompt": RAW_PROMPT},
+        ],
+    }
+    capture = capture_lib.scaffold_capture(packet)
+    capture["cases"][0].update(
+        {
+            "validation_status": "captured",
+            "baseline_output": RAW_BASELINE,
+            "routed_output": RAW_ROUTED,
+            "route_metadata": {"route": RAW_ROUTE_META},
+        }
+    )
+    capture["cases"][1].update(
+        {
+            "validation_status": "excluded",
+            "baseline_output": "",
+            "routed_output": "",
+            "route_metadata": {},
+            "exclusion_reason": "low headroom",
+        }
+    )
+    return capture
+
+
+def _write(tmp_path: Path, name: str, obj) -> None:
+    (tmp_path / name).write_text(json.dumps(obj), encoding="utf-8")
+
+
+def _use_root(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(artifacts, "resolve_artifact_root", lambda: tmp_path)
+
+
+def test_no_local_artifacts_status_and_render(client: TestClient) -> None:
+    _login(client)
+    payload = client.get(STATUS_ROUTE).json()
+    local = payload["local_artifacts"]
+
+    assert local["detected"] is False
+    assert local["no_artifacts_message"] == artifacts.NO_ARTIFACTS_TEXT
+    for section in ("capture", "evidence_packet", "anchor_preflight", "lift_preflight"):
+        assert local[section]["state"] == "missing"
+
+    html_text = client.get(PAGE_ROUTE).text
+    assert artifacts.NO_ARTIFACTS_TEXT in html_text
+
+
+def test_artifact_boundary_texts_present(client: TestClient) -> None:
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    payload_text = json.dumps(client.get(STATUS_ROUTE).json())
+    for text in artifacts.BOUNDARY_TEXTS:
+        assert text in html_text
+        assert text in payload_text
+
+
+def test_valid_capture_summary(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _write(tmp_path, "capture.json", _valid_capture())
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+
+    payload = client.get(STATUS_ROUTE).json()
+    cap = payload["local_artifacts"]["capture"]
+    assert cap["state"] in {"structurally_valid", "export_ready"}
+    assert cap["schema_version"] == capture_lib.CAPTURE_SCHEMA_VERSION
+    assert cap["packet_id"] == "ORC-TEST-001"
+    assert cap["counts"] == {
+        "total": 2,
+        "captured": 1,
+        "excluded": 1,
+        "pending": 0,
+    }
+    assert cap["route_metadata_present_count"] == 1
+
+    html_text = client.get(PAGE_ROUTE).text
+    body = json.dumps(payload)
+    for raw in (RAW_PROMPT, RAW_BASELINE, RAW_ROUTED, RAW_ROUTE_META):
+        assert raw not in html_text
+        assert raw not in body
+
+
+def test_invalid_json_capture_fails_safe(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    (tmp_path / "capture.json").write_text("{ not valid json", encoding="utf-8")
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+
+    response = client.get(STATUS_ROUTE)
+    assert response.status_code == 200
+    assert response.json()["local_artifacts"]["capture"]["state"] == "invalid_json"
+    assert client.get(PAGE_ROUTE).status_code == 200
+
+
+def test_invalid_structure_capture_fails_safe(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _write(tmp_path, "capture.json", {"schema_version": "wrong", "cases": "nope"})
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+
+    response = client.get(STATUS_ROUTE)
+    assert response.status_code == 200
+    assert (
+        response.json()["local_artifacts"]["capture"]["state"] == "invalid_structure"
+    )
+    assert client.get(PAGE_ROUTE).status_code == 200
+
+
+def test_valid_evidence_packet_digest_valid(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    packet = capture_lib.build_evidence_packet(_valid_capture())
+    _write(tmp_path, "evidence_packet.json", packet)
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+
+    payload = client.get(STATUS_ROUTE).json()
+    pkt = payload["local_artifacts"]["evidence_packet"]
+    assert pkt["state"] == "digest_valid"
+    assert pkt["packet_id"] == "ORC-TEST-001"
+    assert pkt["schema_version"] == capture_lib.PACKET_SCHEMA_VERSION
+    assert pkt["content_digest"].startswith("sha256:")
+    assert pkt["counts"]["total"] == 2
+
+    # digest (a hash, not raw content) is shown; raw case content is not.
+    html_text = client.get(PAGE_ROUTE).text
+    assert pkt["content_digest"] in html_text
+    for raw in (RAW_PROMPT, RAW_BASELINE, RAW_ROUTED, RAW_ROUTE_META):
+        assert raw not in html_text
+        assert raw not in json.dumps(payload)
+
+
+def test_bad_evidence_packet_digest_fails_safe(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    packet = capture_lib.build_evidence_packet(_valid_capture())
+    packet["packet_id"] = "tampered-after-digest"  # digest no longer matches body
+    _write(tmp_path, "evidence_packet.json", packet)
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+
+    response = client.get(STATUS_ROUTE)
+    assert response.status_code == 200
+    assert (
+        response.json()["local_artifacts"]["evidence_packet"]["state"]
+        == "digest_invalid"
+    )
+
+
+def test_evidence_packet_missing_digest_unverifiable(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    packet = capture_lib.build_evidence_packet(_valid_capture())
+    del packet["content_digest"]
+    _write(tmp_path, "evidence_packet.json", packet)
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+
+    payload = client.get(STATUS_ROUTE).json()
+    assert (
+        payload["local_artifacts"]["evidence_packet"]["state"] == "digest_unverifiable"
+    )
+
+
+def test_preflight_report_summaries(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    anchor_report = {
+        "schema_version": capture_lib.ANCHOR_PREFLIGHT_REPORT_SCHEMA_VERSION,
+        "packet_id": "ORC-TEST-001",
+        "boundary": "structural only",
+        "summary": {
+            "counts": {
+                "anchor_bearing": 1,
+                "anchor_free": 0,
+                "invalid_case": 1,
+                "total": 2,
+            },
+            "needs_attention": ["t2"],
+        },
+        # A raw prompt buried in case detail must never surface.
+        "cases": [{"task_id": "t1", "state": "anchor_bearing", "prompt": RAW_PROMPT}],
+    }
+    lift_report = {
+        "schema_version": capture_lib.LIFT_PREFLIGHT_REPORT_SCHEMA_VERSION,
+        "packet_id": "ORC-TEST-001",
+        "boundary": "structural only",
+        "summary": {
+            "counts": {"structural_pass": 1, "total": 1},
+            "needs_attention": [],
+        },
+        "cases": [{"task_id": "t1", "state": "structural_pass", "routed": RAW_ROUTED}],
+    }
+    _write(tmp_path, "anchor_preflight_report.json", anchor_report)
+    _write(tmp_path, "lift_preflight_report.json", lift_report)
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+
+    payload = client.get(STATUS_ROUTE).json()
+    anchor = payload["local_artifacts"]["anchor_preflight"]
+    lift = payload["local_artifacts"]["lift_preflight"]
+
+    assert anchor["state"] == "present"
+    assert anchor["needs_attention_count"] == 1
+    assert anchor["state_counts"]["invalid_case"] == 1
+    assert lift["state"] == "present"
+    assert lift["needs_attention_count"] == 0
+
+    # Preflight presence is not a quality/readiness signal, and raw case detail
+    # never surfaces.
+    html_text = client.get(PAGE_ROUTE).text
+    body = json.dumps(payload)
+    for raw in (RAW_PROMPT, RAW_ROUTED):
+        assert raw not in html_text
+        assert raw not in body
+
+
+def test_path_override_outside_root_rejected(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv(artifacts.ARTIFACT_ROOT_ENV, "/etc")
+    assert artifacts.resolve_artifact_root() == artifacts.DEFAULT_ARTIFACT_ROOT
+
+
+def test_path_override_traversal_rejected(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv(artifacts.ARTIFACT_ROOT_ENV, "../../../../../etc")
+    assert artifacts.resolve_artifact_root() == artifacts.DEFAULT_ARTIFACT_ROOT
+
+
+def test_path_override_inside_repo_honored(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv(artifacts.ARTIFACT_ROOT_ENV, "local/oc_test_subdir")
+    resolved = artifacts.resolve_artifact_root()
+    repo_root = Path(artifacts.__file__).resolve().parents[2]
+    assert resolved == (repo_root / "local" / "oc_test_subdir").resolve()
+    assert str(resolved).startswith(str(repo_root.resolve()))
+
+
+def test_no_secret_leak_with_artifacts_present(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", FAKE_SECRET)
+    capture = _valid_capture()
+    _write(tmp_path, "capture.json", capture)
+    _write(tmp_path, "evidence_packet.json", capture_lib.build_evidence_packet(capture))
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+
+    assert FAKE_SECRET not in client.get(PAGE_ROUTE).text
+    assert FAKE_SECRET not in client.get(STATUS_ROUTE).text
+
+
+def test_no_provider_call_with_artifacts_present(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    import alpha.providers.openai as openai_provider
+
+    def _boom(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("provider client must not be used by operator console")
+
+    monkeypatch.setattr(openai_provider.OpenAIProviderClient, "__init__", _boom)
+    monkeypatch.setattr(openai_provider.OpenAIProviderClient, "execute", _boom)
+    _write(tmp_path, "capture.json", _valid_capture())
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+
+    assert client.get(PAGE_ROUTE).status_code == 200
+    assert client.get(STATUS_ROUTE).status_code == 200
+
+
+def test_artifacts_module_does_not_import_provider_clients() -> None:
+    source = Path(artifacts.__file__).read_text(encoding="utf-8")
+    for forbidden in ("ProviderClient", "OpenAIProviderClient", "httpx", "requests."):
+        assert forbidden not in source
+
+
+# Recognizable raw text smuggled into a content_digest field must never render.
+RAW_DIGEST_LEAK = "RAW-DIGEST-LEAK-must-not-render-zzz"
+
+
+def test_malformed_content_digest_never_leaks_raw_content(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """A corrupted content_digest carrying raw text is withheld and fails safe."""
+
+    packet = capture_lib.build_evidence_packet(_valid_capture())
+    # Corrupt the digest to smuggle raw prompt/output-like text.
+    packet["content_digest"] = "sha256:" + RAW_DIGEST_LEAK + " " + RAW_PROMPT
+    _write(tmp_path, "evidence_packet.json", packet)
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+
+    payload = client.get(STATUS_ROUTE).json()
+    pkt = payload["local_artifacts"]["evidence_packet"]
+
+    # Malformed digest -> safe non-leaking state, value not returned.
+    assert pkt["state"] == "invalid_structure"
+    assert pkt.get("content_digest") is None
+
+    html_text = client.get(PAGE_ROUTE).text
+    body = json.dumps(payload)
+    for raw in (RAW_DIGEST_LEAK, RAW_PROMPT, RAW_BASELINE, RAW_ROUTED):
+        assert raw not in html_text
+        assert raw not in body
+
+
+def test_wellformed_digest_value_is_still_exposed(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """A valid sha256:<64 hex> digest is still surfaced (regression guard)."""
+
+    packet = capture_lib.build_evidence_packet(_valid_capture())
+    _write(tmp_path, "evidence_packet.json", packet)
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+
+    pkt = client.get(STATUS_ROUTE).json()["local_artifacts"]["evidence_packet"]
+    assert pkt["state"] == "digest_valid"
+    assert pkt["content_digest"] == packet["content_digest"]
+    assert pkt["content_digest"] in client.get(PAGE_ROUTE).text
+
+
+def test_invalid_utf8_artifact_fails_safe(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Undecodable artifact bytes report invalid_json and never 500."""
+
+    (tmp_path / "capture.json").write_bytes(b"\xff\xfe\x00\x80 not utf-8 \xff")
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+
+    response = client.get(STATUS_ROUTE)
+    assert response.status_code == 200
+    assert response.json()["local_artifacts"]["capture"]["state"] == "invalid_json"
+    assert client.get(PAGE_ROUTE).status_code == 200

@@ -58,7 +58,56 @@ return 404. When mounted, an unauthenticated `GET` redirects to `/login`.
    command snippets and a docs pointer. These run from a terminal, not from the
    console.
 7. **Evidence and Receipt** — placeholders for a future receipt id, export
-   digest, and validation status.
+   digest, and validation status, plus local artifact status (see below).
+
+## Local artifact status
+
+The console reads a narrow, fixed local directory and shows compact status for
+local operator artifacts. It is read-only: it never creates, modifies, deletes,
+or writes any artifact, and it never runs a workflow.
+
+### Artifact root and path policy
+
+- Fixed root: `local/operator_console/` under the repository root (kept
+  untracked via `.gitignore`).
+- Optional override env `ALPHA_OPERATOR_CONSOLE_ARTIFACT_ROOT` is honored only
+  when it resolves to a path **inside** the repository root. Path-traversal and
+  outside-root values are rejected and the fixed default is used.
+- The console never reads a path from query parameters, form data, request
+  bodies, cookies, or headers.
+- If the directory does not exist, the console renders normally and shows
+  "No local operator artifacts detected."
+
+### Files and states
+
+Inside the root, these optional files are summarized:
+
+- `capture.json` — `missing` / `invalid_json` / `invalid_structure` /
+  `structurally_valid` / `export_ready`, with schema version, packet id, and
+  total/captured/excluded/pending counts plus a route-metadata presence count.
+- `evidence_packet.json` — `missing` / `invalid_json` / `invalid_structure` /
+  `digest_valid` / `digest_invalid` / `digest_unverifiable`, with schema
+  version, packet id, content digest, and counts. Digest verification reuses
+  `operator_run_capture.verify_packet_digest`.
+- `anchor_preflight_report.json` and `lift_preflight_report.json` — `missing` /
+  `invalid_json` / `invalid_structure` / `present`, with a needs-attention count
+  and state counts.
+
+### What is not shown
+
+Only counts, states, schema versions, ids, and the content digest (a hash) are
+surfaced. Raw prompts, baseline outputs, routed outputs, raw route metadata,
+system prompts, and provider payloads are **not** displayed by default. The
+following boundary statements appear in both the page and the status JSON:
+
+- Local artifacts are structural support artifacts only.
+- This console does not execute providers, models, /v1/solve, MCP, tools,
+  browser automation, or CLI commands.
+- No raw prompts or raw outputs are displayed by default.
+- No answer-quality, benchmark, readiness, production, validation, or
+  superiority claim is made.
+
+A preflight report being present is not a quality or readiness signal.
 
 ## Secret handling
 
