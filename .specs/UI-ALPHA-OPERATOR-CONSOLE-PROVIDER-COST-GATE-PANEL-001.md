@@ -39,8 +39,18 @@ execution path.
   - Pure helpers derive everything from environment *presence* and truthiness
     only: `_cap_status`, `_cap_completeness`, `_cost_cap_status`,
     `_token_request_cap_status`, `_provider_mode_label`,
+    `_required_key_envs_for_provider`, `_provider_key_status`,
     `_live_execution_blockers`, and `_build_provider_gate`. No secret value is
     read, no credential is validated, and no provider is contacted.
+  - The `missing_provider_key` blocker is derived from the **configured
+    provider's** required key, not from any known key, mirroring the categorical
+    provider-key mapping in `scripts/check_env.py` (`openai` →
+    `OPENAI_API_KEY`, `anthropic` → `ANTHROPIC_API_KEY`, `google` / `gemini` →
+    `GOOGLE_API_KEY`, `local` / `none` → no key). `local_llm` is never satisfied
+    by a hosted-provider key: it reports `provider_key_status: not_evaluated` and
+    adds a `local_llm_configuration_not_evaluated` blocker. `GOOGLE_API_KEY` is
+    included in `key_status`, and `required_provider_keys` /
+    `provider_key_status` are surfaced on the payload.
   - The card keeps the disabled live-run button, adds a compact "Live Execution
     Gate" subsection (gate result, cap completeness, cost cap, token/request
     caps), a blockers list, per-cap presence rows, key presence rows, and the

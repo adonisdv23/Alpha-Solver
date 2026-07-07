@@ -1133,6 +1133,8 @@ _GATE_ENVS = (
     "ALPHA_PROVIDER_MAX_REQUESTS",
     "OPENAI_API_KEY",
     "ANTHROPIC_API_KEY",
+    "GOOGLE_API_KEY",
+    "GEMINI_API_KEY",
 )
 
 
@@ -1157,6 +1159,8 @@ def test_provider_gate_includes_expanded_fields(client: TestClient) -> None:
         "emergency_stop",
         "live_preview_surface",
         "key_status",
+        "required_provider_keys",
+        "provider_key_status",
         "cap_status",
         "cap_completeness",
         "cost_cap_status",
@@ -1218,28 +1222,34 @@ def test_emergency_stop_appears_as_blocker(
     assert "emergency_stop_engaged" in gate["live_execution_blockers"]
 
 
-# 6. Missing provider key appears as a safe blocker without displaying a value.
+# 6. Missing provider key for the configured provider appears as a safe blocker
+#    without displaying any value.
 def test_missing_provider_key_blocker(
     client: TestClient, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     _clear_gate_env(monkeypatch)
+    # Configured provider requires a key that is absent.
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
     _login(client)
     gate = _gate(client)
+    assert gate["provider_key_status"] == "missing"
     assert "missing_provider_key" in gate["live_execution_blockers"]
     assert gate["key_status"]["OPENAI_API_KEY"] == "missing"
-    assert gate["key_status"]["ANTHROPIC_API_KEY"] == "missing"
 
 
-# 7. Present provider key reports present only, never raw or partial value.
+# 7. Present provider key for the configured provider reports present only,
+#    never a raw or partial value.
 def test_present_provider_key_categorical_only(
     client: TestClient, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     _clear_gate_env(monkeypatch)
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
     monkeypatch.setenv("OPENAI_API_KEY", FAKE_SECRET)
     _login(client)
     status_text = client.get(STATUS_ROUTE).text
     gate = _gate(client)
     assert gate["key_status"]["OPENAI_API_KEY"] == "present"
+    assert gate["provider_key_status"] == "present"
     assert "missing_provider_key" not in gate["live_execution_blockers"]
     assert FAKE_SECRET not in status_text
     # Not even a partial (prefix or suffix) of the key value is surfaced.
@@ -1459,3 +1469,162 @@ def test_artifact_surfaces_persist_with_gate_panel(client: TestClient) -> None:
     assert "status_generated_at_utc" in local
     for section in ("capture", "evidence_packet", "anchor_preflight", "lift_preflight"):
         assert section in local
+
+
+# ---------------------------------------------------------------------------
+# Provider-specific required-key gating (Codex P2 regression).
+# The missing_provider_key blocker must be derived from the *configured
+# provider's* required key, not from any known key. Mirrors the categorical
+# provider-key mapping in scripts/check_env.py without reading or validating a
+# key value.
+# ---------------------------------------------------------------------------
+def _gate_for_provider(
+    client: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
+    provider: str,
+    present_keys: tuple = (),
+) -> dict:
+    _clear_gate_env(monkeypatch)
+    monkeypatch.setenv("MODEL_PROVIDER", provider)
+    for env in present_keys:
+        monkeypatch.setenv(env, FAKE_SECRET)
+    _login(client)
+    return _gate(client)
+
+
+# 1. anthropic + only OPENAI_API_KEY present still blocks with missing_provider_key.
+def test_anthropic_with_only_openai_key_still_missing_provider_key(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    gate = _gate_for_provider(
+        client, monkeypatch, "anthropic", present_keys=("OPENAI_API_KEY",)
+    )
+    assert gate["configured_provider"] == "anthropic"
+    assert gate["required_provider_keys"] == ["ANTHROPIC_API_KEY"]
+    assert gate["provider_key_status"] == "missing"
+    assert "missing_provider_key" in gate["live_execution_blockers"]
+    assert gate["live_execution_gate"] == "blocked"
+
+
+# 2. anthropic + ANTHROPIC_API_KEY present removes missing_provider_key.
+def test_anthropic_with_anthropic_key_removes_missing_provider_key(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    gate = _gate_for_provider(
+        client, monkeypatch, "anthropic", present_keys=("ANTHROPIC_API_KEY",)
+    )
+    assert gate["provider_key_status"] == "present"
+    assert "missing_provider_key" not in gate["live_execution_blockers"]
+    assert gate["live_execution_gate"] == "blocked"
+
+
+# 3. openai + OPENAI_API_KEY present removes missing_provider_key.
+def test_openai_with_openai_key_removes_missing_provider_key(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    gate = _gate_for_provider(
+        client, monkeypatch, "openai", present_keys=("OPENAI_API_KEY",)
+    )
+    assert gate["required_provider_keys"] == ["OPENAI_API_KEY"]
+    assert gate["provider_key_status"] == "present"
+    assert "missing_provider_key" not in gate["live_execution_blockers"]
+
+
+# 4. google + GOOGLE_API_KEY present removes missing_provider_key.
+def test_google_with_google_key_removes_missing_provider_key(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    gate = _gate_for_provider(
+        client, monkeypatch, "google", present_keys=("GOOGLE_API_KEY",)
+    )
+    assert gate["required_provider_keys"] == ["GOOGLE_API_KEY"]
+    assert gate["provider_key_status"] == "present"
+    assert "missing_provider_key" not in gate["live_execution_blockers"]
+
+
+# 5. gemini + GOOGLE_API_KEY present removes missing_provider_key.
+def test_gemini_with_google_key_removes_missing_provider_key(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    gate = _gate_for_provider(
+        client, monkeypatch, "gemini", present_keys=("GOOGLE_API_KEY",)
+    )
+    assert gate["required_provider_keys"] == ["GOOGLE_API_KEY"]
+    assert gate["provider_key_status"] == "present"
+    assert "missing_provider_key" not in gate["live_execution_blockers"]
+
+
+# 6. local requires no provider key.
+def test_local_provider_requires_no_key(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    gate = _gate_for_provider(client, monkeypatch, "local")
+    assert gate["required_provider_keys"] == []
+    assert gate["provider_key_status"] == "not_required"
+    assert "missing_provider_key" not in gate["live_execution_blockers"]
+    assert gate["live_execution_gate"] == "blocked"
+
+
+# 7. none requires no provider key.
+def test_none_provider_requires_no_key(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    gate = _gate_for_provider(client, monkeypatch, "none")
+    assert gate["required_provider_keys"] == []
+    assert gate["provider_key_status"] == "not_required"
+    assert "missing_provider_key" not in gate["live_execution_blockers"]
+    assert gate["live_execution_gate"] == "blocked"
+
+
+# 8. local_llm is not satisfied by any hosted-provider key; stays blocked.
+def test_local_llm_not_satisfied_by_hosted_keys(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    gate = _gate_for_provider(
+        client,
+        monkeypatch,
+        "local_llm",
+        present_keys=(
+            "OPENAI_API_KEY",
+            "ANTHROPIC_API_KEY",
+            "GOOGLE_API_KEY",
+            "GEMINI_API_KEY",
+        ),
+    )
+    assert gate["provider_key_status"] == "not_evaluated"
+    # Hosted-provider keys do not satisfy local_llm.
+    assert "missing_provider_key" not in gate["live_execution_blockers"]
+    assert "local_llm_configuration_not_evaluated" in gate["live_execution_blockers"]
+    assert gate["live_execution_gate"] == "blocked"
+
+
+# 9. Raw key values never appear in HTML, JSON, or reprs under provider gating.
+def test_provider_gating_never_leaks_key_values(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _clear_gate_env(monkeypatch)
+    monkeypatch.setenv("MODEL_PROVIDER", "google")
+    monkeypatch.setenv("GOOGLE_API_KEY", FAKE_SECRET)
+    monkeypatch.setenv("OPENAI_API_KEY", FAKE_SECRET)
+    _login(client)
+    assert FAKE_SECRET not in client.get(PAGE_ROUTE).text
+    assert FAKE_SECRET not in client.get(STATUS_ROUTE).text
+    assert FAKE_SECRET not in repr(operator_console.build_console_status())
+
+
+# 10. Provider clients patched to raise still allow both routes with gating.
+def test_provider_gating_does_not_call_provider_clients(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import alpha.providers.openai as openai_provider
+
+    def _boom(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("provider client must not be used by operator console")
+
+    monkeypatch.setattr(openai_provider.OpenAIProviderClient, "__init__", _boom)
+    monkeypatch.setattr(openai_provider.OpenAIProviderClient, "execute", _boom)
+    _clear_gate_env(monkeypatch)
+    monkeypatch.setenv("MODEL_PROVIDER", "anthropic")
+    _login(client)
+    assert client.get(PAGE_ROUTE).status_code == 200
+    assert client.get(STATUS_ROUTE).status_code == 200

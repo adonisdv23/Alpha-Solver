@@ -212,7 +212,17 @@ authorizes live execution.
   `ALPHA_PROVIDER_EMERGENCY_STOP`).
 - `live_preview_surface` — `enabled` / `disabled` (from
   `ALPHA_LIVE_PREVIEW_ENABLED`).
-- `key_status` — per credential env, `present` / `missing` only.
+- `key_status` — per credential env (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`,
+  `GOOGLE_API_KEY`), `present` / `missing` only.
+- `required_provider_keys` — the credential env var name(s) the **configured
+  provider** would require (names only, never values).
+- `provider_key_status` — the categorical status of that specific requirement:
+  `not_required` (`local` / `none`), `not_evaluated` (`local_llm`, whose local
+  runtime configuration this display-only gate does not assess), `present` (all
+  required keys present), or `missing` (a required key is absent). This mirrors
+  the provider-key mapping in `scripts/check_env.py` categorically: `openai`
+  requires `OPENAI_API_KEY`, `anthropic` requires `ANTHROPIC_API_KEY`, and
+  `google` / `gemini` require `GOOGLE_API_KEY`.
 
 ### Live Execution Gate (display-only)
 
@@ -222,7 +232,10 @@ authorizes live execution.
   blocked. `display_only_lane` and `live_provider_calls_disabled` are always
   present. The rest describe what a future, separately authorized live-provider
   lane would still need in place: `emergency_stop_engaged`,
-  `missing_provider_key`, `missing_cost_cap`, `missing_token_or_request_cap`,
+  `missing_provider_key` (derived from the **configured provider's** required
+  key, not from any key), `local_llm_configuration_not_evaluated` (for
+  `local_llm`, which is never satisfied by a hosted-provider key),
+  `missing_cost_cap`, `missing_token_or_request_cap`,
   `live_preview_surface_disabled`.
 - `gate_boundary` — `display-only; no provider call or credential validation
   performed`.

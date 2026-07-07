@@ -25,7 +25,7 @@ from __future__ import annotations
 import html
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Mapping
+from typing import Any, Dict, List, Mapping, Tuple
 
 from fastapi import APIRouter
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -137,8 +137,26 @@ _TOKEN_REQUEST_CAP_ENVS = (
     "ALPHA_PROVIDER_MAX_REQUESTS",
 )
 # Provider credential env var names surfaced as present/missing only. The names
-# are shown; the values never are.
-_KEY_ENVS = ("OPENAI_API_KEY", "ANTHROPIC_API_KEY")
+# are shown; the values never are. GOOGLE_API_KEY is included so google/gemini
+# provider gating can reason about its required key categorically.
+_KEY_ENVS = ("OPENAI_API_KEY", "ANTHROPIC_API_KEY", "GOOGLE_API_KEY")
+
+# Provider -> required credential env var(s), mirroring the categorical
+# provider-key requirements in ``scripts/check_env.py``
+# (``_required_keys_for_provider`` + ``_NO_KEY_PROVIDERS``). This is a small,
+# display-only copy: it reasons about env *presence* categories only, never reads
+# or validates a key value, and is intentionally not imported from that CLI
+# script to avoid coupling the console route to CLI code. ``local`` and ``none``
+# require no key; ``local_llm`` is handled separately below (it must never be
+# satisfied by a hosted-provider key).
+_NO_KEY_PROVIDERS = frozenset({"local", "none"})
+_LOCAL_LLM_PROVIDER = "local_llm"
+_PROVIDER_REQUIRED_KEYS = {
+    "openai": ("OPENAI_API_KEY",),
+    "anthropic": ("ANTHROPIC_API_KEY",),
+    "gemini": ("GOOGLE_API_KEY",),
+    "google": ("GOOGLE_API_KEY",),
+}
 
 _TRUTHY = {"1", "true", "yes", "on"}
 
@@ -222,10 +240,46 @@ def _provider_mode_label(provider: str) -> str:
     return f"{provider} (live provider execution not enabled from this console)"
 
 
+def _required_key_envs_for_provider(provider: str) -> Tuple[str, ...]:
+    """Return the credential env var(s) the configured provider would require.
+
+    Mirrors ``scripts/check_env.py`` categorically (presence only). ``local`` and
+    ``none`` need no key; ``local_llm`` is handled separately (it must not be
+    satisfied by any hosted-provider key). Unknown providers declare no required
+    key here — live execution stays blocked by the always-on blockers regardless.
+    """
+
+    return _PROVIDER_REQUIRED_KEYS.get(provider, ())
+
+
+def _provider_key_status(provider: str, key_status: Mapping[str, str]) -> str:
+    """Categorical status of the *configured provider's* required key(s).
+
+    Returns ``not_required`` (local/none), ``not_evaluated`` (local_llm, whose
+    local runtime configuration this display-only gate does not assess),
+    ``present`` (all required keys present), or ``missing`` (a required key is
+    absent). Reasoning is over ``key_status`` presence categories only; no key
+    value is read or validated.
+    """
+
+    if provider == _LOCAL_LLM_PROVIDER:
+        return "not_evaluated"
+    if provider in _NO_KEY_PROVIDERS:
+        return "not_required"
+    required = _required_key_envs_for_provider(provider)
+    if not required:
+        # Unknown provider: no known required key here. Live execution stays
+        # blocked by the always-on blockers regardless.
+        return "not_required"
+    if all(key_status.get(env) == "present" for env in required):
+        return "present"
+    return "missing"
+
+
 def _live_execution_blockers(
     *,
     emergency_stop_engaged: bool,
-    any_key_present: bool,
+    provider_key_status: str,
     cost_cap_status: str,
     token_request_cap_status: str,
     live_preview_enabled: bool,
@@ -235,14 +289,20 @@ def _live_execution_blockers(
     ``display_only_lane`` and ``live_provider_calls_disabled`` are always
     present: this console is display-only and never enables live calls,
     regardless of configuration. The remaining labels describe what a future,
-    separately authorized live-provider lane would still need in place. No
-    credential is validated and no provider is contacted to derive these.
+    separately authorized live-provider lane would still need in place. The
+    provider-key blocker is derived from the *configured provider's* required
+    key, not from any key. No credential is validated and no provider is
+    contacted to derive these.
     """
 
     blockers = ["display_only_lane", "live_provider_calls_disabled"]
     if emergency_stop_engaged:
         blockers.append("emergency_stop_engaged")
-    if not any_key_present:
+    if provider_key_status == "not_evaluated":
+        # local_llm: keep the gate blocked with a specific, safe label rather
+        # than treating any hosted-provider key as satisfying it.
+        blockers.append("local_llm_configuration_not_evaluated")
+    elif provider_key_status == "missing":
         blockers.append("missing_provider_key")
     if cost_cap_status != "present":
         blockers.append("missing_cost_cap")
@@ -265,12 +325,12 @@ def _build_provider_gate(provider: str) -> Dict[str, Any]:
     emergency_stop_engaged = _truthy_env(_EMERGENCY_STOP_ENV)
     live_preview_enabled = _truthy_env(_LIVE_PREVIEW_ENV)
     key_status = {name: _key_presence(name) for name in _KEY_ENVS}
-    any_key_present = any(state == "present" for state in key_status.values())
+    provider_key_status = _provider_key_status(provider, key_status)
     cost_cap_status = _cost_cap_status()
     token_request_cap_status = _token_request_cap_status()
     blockers = _live_execution_blockers(
         emergency_stop_engaged=emergency_stop_engaged,
-        any_key_present=any_key_present,
+        provider_key_status=provider_key_status,
         cost_cap_status=cost_cap_status,
         token_request_cap_status=token_request_cap_status,
         live_preview_enabled=live_preview_enabled,
@@ -284,6 +344,10 @@ def _build_provider_gate(provider: str) -> Dict[str, Any]:
         "emergency_stop": "engaged" if emergency_stop_engaged else "not engaged",
         "live_preview_surface": "enabled" if live_preview_enabled else "disabled",
         "key_status": key_status,
+        # Required key(s) for the configured provider (env var names only) and the
+        # categorical status of that specific requirement.
+        "required_provider_keys": list(_required_key_envs_for_provider(provider)),
+        "provider_key_status": provider_key_status,
         # ``cost_caps`` retains the prior categorical summary for compatibility.
         "cost_caps": _cost_caps_status(),
         "cap_status": _cap_status(),
@@ -717,6 +781,7 @@ def _render_page(status: Mapping[str, Any]) -> str:
           <h3 class="subhead">Live Execution Gate (display-only)</h3>
           {_kv_rows({
               "gate result": gate["live_execution_gate"],
+              "provider key (configured provider)": gate["provider_key_status"],
               "cap completeness": gate["cap_completeness"],
               "cost cap": gate["cost_cap_status"],
               "token/request caps": gate["token_request_cap_status"],
