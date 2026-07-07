@@ -5,14 +5,15 @@ Subcommands:
   init            Scaffold a capture file from an operator-authored case packet.
   validate        Check a capture file (add --for-export for export completeness).
   export          Validate and write the normalized evidence packet.
-  lift-preflight  Read-only Substantive Lift structural preflight over a capture.
+  lift-preflight    Read-only Substantive Lift structural preflight over a capture.
+  anchor-preflight  Authoring-time anchor-presence preflight over a case packet.
 
 This CLI reads and writes local JSON files only. It performs no provider,
 hosted-model, or local-model calls, no tool execution, and no network access,
-and it does not score, blind, or unblind outputs. The lift-preflight
-subcommand is a structural wording preflight only: it never mutates the
-capture, and a pass is not answer quality, benchmark validation, readiness,
-or Alpha superiority.
+and it does not score, blind, or unblind outputs. The lift-preflight and
+anchor-preflight subcommands are structural preflights only: they never mutate
+their input, and a pass is not answer quality, benchmark validation,
+readiness, or Alpha superiority.
 """
 from __future__ import annotations
 
@@ -119,6 +120,26 @@ def cmd_lift_preflight(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def cmd_anchor_preflight(args: argparse.Namespace) -> int:
+    case_packet = _read_json(Path(args.case_packet), "case packet")
+    try:
+        report = orc.anchor_preflight_case_packet(
+            case_packet, require_anchors=args.require_anchors
+        )
+    except ValueError as exc:
+        print(f"FAIL {exc}")
+        return EXIT_VALIDATION
+    print(orc.render_anchor_preflight_text(report))
+    if args.report_out:
+        _write_bytes(
+            Path(args.report_out), orc.render_json_bytes(report), args.force
+        )
+        print(f"OK wrote anchor preflight report -> {args.report_out}")
+    if report["summary"]["needs_attention"]:
+        return EXIT_VALIDATION
+    return EXIT_OK
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="operator_run_capture",
@@ -159,6 +180,29 @@ def build_parser() -> argparse.ArgumentParser:
     )
     preflight_parser.add_argument("--force", action="store_true")
     preflight_parser.set_defaults(func=cmd_lift_preflight)
+
+    anchor_parser = sub.add_parser(
+        "anchor-preflight",
+        help=(
+            "authoring-time structural anchor-presence preflight over a case "
+            "packet's prompts (not a quality, benchmark, readiness, or "
+            "superiority check; anchor-free is informational)"
+        ),
+    )
+    anchor_parser.add_argument("--case-packet", required=True)
+    anchor_parser.add_argument(
+        "--report-out",
+        help="optional path for a local JSON anchor-preflight report "
+        "(separate from the capture and export packet)",
+    )
+    anchor_parser.add_argument(
+        "--require-anchors",
+        action="store_true",
+        help="opt-in stricter gate: list anchor-free prompts as needing "
+        "attention (exit 1) instead of informational",
+    )
+    anchor_parser.add_argument("--force", action="store_true")
+    anchor_parser.set_defaults(func=cmd_anchor_preflight)
     return parser
 
 

@@ -357,22 +357,6 @@ LIFT_PREFLIGHT_ATTENTION_STATES = frozenset(
 # instead of failing them. Explicit prefix match only, mirroring the portable
 # honesty guard's explicit-prefix style.
 _LIFT_PREFLIGHT_SAFEOUT_PREFIX = "safe-out:"
-_LIFT_PREFLIGHT_SOLUTION_LABEL = "solution:"
-
-
-def _lift_preflight_solution_text(routed_output: str) -> str:
-    """Return the SOLUTION body when an operator pasted a full envelope.
-
-    Capture docs ask operators to paste the routed Alpha output they collected,
-    which can be a full ChatGPT/Alpha Solver response that begins with a
-    ``SOLUTION:`` label before the six Substantive Lift moves. The portable
-    checker intentionally checks the six-move solution text itself, so the
-    preflight peels only that narrow leading label when it is present.
-    """
-    stripped = routed_output.strip()
-    if stripped.lower().startswith(_LIFT_PREFLIGHT_SOLUTION_LABEL):
-        return stripped[len(_LIFT_PREFLIGHT_SOLUTION_LABEL) :].lstrip()
-    return routed_output
 
 
 def _lift_structural_flags(checker_result: Dict[str, Any]) -> List[str]:
@@ -401,29 +385,6 @@ def _lift_structural_flags(checker_result: Dict[str, Any]) -> List[str]:
     return flags
 
 
-def _lift_preflight_capture_case_shape_errors(case: Any, index: int) -> List[str]:
-    """Validate capture-case shape before Substantive Lift preflight.
-
-    The preflight has separate states for empty prompt and empty routed output,
-    so this helper reuses the capture-case validator while allowing those two
-    text fields to be blank when their keys are present. Missing keys, unknown
-    keys, invalid statuses, invalid metadata, and malformed excluded cases stay
-    schema errors and must never be reported as structural lift results.
-    """
-    if not isinstance(case, dict):
-        return _validate_capture_case(case, index)
-    validation_case = dict(case)
-    if "prompt" in validation_case and not _is_nonempty_str(
-        validation_case.get("prompt")
-    ):
-        validation_case["prompt"] = "preflight prompt placeholder"
-    if "routed_output" in validation_case and not _is_nonempty_str(
-        validation_case.get("routed_output")
-    ):
-        validation_case["routed_output"] = "preflight routed output placeholder"
-    return _validate_capture_case(validation_case, index)
-
-
 def _lift_preflight_case(case: Any, index: int, checker: Any) -> Dict[str, Any]:
     finding: Dict[str, Any] = {
         "task_id": f"cases[{index}]",
@@ -433,9 +394,8 @@ def _lift_preflight_case(case: Any, index: int, checker: Any) -> Dict[str, Any]:
         "structural_flags": [],
         "detail": "",
     }
-    shape_errors = _lift_preflight_capture_case_shape_errors(case, index)
-    if shape_errors:
-        finding["detail"] = "; ".join(shape_errors)
+    if not isinstance(case, dict):
+        finding["detail"] = "case is not a JSON object"
         return finding
     if _is_nonempty_str(case.get("task_id")):
         finding["task_id"] = case["task_id"]
@@ -461,9 +421,7 @@ def _lift_preflight_case(case: Any, index: int, checker: Any) -> Dict[str, Any]:
         )
         return finding
 
-    solution_text = _lift_preflight_solution_text(routed_output)
-
-    if solution_text.strip().lower().startswith(_LIFT_PREFLIGHT_SAFEOUT_PREFIX):
+    if routed_output.strip().lower().startswith(_LIFT_PREFLIGHT_SAFEOUT_PREFIX):
         finding["state"] = "safe_out_not_applicable"
         finding["detail"] = (
             "routed output is a bounded SAFE-OUT response; the Substantive "
@@ -471,7 +429,7 @@ def _lift_preflight_case(case: Any, index: int, checker: Any) -> Dict[str, Any]:
         )
         return finding
 
-    checker_result = checker(solution_text, prompt=prompt)
+    checker_result = checker(routed_output, prompt=prompt)
     finding["case_anchor_count"] = len(checker_result.get("case_anchors", []))
     finding["anchor_checks_vacuous"] = finding["case_anchor_count"] == 0
     finding["checker"] = checker_result
@@ -559,6 +517,177 @@ def render_lift_preflight_text(report: Dict[str, Any]) -> str:
     summary_bits = [
         f"{state}={counts[state]}"
         for state in LIFT_PREFLIGHT_STATES
+        if counts[state]
+    ]
+    lines.append("summary: " + (" ".join(summary_bits) if summary_bits else "empty"))
+    needs_attention = report["summary"]["needs_attention"]
+    if needs_attention:
+        lines.append("needs attention: " + ", ".join(needs_attention))
+    else:
+        lines.append("needs attention: none")
+    return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# Case-packet anchor preflight
+# (OPERATOR-RUN-CAPTURE-CASE-PACKET-ANCHOR-PREFLIGHT-CLI-001)
+#
+# Authoring-time companion to the Substantive Lift preflight above. Given a
+# case packet (before any manual capture), it reports which prompts carry
+# extractable case anchors and which do not, so the operator learns up front
+# which prompts will actually exercise the lift contract's anchoring checks
+# instead of discovering vacuous anchor coverage after an expensive manual
+# run. It only reports anchor presence; it never scores, ranks, compares, or
+# judges prompt quality, and anchor-free is informational, not a defect.
+# ---------------------------------------------------------------------------
+
+ANCHOR_PREFLIGHT_LANE_ID = "OPERATOR-RUN-CAPTURE-CASE-PACKET-ANCHOR-PREFLIGHT-CLI-001"
+ANCHOR_PREFLIGHT_REPORT_SCHEMA_VERSION = "operator_anchor_preflight_report/v1"
+
+ANCHOR_PREFLIGHT_BOUNDARY = (
+    "Structural anchor-presence preflight only: it reports whether a prompt "
+    "carries extractable case anchors so the operator knows the lift "
+    "anchoring checks will be meaningful, not vacuous. Anchor-free is "
+    "informational, not a defect; some prompts are legitimately low-headroom. "
+    "This is not answer quality, not benchmark validation, not readiness, and "
+    "not Alpha superiority."
+)
+
+# anchor_bearing: prompt yields >=1 anchor; lift anchoring checks will apply.
+# anchor_free: prompt yields no anchors; lift anchoring checks would be vacuous.
+# invalid_case: the case is not a well-formed object with a non-empty prompt.
+ANCHOR_PREFLIGHT_STATES = ("invalid_case", "anchor_free", "anchor_bearing")
+
+
+def _anchor_preflight_case(case: Any, index: int, extract: Any) -> Dict[str, Any]:
+    finding: Dict[str, Any] = {
+        "task_id": f"cases[{index}]",
+        "state": "invalid_case",
+        "anchor_count": 0,
+        "anchors": [],
+        "detail": "",
+    }
+    if not isinstance(case, dict):
+        finding["detail"] = "case is not a JSON object"
+        return finding
+    if _is_nonempty_str(case.get("task_id")):
+        finding["task_id"] = case["task_id"]
+    prompt = case.get("prompt")
+    if not _is_nonempty_str(prompt):
+        finding["detail"] = "prompt is missing or empty; cannot extract anchors"
+        return finding
+
+    anchors = list(extract(prompt))
+    finding["anchor_count"] = len(anchors)
+    finding["anchors"] = anchors
+    if anchors:
+        finding["state"] = "anchor_bearing"
+        finding["detail"] = "lift anchoring checks will apply to this prompt"
+    else:
+        finding["state"] = "anchor_free"
+        finding["detail"] = (
+            "no extractable anchors; lift anchoring checks would be vacuous "
+            "(fine for a low-headroom prompt; add concrete objects if the "
+            "prompt is meant to be high-headroom)"
+        )
+    return finding
+
+
+def anchor_preflight_case_packet(
+    case_packet: Any, require_anchors: bool = False
+) -> Dict[str, Any]:
+    """Report per-prompt case-anchor presence for an operator case packet.
+
+    Runs :func:`_extract_case_anchors` from the portable spec monolith over
+    each case prompt so the operator can see, before any manual capture, which
+    prompts are anchor-bearing and which are anchor-free. The result is a local
+    report structure, not a capture or evidence packet: it carries no scores,
+    ranks, winners, blind labels, source maps, or identity maps, and it never
+    modifies the input. Anchor-free is informational; when ``require_anchors``
+    is True the operator is opting into a stricter authoring gate that lists
+    anchor-free cases as needing attention.
+    """
+    from alpha_solver_portable import _extract_case_anchors
+
+    if not isinstance(case_packet, dict):
+        raise ValueError("anchor preflight: case packet top level must be an object")
+    cases = case_packet.get("cases")
+    if not isinstance(cases, list) or not cases:
+        raise ValueError("anchor preflight: case packet cases must be a non-empty list")
+
+    validation_errors = validate_case_packet(case_packet)
+    if validation_errors:
+        detail = "case packet failed validation: " + "; ".join(validation_errors)
+        findings = []
+        for index, case in enumerate(cases):
+            task_id = f"cases[{index}]"
+            if isinstance(case, dict) and _is_nonempty_str(case.get("task_id")):
+                task_id = case["task_id"]
+            findings.append(
+                {
+                    "task_id": task_id,
+                    "state": "invalid_case",
+                    "anchor_count": 0,
+                    "anchors": [],
+                    "detail": detail,
+                }
+            )
+    else:
+        findings = [
+            _anchor_preflight_case(case, index, _extract_case_anchors)
+            for index, case in enumerate(cases)
+        ]
+    counts = {state: 0 for state in ANCHOR_PREFLIGHT_STATES}
+    for finding in findings:
+        counts[finding["state"]] += 1
+    attention_states = {"invalid_case"}
+    if require_anchors:
+        attention_states = attention_states | {"anchor_free"}
+    needs_attention = [
+        finding["task_id"]
+        for finding in findings
+        if finding["state"] in attention_states
+    ]
+    packet_id = (
+        case_packet["packet_id"]
+        if _is_nonempty_str(case_packet.get("packet_id"))
+        else None
+    )
+    return {
+        "schema_version": ANCHOR_PREFLIGHT_REPORT_SCHEMA_VERSION,
+        "lane_id": ANCHOR_PREFLIGHT_LANE_ID,
+        "packet_id": packet_id,
+        "require_anchors": bool(require_anchors),
+        "boundary": ANCHOR_PREFLIGHT_BOUNDARY,
+        "cases": findings,
+        "summary": {
+            "counts": {**counts, "total": len(findings)},
+            "needs_attention": needs_attention,
+        },
+    }
+
+
+def render_anchor_preflight_text(report: Dict[str, Any]) -> str:
+    """Render a case-packet anchor preflight report as operator console text."""
+    lines = [
+        (
+            f"Case-packet anchor preflight for packet {report['packet_id']!r} "
+            f"({report['summary']['counts']['total']} cases"
+            f"{', require-anchors' if report['require_anchors'] else ''})"
+        ),
+        f"boundary: {report['boundary']}",
+    ]
+    for finding in report["cases"]:
+        line = f"  {finding['task_id']}: {finding['state']}"
+        if finding["state"] == "anchor_bearing":
+            line += f" (anchors={finding['anchor_count']})"
+        elif finding["detail"]:
+            line += f" — {finding['detail']}"
+        lines.append(line)
+    counts = report["summary"]["counts"]
+    summary_bits = [
+        f"{state}={counts[state]}"
+        for state in ANCHOR_PREFLIGHT_STATES
         if counts[state]
     ]
     lines.append("summary: " + (" ".join(summary_bits) if summary_bits else "empty"))

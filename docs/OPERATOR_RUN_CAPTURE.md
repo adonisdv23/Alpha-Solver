@@ -95,11 +95,8 @@ python scripts/operator_run_capture.py lift-preflight \
 ```
 
 The command loads the capture, and for every case that has both a prompt and
-a routed output it runs the local checker over the solution body and prints one
-state per case. If the pasted routed output begins with a full-response
-`SOLUTION:` label, the preflight strips that leading label before checking so
-operators may paste the collected routed output rather than hand-editing it
-down to only the six-line body.
+a routed output it runs `check_substantive_lift(routed_output, prompt=prompt)`
+and prints one state per case:
 
 - `structural_pass` / `structural_fail` — the configured structural wording
   checks held or did not hold for the supplied routed output and prompt. When
@@ -123,6 +120,44 @@ as answer quality, benchmark validation, readiness, or Alpha superiority; a
 `structural_pass` means only that the configured local structural checks held
 for the supplied text and prompt. Comparative interpretation of baseline
 versus routed outputs remains out of scope for this harness.
+
+### Checking prompt anchors before you capture
+
+The lift preflight above runs on routed outputs, so it can only run after the
+operator has already done the manual ghost-chat work. To catch anchoring
+problems at authoring time — before spending a manual run — run the anchor
+preflight over the case packet itself:
+
+```bash
+python scripts/operator_run_capture.py anchor-preflight \
+  --case-packet tests/fixtures/operator_run_capture/pr646_substantive_lift_case_packet.json
+```
+
+For each case it reports one state:
+
+- `anchor_bearing` — the prompt carries extractable case anchors (files, PR or
+  issue numbers, lane IDs, backticked spans, identifier tokens), so the lift
+  contract's anchoring checks will be meaningful for that prompt.
+- `anchor_free` — the prompt has no extractable anchors, so the lift anchoring
+  checks would be vacuous. This is **informational, not a defect**: a
+  low-headroom prompt is legitimately anchor-free. If the prompt is meant to be
+  high-headroom, add the concrete objects it should force the answer to engage.
+- `invalid_case` — the case is malformed or has an empty prompt.
+
+By default the command exits 0 for a well-formed packet (anchor-free cases are
+reported but not treated as errors), and exits 1 only when a case is
+malformed. Pass `--require-anchors` to opt into a stricter authoring gate that
+also lists anchor-free prompts as needing attention (exit 1) — useful when a
+packet is intended to be entirely high-headroom. The optional `--report-out`
+writes a local JSON report; like the lift-preflight report it is not a capture
+file, not an evidence packet, not an input to `export`, and carries no score,
+rank, winner, blind-label, source-map, or identity-map fields. The command
+never modifies the case packet.
+
+This is a structural anchor-presence check only. Reporting a prompt as
+`anchor_bearing` says nothing about answer quality, benchmark validation,
+readiness, or Alpha superiority; it means only that the prompt contains the
+kind of concrete objects the lift anchoring checks look for.
 
 ## Packet contents
 

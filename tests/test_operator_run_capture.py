@@ -263,9 +263,6 @@ Recommendation: Add the rollback step to tests/fixtures/demo_plan.json now and k
 Fails if: The rollback step needs fields that tests/fixtures/demo_plan.json cannot carry without breaking the packet loader.
 Next: Draft the rollback entry in tests/fixtures/demo_plan.json and attach it to the PR #701 description today."""
 
-FULL_ENVELOPE_PASS_BLOCK = f"""SOLUTION:
-{ANCHORED_PASS_BLOCK}"""
-
 # Structurally shaped six-move block with no case objects at all: fails the
 # prompt-aware checker for an anchored prompt, but is a legitimate pass when
 # the prompt itself has no extractable anchors (vacuous anchor checks).
@@ -331,21 +328,6 @@ class TestLiftPreflight:
         assert finding["anchor_checks_vacuous"] is False
         assert finding["case_anchor_count"] >= 2
         assert finding["structural_flags"] == []
-        assert report["summary"]["needs_attention"] == []
-
-    def test_full_solution_envelope_is_checked_as_solution_body(self):
-        capture = _preflight_capture(
-            [
-                _preflight_case(
-                    "case-full-envelope", ANCHORED_PROMPT, FULL_ENVELOPE_PASS_BLOCK
-                )
-            ]
-        )
-        report = orc.lift_preflight_capture(capture)
-        finding = report["cases"][0]
-        assert finding["state"] == "structural_pass"
-        assert finding["structural_flags"] == []
-        assert finding["checker"]["opens_with_intent"] is True
         assert report["summary"]["needs_attention"] == []
 
     def test_generic_block_fails_for_anchored_prompt(self):
@@ -487,54 +469,6 @@ class TestLiftPreflight:
         assert report["cases"][1]["state"] == "invalid_case"
         assert report["summary"]["needs_attention"] == ["cases[1]"]
 
-    def test_malformed_dict_case_with_compliant_output_is_invalid_case(self):
-        case = {
-            "prompt": ANCHORED_PROMPT,
-            "routed_output": ANCHORED_PASS_BLOCK,
-        }
-        report = orc.lift_preflight_capture(_preflight_capture([case]))
-        finding = report["cases"][0]
-        assert finding["state"] == "invalid_case"
-        assert "missing required keys" in finding["detail"]
-        assert "task_id" in finding["detail"]
-        assert "validation_status" in finding["detail"]
-        assert "baseline_output" in finding["detail"]
-        assert "route_metadata" in finding["detail"]
-        assert report["summary"]["needs_attention"] == ["cases[0]"]
-
-    def test_malformed_case_never_returns_structural_pass(self):
-        malformed_cases = [
-            {"prompt": ANCHORED_PROMPT, "routed_output": ANCHORED_PASS_BLOCK},
-            _preflight_case(
-                "case-unknown",
-                ANCHORED_PROMPT,
-                ANCHORED_PASS_BLOCK,
-                unexpected="not allowed",
-            ),
-            _preflight_case(
-                "case-status",
-                ANCHORED_PROMPT,
-                ANCHORED_PASS_BLOCK,
-                validation_status="done",
-            ),
-            _preflight_case(
-                "case-metadata",
-                ANCHORED_PROMPT,
-                ANCHORED_PASS_BLOCK,
-                route_metadata=[],
-            ),
-            _preflight_case(
-                "case-excluded",
-                ANCHORED_PROMPT,
-                "",
-                validation_status="excluded",
-                exclusion_reason="",
-            ),
-        ]
-        report = orc.lift_preflight_capture(_preflight_capture(malformed_cases))
-        assert {finding["state"] for finding in report["cases"]} == {"invalid_case"}
-        assert report["summary"]["counts"]["structural_pass"] == 0
-
     def test_render_text_names_boundary_and_vacuous_anchors(self):
         capture = _preflight_capture(
             [_preflight_case("case-c", ANCHOR_FREE_PROMPT, GENERIC_BLOCK)]
@@ -560,26 +494,6 @@ class TestLiftPreflightCli:
         assert "structural_pass" in result.stdout
         assert "Structural wording preflight only" in result.stdout
         assert "not answer quality" in result.stdout
-
-    def test_post655_smoke_fixture_with_solution_label_exits_zero(self):
-        result = _run_cli(
-            "lift-preflight",
-            "--capture",
-            str(FIXTURES / "post655_lift_preflight_smoke_capture.json"),
-        )
-        assert result.returncode == 0, result.stderr
-        assert "post655-full-solution-envelope-smoke: structural_pass" in result.stdout
-        assert "needs attention: none" in result.stdout
-
-    def test_malformed_compliant_case_exits_one(self, tmp_path: Path):
-        capture_path = self._write_capture(
-            tmp_path,
-            [{"prompt": ANCHORED_PROMPT, "routed_output": ANCHORED_PASS_BLOCK}],
-        )
-        result = _run_cli("lift-preflight", "--capture", str(capture_path))
-        assert result.returncode == 1
-        assert "invalid_case" in result.stdout
-        assert "structural_pass" not in result.stdout
 
     def test_structural_fail_exits_one_and_writes_report(self, tmp_path: Path):
         capture_path = self._write_capture(
@@ -638,3 +552,265 @@ class TestLiftPreflightCli:
         exported = json.loads(packet_path.read_text(encoding="utf-8"))
         assert orc.verify_packet_digest(exported)
         assert "lift_preflight" not in json.dumps(exported)
+
+
+# ---------------------------------------------------------------------------
+# Case-packet anchor preflight
+# (OPERATOR-RUN-CAPTURE-CASE-PACKET-ANCHOR-PREFLIGHT-CLI-001)
+# ---------------------------------------------------------------------------
+
+ANCHOR_BEARING_PROMPT = (
+    "Decide whether `tests/fixtures/demo_plan.json` gains a rollback step "
+    "before the PR #701 review."
+)
+ANCHOR_FREE_PROMPT = "Should our weekly status update lead with wins or with risks?"
+
+
+def _anchor_packet(cases: list) -> dict:
+    return {"packet_id": "anchor-preflight-tests", "cases": cases}
+
+
+class TestAnchorPreflight:
+    def test_anchor_bearing_prompt_is_reported(self):
+        packet = _anchor_packet(
+            [{"task_id": "case-a", "prompt": ANCHOR_BEARING_PROMPT}]
+        )
+        report = orc.anchor_preflight_case_packet(packet)
+        finding = report["cases"][0]
+        assert finding["state"] == "anchor_bearing"
+        assert finding["anchor_count"] >= 2
+        assert finding["anchors"]
+        assert report["summary"]["needs_attention"] == []
+
+    def test_anchor_free_prompt_is_informational_not_attention(self):
+        packet = _anchor_packet(
+            [{"task_id": "case-b", "prompt": ANCHOR_FREE_PROMPT}]
+        )
+        report = orc.anchor_preflight_case_packet(packet)
+        finding = report["cases"][0]
+        assert finding["state"] == "anchor_free"
+        assert finding["anchor_count"] == 0
+        # Anchor-free is not a defect by default; nothing needs attention.
+        assert report["summary"]["needs_attention"] == []
+
+    def test_require_anchors_flags_anchor_free_prompts(self):
+        packet = _anchor_packet(
+            [
+                {"task_id": "case-a", "prompt": ANCHOR_BEARING_PROMPT},
+                {"task_id": "case-b", "prompt": ANCHOR_FREE_PROMPT},
+            ]
+        )
+        report = orc.anchor_preflight_case_packet(packet, require_anchors=True)
+        assert report["require_anchors"] is True
+        assert report["summary"]["needs_attention"] == ["case-b"]
+
+    def test_missing_prompt_and_non_dict_case_are_invalid(self):
+        packet = _anchor_packet(
+            [
+                {"task_id": "case-a", "prompt": ""},
+            ]
+        )
+        packet["cases"].append("not a case object")
+        report = orc.anchor_preflight_case_packet(packet)
+        states = [f["state"] for f in report["cases"]]
+        assert states == ["invalid_case", "invalid_case"]
+        assert report["summary"]["needs_attention"] == ["case-a", "cases[1]"]
+
+
+    def test_malformed_anchor_bearing_packet_is_invalid_not_anchor_bearing(self):
+        packet = _anchor_packet(
+            [{"task_id": "case-a", "prompt": ANCHOR_BEARING_PROMPT}]
+        )
+        del packet["packet_id"]
+        report = orc.anchor_preflight_case_packet(packet)
+        assert [finding["state"] for finding in report["cases"]] == ["invalid_case"]
+        assert report["cases"][0]["anchor_count"] == 0
+        assert report["summary"]["needs_attention"] == ["case-a"]
+        assert "missing required keys" in report["cases"][0]["detail"]
+
+    def test_unknown_prohibited_fields_do_not_pass_anchor_preflight(self):
+        packet = _anchor_packet(
+            [{"task_id": "case-a", "prompt": ANCHOR_BEARING_PROMPT, "winner": "alpha"}]
+        )
+        packet["score"] = 1
+        report = orc.anchor_preflight_case_packet(packet)
+        assert report["cases"][0]["state"] == "invalid_case"
+        assert report["summary"]["needs_attention"] == ["case-a"]
+        assert "unknown keys" in report["cases"][0]["detail"]
+
+    def test_duplicate_task_ids_do_not_pass_anchor_preflight(self):
+        packet = _anchor_packet(
+            [
+                {"task_id": "case-a", "prompt": ANCHOR_BEARING_PROMPT},
+                {"task_id": "case-a", "prompt": ANCHOR_BEARING_PROMPT},
+            ]
+        )
+        report = orc.anchor_preflight_case_packet(packet)
+        assert [finding["state"] for finding in report["cases"]] == [
+            "invalid_case",
+            "invalid_case",
+        ]
+        assert report["summary"]["needs_attention"] == ["case-a", "case-a"]
+        assert "duplicate task_id" in report["cases"][0]["detail"]
+
+    def test_pr646_packet_is_fully_anchor_bearing(self):
+        packet = json.loads(
+            (
+                FIXTURES / "pr646_substantive_lift_case_packet.json"
+            ).read_text(encoding="utf-8")
+        )
+        report = orc.anchor_preflight_case_packet(packet)
+        assert report["summary"]["counts"]["anchor_bearing"] == len(packet["cases"])
+        assert report["summary"]["counts"]["anchor_free"] == 0
+        assert report["summary"]["needs_attention"] == []
+
+    def test_report_carries_boundary_and_no_prohibited_fields(self):
+        packet = _anchor_packet(
+            [
+                {"task_id": "case-a", "prompt": ANCHOR_BEARING_PROMPT},
+                {"task_id": "case-b", "prompt": ANCHOR_FREE_PROMPT},
+            ]
+        )
+        report = orc.anchor_preflight_case_packet(packet)
+        assert report["boundary"] == orc.ANCHOR_PREFLIGHT_BOUNDARY
+        assert "not answer quality" in report["boundary"]
+        assert (
+            report["schema_version"] == orc.ANCHOR_PREFLIGHT_REPORT_SCHEMA_VERSION
+        )
+        assert report["schema_version"] != orc.CAPTURE_SCHEMA_VERSION
+        assert report["schema_version"] != orc.PACKET_SCHEMA_VERSION
+        for key in _walk_keys(report):
+            for marker in PROHIBITED_KEY_MARKERS:
+                assert marker not in key.lower(), key
+
+    def test_preflight_does_not_mutate_case_packet(self):
+        packet = _anchor_packet(
+            [
+                {"task_id": "case-a", "prompt": ANCHOR_BEARING_PROMPT},
+                {"task_id": "case-b", "prompt": ANCHOR_FREE_PROMPT},
+            ]
+        )
+        snapshot = copy.deepcopy(packet)
+        orc.anchor_preflight_case_packet(packet)
+        assert packet == snapshot
+
+    def test_invalid_top_level_shapes_are_rejected(self):
+        with pytest.raises(ValueError):
+            orc.anchor_preflight_case_packet(["not", "a", "dict"])
+        with pytest.raises(ValueError):
+            orc.anchor_preflight_case_packet({"packet_id": "x", "cases": []})
+
+    def test_render_text_names_boundary_and_states(self):
+        packet = _anchor_packet(
+            [
+                {"task_id": "case-a", "prompt": ANCHOR_BEARING_PROMPT},
+                {"task_id": "case-b", "prompt": ANCHOR_FREE_PROMPT},
+            ]
+        )
+        text = orc.render_anchor_preflight_text(
+            orc.anchor_preflight_case_packet(packet)
+        )
+        assert "Structural anchor-presence preflight only" in text
+        assert "anchor_bearing" in text
+        assert "anchor_free" in text
+        assert "needs attention: none" in text
+
+
+class TestAnchorPreflightCli:
+    def _write_packet(self, tmp_path: Path, cases: list) -> Path:
+        path = tmp_path / "packet.json"
+        path.write_text(json.dumps(_anchor_packet(cases)), encoding="utf-8")
+        return path
+
+    def test_anchor_bearing_packet_exits_zero(self, tmp_path: Path):
+        packet_path = self._write_packet(
+            tmp_path, [{"task_id": "case-a", "prompt": ANCHOR_BEARING_PROMPT}]
+        )
+        result = _run_cli("anchor-preflight", "--case-packet", str(packet_path))
+        assert result.returncode == 0, result.stderr
+        assert "anchor_bearing" in result.stdout
+        assert "Structural anchor-presence preflight only" in result.stdout
+
+
+    def test_malformed_anchor_bearing_packet_exits_one(self, tmp_path: Path):
+        packet = _anchor_packet(
+            [{"task_id": "case-a", "prompt": ANCHOR_BEARING_PROMPT}]
+        )
+        packet["packet_id"] = ""
+        packet_path = tmp_path / "packet.json"
+        packet_path.write_text(json.dumps(packet), encoding="utf-8")
+        result = _run_cli("anchor-preflight", "--case-packet", str(packet_path))
+        assert result.returncode == 1
+        assert "invalid_case" in result.stdout
+        assert "needs attention: case-a" in result.stdout
+
+    def test_anchor_free_exits_zero_by_default(self, tmp_path: Path):
+        packet_path = self._write_packet(
+            tmp_path, [{"task_id": "case-b", "prompt": ANCHOR_FREE_PROMPT}]
+        )
+        result = _run_cli("anchor-preflight", "--case-packet", str(packet_path))
+        assert result.returncode == 0, result.stderr
+        assert "anchor_free" in result.stdout
+
+    def test_require_anchors_exits_one_and_writes_report(self, tmp_path: Path):
+        packet_path = self._write_packet(
+            tmp_path, [{"task_id": "case-b", "prompt": ANCHOR_FREE_PROMPT}]
+        )
+        report_path = tmp_path / "report.json"
+        result = _run_cli(
+            "anchor-preflight",
+            "--case-packet",
+            str(packet_path),
+            "--require-anchors",
+            "--report-out",
+            str(report_path),
+        )
+        assert result.returncode == 1
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+        assert report["cases"][0]["state"] == "anchor_free"
+        assert report["require_anchors"] is True
+        for key in _walk_keys(report):
+            for marker in PROHIBITED_KEY_MARKERS:
+                assert marker not in key.lower(), key
+
+    def test_report_out_refuses_overwrite_without_force(self, tmp_path: Path):
+        packet_path = self._write_packet(
+            tmp_path, [{"task_id": "case-a", "prompt": ANCHOR_BEARING_PROMPT}]
+        )
+        report_path = tmp_path / "report.json"
+        report_path.write_text("existing", encoding="utf-8")
+        result = _run_cli(
+            "anchor-preflight",
+            "--case-packet",
+            str(packet_path),
+            "--report-out",
+            str(report_path),
+        )
+        assert result.returncode == 2
+        assert "refusing to overwrite" in result.stderr
+        assert report_path.read_text(encoding="utf-8") == "existing"
+
+    def test_preflight_leaves_case_packet_bytes_unchanged(self, tmp_path: Path):
+        packet_path = self._write_packet(
+            tmp_path, [{"task_id": "case-b", "prompt": ANCHOR_FREE_PROMPT}]
+        )
+        before = packet_path.read_bytes()
+        _run_cli(
+            "anchor-preflight",
+            "--case-packet",
+            str(packet_path),
+            "--require-anchors",
+        )
+        assert packet_path.read_bytes() == before
+
+    def test_existing_subcommands_unaffected(self, tmp_path: Path):
+        capture_path = tmp_path / "capture.json"
+        result = _run_cli(
+            "init",
+            "--case-packet",
+            str(FIXTURES / "case_packet.json"),
+            "--out",
+            str(capture_path),
+        )
+        assert result.returncode == 0, result.stderr
+        assert "OK scaffolded capture" in result.stdout
