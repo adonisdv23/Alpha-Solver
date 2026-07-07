@@ -96,6 +96,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 | `SOLVE-SANITIZER-FALSE-POSITIVE-001.md` | SOLVE-SANITIZER-FALSE-POSITIVE-001 · Narrow Import-Substring Sanitizer Fix | ✅ `SPEC_OK` |
 | `UI-ALPHA-OPERATOR-CONSOLE-MVP-001.md` | UI-ALPHA-OPERATOR-CONSOLE-MVP-001 · Alpha Solver Operator Console Shell (MVP) | ✅ `SPEC_OK` |
 | `UI-ALPHA-OPERATOR-CONSOLE-LOCAL-ARTIFACT-STATUS-001.md` | UI-ALPHA-OPERATOR-CONSOLE-LOCAL-ARTIFACT-STATUS-001 · Operator Console Local Artifact Status | ✅ `SPEC_OK` |
+| `UI-ALPHA-OPERATOR-CONSOLE-ARTIFACT-FRESHNESS-001.md` | UI-ALPHA-OPERATOR-CONSOLE-ARTIFACT-FRESHNESS-001 · Operator Console Artifact Freshness and Sequence Coherence | ✅ `SPEC_OK` |
 | `UI-JOBS-001.md` | UI-JOBS-001 · Dashboard Job History & Metrics (RES_Dash) | ✅ `SPEC_OK` |
 | `UI-PREVIEW-001.md` | UI-PREVIEW-001 · Authenticated Expert Preview UI | ✅ `SPEC_OK` |
 | `UI-PREVIEW-LOADING-STATE-001.md` | UI-PREVIEW-LOADING-STATE-001 · Expert Preview Loading State | ✅ `SPEC_OK` |

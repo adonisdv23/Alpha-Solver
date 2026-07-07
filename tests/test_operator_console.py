@@ -15,7 +15,9 @@ from __future__ import annotations
 
 import html
 import json
+import os
 import sys
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -666,3 +668,447 @@ def test_invalid_utf8_artifact_fails_safe(
     assert response.status_code == 200
     assert response.json()["local_artifacts"]["capture"]["state"] == "invalid_json"
     assert client.get(PAGE_ROUTE).status_code == 200
+
+
+# ---------------------------------------------------------------------------
+# Artifact freshness and sequence coherence
+# (AOC-B003-ARTIFACT-FRESHNESS-001 / UI-ALPHA-OPERATOR-CONSOLE-ARTIFACT-
+# FRESHNESS-001). Timestamps are injected and mtimes are controlled so the
+# freshness labels and ordering states are deterministic.
+# ---------------------------------------------------------------------------
+FIXED_NOW = datetime(2026, 7, 7, 12, 0, 0, tzinfo=timezone.utc)
+FIXED_NOW_TS = FIXED_NOW.timestamp()
+
+
+def _set_age(path: Path, seconds_old: float) -> None:
+    """Set a file's mtime to ``FIXED_NOW`` minus ``seconds_old``."""
+
+    ts = FIXED_NOW_TS - seconds_old
+    os.utime(path, (ts, ts))
+
+
+def _status(tmp_path: Path, now: datetime = FIXED_NOW) -> dict:
+    return artifacts.build_artifact_status(root=tmp_path, now=now)
+
+
+def _anchor_report(packet_id: str = "ORC-TEST-001") -> dict:
+    return {
+        "schema_version": capture_lib.ANCHOR_PREFLIGHT_REPORT_SCHEMA_VERSION,
+        "packet_id": packet_id,
+        "boundary": "structural only",
+        "summary": {
+            "counts": {
+                "anchor_bearing": 1,
+                "anchor_free": 0,
+                "invalid_case": 1,
+                "total": 2,
+            },
+            "needs_attention": ["t2"],
+        },
+        "cases": [{"task_id": "t1", "state": "anchor_bearing", "prompt": RAW_PROMPT}],
+    }
+
+
+def _lift_report(packet_id: str = "ORC-TEST-001") -> dict:
+    return {
+        "schema_version": capture_lib.LIFT_PREFLIGHT_REPORT_SCHEMA_VERSION,
+        "packet_id": packet_id,
+        "boundary": "structural only",
+        "summary": {
+            "counts": {"structural_pass": 1, "total": 1},
+            "needs_attention": [],
+        },
+        "cases": [{"task_id": "t1", "state": "structural_pass", "routed": RAW_ROUTED}],
+    }
+
+
+def _write_all_four(tmp_path: Path) -> None:
+    capture = _valid_capture()
+    _write(tmp_path, "capture.json", capture)
+    _write(
+        tmp_path,
+        "evidence_packet.json",
+        capture_lib.build_evidence_packet(capture),
+    )
+    _write(tmp_path, "anchor_preflight_report.json", _anchor_report())
+    _write(tmp_path, "lift_preflight_report.json", _lift_report())
+
+
+# 1. Status JSON includes status_generated_at_utc.
+def test_status_json_includes_status_generated_at_utc(client: TestClient) -> None:
+    _login(client)
+    local = client.get(STATUS_ROUTE).json()["local_artifacts"]
+    generated = local["status_generated_at_utc"]
+    assert isinstance(generated, str) and generated
+    parsed = datetime.fromisoformat(generated)
+    assert parsed.tzinfo is not None
+
+
+# 2. Each of the four fixed summaries includes safe metadata when present.
+def test_freshness_metadata_present_for_all_four_files(tmp_path: Path) -> None:
+    _write_all_four(tmp_path)
+    names = {
+        "capture": "capture.json",
+        "evidence_packet": "evidence_packet.json",
+        "anchor_preflight": "anchor_preflight_report.json",
+        "lift_preflight": "lift_preflight_report.json",
+    }
+    for filename in names.values():
+        _set_age(tmp_path / filename, 10)
+
+    files = _status(tmp_path)["freshness"]["files"]
+    for key, filename in names.items():
+        meta = files[key]
+        assert meta["path_label"] == filename
+        assert meta["exists"] is True
+        assert meta["metadata_state"] == "present"
+        assert isinstance(meta["age_seconds"], int) and meta["age_seconds"] >= 0
+        assert meta["modified_at_utc"] is not None
+        assert meta["age_label"] == "just_updated"
+
+
+# 3. Missing files still return safe missing states and render normally.
+def test_freshness_missing_files_safe_and_render(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+
+    freshness = client.get(STATUS_ROUTE).json()["local_artifacts"]["freshness"]
+    for key in ("capture", "evidence_packet", "anchor_preflight", "lift_preflight"):
+        meta = freshness["files"][key]
+        assert meta["exists"] is False
+        assert meta["metadata_state"] == "missing"
+        assert meta["age_label"] == "missing"
+        assert meta["modified_at_utc"] is None
+        assert meta["age_seconds"] is None
+    for key in (
+        "evidence_packet_vs_capture",
+        "anchor_preflight_vs_capture",
+        "lift_preflight_vs_capture",
+    ):
+        assert freshness["sequence_coherence"][key]["state"] == "not_comparable"
+
+    assert client.get(PAGE_ROUTE).status_code == 200
+
+
+# 4. Invalid JSON still fails safe and does not 500 (freshness still present).
+def test_freshness_invalid_json_fails_safe(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    (tmp_path / "capture.json").write_text("{ not valid json", encoding="utf-8")
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+
+    response = client.get(STATUS_ROUTE)
+    assert response.status_code == 200
+    local = response.json()["local_artifacts"]
+    assert local["capture"]["state"] == "invalid_json"
+    # The file exists on disk, so filesystem metadata is still surfaced.
+    assert local["freshness"]["files"]["capture"]["metadata_state"] == "present"
+    assert client.get(PAGE_ROUTE).status_code == 200
+
+
+# 5. Invalid UTF-8 still fails safe and does not 500 (freshness still present).
+def test_freshness_invalid_utf8_fails_safe(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    (tmp_path / "capture.json").write_bytes(b"\xff\xfe\x00 not utf-8 \xff")
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+
+    response = client.get(STATUS_ROUTE)
+    assert response.status_code == 200
+    local = response.json()["local_artifacts"]
+    assert local["capture"]["state"] == "invalid_json"
+    assert local["freshness"]["files"]["capture"]["metadata_state"] == "present"
+    assert client.get(PAGE_ROUTE).status_code == 200
+
+
+# 6. File mtimes are surfaced only as safe metadata (ISO string + int age).
+def test_file_mtime_surfaced_only_as_safe_metadata(tmp_path: Path) -> None:
+    _write(tmp_path, "capture.json", _valid_capture())
+    _set_age(tmp_path / "capture.json", 42)
+
+    status = _status(tmp_path)
+    meta = status["freshness"]["files"]["capture"]
+    assert meta["age_seconds"] == 42
+    assert meta["path_label"] == "capture.json"
+    parsed = datetime.fromisoformat(meta["modified_at_utc"])
+    expected = FIXED_NOW - timedelta(seconds=42)
+    assert abs((parsed - expected).total_seconds()) < 1
+
+    body = json.dumps(status)
+    # No absolute path and no raw epoch float leak into the payload.
+    assert str(tmp_path) not in body
+    assert repr(FIXED_NOW_TS - 42) not in body
+
+
+# 7. Freshness labels are deterministic under injected time / controlled mtimes.
+def test_freshness_labels_are_deterministic(tmp_path: Path) -> None:
+    path = tmp_path / "capture.json"
+    _write(tmp_path, "capture.json", _valid_capture())
+
+    cases = {
+        0: "just_updated",
+        300: "just_updated",
+        301: "recent",
+        3600: "recent",
+        86_400: "recent",
+        86_401: "older",
+    }
+    for seconds_old, expected in cases.items():
+        _set_age(path, seconds_old)
+        label = _status(tmp_path)["freshness"]["files"]["capture"]["age_label"]
+        assert label == expected, (seconds_old, label)
+
+    # The pure helper is deterministic for edge/metadata states too.
+    assert artifacts.age_label(None, "missing") == "missing"
+    assert artifacts.age_label(None, "unavailable") == "unknown"
+    assert artifacts.age_label(0, "present") == "just_updated"
+
+
+# 8. evidence_packet.json older than capture.json -> older_than_capture.
+def test_evidence_packet_older_than_capture(tmp_path: Path) -> None:
+    capture = _valid_capture()
+    _write(tmp_path, "capture.json", capture)
+    _write(
+        tmp_path, "evidence_packet.json", capture_lib.build_evidence_packet(capture)
+    )
+    _set_age(tmp_path / "capture.json", 10)
+    _set_age(tmp_path / "evidence_packet.json", 3600)
+
+    seq = _status(tmp_path)["freshness"]["sequence_coherence"]
+    assert seq["evidence_packet_vs_capture"]["state"] == "older_than_capture"
+
+
+# 9. anchor_preflight_report.json older than capture.json -> older_than_capture.
+def test_anchor_preflight_older_than_capture(tmp_path: Path) -> None:
+    _write(tmp_path, "capture.json", _valid_capture())
+    _write(tmp_path, "anchor_preflight_report.json", _anchor_report())
+    _set_age(tmp_path / "capture.json", 10)
+    _set_age(tmp_path / "anchor_preflight_report.json", 3600)
+
+    seq = _status(tmp_path)["freshness"]["sequence_coherence"]
+    assert seq["anchor_preflight_vs_capture"]["state"] == "older_than_capture"
+
+
+# 10. lift_preflight_report.json older than capture.json -> older_than_capture.
+def test_lift_preflight_older_than_capture(tmp_path: Path) -> None:
+    _write(tmp_path, "capture.json", _valid_capture())
+    _write(tmp_path, "lift_preflight_report.json", _lift_report())
+    _set_age(tmp_path / "capture.json", 10)
+    _set_age(tmp_path / "lift_preflight_report.json", 3600)
+
+    seq = _status(tmp_path)["freshness"]["sequence_coherence"]
+    assert seq["lift_preflight_vs_capture"]["state"] == "older_than_capture"
+
+
+# 11. Derived same-age-or-newer than capture -> same_or_newer_than_capture.
+def test_derived_same_or_newer_than_capture(tmp_path: Path) -> None:
+    _write_all_four(tmp_path)
+    _set_age(tmp_path / "capture.json", 100)
+    for filename in (
+        "evidence_packet.json",
+        "anchor_preflight_report.json",
+        "lift_preflight_report.json",
+    ):
+        _set_age(tmp_path / filename, 10)
+
+    seq = _status(tmp_path)["freshness"]["sequence_coherence"]
+    assert seq["evidence_packet_vs_capture"]["state"] == "same_or_newer_than_capture"
+    assert seq["anchor_preflight_vs_capture"]["state"] == "same_or_newer_than_capture"
+    assert seq["lift_preflight_vs_capture"]["state"] == "same_or_newer_than_capture"
+
+
+# 12. Packet id mismatch is reported without raw artifact display.
+def test_packet_id_mismatch_reported_without_raw(tmp_path: Path) -> None:
+    _write(tmp_path, "capture.json", _valid_capture())  # packet_id ORC-TEST-001
+    other = _valid_capture()
+    other["packet_id"] = "ORC-OTHER-999"
+    _write(
+        tmp_path, "evidence_packet.json", capture_lib.build_evidence_packet(other)
+    )
+    _set_age(tmp_path / "capture.json", 10)
+    _set_age(tmp_path / "evidence_packet.json", 10)
+
+    status = _status(tmp_path)
+    seq = status["freshness"]["sequence_coherence"]["evidence_packet_vs_capture"]
+    assert "packet_id_mismatch" in seq["flags"]
+
+    body = json.dumps(status)
+    for raw in (RAW_PROMPT, RAW_BASELINE, RAW_ROUTED, RAW_ROUTE_META):
+        assert raw not in body
+
+
+# 13. Digest valid but older than capture still reports a stale sequence state.
+def test_digest_valid_but_older_than_capture_still_flags_stale(
+    tmp_path: Path,
+) -> None:
+    capture = _valid_capture()
+    _write(tmp_path, "capture.json", capture)
+    _write(
+        tmp_path, "evidence_packet.json", capture_lib.build_evidence_packet(capture)
+    )
+    _set_age(tmp_path / "capture.json", 10)
+    _set_age(tmp_path / "evidence_packet.json", 3600)
+
+    status = _status(tmp_path)
+    # Packet self-integrity is intact...
+    assert status["evidence_packet"]["state"] == "digest_valid"
+    # ...yet the packet file appears older than capture on disk.
+    seq = status["freshness"]["sequence_coherence"]["evidence_packet_vs_capture"]
+    assert seq["state"] == "older_than_capture"
+
+
+# 14. Digest invalid / unverifiable are not hidden by freshness metadata.
+def test_digest_invalid_not_hidden_by_freshness(tmp_path: Path) -> None:
+    capture = _valid_capture()
+    _write(tmp_path, "capture.json", capture)
+    packet = capture_lib.build_evidence_packet(capture)
+    packet["packet_id"] = "tampered-after-digest"  # digest no longer matches body
+    _write(tmp_path, "evidence_packet.json", packet)
+    _set_age(tmp_path / "capture.json", 10)
+    _set_age(tmp_path / "evidence_packet.json", 10)
+
+    status = _status(tmp_path)
+    assert status["evidence_packet"]["state"] == "digest_invalid"
+    seq = status["freshness"]["sequence_coherence"]["evidence_packet_vs_capture"]
+    assert "digest_invalid" in seq["flags"]
+
+
+def test_digest_unverifiable_not_hidden_by_freshness(tmp_path: Path) -> None:
+    capture = _valid_capture()
+    _write(tmp_path, "capture.json", capture)
+    packet = capture_lib.build_evidence_packet(capture)
+    del packet["content_digest"]
+    _write(tmp_path, "evidence_packet.json", packet)
+    _set_age(tmp_path / "capture.json", 10)
+    _set_age(tmp_path / "evidence_packet.json", 10)
+
+    status = _status(tmp_path)
+    assert status["evidence_packet"]["state"] == "digest_unverifiable"
+    seq = status["freshness"]["sequence_coherence"]["evidence_packet_vs_capture"]
+    assert "digest_unverifiable" in seq["flags"]
+
+
+# 15. Fake API keys never appear in HTML or JSON when freshness is rendered.
+def test_fake_secret_never_leaks_with_freshness(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", FAKE_SECRET)
+    capture = _valid_capture()
+    _write(tmp_path, "capture.json", capture)
+    _write(
+        tmp_path, "evidence_packet.json", capture_lib.build_evidence_packet(capture)
+    )
+    _set_age(tmp_path / "capture.json", 10)
+    _set_age(tmp_path / "evidence_packet.json", 20)
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+
+    assert FAKE_SECRET not in client.get(PAGE_ROUTE).text
+    assert FAKE_SECRET not in client.get(STATUS_ROUTE).text
+
+
+# 16. Raw prompt / baseline / routed / route-metadata never appear with freshness.
+def test_raw_content_never_leaks_with_freshness(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _write_all_four(tmp_path)
+    for filename in (
+        "capture.json",
+        "evidence_packet.json",
+        "anchor_preflight_report.json",
+        "lift_preflight_report.json",
+    ):
+        _set_age(tmp_path / filename, 30)
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+
+    html_text = client.get(PAGE_ROUTE).text
+    body = client.get(STATUS_ROUTE).text
+    for raw in (RAW_PROMPT, RAW_BASELINE, RAW_ROUTED, RAW_ROUTE_META):
+        assert raw not in html_text
+        assert raw not in body
+
+
+# 17. Provider client constructors patched to raise still allow both routes.
+def test_provider_client_patched_raise_routes_ok_with_freshness(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    import alpha.providers.openai as openai_provider
+
+    def _boom(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("provider client must not be used by operator console")
+
+    monkeypatch.setattr(openai_provider.OpenAIProviderClient, "__init__", _boom)
+    monkeypatch.setattr(openai_provider.OpenAIProviderClient, "execute", _boom)
+
+    capture = _valid_capture()
+    _write(tmp_path, "capture.json", capture)
+    _write(
+        tmp_path, "evidence_packet.json", capture_lib.build_evidence_packet(capture)
+    )
+    _set_age(tmp_path / "capture.json", 10)
+    _set_age(tmp_path / "evidence_packet.json", 20)
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+
+    assert client.get(PAGE_ROUTE).status_code == 200
+    assert client.get(STATUS_ROUTE).status_code == 200
+
+
+# 18. Source-scan: no provider/network/subprocess/browser/CLI execution imports.
+def test_no_execution_imports_in_console_sources() -> None:
+    forbidden = (
+        "ProviderClient",
+        "OpenAIProviderClient",
+        "httpx",
+        "requests.",
+        "import subprocess",
+        "subprocess.",
+        "import socket",
+        "urllib",
+        "playwright",
+        "selenium",
+        "webdriver",
+        "webbrowser",
+        "pexpect",
+    )
+    for module in (artifacts, operator_console):
+        source = Path(module.__file__).read_text(encoding="utf-8")
+        for token in forbidden:
+            assert token not in source, f"{token!r} found in {module.__file__}"
+
+
+# 19. Outside-root override remains rejected.
+def test_freshness_outside_root_override_rejected(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv(artifacts.ARTIFACT_ROOT_ENV, "/etc")
+    assert artifacts.resolve_artifact_root() == artifacts.DEFAULT_ARTIFACT_ROOT
+
+
+# 20. Inside-repo override remains honored.
+def test_freshness_inside_root_override_honored(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv(artifacts.ARTIFACT_ROOT_ENV, "local/oc_freshness_subdir")
+    resolved = artifacts.resolve_artifact_root()
+    repo_root = Path(artifacts.__file__).resolve().parents[2]
+    assert resolved == (repo_root / "local" / "oc_freshness_subdir").resolve()
+
+
+# 21. No path is taken from request data (query params, headers).
+def test_no_path_taken_from_request_data(client: TestClient) -> None:
+    _login(client)
+    response = client.get(
+        STATUS_ROUTE + "?root=/etc&artifact_root=/etc&path=/etc/passwd",
+        headers={"X-Artifact-Root": "/etc"},
+    )
+    assert response.status_code == 200
+    local = response.json()["local_artifacts"]
+    # The fixed default root is used regardless of request-supplied paths.
+    assert local["artifact_root"] == "local/operator_console"
+    assert "/etc" not in json.dumps(local)
