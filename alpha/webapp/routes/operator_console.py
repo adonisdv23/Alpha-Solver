@@ -28,14 +28,16 @@ from pathlib import Path
 from typing import Any, Dict, List, Mapping, Tuple
 
 from fastapi import APIRouter
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 
 from alpha.webapp import operator_console_artifacts as artifacts
+from alpha.webapp import operator_console_receipts as receipts
 
 router = APIRouter()
 
 ROUTE = "/dashboard/operator-console"
 STATUS_ROUTE = "/dashboard/operator-console/status"
+RECEIPTS_ROUTE = receipts.CREATE_RECEIPT_ENDPOINT
 
 # ---------------------------------------------------------------------------
 # Boundary text. These strings are asserted by tests and must appear verbatim
@@ -734,6 +736,7 @@ def build_console_status() -> Dict[str, Any]:
             ),
         },
         "local_artifacts": local_artifacts,
+        "local_receipts": receipts.build_receipt_store_status(),
     }
 
 
@@ -753,6 +756,10 @@ def _list_items(items: List[Any]) -> str:
     return "".join(f"<li>{_escape(item)}</li>" for item in items)
 
 
+def receipts_auth_header() -> str:
+    return "x-alpha-csrf"
+
+
 def _render_page(status: Mapping[str, Any]) -> str:
     console = status["console"]
     contract = status["portable_contract"]
@@ -762,6 +769,7 @@ def _render_page(status: Mapping[str, Any]) -> str:
     dry_run = status["dry_run_preview"]
     capture = status["preflight_capture"]
     receipt = status["evidence_receipt"]
+    receipt_store = status["local_receipts"]
 
     run_mode_rows = "".join(
         '<li class="mode">'
@@ -956,6 +964,25 @@ def _render_page(status: Mapping[str, Any]) -> str:
     )
     dr_gate = dry_run["provider_gate_summary"]
 
+    receipt_items = receipt_store["recent"]
+    receipt_rows = (
+        "".join(
+            "<li>"
+            f"<strong>{_escape(item.get('receipt_id') or 'invalid')}</strong>"
+            f" · {_escape(item.get('created_at_utc') or 'unknown time')}"
+            f" · {_escape(item.get('state'))}"
+            f" · {_escape(item.get('content_digest') or '—')}"
+            f" · {_escape((item.get('snapshot_summary') or {}).get('preview_readiness') or '—')}"
+            "</li>"
+            for item in receipt_items
+        )
+        if receipt_items
+        else "<li>No local receipts saved yet.</li>"
+    )
+    receipt_boundary_html = "".join(
+        f"<li>{_escape(text)}</li>" for text in receipt_store["boundary_notes"]
+    )
+
     return f"""<!doctype html>
 <html lang="en">
   <head>
@@ -995,6 +1022,7 @@ def _render_page(status: Mapping[str, Any]) -> str:
       .disabled-btn {{ margin-top: 0.75rem; border: 0; border-radius: 999px; padding: 0.6rem 1.15rem; font: inherit; font-weight: 700; color: #475569; background: rgba(100, 116, 139, 0.16); cursor: not-allowed; }}
       a.status-link, a.refresh-link {{ display: inline-block; margin-top: 0.75rem; color: #4f46e5; font-weight: 700; }}
       a.refresh-link {{ margin-right: 0.85rem; }}
+      .receipt-btn {{ margin-top: 0.75rem; border: 0; border-radius: 999px; padding: 0.6rem 1.15rem; font: inherit; font-weight: 800; color: #ffffff; background: #4f46e5; cursor: pointer; }}
     </style>
   </head>
   <body>
@@ -1119,6 +1147,24 @@ def _render_page(status: Mapping[str, Any]) -> str:
           {preflight_artifact_html}
         </article>
 
+
+
+        <article class="card" id="card-local-receipt-store">
+          <h2>Local Receipt Store</h2>
+          {_kv_rows({
+              "receipt root": receipt_store["receipt_root"],
+              "recent receipt count": receipt_store["count"],
+              "store state": ", ".join(receipt_store["states"]),
+              "boundary": receipt_store["boundary"],
+          })}
+          <form method="post" action="{RECEIPTS_ROUTE}" data-csrf-header="{_escape(receipts_auth_header())}" onsubmit="event.preventDefault(); fetch(this.action, {{method: 'POST', headers: {{'{_escape(receipts_auth_header())}': document.cookie.split('; ').find(r => r.startsWith('alpha_dashboard_csrf='))?.split('=')[1] || ''}}}}).then(() => window.location.href='{ROUTE}');">
+            <button type="submit" class="receipt-btn">Save local receipt snapshot</button>
+          </form>
+          <p class="note">Recent receipts (safe metadata only):</p>
+          <ul class="surfaces">{receipt_rows}</ul>
+          <ul class="surfaces">{receipt_boundary_html}</ul>
+        </article>
+
         <article class="card" id="card-evidence-receipt">
           <h2>Evidence and Receipt</h2>
           {_kv_rows({
@@ -1154,6 +1200,15 @@ async def operator_console_page() -> HTMLResponse:
     """Render the read-only operator console shell."""
 
     return HTMLResponse(content=_render_page(build_console_status()))
+
+
+@router.post(RECEIPTS_ROUTE)
+async def operator_console_create_receipt() -> RedirectResponse:
+    """Create one safe local receipt snapshot and return to the console."""
+
+    status = build_console_status()
+    receipts.create_receipt_snapshot(status)
+    return RedirectResponse(ROUTE, status_code=303)
 
 
 @router.get(STATUS_ROUTE)
