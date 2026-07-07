@@ -58,7 +58,8 @@ return 404. When mounted, an unauthenticated `GET` redirects to `/login`.
    command snippets and a docs pointer. These run from a terminal, not from the
    console.
 7. **Evidence and Receipt** — placeholders for a future receipt id, export
-   digest, and validation status, plus local artifact status (see below).
+   digest, and validation status, plus local artifact status and a read-only
+   artifact freshness / sequence-coherence subsection (see below).
 
 ## Local artifact status
 
@@ -108,6 +109,84 @@ following boundary statements appear in both the page and the status JSON:
   superiority claim is made.
 
 A preflight report being present is not a quality or readiness signal.
+
+## Artifact freshness and sequence coherence
+
+Lane: `UI-ALPHA-OPERATOR-CONSOLE-ARTIFACT-FRESHNESS-001`
+
+Structural validity answers "does this artifact exist and is it well formed."
+It does not answer "am I looking at a fresh capture and matching derived
+artifacts, or stale evidence/preflight files from an older local run." The
+console adds a small, read-only **Artifact Freshness and Sequence Coherence**
+subsection to the Evidence and Receipt card to help answer that second
+question. It infers everything from local filesystem modified-time metadata and
+the existing safe summaries above; it changes no schema and reads no raw
+content.
+
+### Status generation time
+
+The status payload includes `status_generated_at_utc`, a UTC ISO-8601 timestamp
+recorded when the status is assembled. It is the reference point the console
+uses to describe how old each file is.
+
+### Per-file freshness
+
+For each of the four fixed files the console surfaces only safe metadata:
+
+- `path_label` — the fixed filename (never an absolute local path).
+- `exists` — whether the file is present.
+- `modified_at_utc` — the file's modified time as a UTC ISO-8601 string, or
+  `null`.
+- `age_seconds` — a nonnegative integer age relative to the status time, or
+  `null`.
+- `metadata_state` — `missing`, `present`, or `unavailable`.
+- `age_label` — a deterministic bounded label:
+  - `missing` — the file is not present.
+  - `just_updated` — modified within the last 5 minutes.
+  - `recent` — modified within the last 24 hours.
+  - `older` — modified more than 24 hours ago.
+  - `unknown` — the file exists but its modified time could not be read.
+
+### Sequence coherence (derived vs capture)
+
+`capture.json` is treated as the source. Each derived artifact is compared to it
+under `sequence_coherence`:
+
+- `evidence_packet_vs_capture`
+- `anchor_preflight_vs_capture`
+- `lift_preflight_vs_capture`
+
+Each comparison reports an ordering `state`:
+
+- `not_comparable` — one or both modified times are unavailable (for example a
+  missing file).
+- `same_or_newer_than_capture` — the derived file's timestamp is at or after the
+  capture timestamp.
+- `older_than_capture` — the derived file's timestamp appears older than the
+  capture timestamp, so it may reflect an earlier local run.
+
+Each comparison also carries a `flags` list of safe mismatch signals drawn only
+from the existing summaries: `packet_id_mismatch` (packet ids differ),
+`counts_mismatch` (evidence-packet counts differ from capture counts),
+`digest_invalid` / `digest_unverifiable` (the evidence packet's own digest
+state), and `metadata_only_no_claim` (always present as a reminder that this is
+metadata, not a quality claim).
+
+A "Refresh" affordance on the page is a plain link that reloads the current
+read-only `GET` page. It never POSTs, runs a workflow, calls a provider or
+model, calls a CLI, mutates an artifact, or creates a receipt.
+
+### Freshness boundaries
+
+- Freshness is local filesystem metadata only.
+- A newer artifact is not answer-quality, benchmark, readiness, production,
+  validation, or superiority evidence.
+- An older derived artifact means only that the local file timestamp appears
+  older than the capture timestamp.
+- Digest validity is packet self-integrity only, not proof that the packet
+  reflects the latest capture file.
+- Copied or restored files can carry misleading modified times, so freshness and
+  ordering are hints for the operator, not guarantees about run order.
 
 ## Secret handling
 

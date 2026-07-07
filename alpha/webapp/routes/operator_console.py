@@ -376,6 +376,55 @@ def _render_page(status: Mapping[str, Any]) -> str:
     )
     evidence_no_artifacts = "" if local["detected"] else _no_artifacts_note()
 
+    # Artifact freshness and sequence coherence (local filesystem metadata only;
+    # never a quality/readiness signal). Only safe labels/timestamps/states are
+    # rendered — no absolute path and no raw artifact content.
+    freshness = local["freshness"]
+    fresh_files = freshness["files"]
+    fresh_seq = freshness["sequence_coherence"]
+
+    def _freshness_row(label: str, meta: Mapping[str, Any]) -> str:
+        return (
+            f'<div class="kv"><dt>{_escape(label)}</dt><dd>'
+            f'<span class="badge muted">{_escape(meta["age_label"])}</span>'
+            f' · {_escape(meta["modified_at_utc"] or "—")}'
+            f' · age {_escape(meta["age_seconds"] if meta["age_seconds"] is not None else "—")}s'
+            "</dd></div>"
+        )
+
+    freshness_files_html = (
+        _freshness_row("capture", fresh_files["capture"])
+        + _freshness_row("evidence packet", fresh_files["evidence_packet"])
+        + _freshness_row("anchor preflight", fresh_files["anchor_preflight"])
+        + _freshness_row("lift preflight", fresh_files["lift_preflight"])
+    )
+
+    def _coherence_row(label: str, entry: Mapping[str, Any]) -> str:
+        # Drop the always-present metadata-only marker from the visible flags.
+        flags = [f for f in entry["flags"] if f != "metadata_only_no_claim"]
+        flag_text = ", ".join(flags) if flags else "—"
+        return (
+            f'<div class="kv"><dt>{_escape(label)}</dt><dd>'
+            f'<span class="badge muted">{_escape(entry["state"])}</span>'
+            f' · flags: {_escape(flag_text)}</dd></div>'
+        )
+
+    coherence_html = (
+        _coherence_row(
+            "evidence packet vs capture", fresh_seq["evidence_packet_vs_capture"]
+        )
+        + _coherence_row(
+            "anchor preflight vs capture", fresh_seq["anchor_preflight_vs_capture"]
+        )
+        + _coherence_row(
+            "lift preflight vs capture", fresh_seq["lift_preflight_vs_capture"]
+        )
+    )
+
+    freshness_boundary_html = "".join(
+        f"<li>{_escape(text)}</li>" for text in freshness["boundaries"]
+    )
+
     return f"""<!doctype html>
 <html lang="en">
   <head>
@@ -411,8 +460,10 @@ def _render_page(status: Mapping[str, Any]) -> str:
       .wf-id {{ font-weight: 800; color: #3730a3; }}
       pre.wf-cmd {{ white-space: pre-wrap; overflow-wrap: anywhere; background: #111827; color: #e5e7eb; border-radius: 10px; padding: 0.55rem 0.7rem; margin: 0.35rem 0 0; font-size: 0.82rem; }}
       .note {{ color: #5f668f; font-size: 0.85rem; margin: 0.65rem 0 0; }}
+      .subhead {{ margin: 1rem 0 0.35rem; font-size: 0.95rem; color: #30365f; }}
       .disabled-btn {{ margin-top: 0.75rem; border: 0; border-radius: 999px; padding: 0.6rem 1.15rem; font: inherit; font-weight: 700; color: #475569; background: rgba(100, 116, 139, 0.16); cursor: not-allowed; }}
-      a.status-link {{ display: inline-block; margin-top: 0.75rem; color: #4f46e5; font-weight: 700; }}
+      a.status-link, a.refresh-link {{ display: inline-block; margin-top: 0.75rem; color: #4f46e5; font-weight: 700; }}
+      a.refresh-link {{ margin-right: 0.85rem; }}
     </style>
   </head>
   <body>
@@ -506,6 +557,14 @@ def _render_page(status: Mapping[str, Any]) -> str:
           {evidence_no_artifacts}
           <ul class="surfaces">{boundary_html}</ul>
           <p class="note">{_escape(ARTIFACT_BOUNDARY_TEXT)}.</p>
+
+          <h3 class="subhead">Artifact Freshness and Sequence Coherence</h3>
+          <p class="note">Local filesystem metadata only. Status generated at: {_escape(local["status_generated_at_utc"])}</p>
+          {freshness_files_html}
+          <p class="note">Derived-vs-capture ordering (metadata only):</p>
+          {coherence_html}
+          <ul class="surfaces">{freshness_boundary_html}</ul>
+          <a class="refresh-link" href="{ROUTE}">Refresh (reload this read-only page)</a>
         </article>
       </div>
 
