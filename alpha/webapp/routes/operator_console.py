@@ -30,6 +30,8 @@ from typing import Any, Dict, List, Mapping
 from fastapi import APIRouter
 from fastapi.responses import HTMLResponse, JSONResponse
 
+from alpha.webapp import operator_console_artifacts as artifacts
+
 router = APIRouter()
 
 ROUTE = "/dashboard/operator-console"
@@ -123,6 +125,7 @@ def build_console_status() -> Dict[str, Any]:
     """
 
     provider = os.getenv(_PROVIDER_ENV, "local").strip().lower() or "local"
+    local_artifacts = artifacts.build_artifact_status()
 
     return {
         "console": {
@@ -236,6 +239,7 @@ def build_console_status() -> Dict[str, Any]:
                 "proof."
             ),
         },
+        "local_artifacts": local_artifacts,
     }
 
 
@@ -290,6 +294,88 @@ def _render_page(status: Mapping[str, Any]) -> str:
 
     contract_badge = "present" if contract["present"] else "missing"
 
+    # Local artifact status (read-only; counts/states/digests only).
+    local = status["local_artifacts"]
+    no_artifacts_msg = local["no_artifacts_message"]
+    cap = local["capture"]
+    pkt = local["evidence_packet"]
+    anchor = local["anchor_preflight"]
+    lift = local["lift_preflight"]
+
+    def _state_badge(state: Any) -> str:
+        good = {"structurally_valid", "export_ready", "digest_valid", "present"}
+        bad = {"invalid_json", "invalid_structure", "digest_invalid"}
+        text = str(state)
+        cls = "ok" if text in good else "off" if text in bad else "muted"
+        return f'<span class="badge {cls}">{_escape(text)}</span>'
+
+    def _no_artifacts_note() -> str:
+        return f'<p class="note">{_escape(no_artifacts_msg)}</p>'
+
+    # Route and Trace: local capture counts + route metadata presence count.
+    if cap.get("state") in {"structurally_valid", "export_ready"}:
+        cap_counts = cap.get("counts", {})
+        trace_artifact_html = _kv_rows(
+            {
+                "captured (local)": cap_counts.get("captured", 0),
+                "excluded (local)": cap_counts.get("excluded", 0),
+                "pending (local)": cap_counts.get("pending", 0),
+                "route metadata present": cap.get("route_metadata_present_count", 0),
+            }
+        )
+    elif cap.get("state") == "missing":
+        trace_artifact_html = _no_artifacts_note()
+    else:
+        trace_artifact_html = (
+            f'<div class="kv"><dt>local capture</dt><dd>'
+            f'{_state_badge(cap.get("state"))}</dd></div>'
+        )
+
+    # Preflight and Capture: whether reports exist and need attention.
+    def _preflight_rows(label: str, summary: Mapping[str, Any]) -> str:
+        state = summary.get("state")
+        if state == "present":
+            return (
+                f'<div class="kv"><dt>{_escape(label)}</dt><dd>'
+                f'{_state_badge(state)} · needs attention: '
+                f'{_escape(summary.get("needs_attention_count", 0))}</dd></div>'
+            )
+        return (
+            f'<div class="kv"><dt>{_escape(label)}</dt><dd>'
+            f'{_state_badge(state)}</dd></div>'
+        )
+
+    preflight_artifact_html = _preflight_rows(
+        "anchor preflight report", anchor
+    ) + _preflight_rows("lift preflight report", lift)
+
+    # Evidence and Receipt: root, capture/packet states, digest, id, counts.
+    pkt_counts = pkt.get("counts", {})
+    evidence_artifact_html = _kv_rows(
+        {
+            "artifact root": local["artifact_root"],
+            "local artifacts detected": "yes" if local["detected"] else "no",
+        }
+    ) + (
+        f'<div class="kv"><dt>capture state</dt><dd>'
+        f'{_state_badge(cap.get("state"))}</dd></div>'
+        f'<div class="kv"><dt>evidence packet state</dt><dd>'
+        f'{_state_badge(pkt.get("state"))}</dd></div>'
+        + _kv_rows(
+            {
+                "packet id": pkt.get("packet_id") or "—",
+                "content digest": pkt.get("content_digest") or "—",
+                "packet captured": pkt_counts.get("captured", "—"),
+                "packet excluded": pkt_counts.get("excluded", "—"),
+                "packet total": pkt_counts.get("total", "—"),
+            }
+        )
+    )
+    boundary_html = "".join(
+        f"<li>{_escape(text)}</li>" for text in local["boundaries"]
+    )
+    evidence_no_artifacts = "" if local["detected"] else _no_artifacts_note()
+
     return f"""<!doctype html>
 <html lang="en">
   <head>
@@ -341,6 +427,7 @@ def _render_page(status: Mapping[str, Any]) -> str:
           <li>Claim boundary: {_escape(console["claim_boundary"])}</li>
           <li>{_escape(CLAIM_BOUNDARY_TEXT)}.</li>
           <li>{_escape(NO_KEYS_TEXT)}.</li>
+          {boundary_html}
         </ul>
       </section>
 
@@ -377,6 +464,8 @@ def _render_page(status: Mapping[str, Any]) -> str:
               "diagnostics": trace["diagnostics"],
           })}
           <p class="note">{_escape(trace["note"])}</p>
+          <p class="note">Local capture counts (structural only):</p>
+          {trace_artifact_html}
         </article>
 
         <article class="card" id="card-provider-gate">
@@ -400,6 +489,8 @@ def _render_page(status: Mapping[str, Any]) -> str:
           <ul class="workflows">{workflow_rows}</ul>
           <p class="note">Docs: {_escape(capture["docs"])}</p>
           <p class="note">{_escape(capture["note"])}</p>
+          <p class="note">Local preflight report status:</p>
+          {preflight_artifact_html}
         </article>
 
         <article class="card" id="card-evidence-receipt">
@@ -410,6 +501,10 @@ def _render_page(status: Mapping[str, Any]) -> str:
               "validation status": receipt["validation_status"],
           })}
           <p class="note">{_escape(receipt["note"])}</p>
+          <p class="note">Local artifact status:</p>
+          {evidence_artifact_html}
+          {evidence_no_artifacts}
+          <ul class="surfaces">{boundary_html}</ul>
           <p class="note">{_escape(ARTIFACT_BOUNDARY_TEXT)}.</p>
         </article>
       </div>

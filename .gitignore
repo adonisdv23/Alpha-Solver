@@ -4,6 +4,7 @@ __pycache__/
 .ruff_cache/
 logs/
 artifacts/
+local/
 telemetry/*.jsonl
 .DS_Store
 bench_out/
