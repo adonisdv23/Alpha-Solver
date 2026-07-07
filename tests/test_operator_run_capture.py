@@ -403,6 +403,41 @@ class TestLiftPreflight:
         assert "checker" not in finding
         assert report["summary"]["needs_attention"] == []
 
+    def test_leading_solution_label_is_stripped_before_checking(self):
+        capture = _preflight_capture(
+            [
+                _preflight_case(
+                    "case-solution-label",
+                    ANCHORED_PROMPT,
+                    "SOLUTION:\n" + ANCHORED_PASS_BLOCK,
+                )
+            ]
+        )
+        report = orc.lift_preflight_capture(capture)
+        finding = report["cases"][0]
+        assert finding["state"] == "structural_pass"
+        assert finding["structural_flags"] == []
+        assert report["summary"]["needs_attention"] == []
+
+    def test_malformed_capture_case_is_invalid_before_lift_check(self):
+        case = _preflight_case(
+            "case-malformed",
+            ANCHORED_PROMPT,
+            ANCHORED_PASS_BLOCK,
+            validation_status="bad-status",
+            winner="alpha",
+        )
+        del case["baseline_output"]
+        capture = _preflight_capture([case])
+        report = orc.lift_preflight_capture(capture)
+        finding = report["cases"][0]
+        assert finding["state"] == "invalid_case"
+        assert "unknown keys not allowed" in finding["detail"]
+        assert "missing required keys" in finding["detail"]
+        assert "validation_status must be one of" in finding["detail"]
+        assert "checker" not in finding
+        assert report["summary"]["needs_attention"] == ["case-malformed"]
+
     def test_preflight_does_not_mutate_capture(self):
         capture = _preflight_capture(
             [

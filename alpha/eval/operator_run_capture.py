@@ -357,6 +357,15 @@ LIFT_PREFLIGHT_ATTENTION_STATES = frozenset(
 # instead of failing them. Explicit prefix match only, mirroring the portable
 # honesty guard's explicit-prefix style.
 _LIFT_PREFLIGHT_SAFEOUT_PREFIX = "safe-out:"
+_LIFT_PREFLIGHT_SOLUTION_LABEL = "solution:"
+
+
+def _strip_lift_preflight_solution_label(routed_output: str) -> str:
+    """Peel one narrow leading ``SOLUTION:`` envelope label if present."""
+    stripped = routed_output.lstrip()
+    if not stripped.lower().startswith(_LIFT_PREFLIGHT_SOLUTION_LABEL):
+        return routed_output
+    return stripped[len(_LIFT_PREFLIGHT_SOLUTION_LABEL) :].lstrip("\r\n")
 
 
 def _lift_structural_flags(checker_result: Dict[str, Any]) -> List[str]:
@@ -421,7 +430,14 @@ def _lift_preflight_case(case: Any, index: int, checker: Any) -> Dict[str, Any]:
         )
         return finding
 
-    if routed_output.strip().lower().startswith(_LIFT_PREFLIGHT_SAFEOUT_PREFIX):
+    case_errors = _validate_capture_case(case, index)
+    if case_errors:
+        finding["detail"] = "; ".join(case_errors)
+        return finding
+
+    routed_output_for_check = _strip_lift_preflight_solution_label(routed_output)
+
+    if routed_output_for_check.strip().lower().startswith(_LIFT_PREFLIGHT_SAFEOUT_PREFIX):
         finding["state"] = "safe_out_not_applicable"
         finding["detail"] = (
             "routed output is a bounded SAFE-OUT response; the Substantive "
@@ -429,7 +445,7 @@ def _lift_preflight_case(case: Any, index: int, checker: Any) -> Dict[str, Any]:
         )
         return finding
 
-    checker_result = checker(routed_output, prompt=prompt)
+    checker_result = checker(routed_output_for_check, prompt=prompt)
     finding["case_anchor_count"] = len(checker_result.get("case_anchors", []))
     finding["anchor_checks_vacuous"] = finding["case_anchor_count"] == 0
     finding["checker"] = checker_result
