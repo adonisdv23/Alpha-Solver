@@ -360,12 +360,19 @@ _LIFT_PREFLIGHT_SAFEOUT_PREFIX = "safe-out:"
 _LIFT_PREFLIGHT_SOLUTION_LABEL = "solution:"
 
 
-def _strip_lift_preflight_solution_label(routed_output: str) -> str:
-    """Peel one narrow leading ``SOLUTION:`` envelope label if present."""
-    stripped = routed_output.lstrip()
-    if not stripped.lower().startswith(_LIFT_PREFLIGHT_SOLUTION_LABEL):
-        return routed_output
-    return stripped[len(_LIFT_PREFLIGHT_SOLUTION_LABEL) :].lstrip("\r\n")
+def _lift_preflight_solution_text(routed_output: str) -> str:
+    """Return the SOLUTION body when an operator pasted a full envelope.
+
+    Capture docs ask operators to paste the routed Alpha output they collected,
+    which can be a full ChatGPT/Alpha Solver response that begins with a
+    ``SOLUTION:`` label before the six Substantive Lift moves. The portable
+    checker intentionally checks the six-move solution text itself, so the
+    preflight peels only that narrow leading label when it is present.
+    """
+    stripped = routed_output.strip()
+    if stripped.lower().startswith(_LIFT_PREFLIGHT_SOLUTION_LABEL):
+        return stripped[len(_LIFT_PREFLIGHT_SOLUTION_LABEL) :].lstrip()
+    return routed_output
 
 
 def _lift_structural_flags(checker_result: Dict[str, Any]) -> List[str]:
@@ -394,6 +401,29 @@ def _lift_structural_flags(checker_result: Dict[str, Any]) -> List[str]:
     return flags
 
 
+def _lift_preflight_capture_case_shape_errors(case: Any, index: int) -> List[str]:
+    """Validate capture-case shape before Substantive Lift preflight.
+
+    The preflight has separate states for empty prompt and empty routed output,
+    so this helper reuses the capture-case validator while allowing those two
+    text fields to be blank when their keys are present. Missing keys, unknown
+    keys, invalid statuses, invalid metadata, and malformed excluded cases stay
+    schema errors and must never be reported as structural lift results.
+    """
+    if not isinstance(case, dict):
+        return _validate_capture_case(case, index)
+    validation_case = dict(case)
+    if "prompt" in validation_case and not _is_nonempty_str(
+        validation_case.get("prompt")
+    ):
+        validation_case["prompt"] = "preflight prompt placeholder"
+    if "routed_output" in validation_case and not _is_nonempty_str(
+        validation_case.get("routed_output")
+    ):
+        validation_case["routed_output"] = "preflight routed output placeholder"
+    return _validate_capture_case(validation_case, index)
+
+
 def _lift_preflight_case(case: Any, index: int, checker: Any) -> Dict[str, Any]:
     finding: Dict[str, Any] = {
         "task_id": f"cases[{index}]",
@@ -403,8 +433,9 @@ def _lift_preflight_case(case: Any, index: int, checker: Any) -> Dict[str, Any]:
         "structural_flags": [],
         "detail": "",
     }
-    if not isinstance(case, dict):
-        finding["detail"] = "case is not a JSON object"
+    shape_errors = _lift_preflight_capture_case_shape_errors(case, index)
+    if shape_errors:
+        finding["detail"] = "; ".join(shape_errors)
         return finding
     if _is_nonempty_str(case.get("task_id")):
         finding["task_id"] = case["task_id"]
@@ -430,14 +461,9 @@ def _lift_preflight_case(case: Any, index: int, checker: Any) -> Dict[str, Any]:
         )
         return finding
 
-    case_errors = _validate_capture_case(case, index)
-    if case_errors:
-        finding["detail"] = "; ".join(case_errors)
-        return finding
+    solution_text = _lift_preflight_solution_text(routed_output)
 
-    routed_output_for_check = _strip_lift_preflight_solution_label(routed_output)
-
-    if routed_output_for_check.strip().lower().startswith(_LIFT_PREFLIGHT_SAFEOUT_PREFIX):
+    if solution_text.strip().lower().startswith(_LIFT_PREFLIGHT_SAFEOUT_PREFIX):
         finding["state"] = "safe_out_not_applicable"
         finding["detail"] = (
             "routed output is a bounded SAFE-OUT response; the Substantive "
@@ -445,7 +471,7 @@ def _lift_preflight_case(case: Any, index: int, checker: Any) -> Dict[str, Any]:
         )
         return finding
 
-    checker_result = checker(routed_output_for_check, prompt=prompt)
+    checker_result = checker(solution_text, prompt=prompt)
     finding["case_anchor_count"] = len(checker_result.get("case_anchors", []))
     finding["anchor_checks_vacuous"] = finding["case_anchor_count"] == 0
     finding["checker"] = checker_result

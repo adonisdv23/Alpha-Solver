@@ -263,6 +263,9 @@ Recommendation: Add the rollback step to tests/fixtures/demo_plan.json now and k
 Fails if: The rollback step needs fields that tests/fixtures/demo_plan.json cannot carry without breaking the packet loader.
 Next: Draft the rollback entry in tests/fixtures/demo_plan.json and attach it to the PR #701 description today."""
 
+FULL_ENVELOPE_PASS_BLOCK = f"""SOLUTION:
+{ANCHORED_PASS_BLOCK}"""
+
 # Structurally shaped six-move block with no case objects at all: fails the
 # prompt-aware checker for an anchored prompt, but is a legitimate pass when
 # the prompt itself has no extractable anchors (vacuous anchor checks).
@@ -328,6 +331,21 @@ class TestLiftPreflight:
         assert finding["anchor_checks_vacuous"] is False
         assert finding["case_anchor_count"] >= 2
         assert finding["structural_flags"] == []
+        assert report["summary"]["needs_attention"] == []
+
+    def test_full_solution_envelope_is_checked_as_solution_body(self):
+        capture = _preflight_capture(
+            [
+                _preflight_case(
+                    "case-full-envelope", ANCHORED_PROMPT, FULL_ENVELOPE_PASS_BLOCK
+                )
+            ]
+        )
+        report = orc.lift_preflight_capture(capture)
+        finding = report["cases"][0]
+        assert finding["state"] == "structural_pass"
+        assert finding["structural_flags"] == []
+        assert finding["checker"]["opens_with_intent"] is True
         assert report["summary"]["needs_attention"] == []
 
     def test_generic_block_fails_for_anchored_prompt(self):
@@ -403,41 +421,6 @@ class TestLiftPreflight:
         assert "checker" not in finding
         assert report["summary"]["needs_attention"] == []
 
-    def test_leading_solution_label_is_stripped_before_checking(self):
-        capture = _preflight_capture(
-            [
-                _preflight_case(
-                    "case-solution-label",
-                    ANCHORED_PROMPT,
-                    "SOLUTION:\n" + ANCHORED_PASS_BLOCK,
-                )
-            ]
-        )
-        report = orc.lift_preflight_capture(capture)
-        finding = report["cases"][0]
-        assert finding["state"] == "structural_pass"
-        assert finding["structural_flags"] == []
-        assert report["summary"]["needs_attention"] == []
-
-    def test_malformed_capture_case_is_invalid_before_lift_check(self):
-        case = _preflight_case(
-            "case-malformed",
-            ANCHORED_PROMPT,
-            ANCHORED_PASS_BLOCK,
-            validation_status="bad-status",
-            winner="alpha",
-        )
-        del case["baseline_output"]
-        capture = _preflight_capture([case])
-        report = orc.lift_preflight_capture(capture)
-        finding = report["cases"][0]
-        assert finding["state"] == "invalid_case"
-        assert "unknown keys not allowed" in finding["detail"]
-        assert "missing required keys" in finding["detail"]
-        assert "validation_status must be one of" in finding["detail"]
-        assert "checker" not in finding
-        assert report["summary"]["needs_attention"] == ["case-malformed"]
-
     def test_preflight_does_not_mutate_capture(self):
         capture = _preflight_capture(
             [
@@ -504,6 +487,54 @@ class TestLiftPreflight:
         assert report["cases"][1]["state"] == "invalid_case"
         assert report["summary"]["needs_attention"] == ["cases[1]"]
 
+    def test_malformed_dict_case_with_compliant_output_is_invalid_case(self):
+        case = {
+            "prompt": ANCHORED_PROMPT,
+            "routed_output": ANCHORED_PASS_BLOCK,
+        }
+        report = orc.lift_preflight_capture(_preflight_capture([case]))
+        finding = report["cases"][0]
+        assert finding["state"] == "invalid_case"
+        assert "missing required keys" in finding["detail"]
+        assert "task_id" in finding["detail"]
+        assert "validation_status" in finding["detail"]
+        assert "baseline_output" in finding["detail"]
+        assert "route_metadata" in finding["detail"]
+        assert report["summary"]["needs_attention"] == ["cases[0]"]
+
+    def test_malformed_case_never_returns_structural_pass(self):
+        malformed_cases = [
+            {"prompt": ANCHORED_PROMPT, "routed_output": ANCHORED_PASS_BLOCK},
+            _preflight_case(
+                "case-unknown",
+                ANCHORED_PROMPT,
+                ANCHORED_PASS_BLOCK,
+                unexpected="not allowed",
+            ),
+            _preflight_case(
+                "case-status",
+                ANCHORED_PROMPT,
+                ANCHORED_PASS_BLOCK,
+                validation_status="done",
+            ),
+            _preflight_case(
+                "case-metadata",
+                ANCHORED_PROMPT,
+                ANCHORED_PASS_BLOCK,
+                route_metadata=[],
+            ),
+            _preflight_case(
+                "case-excluded",
+                ANCHORED_PROMPT,
+                "",
+                validation_status="excluded",
+                exclusion_reason="",
+            ),
+        ]
+        report = orc.lift_preflight_capture(_preflight_capture(malformed_cases))
+        assert {finding["state"] for finding in report["cases"]} == {"invalid_case"}
+        assert report["summary"]["counts"]["structural_pass"] == 0
+
     def test_render_text_names_boundary_and_vacuous_anchors(self):
         capture = _preflight_capture(
             [_preflight_case("case-c", ANCHOR_FREE_PROMPT, GENERIC_BLOCK)]
@@ -529,6 +560,26 @@ class TestLiftPreflightCli:
         assert "structural_pass" in result.stdout
         assert "Structural wording preflight only" in result.stdout
         assert "not answer quality" in result.stdout
+
+    def test_post655_smoke_fixture_with_solution_label_exits_zero(self):
+        result = _run_cli(
+            "lift-preflight",
+            "--capture",
+            str(FIXTURES / "post655_lift_preflight_smoke_capture.json"),
+        )
+        assert result.returncode == 0, result.stderr
+        assert "post655-full-solution-envelope-smoke: structural_pass" in result.stdout
+        assert "needs attention: none" in result.stdout
+
+    def test_malformed_compliant_case_exits_one(self, tmp_path: Path):
+        capture_path = self._write_capture(
+            tmp_path,
+            [{"prompt": ANCHORED_PROMPT, "routed_output": ANCHORED_PASS_BLOCK}],
+        )
+        result = _run_cli("lift-preflight", "--capture", str(capture_path))
+        assert result.returncode == 1
+        assert "invalid_case" in result.stdout
+        assert "structural_pass" not in result.stdout
 
     def test_structural_fail_exits_one_and_writes_report(self, tmp_path: Path):
         capture_path = self._write_capture(

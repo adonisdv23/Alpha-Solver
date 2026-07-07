@@ -95,8 +95,11 @@ python scripts/operator_run_capture.py lift-preflight \
 ```
 
 The command loads the capture, and for every case that has both a prompt and
-a routed output it runs `check_substantive_lift(routed_output, prompt=prompt)`
-and prints one state per case:
+a routed output it runs the local checker over the solution body and prints one
+state per case. If the pasted routed output begins with a full-response
+`SOLUTION:` label, the preflight strips that leading label before checking so
+operators may paste the collected routed output rather than hand-editing it
+down to only the six-line body.
 
 - `structural_pass` / `structural_fail` — the configured structural wording
   checks held or did not hold for the supplied routed output and prompt. When
