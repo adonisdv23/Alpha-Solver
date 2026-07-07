@@ -62,7 +62,10 @@ return 404. When mounted, an unauthenticated `GET` redirects to `/login`.
    lift-preflight, init capture, validate capture, export evidence packet) with
    command snippets and a docs pointer. These run from a terminal, not from the
    console.
-8. **Evidence and Receipt** — placeholders for a future receipt id, export
+8. **Local Receipt Store** — a narrow local audit-snapshot store with a
+   receipt-root label, recent receipt count, recent receipt metadata, boundary
+   text, and one `Save local receipt snapshot` action.
+9. **Evidence and Receipt** — placeholders for a future receipt id, export
    digest, and validation status, plus local artifact status and a read-only
    artifact freshness / sequence-coherence subsection (see below).
 
@@ -179,7 +182,9 @@ metadata, not a quality claim).
 
 A "Refresh" affordance on the page is a plain link that reloads the current
 read-only `GET` page. It never POSTs, runs a workflow, calls a provider or
-model, calls a CLI, mutates an artifact, or creates a receipt.
+model, calls a CLI, or mutates an artifact. Receipt creation is available only
+through the separate protected Local Receipt Store action described below, and
+that action writes only a safe receipt JSON.
 
 ### Freshness boundaries
 
@@ -192,6 +197,122 @@ model, calls a CLI, mutates an artifact, or creates a receipt.
   reflects the latest capture file.
 - Copied or restored files can carry misleading modified times, so freshness and
   ordering are hints for the operator, not guarantees about run order.
+
+## Local Receipt Store
+
+Lane: `UI-ALPHA-OPERATOR-CONSOLE-LOCAL-RECEIPT-STORE-001`
+
+The Local Receipt Store card lets an authenticated operator save a safe local
+audit snapshot of the current console status and then see recent receipt
+metadata. A local receipt is a JSON status snapshot for later comparison or
+audit. It is local-only and summary-only; it is not an answer, proof, validation
+result, readiness result, benchmark result, billing result, or superiority
+claim.
+
+### Routes and protection
+
+- Page: `GET /dashboard/operator-console`
+- Read-only status JSON: `GET /dashboard/operator-console/status`
+- Receipt creation: `POST /dashboard/operator-console/receipts`
+
+The receipt creation route is under the same protected `/dashboard` surface as
+the console. Unauthenticated POST requests fail under dashboard protection, and
+authenticated POST requests must satisfy the dashboard CSRF guard. The route
+takes no user-supplied path, filename, receipt id, or receipt body. Query-string
+and request-body attempts to provide any of those values are ignored.
+
+### Receipt root and path policy
+
+Receipts are stored only under the existing safe local artifact root:
+
+- Default: `local/operator_console/receipts/` under the repository root.
+- Safe override: if `ALPHA_OPERATOR_CONSOLE_ARTIFACT_ROOT` resolves inside the
+  repository root, receipts are written under that resolved root's `receipts/`
+  child.
+- Outside-root, traversal, or invalid overrides are rejected by the same safe
+  root policy used for local artifacts, so they cannot redirect receipt writes
+  outside the repository.
+
+Receipt ids are generated internally as bounded safe identifiers with no path
+separators. Filenames are derived internally from the receipt id and end in
+`.json`. Receipt creation writes a temporary file inside the receipt directory
+and then atomically renames it to the final receipt path. It does not overwrite
+an existing receipt silently and does not use a request-supplied path.
+
+### Receipt schema and safe fields
+
+Receipt files use schema version `operator_console_receipt_v1` and receipt type
+`status_snapshot`. Top-level fields are:
+
+- `schema_version`
+- `receipt_id`
+- `created_at_utc`
+- `source` (`operator_console`)
+- `receipt_type` (`status_snapshot`)
+- `content_digest`
+- `snapshot`
+
+`content_digest` is a `sha256:<hex>` digest over the safe receipt body excluding
+the digest field itself. It is self-integrity only. It is not proof that the
+receipt is correct, current, answer-quality evidence, validation evidence, or a
+readiness signal.
+
+The `snapshot` stores only whitelisted safe status summaries:
+
+- Console mode, disabled live-provider-call status, claim boundary, and boundary
+  notes.
+- Portable-contract presence, source path, contract mode, and high-level surface
+  labels.
+- Run modes, disabled live-run button flag, and run-setup note.
+- Route/trace placeholder states only.
+- Provider/cost gate summary: configured provider, provider mode label, disabled
+  live provider calls, console-calls-providers flag, emergency-stop state, live
+  preview surface state, categorical key status (`present` / `missing` only),
+  required provider key names, categorical provider-key status, cap
+  completeness, categorical cap statuses, cost cap status, token/request cap
+  status, live execution gate, blockers, and gate boundary.
+- Dry-run preview summary: display-only preview mode, dry-run execution status,
+  would-use labels, input/evidence/preflight/freshness states, provider-gate
+  summary, preview readiness/blockers, and boundary notes.
+- Local artifact status summaries: artifact-root label only; detected flag;
+  status timestamp; capture/evidence/preflight states, schema versions, packet
+  ids, counts, content digest, route-metadata presence count, freshness metadata,
+  sequence-coherence states/flags, and boundary texts.
+- Existing evidence/receipt placeholder fields and note.
+
+### What receipts do not store
+
+Receipts do **not** store raw prompts, raw baseline outputs, raw routed outputs,
+raw route metadata, system prompts, provider payloads, raw secrets, partial API
+keys, raw environment values, arbitrary request bodies, full artifact JSON, or
+future unsafe status fields. The recent receipt list in the page/status JSON
+shows metadata only: receipt id, creation time, schema version, receipt type,
+content digest, safe path label, state, and a compact snapshot summary. It does
+not return or render the full receipt body by default.
+
+### Receipt boundaries
+
+- Local receipts are local audit snapshots only.
+- Saving a receipt does not run a solve.
+- Saving a receipt does not call `/v1/solve`.
+- Saving a receipt does not call providers, models, MCP, browser automation,
+  network, CLI, or subprocesses.
+- Saving a receipt does not create, edit, delete, upload, save, or mutate
+  capture/evidence/preflight artifacts.
+- Saving a receipt writes only a safe local receipt JSON under the fixed receipt
+  directory.
+- Receipts store safe summaries only.
+- Receipts do not store raw prompts, raw outputs, raw route metadata, system
+  prompts, provider payloads, raw secrets, partial keys, or raw environment
+  values.
+- A receipt is not answer-quality proof, validation, production readiness,
+  provider readiness, benchmark evidence, billing accuracy, or superiority
+  evidence.
+- A receipt does not authorize live execution or dry-run execution.
+
+The Local Receipt Store does not add receipt delete, edit, upload, download, or
+raw-viewer support. Any future receipt management or export behavior requires a
+separate lane.
 
 ## Provider, model, and cost gate panel
 

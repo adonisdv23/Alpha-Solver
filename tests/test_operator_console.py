@@ -29,12 +29,14 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from alpha.webapp import operator_console_artifacts as artifacts  # noqa: E402
+from alpha.webapp import operator_console_receipts as receipts  # noqa: E402
 from alpha.webapp.routes import auth, operator_console  # noqa: E402
 from alpha.eval import operator_run_capture as capture_lib  # noqa: E402
 from service.app import app, _mount_dashboard  # noqa: E402
 
 PAGE_ROUTE = operator_console.ROUTE
 STATUS_ROUTE = operator_console.STATUS_ROUTE
+RECEIPTS_ROUTE = operator_console.RECEIPTS_ROUTE
 
 # A recognizable fake secret. It is placed in the environment and must never
 # appear in any console response (HTML or JSON).
@@ -73,6 +75,8 @@ def test_routes_registered_in_real_app() -> None:
     paths = {getattr(route, "path", None) for route in app.routes}
     assert PAGE_ROUTE in paths
     assert STATUS_ROUTE in paths
+    assert RECEIPTS_ROUTE in paths
+    assert RECEIPTS_ROUTE in paths
 
 
 def test_mount_dashboard_adds_protected_console_routes() -> None:
@@ -100,6 +104,7 @@ def test_unmounted_app_does_not_serve_console() -> None:
     try:
         assert bare_client.get(PAGE_ROUTE).status_code == 404
         assert bare_client.get(STATUS_ROUTE).status_code == 404
+        assert bare_client.post(RECEIPTS_ROUTE).status_code == 404
     finally:
         bare_client.close()
 
@@ -132,6 +137,7 @@ def test_authenticated_page_renders_all_cards(client: TestClient) -> None:
         "card-provider-gate",
         "card-preflight-capture",
         "card-evidence-receipt",
+        "card-local-receipt-store",
     ):
         assert card_id in html
 
@@ -209,6 +215,7 @@ def test_status_json_shape(client: TestClient) -> None:
         "provider_gate",
         "preflight_capture",
         "evidence_receipt",
+        "local_receipts",
     ):
         assert section in payload
 
@@ -1726,21 +1733,25 @@ def test_dry_run_live_run_button_remains_disabled(client: TestClient) -> None:
 
 
 # 5. No POST/action route (or any non-GET route) is added for dry-run preview.
-def test_dry_run_no_post_or_extra_console_routes() -> None:
+def test_dry_run_adds_no_execution_routes_beyond_receipt_post() -> None:
     console_routes = [
         route
         for route in app.routes
         if getattr(route, "path", "").startswith("/dashboard/operator-console")
     ]
+    post_routes = []
     for route in console_routes:
         methods = getattr(route, "methods", set()) or set()
-        assert "POST" not in methods
+        if "POST" in methods:
+            post_routes.append(getattr(route, "path", ""))
         assert "PUT" not in methods
         assert "DELETE" not in methods
         assert "PATCH" not in methods
+    assert post_routes == [RECEIPTS_ROUTE]
     assert {getattr(route, "path", None) for route in console_routes} == {
         PAGE_ROUTE,
         STATUS_ROUTE,
+        RECEIPTS_ROUTE,
     }
 
 
@@ -2136,3 +2147,338 @@ def test_dry_run_preview_coexists_with_existing_sections(client: TestClient) -> 
     html_text = client.get(PAGE_ROUTE).text
     for card_id in ("card-provider-gate", "card-dry-run-preview", "card-evidence-receipt"):
         assert card_id in html_text
+
+# ---------------------------------------------------------------------------
+# Local Receipt Store
+# (AOC-B006-LOCAL-RECEIPT-STORE-001 /
+# UI-ALPHA-OPERATOR-CONSOLE-LOCAL-RECEIPT-STORE-001). Receipts are safe local
+# audit snapshots only: one protected POST creates one JSON receipt under the
+# safe artifact root and stores only whitelisted status summaries.
+# ---------------------------------------------------------------------------
+RAW_SYSTEM_PROMPT = "RAW-SYSTEM-PROMPT-must-not-render-zzz"
+RAW_PROVIDER_PAYLOAD = "RAW-PROVIDER-PAYLOAD-must-not-render-zzz"
+RAW_ENV_SENTINEL = "RAW-ENV-SENTINEL-must-not-render-zzz"
+PARTIAL_KEY = FAKE_SECRET[:12]
+
+
+def _csrf_headers(client: TestClient) -> dict[str, str]:
+    token = client.cookies.get(auth.CSRF_COOKIE_NAME)
+    assert token
+    return {auth.CSRF_HEADER_NAME: token}
+
+
+def _repo_receipt_root(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
+    repo_root = Path(artifacts.__file__).resolve().parents[2]
+    rel = Path("local") / f"receipt-tests-{tmp_path.name}"
+    root = repo_root / rel
+    if root.exists():
+        for path in sorted(root.rglob("*"), reverse=True):
+            if path.is_file():
+                path.unlink()
+            elif path.is_dir():
+                path.rmdir()
+        root.rmdir()
+    root.mkdir(parents=True, exist_ok=True)
+    monkeypatch.setenv(artifacts.ARTIFACT_ROOT_ENV, rel.as_posix())
+    return root / "receipts"
+
+
+def _receipt_files(root: Path) -> list[Path]:
+    return sorted(root.glob("*.json")) if root.exists() else []
+
+
+def _post_receipt(client: TestClient, **kwargs: object):
+    return client.post(
+        RECEIPTS_ROUTE,
+        headers=_csrf_headers(client),
+        follow_redirects=False,
+        **kwargs,
+    )
+
+
+def test_receipt_status_section_empty_and_safe_label(client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    _repo_receipt_root(monkeypatch, tmp_path)
+    _login(client)
+    store = client.get(STATUS_ROUTE).json()["local_receipts"]
+    assert store["enabled"] is True
+    assert store["create_receipt_endpoint"] == RECEIPTS_ROUTE
+    assert store["count"] == 0
+    assert "missing_dir" in store["states"] or "empty" in store["states"]
+    assert store["receipt_root"].startswith("local/")
+    assert store["receipt_root"].endswith("/receipts")
+    assert not Path(store["receipt_root"]).is_absolute()
+
+
+def test_receipt_page_empty_renders_normally(client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    _repo_receipt_root(monkeypatch, tmp_path)
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    assert "Local Receipt Store" in html_text
+    assert "Save local receipt snapshot" in html_text
+    assert "No local receipts saved yet." in html_text
+
+
+def test_receipt_post_route_is_protected() -> None:
+    paths = {
+        (getattr(route, "path", None), tuple(sorted(getattr(route, "methods", set()) or set())))
+        for route in app.routes
+    }
+    assert (RECEIPTS_ROUTE, ("POST",)) in paths
+
+
+def test_unauthenticated_receipt_post_matches_protected_behavior(client: TestClient) -> None:
+    response = client.post(RECEIPTS_ROUTE, follow_redirects=False)
+    assert response.status_code == 401
+    assert response.json()["detail"] == "not authenticated"
+
+
+def test_authenticated_receipt_post_requires_csrf(client: TestClient) -> None:
+    _login(client)
+    response = client.post(RECEIPTS_ROUTE, follow_redirects=False)
+    assert response.status_code == 403
+    assert response.json()["detail"] == "missing CSRF token"
+
+
+def test_receipt_post_creates_one_file_with_schema_and_digest(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    root = _repo_receipt_root(monkeypatch, tmp_path)
+    _login(client)
+    response = _post_receipt(client)
+    assert response.status_code == 303
+    assert response.headers["location"] == PAGE_ROUTE
+    files = _receipt_files(root)
+    assert len(files) == 1
+    receipt = json.loads(files[0].read_text(encoding="utf-8"))
+    assert receipt["schema_version"] == receipts.RECEIPT_SCHEMA_VERSION
+    assert receipt["content_digest"].startswith("sha256:")
+    body = {key: value for key, value in receipt.items() if key != "content_digest"}
+    assert receipts.digest_receipt_body(body) == receipt["content_digest"]
+    assert receipt["receipt_id"] in files[0].name
+    assert files[0].suffix == ".json"
+    assert "/" not in receipt["receipt_id"] and "\\" not in receipt["receipt_id"]
+    assert len(receipt["receipt_id"]) <= 40
+
+
+def test_receipt_post_ignores_user_path_and_body(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    root = _repo_receipt_root(monkeypatch, tmp_path)
+    _login(client)
+    response = _post_receipt(
+        client,
+        params={"path": "/tmp/evil", "receipt_id": "../evil"},
+        json={"filename": "evil.json", "receipt_id": "evil", "snapshot": {"raw": RAW_PROMPT}},
+    )
+    assert response.status_code == 303
+    files = _receipt_files(root)
+    assert len(files) == 1
+    text = files[0].read_text(encoding="utf-8")
+    assert "evil" not in files[0].name
+    assert "/tmp/evil" not in text
+    assert RAW_PROMPT not in text
+
+
+def test_receipt_outside_root_override_rejected_for_write(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    outside = tmp_path / "outside"
+    monkeypatch.setenv(artifacts.ARTIFACT_ROOT_ENV, str(outside))
+    _login(client)
+    response = _post_receipt(client)
+    assert response.status_code == 303
+    assert not outside.exists()
+    assert receipts.receipt_root() == artifacts.DEFAULT_ARTIFACT_ROOT / "receipts"
+
+
+def test_receipt_inside_root_override_writes_under_safe_root(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    root = _repo_receipt_root(monkeypatch, tmp_path)
+    _login(client)
+    assert _post_receipt(client).status_code == 303
+    files = _receipt_files(root)
+    assert len(files) == 1
+    assert files[0].resolve().is_relative_to(root.resolve())
+
+
+def test_receipt_snapshot_safe_whitelist_no_raw_or_runtime_output(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    root = _repo_receipt_root(monkeypatch, tmp_path)
+    capture_root = root.parent
+    _write_all_four(capture_root)
+    monkeypatch.setenv("OPENAI_API_KEY", FAKE_SECRET)
+    monkeypatch.setenv("RAW_ENV_TEST_SENTINEL", RAW_ENV_SENTINEL)
+    monkeypatch.setenv("MODEL_PROVIDER", "openai")
+    _login(client)
+    assert _post_receipt(client).status_code == 303
+    receipt_text = _receipt_files(root)[0].read_text(encoding="utf-8")
+    receipt = json.loads(receipt_text)
+    snapshot = receipt["snapshot"]
+    gate = snapshot["provider_gate"]
+    assert gate["key_status"]["OPENAI_API_KEY"] == "present"
+    assert gate["provider_key_status"] == "present"
+    assert snapshot["dry_run_preview"]["dry_run_execution"] == "not_enabled"
+    assert snapshot["route_trace"]["route"] == "not run yet"
+    assert snapshot["route_trace"]["confidence"] == "not run yet"
+    assert snapshot["route_trace"]["safe_out_state"] == "not run yet"
+    assert snapshot["local_artifacts"]["capture"]["route_metadata_present_count"] == 1
+    assert snapshot["local_artifacts"]["evidence_packet"]["content_digest"].startswith("sha256:")
+    forbidden = (
+        RAW_PROMPT,
+        RAW_BASELINE,
+        RAW_ROUTED,
+        RAW_ROUTE_META,
+        RAW_SYSTEM_PROMPT,
+        RAW_PROVIDER_PAYLOAD,
+        FAKE_SECRET,
+        PARTIAL_KEY,
+        RAW_ENV_SENTINEL,
+        "generated answer",
+    )
+    for token in forbidden:
+        assert token not in receipt_text
+
+
+def test_receipt_save_does_not_leak_raw_in_status_or_html(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    root = _repo_receipt_root(monkeypatch, tmp_path)
+    _write_all_four(root.parent)
+    monkeypatch.setenv("OPENAI_API_KEY", FAKE_SECRET)
+    _login(client)
+    assert _post_receipt(client).status_code == 303
+    html_text = client.get(PAGE_ROUTE).text
+    status_text = client.get(STATUS_ROUTE).text
+    for token in (RAW_PROMPT, RAW_BASELINE, RAW_ROUTED, RAW_ROUTE_META, RAW_PROVIDER_PAYLOAD, FAKE_SECRET):
+        assert token not in html_text
+        assert token not in status_text
+
+
+def test_recent_receipt_summary_in_status_and_page_without_full_body(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    root = _repo_receipt_root(monkeypatch, tmp_path)
+    _login(client)
+    assert _post_receipt(client).status_code == 303
+    receipt = json.loads(_receipt_files(root)[0].read_text(encoding="utf-8"))
+    status = client.get(STATUS_ROUTE).json()
+    recent = status["local_receipts"]["recent"]
+    assert status["local_receipts"]["count"] == 1
+    assert recent[0]["receipt_id"] == receipt["receipt_id"]
+    assert "snapshot" not in recent[0]
+    html_text = client.get(PAGE_ROUTE).text
+    assert receipt["receipt_id"] in html_text
+    assert receipt["content_digest"] in html_text
+    assert RAW_PROMPT not in html_text
+    assert RAW_BASELINE not in html_text
+
+
+def test_corrupt_receipt_fails_safe(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    root = _repo_receipt_root(monkeypatch, tmp_path)
+    root.mkdir(parents=True)
+    (root / "corrupt.json").write_text("{not json", encoding="utf-8")
+    _login(client)
+    assert client.get(STATUS_ROUTE).status_code == 200
+    assert client.get(PAGE_ROUTE).status_code == 200
+    store = client.get(STATUS_ROUTE).json()["local_receipts"]
+    assert "invalid_entries" in store["states"]
+    assert store["recent"][0]["state"] == "invalid"
+
+
+def test_multiple_receipts_newest_first_with_limit(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _repo_receipt_root(monkeypatch, tmp_path)
+    _login(client)
+    for _ in range(7):
+        assert _post_receipt(client).status_code == 303
+    recent = client.get(STATUS_ROUTE).json()["local_receipts"]["recent"]
+    assert len(recent) == 5
+    created = [item["created_at_utc"] for item in recent]
+    assert created == sorted(created, reverse=True)
+
+
+def test_receipt_creation_does_not_mutate_existing_operator_artifacts(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    root = _repo_receipt_root(monkeypatch, tmp_path)
+    artifact_root = root.parent
+    _write_all_four(artifact_root)
+    names = [
+        "capture.json",
+        "evidence_packet.json",
+        "anchor_preflight_report.json",
+        "lift_preflight_report.json",
+    ]
+    before = {name: (artifact_root / name).read_bytes() for name in names}
+    _login(client)
+    assert _post_receipt(client).status_code == 303
+    after = {name: (artifact_root / name).read_bytes() for name in names}
+    assert after == before
+
+
+def test_provider_client_patched_raise_receipts_ok(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    import alpha.providers.openai as openai_provider
+
+    def _boom(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("provider client must not be used by receipts")
+
+    monkeypatch.setattr(openai_provider.OpenAIProviderClient, "__init__", _boom)
+    monkeypatch.setattr(openai_provider.OpenAIProviderClient, "execute", _boom)
+    _repo_receipt_root(monkeypatch, tmp_path)
+    _login(client)
+    assert client.get(PAGE_ROUTE).status_code == 200
+    assert client.get(STATUS_ROUTE).status_code == 200
+    assert _post_receipt(client).status_code == 303
+
+
+def test_no_execution_imports_in_receipt_sources() -> None:
+    forbidden = (
+        "ProviderClient",
+        "OpenAIProviderClient",
+        "httpx",
+        "requests.",
+        "import subprocess",
+        "subprocess.",
+        "import socket",
+        "urllib",
+        "playwright",
+        "selenium",
+        "webdriver",
+        "webbrowser",
+        "pexpect",
+        "from alpha.providers",
+        "import alpha.providers",
+        "internal_solve",
+    )
+    for module in (operator_console, receipts):
+        source = Path(module.__file__).read_text(encoding="utf-8")
+        for token in forbidden:
+            assert token not in source, f"{token!r} found in {module.__file__}"
+
+
+def test_receipt_ui_boundary_text_and_no_misleading_receipt_language(client: TestClient) -> None:
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    for text in receipts.RECEIPT_BOUNDARY_TEXTS:
+        assert text in html_text
+    receipt_card = html_text.split('id="card-local-receipt-store"', 1)[1].split('id="card-evidence-receipt"', 1)[0]
+    for forbidden in (
+        "Run receipt",
+        "Execute",
+        "Solve",
+        "Submit to provider",
+        "Generate answer",
+        "Validate",
+        "Benchmark",
+        "production ready",
+        "winner",
+        "estimated spend",
+    ):
+        assert forbidden not in receipt_card
