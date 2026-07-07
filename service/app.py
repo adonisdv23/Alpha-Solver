@@ -71,7 +71,11 @@ from .security import validate_api_key, sanitize_query
 from .otel import init_tracer
 from .health import healthcheck
 from .gating.gates import evaluate_gates
-from alpha.webapp.routes import auth as dashboard_auth, expert_preview
+from alpha.webapp.routes import (
+    auth as dashboard_auth,
+    expert_preview,
+    operator_console,
+)
 
 
 class JsonFormatter(logging.Formatter):
@@ -191,6 +195,10 @@ def _mount_dashboard(target: FastAPI) -> None:
     dashboard_auth.configure_login_redirect(target, expert_preview.ROUTE)
     target.include_router(dashboard_auth.router)
     target.include_router(expert_preview.router)
+    # Read-only, local-first operator console shell. It is protected by the same
+    # /dashboard auth/CSRF middleware and never calls a provider (see
+    # alpha/webapp/routes/operator_console.py).
+    target.include_router(operator_console.router)
 
 
 if _dashboard_enabled():
