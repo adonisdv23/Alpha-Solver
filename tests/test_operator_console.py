@@ -1112,3 +1112,350 @@ def test_no_path_taken_from_request_data(client: TestClient) -> None:
     # The fixed default root is used regardless of request-supplied paths.
     assert local["artifact_root"] == "local/operator_console"
     assert "/etc" not in json.dumps(local)
+
+
+# ---------------------------------------------------------------------------
+# Provider, model, and cost gate panel
+# (AOC-B004-PROVIDER-COST-GATE-PANEL-001 /
+# UI-ALPHA-OPERATOR-CONSOLE-PROVIDER-COST-GATE-PANEL-001). The gate is a
+# display-only view of configuration and safety-gate state: no credential
+# validation, no provider call, no billing truth, no authorization of live
+# execution.
+# ---------------------------------------------------------------------------
+# Every environment variable the gate inspects. Cleared so tests start from a
+# known "nothing configured" baseline unless a test sets a value explicitly.
+_GATE_ENVS = (
+    "ALPHA_PROVIDER_EMERGENCY_STOP",
+    "ALPHA_LIVE_PREVIEW_ENABLED",
+    "ALPHA_PROVIDER_MAX_COST_USD",
+    "ALPHA_PROVIDER_MAX_INPUT_TOKENS",
+    "ALPHA_PROVIDER_MAX_OUTPUT_TOKENS",
+    "ALPHA_PROVIDER_MAX_REQUESTS",
+    "OPENAI_API_KEY",
+    "ANTHROPIC_API_KEY",
+)
+
+
+def _clear_gate_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    for env in _GATE_ENVS:
+        monkeypatch.delenv(env, raising=False)
+
+
+def _gate(client: TestClient) -> dict:
+    return client.get(STATUS_ROUTE).json()["provider_gate"]
+
+
+# 1. Status JSON includes the expanded provider_gate fields.
+def test_provider_gate_includes_expanded_fields(client: TestClient) -> None:
+    _login(client)
+    gate = _gate(client)
+    for field in (
+        "configured_provider",
+        "provider_mode_label",
+        "live_provider_calls",
+        "console_calls_providers",
+        "emergency_stop",
+        "live_preview_surface",
+        "key_status",
+        "cap_status",
+        "cap_completeness",
+        "cost_cap_status",
+        "token_request_cap_status",
+        "live_execution_gate",
+        "live_execution_blockers",
+        "gate_boundary",
+    ):
+        assert field in gate, field
+    assert set(gate["cap_status"].keys()) == {
+        "max_cost_usd",
+        "max_input_tokens",
+        "max_output_tokens",
+        "max_requests",
+    }
+
+
+# 2. Default provider gate remains blocked and display-only.
+def test_provider_gate_default_blocked_and_display_only(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _clear_gate_env(monkeypatch)
+    _login(client)
+    gate = _gate(client)
+    assert gate["live_execution_gate"] == "blocked"
+    assert "display_only_lane" in gate["live_execution_blockers"]
+    assert "live_provider_calls_disabled" in gate["live_execution_blockers"]
+    assert "display-only" in gate["gate_boundary"]
+
+
+# 3. Live provider calls remain disabled.
+def test_provider_gate_live_calls_disabled(client: TestClient) -> None:
+    _login(client)
+    gate = _gate(client)
+    assert gate["live_provider_calls"] == "disabled"
+    assert gate["console_calls_providers"] is False
+
+
+# 4. Live-run button remains disabled (with the expanded gate panel present).
+def test_live_run_button_still_disabled_with_gate_panel(client: TestClient) -> None:
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    assert "Live run (disabled)" in html_text
+    assert 'class="disabled-btn" disabled' in html_text
+    assert client.get(STATUS_ROUTE).json()["run_setup"][
+        "live_run_button_enabled"
+    ] is False
+
+
+# 5. Emergency stop engaged appears as a blocker.
+def test_emergency_stop_appears_as_blocker(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _clear_gate_env(monkeypatch)
+    monkeypatch.setenv("ALPHA_PROVIDER_EMERGENCY_STOP", "1")
+    _login(client)
+    gate = _gate(client)
+    assert gate["emergency_stop"] == "engaged"
+    assert "emergency_stop_engaged" in gate["live_execution_blockers"]
+
+
+# 6. Missing provider key appears as a safe blocker without displaying a value.
+def test_missing_provider_key_blocker(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _clear_gate_env(monkeypatch)
+    _login(client)
+    gate = _gate(client)
+    assert "missing_provider_key" in gate["live_execution_blockers"]
+    assert gate["key_status"]["OPENAI_API_KEY"] == "missing"
+    assert gate["key_status"]["ANTHROPIC_API_KEY"] == "missing"
+
+
+# 7. Present provider key reports present only, never raw or partial value.
+def test_present_provider_key_categorical_only(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _clear_gate_env(monkeypatch)
+    monkeypatch.setenv("OPENAI_API_KEY", FAKE_SECRET)
+    _login(client)
+    status_text = client.get(STATUS_ROUTE).text
+    gate = _gate(client)
+    assert gate["key_status"]["OPENAI_API_KEY"] == "present"
+    assert "missing_provider_key" not in gate["live_execution_blockers"]
+    assert FAKE_SECRET not in status_text
+    # Not even a partial (prefix or suffix) of the key value is surfaced.
+    assert FAKE_SECRET[:20] not in status_text
+    assert FAKE_SECRET[-20:] not in status_text
+
+
+# 8. Missing cost cap appears as a safe blocker.
+def test_missing_cost_cap_blocker(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _clear_gate_env(monkeypatch)
+    _login(client)
+    gate = _gate(client)
+    assert gate["cost_cap_status"] == "missing"
+    assert "missing_cost_cap" in gate["live_execution_blockers"]
+
+
+# 9. Partial cap configuration reports partial or equivalent safe state.
+def test_partial_cap_configuration_reports_partial(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _clear_gate_env(monkeypatch)
+    monkeypatch.setenv("ALPHA_PROVIDER_MAX_INPUT_TOKENS", "1000")
+    _login(client)
+    gate = _gate(client)
+    assert gate["cap_completeness"] == "partially_configured"
+    assert gate["token_request_cap_status"] == "partial"
+    assert gate["cap_status"]["max_input_tokens"] == "present"
+    assert gate["cap_status"]["max_output_tokens"] == "missing"
+    assert "missing_token_or_request_cap" in gate["live_execution_blockers"]
+
+
+# 10. Complete cap configuration reports configured or equivalent safe state.
+def test_complete_cap_configuration_reports_configured(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _clear_gate_env(monkeypatch)
+    for env in (
+        "ALPHA_PROVIDER_MAX_COST_USD",
+        "ALPHA_PROVIDER_MAX_INPUT_TOKENS",
+        "ALPHA_PROVIDER_MAX_OUTPUT_TOKENS",
+        "ALPHA_PROVIDER_MAX_REQUESTS",
+    ):
+        monkeypatch.setenv(env, "5")
+    _login(client)
+    gate = _gate(client)
+    assert gate["cap_completeness"] == "configured"
+    assert gate["cost_cap_status"] == "present"
+    assert gate["token_request_cap_status"] == "present"
+    assert "missing_cost_cap" not in gate["live_execution_blockers"]
+    assert "missing_token_or_request_cap" not in gate["live_execution_blockers"]
+    # Complete caps do not authorize live execution; the gate stays blocked.
+    assert gate["live_execution_gate"] == "blocked"
+
+
+# 11. Live-preview surface enabled does not by itself permit live execution.
+def test_live_preview_enabled_does_not_permit_execution(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _clear_gate_env(monkeypatch)
+    monkeypatch.setenv("ALPHA_LIVE_PREVIEW_ENABLED", "1")
+    _login(client)
+    gate = _gate(client)
+    assert gate["live_preview_surface"] == "enabled"
+    assert "live_preview_surface_disabled" not in gate["live_execution_blockers"]
+    assert gate["live_execution_gate"] == "blocked"
+    assert "live_provider_calls_disabled" in gate["live_execution_blockers"]
+    assert "display_only_lane" in gate["live_execution_blockers"]
+
+
+# 12. Provider gate never validates credentials.
+def test_provider_gate_never_validates_credentials(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _clear_gate_env(monkeypatch)
+    monkeypatch.setenv("OPENAI_API_KEY", FAKE_SECRET)
+    _login(client)
+    gate = _gate(client)
+    # Key status is categorical presence only, never a validity verdict.
+    assert set(gate["key_status"].values()) <= {"present", "missing"}
+    # The gate explicitly states no credential validation is performed.
+    assert "credential validation" in gate["gate_boundary"]
+    assert (
+        operator_console.GATE_NO_CREDENTIAL_VALIDATION_TEXT
+        in client.get(PAGE_ROUTE).text
+    )
+
+
+# 13. Provider gate never calls provider clients.
+def test_provider_gate_never_calls_provider_clients(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import alpha.providers.openai as openai_provider
+
+    def _boom(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("provider client must not be used by operator console")
+
+    monkeypatch.setattr(openai_provider.OpenAIProviderClient, "__init__", _boom)
+    monkeypatch.setattr(openai_provider.OpenAIProviderClient, "execute", _boom)
+    monkeypatch.setenv("OPENAI_API_KEY", FAKE_SECRET)
+    _login(client)
+    assert client.get(STATUS_ROUTE).status_code == 200
+    assert operator_console.build_console_status()["provider_gate"][
+        "console_calls_providers"
+    ] is False
+
+
+# 14. Provider client constructors patched to raise still allow both routes.
+def test_provider_client_patched_raise_both_routes_ok_with_gate(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import alpha.providers.openai as openai_provider
+
+    def _boom(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("provider client must not be used by operator console")
+
+    monkeypatch.setattr(openai_provider.OpenAIProviderClient, "__init__", _boom)
+    monkeypatch.setattr(openai_provider.OpenAIProviderClient, "execute", _boom)
+    monkeypatch.setenv("OPENAI_API_KEY", FAKE_SECRET)
+    _login(client)
+    assert client.get(PAGE_ROUTE).status_code == 200
+    assert client.get(STATUS_ROUTE).status_code == 200
+
+
+# 15. Fake API keys never appear in HTML, JSON, or reprs.
+def test_fake_key_never_appears_in_gate_html_json_repr(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", FAKE_SECRET)
+    monkeypatch.setenv("ANTHROPIC_API_KEY", FAKE_SECRET)
+    _login(client)
+    assert FAKE_SECRET not in client.get(PAGE_ROUTE).text
+    assert FAKE_SECRET not in client.get(STATUS_ROUTE).text
+    assert FAKE_SECRET not in repr(operator_console.build_console_status())
+
+
+# 16. Status JSON contains no raw environment values for inspected env vars.
+def test_no_raw_env_values_in_status_json(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    sentinels = {
+        "ALPHA_PROVIDER_MAX_COST_USD": "CAP-COST-SENTINEL-123",
+        "ALPHA_PROVIDER_MAX_INPUT_TOKENS": "CAP-IN-SENTINEL-123",
+        "ALPHA_PROVIDER_MAX_OUTPUT_TOKENS": "CAP-OUT-SENTINEL-123",
+        "ALPHA_PROVIDER_MAX_REQUESTS": "CAP-REQ-SENTINEL-123",
+        "ALPHA_PROVIDER_EMERGENCY_STOP": "STOP-SENTINEL-123",
+        "ALPHA_LIVE_PREVIEW_ENABLED": "PREVIEW-SENTINEL-123",
+        "OPENAI_API_KEY": FAKE_SECRET,
+    }
+    for env, value in sentinels.items():
+        monkeypatch.setenv(env, value)
+    _login(client)
+    body = client.get(STATUS_ROUTE).text
+    for value in sentinels.values():
+        assert value not in body
+
+
+# 17. Rendered HTML contains the provider/cost gate boundary text.
+def test_gate_boundary_text_in_html(client: TestClient) -> None:
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    for text in operator_console.GATE_BOUNDARY_TEXTS:
+        assert text in html_text
+
+
+# 18. Source-scan: no execution imports in the console route module.
+def test_route_module_has_no_execution_imports() -> None:
+    source = Path(operator_console.__file__).read_text(encoding="utf-8")
+    forbidden = (
+        "ProviderClient",
+        "OpenAIProviderClient",
+        "httpx",
+        "requests.",
+        "import subprocess",
+        "subprocess.",
+        "import socket",
+        "urllib",
+        "playwright",
+        "selenium",
+        "webdriver",
+        "webbrowser",
+        "pexpect",
+    )
+    for token in forbidden:
+        assert token not in source, f"{token!r} found in {operator_console.__file__}"
+
+
+# 19. No scoring/ranking/winner/billing/model-comparison claim language in the UI.
+def test_gate_ui_has_no_scoring_or_billing_claim_language(client: TestClient) -> None:
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text.lower()
+    for forbidden in (
+        "winner",
+        "ranking",
+        "leaderboard",
+        "score:",
+        "outperforms",
+        "production ready",
+        "ready for production",
+        "exact spend",
+        "estimated cost",
+        "estimated spend",
+        "model comparison",
+    ):
+        assert forbidden not in html_text
+
+
+# 20. Existing artifact status / freshness surfaces persist alongside the gate.
+def test_artifact_surfaces_persist_with_gate_panel(client: TestClient) -> None:
+    _login(client)
+    payload = client.get(STATUS_ROUTE).json()
+    assert "provider_gate" in payload
+    assert payload["provider_gate"]["live_execution_gate"] == "blocked"
+    local = payload["local_artifacts"]
+    assert "freshness" in local
+    assert "status_generated_at_utc" in local
+    for section in ("capture", "evidence_packet", "anchor_preflight", "lift_preflight"):
+        assert section in local

@@ -49,10 +49,12 @@ return 404. When mounted, an unauthenticated `GET` redirects to `/login`.
 4. **Route and Trace** — placeholder fields for route, confidence, SAFE-OUT
    state, expert/team, shortlist, and diagnostics. They read "not run yet"; the
    console does not invent route output or imply a solve ran.
-5. **Provider and Cost Gate** — the configured provider, that the console does
-   not call providers, emergency-stop and cost-cap status, the live-preview
-   surface state, and API key **presence** only (`present` / `missing`). No raw
-   or partial key values are shown.
+5. **Provider and Cost Gate** — the configured provider and mode label, that the
+   console does not call providers, emergency-stop and live-preview surface
+   state, API key **presence** only (`present` / `missing`), and a display-only
+   Live Execution Gate that reports whether live execution is blocked, the
+   blockers, and cap completeness (see below). No raw or partial key values are
+   shown.
 6. **Preflight and Capture Entry** — the local workflows (anchor-preflight,
    lift-preflight, init capture, validate capture, export evidence packet) with
    command snippets and a docs pointer. These run from a terminal, not from the
@@ -187,6 +189,77 @@ model, calls a CLI, mutates an artifact, or creates a receipt.
   reflects the latest capture file.
 - Copied or restored files can carry misleading modified times, so freshness and
   ordering are hints for the operator, not guarantees about run order.
+
+## Provider, model, and cost gate panel
+
+Lane: `UI-ALPHA-OPERATOR-CONSOLE-PROVIDER-COST-GATE-PANEL-001`
+
+The Provider and Cost Gate card is a **display-only** view of provider, model,
+and cost-gate configuration. It answers a single cockpit question: can live
+execution even be considered later, and if not, what safety gate is missing? It
+reads environment-variable *presence* and truthiness only. It never reads a
+secret value, never validates a credential, never contacts a provider, and never
+authorizes live execution.
+
+### Configuration rows
+
+- `configured_provider` / `provider_mode_label` — the configured provider mode
+  (from `MODEL_PROVIDER`, default `local`). The label always notes that live
+  provider execution is not enabled from this console.
+- `live_provider_calls` — always `disabled`; `console_calls_providers` is always
+  `false`.
+- `emergency_stop` — `engaged` / `not engaged` (from
+  `ALPHA_PROVIDER_EMERGENCY_STOP`).
+- `live_preview_surface` — `enabled` / `disabled` (from
+  `ALPHA_LIVE_PREVIEW_ENABLED`).
+- `key_status` — per credential env, `present` / `missing` only.
+
+### Live Execution Gate (display-only)
+
+- `live_execution_gate` — always `blocked` from this console. This lane does not
+  enable live execution under any configuration.
+- `live_execution_blockers` — safe labels explaining why live execution stays
+  blocked. `display_only_lane` and `live_provider_calls_disabled` are always
+  present. The rest describe what a future, separately authorized live-provider
+  lane would still need in place: `emergency_stop_engaged`,
+  `missing_provider_key`, `missing_cost_cap`, `missing_token_or_request_cap`,
+  `live_preview_surface_disabled`.
+- `gate_boundary` — `display-only; no provider call or credential validation
+  performed`.
+
+### Cap completeness
+
+Cost, token, and request caps are inspected for presence only:
+
+- `cap_status` — per cap (`max_cost_usd`, `max_input_tokens`,
+  `max_output_tokens`, `max_requests`), `present` / `missing`.
+- `cap_completeness` — `none_configured` / `partially_configured` /
+  `configured` across the four caps.
+- `cost_cap_status` — `missing` / `present` for the spend cap only.
+- `token_request_cap_status` — `missing` / `partial` / `present` across the
+  token and request caps.
+
+Caps are **configured limits, not billing truth**. Presence of a cap does not
+verify spend, pricing, or billing accuracy, and this console performs no spend
+estimation.
+
+### Gate boundaries
+
+- Provider and cost gate status is configuration visibility only.
+- This console does not validate credentials.
+- This console does not call providers, models, /v1/solve, MCP, tools, browser
+  automation, network, CLI, or subprocesses.
+- Cost caps are configured limits, not billing accuracy or spend verification.
+- Key status is present/missing only; no raw or partial key values are displayed.
+- A complete display-only gate is not provider readiness, production readiness,
+  validation, benchmark evidence, or superiority evidence.
+- Live execution remains blocked unless a separate future live-provider lane
+  explicitly authorizes it. Complete cap or key configuration does not authorize
+  live execution — the gate result stays `blocked`.
+
+Environment presence is not credential validity: a key reported `present` may
+still be invalid, and the console does not check. A cap reported `present` is a
+configured limit only, not proof of billing behavior.
 
 ## Secret handling
 
