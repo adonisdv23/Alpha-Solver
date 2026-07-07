@@ -13,6 +13,7 @@ They mirror the wiring/auth style of ``tests/ui/test_expert_preview_real_app.py`
 
 from __future__ import annotations
 
+import html
 import sys
 from pathlib import Path
 
@@ -165,6 +166,25 @@ def test_preflight_workflows_present_without_scoring_language(
     # No scoring/ranking/winner language.
     for forbidden in ("winner", "ranking", "leaderboard", "score:"):
         assert forbidden not in html.lower()
+
+
+def test_init_capture_command_includes_required_case_packet(
+    client: TestClient,
+) -> None:
+    _login(client)
+    expected_command = (
+        "python scripts/operator_run_capture.py init "
+        "--case-packet <case_packet.json> --out <capture.json>"
+    )
+
+    payload = client.get(STATUS_ROUTE).json()
+    workflows = {
+        workflow["id"]: workflow["command"]
+        for workflow in payload["preflight_capture"]["workflows"]
+    }
+
+    assert workflows["init-capture"] == expected_command
+    assert html.escape(expected_command) in client.get(PAGE_ROUTE).text
 
 
 # ---------------------------------------------------------------------------

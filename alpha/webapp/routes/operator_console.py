@@ -206,7 +206,7 @@ def build_console_status() -> Dict[str, Any]:
                     "id": "init-capture",
                     "command": (
                         "python scripts/operator_run_capture.py init "
-                        "--out <capture.json>"
+                        "--case-packet <case_packet.json> --out <capture.json>"
                     ),
                 },
                 {
