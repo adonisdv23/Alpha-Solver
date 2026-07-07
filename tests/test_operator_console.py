@@ -605,3 +605,64 @@ def test_artifacts_module_does_not_import_provider_clients() -> None:
     source = Path(artifacts.__file__).read_text(encoding="utf-8")
     for forbidden in ("ProviderClient", "OpenAIProviderClient", "httpx", "requests."):
         assert forbidden not in source
+
+
+# Recognizable raw text smuggled into a content_digest field must never render.
+RAW_DIGEST_LEAK = "RAW-DIGEST-LEAK-must-not-render-zzz"
+
+
+def test_malformed_content_digest_never_leaks_raw_content(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """A corrupted content_digest carrying raw text is withheld and fails safe."""
+
+    packet = capture_lib.build_evidence_packet(_valid_capture())
+    # Corrupt the digest to smuggle raw prompt/output-like text.
+    packet["content_digest"] = "sha256:" + RAW_DIGEST_LEAK + " " + RAW_PROMPT
+    _write(tmp_path, "evidence_packet.json", packet)
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+
+    payload = client.get(STATUS_ROUTE).json()
+    pkt = payload["local_artifacts"]["evidence_packet"]
+
+    # Malformed digest -> safe non-leaking state, value not returned.
+    assert pkt["state"] == "invalid_structure"
+    assert pkt.get("content_digest") is None
+
+    html_text = client.get(PAGE_ROUTE).text
+    body = json.dumps(payload)
+    for raw in (RAW_DIGEST_LEAK, RAW_PROMPT, RAW_BASELINE, RAW_ROUTED):
+        assert raw not in html_text
+        assert raw not in body
+
+
+def test_wellformed_digest_value_is_still_exposed(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """A valid sha256:<64 hex> digest is still surfaced (regression guard)."""
+
+    packet = capture_lib.build_evidence_packet(_valid_capture())
+    _write(tmp_path, "evidence_packet.json", packet)
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+
+    pkt = client.get(STATUS_ROUTE).json()["local_artifacts"]["evidence_packet"]
+    assert pkt["state"] == "digest_valid"
+    assert pkt["content_digest"] == packet["content_digest"]
+    assert pkt["content_digest"] in client.get(PAGE_ROUTE).text
+
+
+def test_invalid_utf8_artifact_fails_safe(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Undecodable artifact bytes report invalid_json and never 500."""
+
+    (tmp_path / "capture.json").write_bytes(b"\xff\xfe\x00\x80 not utf-8 \xff")
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+
+    response = client.get(STATUS_ROUTE)
+    assert response.status_code == 200
+    assert response.json()["local_artifacts"]["capture"]["state"] == "invalid_json"
+    assert client.get(PAGE_ROUTE).status_code == 200

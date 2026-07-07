@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
@@ -56,6 +57,11 @@ CAPTURE_FILENAME = "capture.json"
 EVIDENCE_PACKET_FILENAME = "evidence_packet.json"
 ANCHOR_PREFLIGHT_FILENAME = "anchor_preflight_report.json"
 LIFT_PREFLIGHT_FILENAME = "lift_preflight_report.json"
+
+# Expected shape of a packet content digest: ``sha256:<64 lowercase hex>``.
+# A content_digest that does not match this is never returned or rendered, so a
+# corrupted packet cannot smuggle raw prompt/output text through this field.
+_DIGEST_RE = re.compile(r"sha256:[0-9a-f]{64}")
 
 # ---------------------------------------------------------------------------
 # Boundary text. Surfaced in both the rendered console and the status JSON so
@@ -126,11 +132,15 @@ def _read_json(path: Path) -> Tuple[str, Any]:
         if not path.is_file():
             return "missing", None
         text = path.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        # Undecodable bytes are a malformed artifact, not a missing one, and
+        # read_text raises this before the JSON handler below would run.
+        return "invalid_json", None
     except OSError:
         return "missing", None
     try:
         return "ok", json.loads(text)
-    except (json.JSONDecodeError, ValueError, UnicodeDecodeError):
+    except (json.JSONDecodeError, ValueError):
         return "invalid_json", None
 
 
@@ -219,10 +229,18 @@ def summarize_evidence_packet(root: Path) -> Dict[str, Any]:
     ):
         return {"state": "invalid_structure"}
 
-    content_digest = _safe_str(data.get("content_digest"))
-    if content_digest is None:
+    raw_digest = data.get("content_digest")
+    has_digest = isinstance(raw_digest, str) and bool(raw_digest.strip())
+    if not has_digest:
+        # No recorded digest: nothing to verify and nothing to expose.
         digest_state = "digest_unverifiable"
+        safe_digest: Optional[str] = None
+    elif not _DIGEST_RE.fullmatch(raw_digest):
+        # A malformed content_digest could carry raw prompt/output text; never
+        # return or render its value, and fail to a safe non-leaking state.
+        return {"state": "invalid_structure"}
     else:
+        safe_digest = raw_digest
         try:
             digest_state = (
                 "digest_valid"
@@ -236,7 +254,7 @@ def summarize_evidence_packet(root: Path) -> Dict[str, Any]:
         "state": digest_state,
         "schema_version": _safe_str(data.get("schema_version")),
         "packet_id": _safe_str(data.get("packet_id")),
-        "content_digest": content_digest,
+        "content_digest": safe_digest,
         "counts": _int_counts(
             data.get("counts"), ("total", "captured", "excluded")
         ),
