@@ -1,7 +1,7 @@
 # Lane Registry
 
 > Source-of-truth lane lifecycle registry. Verification date **2026-07-08** for
-> `AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001`.
+> `AS-B016-VALUE-READ-WORKBENCH-STATIC-MOCKUP-001`.
 
 ## Lifecycle classes
 
@@ -11,13 +11,14 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| B015 Value Read workbench source-map/static-prototype plan | **current control posture** | `AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001` records source-map, field-inventory, status-taxonomy, data-readiness, claim-boundary, and text-only first-screen planning for `VALUE_READ_DISCRIMINATION_WORKBENCH`, keeps B012/B013 deferred, records `OPERATOR_REVIEW_REQUIRED_AFTER_B015_VALUE_READ_WORKBENCH_SOURCE_MAP_STATIC_PROTOTYPE_001`, and recommends `AS-B016-VALUE-READ-WORKBENCH-STATIC-MOCKUP-001` as a static-only mockup lane; no runtime, UI implementation, provider/model work, scoring, unblinding, final interpretation, value/readiness/superiority claim, or Roadmap HP repo module is authorized. |
+| B016 Value Read workbench static mockup | **current control posture** | `AS-B016-VALUE-READ-WORKBENCH-STATIC-MOCKUP-001` records a static Markdown first-screen mockup, field-to-source trace, placeholder safety ledger, operator comprehension check, blocked actions, and implementation-follow-up boundaries for `VALUE_READ_DISCRIMINATION_WORKBENCH`; keeps B012/B013 deferred; records `OPERATOR_REVIEW_REQUIRED_AFTER_B016_VALUE_READ_WORKBENCH_STATIC_MOCKUP_001`; selects no implementation lane; no runtime, UI implementation, provider/model work, scoring, unblinding, final interpretation, value/readiness/superiority claim, or Roadmap HP repo module is authorized. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_REVIEW_REQUIRED_AFTER_B015_VALUE_READ_WORKBENCH_SOURCE_MAP_STATIC_PROTOTYPE_001`** | **operator-review selected next state** | Operator review is required after B015 before B016 or any implementation lane. B012 and B013 remain deferred. No runtime, UI implementation, provider/model work, scoring, unblinding, final interpretation, value/readiness/superiority claim, or Roadmap HP repo module is authorized. Recommended follow-up is `AS-B016-VALUE-READ-WORKBENCH-STATIC-MOCKUP-001` as a static mockup lane only unless separately authorized. |
+| **`OPERATOR_REVIEW_REQUIRED_AFTER_B016_VALUE_READ_WORKBENCH_STATIC_MOCKUP_001`** | **operator-review selected next state** | Operator review is required after B016 before any follow-up lane. B012 and B013 remain deferred. No runtime, UI implementation, provider/model work, scoring, unblinding, final interpretation, value/readiness/superiority claim, or Roadmap HP repo module is authorized. No implementation lane is selected by B016. |
+| `OPERATOR_REVIEW_REQUIRED_AFTER_B015_VALUE_READ_WORKBENCH_SOURCE_MAP_STATIC_PROTOTYPE_001` | historical prior review-only selected next state | Operator review was required after B015 before B016 or any implementation lane. B012 and B013 remain deferred. No runtime, UI implementation, provider/model work, scoring, unblinding, final interpretation, value/readiness/superiority claim, or Roadmap HP repo module is authorized. Recommended follow-up is `AS-B016-VALUE-READ-WORKBENCH-STATIC-MOCKUP-001` as a static mockup lane only unless separately authorized. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_B014_VALUE_READ_WORKBENCH_DESIGN_001` | historical prior review-only selected next state | Operator review is required after B014 before B015 or any implementation lane. B012 and B013 remain deferred. No runtime, UI implementation, provider/model work, scoring, unblinding, final interpretation, value/readiness/superiority claim, or Roadmap HP repo module is authorized. Recommended follow-up is `AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001` as docs/design or static prototype planning only unless separately authorized. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_POST_677_PRODUCT_DIRECTION_SELECTION_001` | historical prior review-only selected next state | Product-direction selection selected `VALUE_READ_DISCRIMINATION_WORKBENCH` and recommended B014 as a design-only follow-up; `AS-B014-VALUE-READ-DISCRIMINATION-WORKBENCH-DESIGN-001` resolves that state. B012 and B013 remain deferred; no provider execution, `/v1/solve` exposure, scoring, unblinding, final interpretation, value/readiness/superiority claim, provider/local-model validation claim, production/public claim, or security/privacy claim is authorized by that prior state. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001` | historical prior review-only selected next state | Product-direction selection was required before any next implementation lane after `AS-POST-676-NORTH-STAR-ROADMAP-RESET-001`; `AS-POST-677-PRODUCT-DIRECTION-SELECTION-001` resolves that state. B012 and B013 remain deferred; no provider execution, `/v1/solve` exposure, scoring, unblinding, final interpretation, value/readiness/superiority claim, provider/local-model validation claim, production/public claim, or security/privacy claim is authorized by that prior state. |
@@ -32,6 +33,8 @@
 
 ## Completed (kept as evidence)
 
+- `AS-B016-VALUE-READ-WORKBENCH-STATIC-MOCKUP-001` (current branch) - docs-only static mockup packet derived from B015; no implementation/runtime/provider/scoring/unblinding/final-interpretation or broad claims.
+- `AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001` (PR #680) - docs/source-map/static-prototype planning packet; recommended B016 static mockup; no implementation/runtime/provider/scoring/unblinding/final-interpretation or broad claims.
 - `ALPHA-SOLVER-NO-ECHO-SUBSTANTIVE-GENERATION-GATE-POST-552-SUCCESSOR-001` (PR #557) - no-echo substantive generation gate.
 - `ALPHA-SOLVER-EVAL-FALSE-PREMISE-PERTURBATION-001` (PR #558) - false-premise and hidden-constraint perturbation case set.
 - `ALPHA-SOLVER-NARRATIVE-CLAIM-SAFETY-LINTER-001` (PR #559) - narrative claim-safety linter.
