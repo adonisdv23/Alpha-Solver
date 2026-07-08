@@ -1,6 +1,6 @@
-# Evidence Index - B015 Value Read workbench source map/static prototype plan
+# Evidence Index - B016 Value Read workbench static mockup
 
-> Source-of-truth evidence ledger. Verification date **2026-07-08** after `AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001`.
+> Source-of-truth evidence ledger. Verification date **2026-07-08** after `AS-B016-VALUE-READ-WORKBENCH-STATIC-MOCKUP-001`.
 
 ## How to read evidence value
 
@@ -8,17 +8,18 @@ Entries in this file are design, documentation, gate, helper, static-checking, m
 
 ## Current selected next state
 
-`OPERATOR_REVIEW_REQUIRED_AFTER_B015_VALUE_READ_WORKBENCH_SOURCE_MAP_STATIC_PROTOTYPE_001` is the selected next state.
+`OPERATOR_REVIEW_REQUIRED_AFTER_B016_VALUE_READ_WORKBENCH_STATIC_MOCKUP_001` is the selected next state.
 
-This is an operator-review-required state after completing the B015 source-map/static-prototype planning packet for `VALUE_READ_DISCRIMINATION_WORKBENCH`. It recommends `AS-B016-VALUE-READ-WORKBENCH-STATIC-MOCKUP-001` as a static-only mockup lane. It does not implement UI, select B012, select B013, run model work, change scores, unblind, interpret final results, mutate external ledgers, add dependencies, deploy, or make broad project claims.
+This is an operator-review-required state after completing the B016 static mockup packet for `VALUE_READ_DISCRIMINATION_WORKBENCH`. It does not select an implementation lane. It does not implement UI, select B012, select B013, run model work, change scores, unblind, interpret final results, mutate external ledgers, add dependencies, deploy, or make broad project claims.
 
-The prior B014 review state `OPERATOR_REVIEW_REQUIRED_AFTER_B014_VALUE_READ_WORKBENCH_DESIGN_001` remains historical context only. It is not the current selected state.
+The prior B015 review state `OPERATOR_REVIEW_REQUIRED_AFTER_B015_VALUE_READ_WORKBENCH_SOURCE_MAP_STATIC_PROTOTYPE_001` and B014 review state `OPERATOR_REVIEW_REQUIRED_AFTER_B014_VALUE_READ_WORKBENCH_DESIGN_001` remain historical context only. They are not the current selected state.
 
 ## PR table
 
 | PR | Title | Merged / status | Primary artifact | Evidence value | Non-claims | Lifecycle |
 |----|-------|-----------------|------------------|----------------|------------|-----------|
-| post-B015 source map | `AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001` | current branch | `.specs/AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001.md`; `docs/evals/runs/as-b015-value-read-workbench-source-map-and-static-prototype-001/` | Records the exact-source map, field inventory, status taxonomy, data-readiness rules, claim-boundary map, static prototype plan, first-screen wireframe, and B016 static-mockup recommendation. | No implementation, runtime, live UI, provider/model work, scoring, unblinding, final interpretation, readiness/value claim, or Alpha-superiority claim. | current review gate |
+| post-B016 static mockup | `AS-B016-VALUE-READ-WORKBENCH-STATIC-MOCKUP-001` | current branch | `.specs/AS-B016-VALUE-READ-WORKBENCH-STATIC-MOCKUP-001.md`; `docs/evals/runs/as-b016-value-read-workbench-static-mockup-001/` | Records a static Markdown first-screen mockup, field-to-source trace, placeholder safety ledger, operator comprehension check, blocked actions, and implementation-follow-up boundaries. | No implementation, runtime, live UI, provider/model work, scoring, unblinding, final interpretation, readiness/value claim, or Alpha-superiority claim. | current review gate |
+| post-B015 source map | `AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001` | current branch | `.specs/AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001.md`; `docs/evals/runs/as-b015-value-read-workbench-source-map-and-static-prototype-001/` | Records the exact-source map, field inventory, status taxonomy, data-readiness rules, claim-boundary map, static prototype plan, first-screen wireframe, and B016 static-mockup recommendation. After B016 selection, this is historical completed context rather than the current review gate. | No implementation, runtime, live UI, provider/model work, scoring, unblinding, final interpretation, readiness/value claim, or Alpha-superiority claim. | historical completed context |
 | post-B014 design | `AS-B014-VALUE-READ-DISCRIMINATION-WORKBENCH-DESIGN-001` | merged by PR #679 | `.specs/AS-B014-VALUE-READ-DISCRIMINATION-WORKBENCH-DESIGN-001.md`; `docs/evals/runs/as-b014-value-read-discrimination-workbench-design-001/` | Defines the source-truth-grounded Value Read / discrimination workbench, artifact inputs, workflows, route/expert preview role, claim boundaries, first-screen test, and B015 recommendation. | No implementation, runtime, UI, provider/model work, scoring, unblinding, final interpretation, readiness/value claim, or Alpha-superiority claim. | historical design context |
 | post-#677 selection | `AS-POST-677-PRODUCT-DIRECTION-SELECTION-001` | merged by PR #678 | `.specs/AS-POST-677-PRODUCT-DIRECTION-SELECTION-001.md`; `docs/evals/runs/as-post-677-product-direction-selection-001/` | Selects `VALUE_READ_DISCRIMINATION_WORKBENCH` and recommends B014 design-only follow-up. | No runtime, UI, scoring, unblinding, final interpretation, readiness/value claim, or Alpha-superiority claim. | current review gate |
 | post-#676 reset | `AS-POST-676-NORTH-STAR-ROADMAP-RESET-001` | merged by PR #677 | `.specs/AS-POST-676-NORTH-STAR-ROADMAP-RESET-001.md`; `docs/evals/runs/as-post-676-north-star-roadmap-reset-001/` | Records operator-review-required source-truth reset after the Operator Console sequence; reclassifies B012/B013-style cockpit work as deferred pending product-direction selection. | No runtime execution, `/v1/solve` exposure, scoring, unblinding, final interpretation, broad readiness/value claim, or Alpha-superiority claim. | completed reset |
@@ -29,8 +30,8 @@ The prior B014 review state `OPERATOR_REVIEW_REQUIRED_AFTER_B014_VALUE_READ_WORK
 
 ## Evidence boundary
 
-The current operator-review-required state supports only bounded statements that the repository contains a B015 source-map/static-prototype planning packet and that operator review is required before B016 or any implementation follow-up.
+The current operator-review-required state supports only bounded statements that the repository contains a B016 static mockup packet derived from B015 and that operator review is required before any follow-up.
 
 It does not include implementation, console-run evidence, provider output, hosted-model output, local-model output, tool output, new score output, new unblinding output, new final interpretation, source-arm mapping, Google Sheets mutation, dependency changes, runtime validation, `/v1/solve` evidence, dashboard/public API evidence, readiness evidence, benchmark evidence, quality evidence, value evidence, security/privacy completion, autonomous-readiness evidence, or Alpha-superiority evidence.
 
-Historical lanes remain preserved as historical context only. Those historical artifacts do not override the current selected state, which is `OPERATOR_REVIEW_REQUIRED_AFTER_B015_VALUE_READ_WORKBENCH_SOURCE_MAP_STATIC_PROTOTYPE_001`.
+Historical lanes remain preserved as historical context only. Those historical artifacts do not override the current selected state, which is `OPERATOR_REVIEW_REQUIRED_AFTER_B016_VALUE_READ_WORKBENCH_STATIC_MOCKUP_001`.
