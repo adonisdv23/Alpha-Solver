@@ -3031,3 +3031,186 @@ def test_manual_next_step_guide_under_reusable_safety_guard(
     assert status.status_code == 200
     assert "Manual Next Step Guide" in page.text
     assert "manual_next_step_guide" in status.json()
+
+
+# ---------------------------------------------------------------------------
+# UI-ALPHA-OPERATOR-CONSOLE-PROGRESSIVE-DISCLOSURE-001
+# Progressive disclosure collapses long, repeated boundary/reference blocks
+# behind closed-by-default native <details>/<summary>. It changes default
+# visibility only: no boundary text is removed and no execution capability is
+# added. These tests prove the collapse is native, closed by default, and does
+# not weaken any existing safety boundary, card, control, form, or route.
+# ---------------------------------------------------------------------------
+def test_progressive_disclosure_uses_native_details_and_summary(client: TestClient) -> None:
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    # Several long boundary/reference blocks are now collapsed behind native
+    # <details>/<summary>. Prove both elements are present in useful numbers.
+    assert html_text.count("<details class=\"disclosure\">") >= 8
+    assert html_text.count("<summary>") == html_text.count("<details class=\"disclosure\">")
+    # Each disclosure carries a non-empty <summary> label.
+    assert "<summary></summary>" not in html_text
+
+
+def test_progressive_disclosure_details_are_closed_by_default(client: TestClient) -> None:
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    # No disclosure may render expanded by default: no ``open`` attribute.
+    assert "<details class=\"disclosure\" open" not in html_text
+    assert "<details open" not in html_text
+    assert " open>" not in html_text
+    # And no JavaScript accordion/tab framework was introduced.
+    assert "<script" not in html_text
+    assert "onclick" not in html_text
+
+
+def test_progressive_disclosure_keeps_first_glance_safety_visible_outside_details(
+    client: TestClient,
+) -> None:
+    """The primary mode/safety banner text must not be hidden inside a disclosure."""
+
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    # Everything before the first <details> is the always-visible, un-collapsed
+    # region (banner + card headers). The primary safety signals must live there.
+    first_details = html_text.index("<details class=\"disclosure\">")
+    visible_head = html_text[:first_details]
+    assert operator_console.LOCAL_FIRST_TEXT in visible_head
+    assert operator_console.LIVE_DISABLED_TEXT in visible_head
+    assert operator_console.NO_KEYS_TEXT in visible_head
+    assert operator_console.CLAIM_BOUNDARY_TEXT in visible_head
+
+
+def test_progressive_disclosure_retains_all_boundary_text_in_served_html(
+    client: TestClient,
+) -> None:
+    """Collapsing must not remove any boundary text from the served HTML."""
+
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    for text in (
+        operator_console.LOCAL_FIRST_TEXT,
+        operator_console.LIVE_DISABLED_TEXT,
+        operator_console.NO_KEYS_TEXT,
+        operator_console.CLAIM_BOUNDARY_TEXT,
+        operator_console.ARTIFACT_BOUNDARY_TEXT,
+    ):
+        assert text in html_text
+    for group in (
+        operator_console.GATE_BOUNDARY_TEXTS,
+        operator_console.DRY_RUN_BOUNDARY_TEXTS,
+        operator_console.CHATGPT_CAPTURE_BOUNDARY_TEXTS,
+        operator_console.MANUAL_NEXT_STEP_BOUNDARY_TEXTS,
+    ):
+        for text in group:
+            assert text in html_text
+
+
+def test_progressive_disclosure_preserves_all_card_ids(client: TestClient) -> None:
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    for card_id in (
+        "card-portable-contract",
+        "card-run-setup",
+        "card-dry-run-preview",
+        "card-route-trace",
+        "card-provider-gate",
+        "card-preflight-capture",
+        "card-manual-next-step-guide",
+        "card-chatgpt-copy-paste-capture",
+        "card-local-receipt-store",
+        "card-evidence-receipt",
+    ):
+        assert card_id in html_text
+
+
+def test_progressive_disclosure_keeps_live_run_button_disabled(client: TestClient) -> None:
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    assert "Live run (disabled)" in html_text
+    assert "class=\"disabled-btn\" disabled" in html_text
+
+
+def test_progressive_disclosure_adds_no_new_form(client: TestClient) -> None:
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    # The only form on the page remains the existing receipt-store form.
+    assert html_text.count("<form") == 1
+    assert f'action="{RECEIPTS_ROUTE}"' in html_text
+    # No new interactive text input beyond the pre-existing disabled prompt box.
+    assert html_text.count("<textarea") == 1
+    assert "disabled aria-disabled=\"true\"" in html_text
+
+
+def test_progressive_disclosure_adds_no_new_post_route() -> None:
+    post_paths = {
+        getattr(route, "path", None)
+        for route in app.routes
+        if "POST" in getattr(route, "methods", set())
+        and str(getattr(route, "path", "")).startswith("/dashboard/operator-console")
+    }
+    assert post_paths == {RECEIPTS_ROUTE}
+
+
+def test_progressive_disclosure_adds_no_raw_viewer_or_paste_editor(client: TestClient) -> None:
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    # No editable/paste surface is introduced by the disclosure change.
+    assert "contenteditable" not in html_text
+    # The status payload still refuses to store pasted output.
+    payload = client.get(STATUS_ROUTE).json()
+    assert payload["chatgpt_copy_paste_capture"]["console_stores_pasted_outputs"] is False
+    assert payload["chatgpt_copy_paste_capture"]["console_writes_capture"] is False
+
+
+def test_progressive_disclosure_introduces_no_claim_language(client: TestClient) -> None:
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text.lower()
+    for forbidden in (
+        "run now",
+        "execute now",
+        "submit to provider",
+        "generate answer",
+        "solve now",
+        "start solve",
+        "production ready",
+        "ready for production",
+        "estimated spend",
+        "estimated cost",
+        "winner",
+        "leaderboard",
+        "outperforms",
+        "best-in-class",
+        "state-of-the-art",
+        "benchmark passed",
+        "validated output",
+        "readiness confirmed",
+        "queue started",
+        "runner started",
+        "scheduler started",
+    ):
+        assert forbidden not in html_text, forbidden
+
+
+def test_progressive_disclosure_status_payload_shape_unchanged(client: TestClient) -> None:
+    """Progressive disclosure is a render-only change; status JSON is unchanged."""
+
+    _login(client)
+    payload = client.get(STATUS_ROUTE).json()
+    for section in (
+        "console",
+        "portable_contract",
+        "run_setup",
+        "route_trace",
+        "provider_gate",
+        "dry_run_preview",
+        "chatgpt_copy_paste_capture",
+        "manual_next_step_guide",
+        "preflight_capture",
+        "evidence_receipt",
+        "local_artifacts",
+        "local_receipts",
+    ):
+        assert section in payload
+    assert payload["provider_gate"]["live_execution_gate"] == "blocked"
+    assert payload["run_setup"]["live_run_button_enabled"] is False

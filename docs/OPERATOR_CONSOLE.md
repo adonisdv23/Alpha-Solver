@@ -34,6 +34,20 @@ return 404. When mounted, an unauthenticated `GET` redirects to `/login`.
 - Page: `GET /dashboard/operator-console`
 - Read-only status JSON: `GET /dashboard/operator-console/status`
 
+## Reading a dense page (progressive disclosure)
+
+To keep the page scannable, some long boundary-reminder lists and
+reference-heavy blocks are collapsed by default behind native expandable
+`details` controls. Collapsing changes default visibility only: the full
+boundary text remains present in the page HTML/UI and is one click away under
+each `details` summary. Nothing is removed and no text is paraphrased.
+
+The primary mode banner (local-first, live provider calls disabled, no API keys
+displayed, and the claim boundary), the disabled live-run control, each card
+title, and a one-line boundary summary per card stay visible without expanding
+anything. Expanding a `details` section runs nothing; it only reveals text that
+was already loaded with the page.
+
 
 ## Operator Console First 5 Minutes
 

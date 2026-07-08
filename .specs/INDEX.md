@@ -105,6 +105,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 | `UI-ALPHA-OPERATOR-CONSOLE-MANUAL-NEXT-STEP-GUIDE-001.md` | UI-ALPHA-OPERATOR-CONSOLE-MANUAL-NEXT-STEP-GUIDE-001 · Operator Console Manual Next Step Guide | ✅ `SPEC_OK` |
 | `UI-ALPHA-OPERATOR-CONSOLE-FIRST-FIVE-MINUTES-001.md` | UI-ALPHA-OPERATOR-CONSOLE-FIRST-FIVE-MINUTES-001 · Operator Console First 5 Minutes Guide | ✅ `SPEC_OK` |
 | `UI-ALPHA-OPERATOR-CONSOLE-DAILY-USE-WALKTHROUGH-001.md` | UI-ALPHA-OPERATOR-CONSOLE-DAILY-USE-WALKTHROUGH-001 · Operator Console Daily-Use Walkthrough | ✅ `SPEC_OK` |
+| `UI-ALPHA-OPERATOR-CONSOLE-PROGRESSIVE-DISCLOSURE-001.md` | UI-ALPHA-OPERATOR-CONSOLE-PROGRESSIVE-DISCLOSURE-001 · Operator Console Progressive Disclosure | ✅ `SPEC_OK` |
 | `UI-JOBS-001.md` | UI-JOBS-001 · Dashboard Job History & Metrics (RES_Dash) | ✅ `SPEC_OK` |
 | `UI-PREVIEW-001.md` | UI-PREVIEW-001 · Authenticated Expert Preview UI | ✅ `SPEC_OK` |
 | `UI-PREVIEW-LOADING-STATE-001.md` | UI-PREVIEW-LOADING-STATE-001 · Expert Preview Loading State | ✅ `SPEC_OK` |
