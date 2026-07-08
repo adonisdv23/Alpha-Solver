@@ -1101,6 +1101,22 @@ def _list_items(items: List[Any]) -> str:
     return "".join(f"<li>{_escape(item)}</li>" for item in items)
 
 
+def _details(summary: str, body: str) -> str:
+    """Render a closed-by-default native disclosure (no ``open`` attribute, no JS).
+
+    Progressive-disclosure wrapper for long, repeated boundary lists and
+    reference-heavy blocks. The ``body`` always stays in the served HTML — so
+    substring-based safety tests keep passing and no boundary text is removed —
+    but it is collapsed by default to reduce first-glance density. This changes
+    default visibility only; it adds no execution capability and no new control.
+    """
+
+    return (
+        f'<details class="disclosure"><summary>{_escape(summary)}</summary>'
+        f"{body}</details>"
+    )
+
+
 def receipts_auth_header() -> str:
     return "x-alpha-csrf"
 
@@ -1405,6 +1421,9 @@ def _render_page(status: Mapping[str, Any]) -> str:
       a.status-link, a.refresh-link {{ display: inline-block; margin-top: 0.75rem; color: #4f46e5; font-weight: 700; }}
       a.refresh-link {{ margin-right: 0.85rem; }}
       .receipt-btn {{ margin-top: 0.75rem; border: 0; border-radius: 999px; padding: 0.6rem 1.15rem; font: inherit; font-weight: 800; color: #ffffff; background: #4f46e5; cursor: pointer; }}
+      details.disclosure {{ margin-top: 0.6rem; border-top: 1px solid rgba(86, 97, 246, 0.12); padding-top: 0.45rem; }}
+      details.disclosure > summary {{ cursor: pointer; color: #4f46e5; font-weight: 700; font-size: 0.85rem; }}
+      details.disclosure[open] > summary {{ margin-bottom: 0.5rem; }}
     </style>
   </head>
   <body>
@@ -1457,8 +1476,10 @@ def _render_page(status: Mapping[str, Any]) -> str:
               "anchor preflight": dry_run["preflight_status"]["anchor"],
               "lift preflight": dry_run["preflight_status"]["lift"],
           })}
-          <p class="note">Would use (existing local metadata only):</p>
-          <ul class="surfaces">{dr_would_use_html}</ul>
+          {_details(
+              "Would use — existing local metadata (display-only)",
+              f'<ul class="surfaces">{dr_would_use_html}</ul>',
+          )}
           <p class="note">Freshness warnings (local metadata only):</p>
           <ul class="surfaces">{dr_warnings_html}</ul>
 
@@ -1471,7 +1492,10 @@ def _render_page(status: Mapping[str, Any]) -> str:
           <p class="note">Preview blockers (what is missing before a future dry-run lane):</p>
           <ul class="surfaces">{dr_blockers_html}</ul>
           <p class="note">{_escape(dry_run["boundary"])}.</p>
-          <ul class="surfaces">{dr_boundary_html}</ul>
+          {_details(
+              "Dry-Run Preview safety boundaries",
+              f'<ul class="surfaces">{dr_boundary_html}</ul>',
+          )}
         </article>
 
         <article class="card" id="card-route-trace">
@@ -1510,19 +1534,28 @@ def _render_page(status: Mapping[str, Any]) -> str:
           })}
           <p class="note">Blockers (why live execution stays blocked):</p>
           <ul class="surfaces">{blocker_rows}</ul>
-          <p class="note">Cap presence (configured limits only, not billing truth):</p>
-          {cap_rows}
-          <p class="note">Key presence (categorical only):</p>
-          {key_rows}
+          {_details(
+              "Cap and key presence detail (categorical only)",
+              '<p class="note">Cap presence (configured limits only, not billing truth):</p>'
+              f"{cap_rows}"
+              '<p class="note">Key presence (categorical only):</p>'
+              f"{key_rows}",
+          )}
           <p class="note">{_escape(gate["gate_boundary"])}.</p>
-          <ul class="surfaces">{gate_boundary_html}</ul>
+          {_details(
+              "Provider and cost gate safety boundaries",
+              f'<ul class="surfaces">{gate_boundary_html}</ul>',
+          )}
           <p class="note">{_escape(gate["note"])}</p>
         </article>
 
         <article class="card" id="card-preflight-capture">
           <h2>Preflight and Capture Entry</h2>
-          <p class="note">Local workflows (run from a terminal, not from this console):</p>
-          <ul class="workflows">{workflow_rows}</ul>
+          {_details(
+              "Local terminal workflow commands (text only; not executed)",
+              '<p class="note">Local workflows (run from a terminal, not from this console):</p>'
+              f'<ul class="workflows">{workflow_rows}</ul>',
+          )}
           <p class="note">Docs: {_escape(capture["docs"])}</p>
           <p class="note">{_escape(capture["note"])}</p>
           <p class="note">Local preflight report status:</p>
@@ -1545,8 +1578,10 @@ def _render_page(status: Mapping[str, Any]) -> str:
           <ul class="surfaces">{manual_only_html}</ul>
           <h3 class="subhead">Blocked in this console</h3>
           <ul class="surfaces">{manual_blocked_html}</ul>
-          <p class="note">Boundary reminders:</p>
-          <ul class="surfaces">{manual_boundary_html}</ul>
+          {_details(
+              "Boundary reminders",
+              f'<ul class="surfaces">{manual_boundary_html}</ul>',
+          )}
         </article>
 
 
@@ -1564,22 +1599,36 @@ def _render_page(status: Mapping[str, Any]) -> str:
               "console stores pasted outputs": chatgpt_capture["console_stores_pasted_outputs"],
               "current capture stage": chatgpt_capture["current_capture_stage"],
           })}
-          <p class="note">Would use (safe local workflow labels only):</p>
-          <ul class="surfaces">{chatgpt_would_use_html}</ul>
           <p class="note">Next recommended manual steps:</p>
           <ul class="surfaces">{chatgpt_steps_html}</ul>
-          <h3 class="subhead">Copy/paste field checklist</h3>
-          <ul class="surfaces">{chatgpt_checklist_html}</ul>
-          <h3 class="subhead">Placeholder-only capture slot template</h3>
-          {chatgpt_template_html}
-          <h3 class="subhead">Terminal command snippets (text only; not executed)</h3>
-          <ul class="workflows">{chatgpt_commands_html}</ul>
-          <h3 class="subhead">Route metadata guidance</h3>
-          <ul class="surfaces">{chatgpt_route_guidance_html}</ul>
-          <h3 class="subhead">Unsafe actions blocked</h3>
-          <ul class="surfaces">{chatgpt_unsafe_html}</ul>
+          {_details(
+              "Would use — safe local workflow labels only",
+              f'<ul class="surfaces">{chatgpt_would_use_html}</ul>',
+          )}
+          {_details(
+              "Copy/paste field checklist and placeholder capture slot template",
+              '<h3 class="subhead">Copy/paste field checklist</h3>'
+              f'<ul class="surfaces">{chatgpt_checklist_html}</ul>'
+              '<h3 class="subhead">Placeholder-only capture slot template</h3>'
+              f"{chatgpt_template_html}",
+          )}
+          {_details(
+              "Terminal command snippets (text only; not executed)",
+              f'<ul class="workflows">{chatgpt_commands_html}</ul>',
+          )}
+          {_details(
+              "Route metadata guidance",
+              f'<ul class="surfaces">{chatgpt_route_guidance_html}</ul>',
+          )}
+          {_details(
+              "Unsafe actions blocked",
+              f'<ul class="surfaces">{chatgpt_unsafe_html}</ul>',
+          )}
           <p class="note">{_escape(chatgpt_capture["boundary"])}.</p>
-          <ul class="surfaces">{chatgpt_boundary_html}</ul>
+          {_details(
+              "ChatGPT copy/paste safety boundaries",
+              f'<ul class="surfaces">{chatgpt_boundary_html}</ul>',
+          )}
         </article>
 
 
@@ -1596,7 +1645,10 @@ def _render_page(status: Mapping[str, Any]) -> str:
           </form>
           <p class="note">Recent receipts (safe metadata only):</p>
           <ul class="surfaces">{receipt_rows}</ul>
-          <ul class="surfaces">{receipt_boundary_html}</ul>
+          {_details(
+              "Local receipt boundaries",
+              f'<ul class="surfaces">{receipt_boundary_html}</ul>',
+          )}
         </article>
 
         <article class="card" id="card-evidence-receipt">
@@ -1610,15 +1662,21 @@ def _render_page(status: Mapping[str, Any]) -> str:
           <p class="note">Local artifact status:</p>
           {evidence_artifact_html}
           {evidence_no_artifacts}
-          <ul class="surfaces">{boundary_html}</ul>
+          {_details(
+              "Local artifact boundaries",
+              f'<ul class="surfaces">{boundary_html}</ul>',
+          )}
           <p class="note">{_escape(ARTIFACT_BOUNDARY_TEXT)}.</p>
 
           <h3 class="subhead">Artifact Freshness and Sequence Coherence</h3>
           <p class="note">Local filesystem metadata only. Status generated at: {_escape(local["status_generated_at_utc"])}</p>
-          {freshness_files_html}
-          <p class="note">Derived-vs-capture ordering (metadata only):</p>
-          {coherence_html}
-          <ul class="surfaces">{freshness_boundary_html}</ul>
+          {_details(
+              "Freshness and sequence-coherence detail (local metadata only)",
+              f"{freshness_files_html}"
+              '<p class="note">Derived-vs-capture ordering (metadata only):</p>'
+              f"{coherence_html}"
+              f'<ul class="surfaces">{freshness_boundary_html}</ul>',
+          )}
           <a class="refresh-link" href="{ROUTE}">Refresh (reload this read-only page)</a>
         </article>
       </div>
