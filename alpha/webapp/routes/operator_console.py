@@ -57,6 +57,39 @@ CLAIM_BOUNDARY_TEXT = (
 )
 
 # ---------------------------------------------------------------------------
+# Flow-first orientation band text
+# (AOC-B010-OPERATOR-CONSOLE-FLOW-FIRST-ORIENTATION-001). A read-only band
+# rendered above the existing card grid so an operator can understand the page
+# in the first few seconds: what it is, its static safety posture, whether
+# anything needs attention, and what manual step happens outside the console.
+# These are display-only strings. The band adds no control, route, write path,
+# or status payload field, and it derives attention/next-action only by
+# summarizing the already-assembled in-memory status dict.
+# ---------------------------------------------------------------------------
+ORIENTATION_PURPOSE_TEXT = (
+    "This is a local-first status console. It helps you review current local "
+    "state and decide the next manual step. It does not run, call, or execute "
+    "anything."
+)
+ORIENTATION_POSTURE_CHIPS = (
+    "Local-first",
+    "Live provider calls: disabled",
+    "Non-executing / read-only",
+    "No API keys displayed",
+)
+ORIENTATION_ATTENTION_DEFAULT = (
+    "No immediate attention detected from local metadata."
+)
+ORIENTATION_NEXT_ACTION_DEFAULT = (
+    "No manual action required from this console view."
+)
+ORIENTATION_NEXT_ACTION_PREFIX = "Next manual step outside the console: "
+ORIENTATION_DETAILS_POINTER = (
+    "Details below: review surfaces, manual-only steps, blocked behavior, and "
+    "receipts."
+)
+
+# ---------------------------------------------------------------------------
 # Provider and cost gate boundary text. The provider/cost gate panel is a
 # display-only view of configuration and safety-gate state. These strings are
 # asserted by tests and rendered verbatim so an operator sees that gate status
@@ -1121,6 +1154,91 @@ def receipts_auth_header() -> str:
     return "x-alpha-csrf"
 
 
+# ---------------------------------------------------------------------------
+# Flow-first orientation band. Pure render-only summarization over the already
+# assembled in-memory status dict. It fetches nothing, derives no readiness
+# semantics, and adds no field to the status payload. Attention labels restate
+# missing/invalid/stale conditions that are already rendered in the cards below;
+# the next-action line reuses the existing manual copy/paste next-step labels.
+# ---------------------------------------------------------------------------
+def _orientation_attention_items(status: Mapping[str, Any]) -> List[str]:
+    """Return up to three safe attention labels derived from existing status.
+
+    Read-only over the already-assembled status dict. Every label restates a
+    missing/invalid/stale condition already surfaced by a card below. It invents
+    no readiness semantics and uses no "ready"/"validated"/"healthy" wording.
+    """
+
+    local = status.get("local_artifacts") or {}
+    capture = local.get("capture") or {}
+    packet = local.get("evidence_packet") or {}
+    dry_run = status.get("dry_run_preview") or {}
+    warnings = dry_run.get("freshness_warnings") or []
+
+    items: List[str] = []
+    cap_state = capture.get("state")
+    if cap_state == "missing":
+        items.append("Capture artifact missing.")
+    elif cap_state in {"invalid_json", "invalid_structure"}:
+        items.append("Local capture cannot be read.")
+    if packet.get("state") in {"digest_invalid", "digest_unverifiable"}:
+        items.append("Evidence packet digest needs attention.")
+    if any(str(warning).endswith("_older_than_capture") for warning in warnings):
+        items.append("Derived artifacts appear older than capture.")
+    return items[:3]
+
+
+def _orientation_next_action(status: Mapping[str, Any]) -> str:
+    """Return a read-only next-manual-action line from existing capture data.
+
+    Reuses the first existing ``chatgpt_copy_paste_capture.next_manual_steps``
+    label (underscores rendered as spaces) and states plainly that it happens
+    outside the console. Falls back to the safe default when no step exists. It
+    starts nothing, dispatches nothing, and is not a control.
+    """
+
+    steps = (status.get("chatgpt_copy_paste_capture") or {}).get(
+        "next_manual_steps"
+    ) or []
+    if steps:
+        label = str(steps[0]).replace("_", " ")
+        return ORIENTATION_NEXT_ACTION_PREFIX + label + "."
+    return ORIENTATION_NEXT_ACTION_DEFAULT
+
+
+def _render_orientation_band(status: Mapping[str, Any]) -> str:
+    """Render the display-only flow-first orientation band (no controls)."""
+
+    chips_html = "".join(
+        f'<span class="posture-chip">{_escape(chip)}</span>'
+        for chip in ORIENTATION_POSTURE_CHIPS
+    )
+    attention_items = _orientation_attention_items(status)
+    if attention_items:
+        attention_html = "".join(
+            f"<li>{_escape(item)}</li>" for item in attention_items
+        )
+    else:
+        attention_html = f"<li>{_escape(ORIENTATION_ATTENTION_DEFAULT)}</li>"
+    next_action = _orientation_next_action(status)
+
+    return (
+        '<section class="orientation-band" id="orientation-band" '
+        'aria-label="Operator console orientation">'
+        f'<p class="orientation-purpose">{_escape(ORIENTATION_PURPOSE_TEXT)}</p>'
+        '<div class="posture-chips" aria-label="Static console posture">'
+        f"{chips_html}</div>"
+        '<div class="orientation-signals">'
+        '<p class="orientation-label">Attention summary</p>'
+        f'<ul class="orientation-attention">{attention_html}</ul>'
+        '<p class="orientation-label">Next manual action</p>'
+        f'<p class="orientation-next-action">{_escape(next_action)}</p>'
+        "</div>"
+        f'<p class="orientation-pointer note">{_escape(ORIENTATION_DETAILS_POINTER)}</p>'
+        "</section>"
+    )
+
+
 def _render_page(status: Mapping[str, Any]) -> str:
     console = status["console"]
     contract = status["portable_contract"]
@@ -1395,6 +1513,15 @@ def _render_page(status: Mapping[str, Any]) -> str:
       .subtitle {{ color: #565b8f; margin: 0 0 1.25rem; font-weight: 600; }}
       .banner {{ border: 1px solid #c7d2fe; background: rgba(238, 242, 255, 0.9); border-radius: 14px; padding: 1rem 1.15rem; color: #30365f; margin-bottom: 1.5rem; }}
       .banner ul {{ margin: 0.5rem 0 0; padding-left: 1.1rem; }}
+      .orientation-band {{ border: 1px solid #c7d2fe; background: rgba(255, 255, 255, 0.96); border-radius: 14px; padding: 1.1rem 1.25rem; margin-bottom: 1.5rem; box-shadow: 0 12px 40px rgba(31, 35, 71, 0.06); }}
+      .orientation-purpose {{ margin: 0 0 0.85rem; font-size: 1.02rem; font-weight: 700; color: #262a4d; }}
+      .posture-chips {{ display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0 0 1rem; }}
+      .posture-chip {{ display: inline-block; border-radius: 999px; padding: 0.2rem 0.7rem; font-size: 0.78rem; font-weight: 700; color: #3730a3; background: rgba(99, 102, 241, 0.12); cursor: default; user-select: none; }}
+      .orientation-signals {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.35rem 1.5rem; }}
+      .orientation-label {{ margin: 0.35rem 0 0.15rem; font-size: 0.74rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: #565b8f; }}
+      .orientation-attention {{ margin: 0; padding-left: 1.1rem; }}
+      .orientation-next-action {{ margin: 0.1rem 0 0; font-weight: 600; color: #30365f; overflow-wrap: anywhere; }}
+      .orientation-pointer {{ margin-top: 0.9rem; }}
       .cards {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.1rem; align-items: start; }}
       .card {{ background: rgba(255, 255, 255, 0.94); border-radius: 16px; padding: 1.15rem 1.25rem; box-shadow: 0 18px 55px rgba(31, 35, 71, 0.08); min-width: 0; }}
       .card h2 {{ margin: 0 0 0.75rem; font-size: 1.08rem; }}
@@ -1441,6 +1568,8 @@ def _render_page(status: Mapping[str, Any]) -> str:
           {boundary_html}
         </ul>
       </section>
+
+      {_render_orientation_band(status)}
 
       <div class="cards">
         <article class="card" id="card-portable-contract">

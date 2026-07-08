@@ -48,6 +48,51 @@ title, and a one-line boundary summary per card stay visible without expanding
 anything. Expanding a `details` section runs nothing; it only reveals text that
 was already loaded with the page.
 
+## Flow-first orientation band
+
+Lane: `UI-ALPHA-OPERATOR-CONSOLE-FLOW-FIRST-ORIENTATION-001`
+
+Above the card grid, an always-visible **orientation band** gives a flow-first
+answer to "what is this page and how do I use it" before you read any card. It
+is read-only orientation: it starts nothing, changes no state, and adds no
+control. The band has five parts:
+
+- **One-line purpose** — a plain statement that this is a local-first status
+  console that helps you review current local state and decide the next manual
+  step, and that it does not run, call, or execute anything.
+- **Static posture chips** — four non-interactive labels (`Local-first`,
+  `Live provider calls: disabled`, `Non-executing / read-only`,
+  `No API keys displayed`). They are static text, not toggles or buttons: they
+  are not clickable, submit nothing, and do not imply any state can be changed
+  from the console.
+- **Attention summary** — a short read-only summary derived only from local
+  metadata the console already assembles. The safe default is that no immediate
+  attention is detected from local metadata. When existing local metadata shows a
+  missing, unreadable, or stale condition already surfaced by a card below (for
+  example a missing capture artifact or derived files older than capture), the
+  band restates up to three of those items in bounded language. It is
+  local-metadata-only because it summarizes the same in-memory status the cards
+  read; it performs no new fetch and derives no readiness meaning.
+- **Next manual action** — one short line drawn from the existing manual
+  next-step data. It names a step that happens **outside** the console (for
+  example collecting outputs or running a terminal command). The console does not
+  perform the step; there is no button, no queue, and nothing is dispatched. When
+  no step applies, the band says no manual action is required from this console
+  view.
+- **Details-below pointer** — a quiet note that the review surfaces, manual-only
+  steps, blocked behavior, and receipts are detailed in the cards below.
+
+### What the band does not prove
+
+The orientation band is presentation only. It does not add execution, routes,
+write paths, action controls, or status JSON semantics, and it does not prove
+answer quality, route correctness, model superiority, provider readiness,
+billing accuracy, benchmark validity, production readiness, or validation
+success. The posture chips describe the console's fixed local-first, non-executing
+posture; they are not a health check, and a clean attention summary is not a
+readiness signal. It restates existing safety information and manual next steps
+so they are easier to understand; it does not make the console more capable.
+
 
 ## Operator Console First 5 Minutes
 
