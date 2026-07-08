@@ -272,7 +272,13 @@ AS-B014-VALUE-READ-DISCRIMINATION-WORKBENCH-DESIGN-001 ← recommends AS-B015 so
 AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001 ← recommends AS-B016 static mockup; implementation not authorized
         │
         ▼
-OPERATOR_REVIEW_REQUIRED_AFTER_B015_VALUE_READ_WORKBENCH_SOURCE_MAP_STATIC_PROTOTYPE_001 ← current review-only selected next state
+OPERATOR_REVIEW_REQUIRED_AFTER_B015_VALUE_READ_WORKBENCH_SOURCE_MAP_STATIC_PROTOTYPE_001 ← historical prior review-only selected next state
+        │
+        ▼
+AS-B016-VALUE-READ-WORKBENCH-STATIC-MOCKUP-001 ← static mockup packet completed; no implementation/runtime/provider/scoring/unblinding/final-interpretation authorized
+        │
+        ▼
+OPERATOR_REVIEW_REQUIRED_AFTER_B016_VALUE_READ_WORKBENCH_STATIC_MOCKUP_001 ← current review-only selected next state; no implementation lane selected
 ```
 
 This registry does not authorize production/public UI exposure, dashboard readiness, public provider exposure, local model validation claims, further task execution outside this manual simulation packet, scoring, score change, unblinding, source-map work, raw output inspection, Pi.dev install/run/integration, runtime endpoint exposure, public API exposure, `/v1/solve` exposure, Google Sheets mutation, benchmark, dependency addition, release implementation lane, or readiness/broad-value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
