@@ -34,6 +34,163 @@ return 404. When mounted, an unauthenticated `GET` redirects to `/login`.
 - Page: `GET /dashboard/operator-console`
 - Read-only status JSON: `GET /dashboard/operator-console/status`
 
+
+## Operator Console First 5 Minutes
+
+The Operator Console helps you review local evidence, understand manual next
+steps, and see what is blocked. It does not run Alpha Solver or call providers.
+
+Alpha Solver remains a discrimination and operator-control layer, not a generic
+dashboard or runner. Use this page as a local-first cockpit for reading bounded
+metadata and choosing manual next steps outside the console.
+
+### First five-minute checklist
+
+1. Confirm the console is protected and local-first under
+   `/dashboard/operator-console`.
+2. Check **Local Artifact Status** to see which local support files are present.
+3. Check **Freshness and Sequence Coherence** to see local file-time hints and
+   possible derived-artifact mismatches.
+4. Check **Provider, Model, and Cost Gate** to see configuration visibility and
+   why provider use remains blocked here.
+5. Read **Dry-Run Preview** as metadata only. It does not run a dry-run.
+6. Use **Manual Next Step Guide** to decide what is reviewable, manual-only, or
+   blocked.
+7. Use **ChatGPT Copy/Paste Capture** guidance only if you are manually
+   collecting outputs outside the console.
+8. Create a local receipt only if you need a bounded metadata snapshot of the
+   current console state.
+
+### Card-by-card interpretation
+
+#### Local Artifact Status
+
+- **What it shows:** compact states, counts, schema versions, packet ids, and
+  digests for local capture, evidence packet, and preflight support files.
+- **What it does not do:** it does not create, repair, delete, or rewrite those
+  files, and it does not show raw prompts or raw outputs.
+- **Mistake to avoid:** do not treat a present file or valid structure as proof
+  of answer quality or proof that the evidence is current.
+
+#### Freshness and Sequence Coherence
+
+- **What it shows:** local filesystem modified-time metadata and metadata-only
+  comparisons between capture and derived artifacts.
+- **What it does not do:** it does not prove the true order of manual work, and
+  it does not inspect raw prompt or output content.
+- **Mistake to avoid:** do not treat newer timestamps as quality evidence; copied
+  or restored files can carry misleading times.
+
+#### Provider, Model, and Cost Gate
+
+- **What it shows:** configured provider labels, key presence categories, cap
+  presence categories, and the display-only reason provider use stays blocked
+  inside this console.
+- **What it does not do:** it does not validate credentials, estimate spend, call
+  providers, or call ChatGPT.
+- **Mistake to avoid:** do not treat a present key or cap as provider readiness,
+  billing accuracy, or permission to run anything from the console.
+
+#### Dry-Run Preview
+
+- **What it shows:** a display-only summary of local metadata that a future lane
+  might use: capture state, evidence state, preflight state, freshness hints,
+  and provider-gate blockers.
+- **What it does not do:** it does not run a dry-run, call `/v1/solve`, call a
+  provider, generate answer text, or prove execution readiness.
+- **Mistake to avoid:** do not read `preview_ready` as a product readiness claim;
+  it means only local metadata completeness for this preview panel.
+
+#### Local Receipt Store
+
+- **What it shows:** recent local receipt metadata and a protected action to save
+  one bounded status snapshot.
+- **What it does not do:** it does not save raw prompts, raw outputs, pasted
+  model output, provider payloads, or arbitrary files.
+- **Mistake to avoid:** do not treat a receipt as validation, answer-quality
+  proof, benchmark evidence, or production readiness.
+
+#### ChatGPT Copy/Paste Capture
+
+- **What it shows:** manual-only guidance for collecting plain ChatGPT output and
+  routed Alpha output outside the console, then updating the local capture file
+  outside the console.
+- **What it does not do:** it does not call ChatGPT, automate a browser, provide
+  a paste box, store pasted output, or edit capture files.
+- **Mistake to avoid:** do not paste model output into the console; use the
+  operator-owned local capture workflow outside this page.
+
+#### Manual Next Step Guide
+
+- **What it shows:** bounded labels for what can be reviewed now, what must be
+  done manually outside the console, and what is blocked inside the console.
+- **What it does not do:** it does not create tasks, start work, run commands,
+  call services, or mutate artifacts.
+- **Mistake to avoid:** do not treat guide labels as instructions that the
+  console will perform; they are only operator-safety labels.
+
+#### Route/Trace placeholders
+
+- **What it shows:** placeholder route, trace, confidence, SAFE-OUT, expert/team,
+  shortlist, and diagnostics fields that say no run has happened here.
+- **What it does not do:** it does not invent route output, expose raw route
+  metadata, select outputs, or imply a solve occurred.
+- **Mistake to avoid:** do not treat placeholders as hidden results or pending
+  work; they are empty until a separately authorized lane wires real metadata.
+
+### What to do manually outside the console
+
+Do terminal commands from a terminal. Edit capture files outside the console.
+Collect ChatGPT copy/paste outputs manually outside the console. Review local
+evidence files outside the console when you need the raw local material. Decide
+manually whether a local receipt is useful for the current review.
+
+The console can show bounded metadata about those surfaces, but it does not
+perform the manual steps for you.
+
+### When to create a local receipt
+
+Create a local receipt when you need a bounded metadata snapshot of the current
+console state. A receipt is useful when you want a local timestamped summary of
+what the console showed at that moment.
+
+A receipt is not validation, not answer-quality proof, not benchmark evidence,
+and not production readiness. It is a local metadata snapshot only.
+
+### How to interpret Dry-Run Preview
+
+Dry-Run Preview is a display-only summary of local metadata that a future lane
+might use. It does not run a dry-run and does not prove execution readiness.
+
+Treat the preview as a checklist of visible local metadata and blockers. If it
+points to missing artifacts or blocked provider use, handle those items manually
+outside the console or wait for a separately authorized lane.
+
+### What the console does not prove
+
+The console does not prove:
+
+- answer quality
+- route correctness
+- model superiority
+- provider readiness
+- billing accuracy
+- benchmark validity
+- production readiness
+- validation success
+
+### Do not expect this console to...
+
+- run providers
+- call ChatGPT
+- run `/v1/solve`
+- run terminal commands
+- automate a browser
+- store pasted model output
+- edit capture files
+- display raw prompts or outputs
+- score, rank, or select winners
+
 ## Cards
 
 1. **Operator Console Header** — title, `local-first` mode, live provider calls
