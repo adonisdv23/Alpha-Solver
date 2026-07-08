@@ -1,0 +1,3 @@
+# Non-actions
+
+B017 does not implement runtime code, modify provider execution, modify Operator Console runtime behavior, modify webapp routes, add live UI behavior, add routes, add POST routes, create a real-run cockpit, call providers, run hosted models, run local models, expose or invoke `/v1/solve`, score outputs, mutate scores, unblind results, reveal source identities, perform final interpretation, mutate Google Sheets or external ledgers, create shell execution from UI, create CLI/subprocess execution from UI, create queues/runners/schedulers/workers/background jobs, implement B012, implement B013, or create a generic LLM playground.
