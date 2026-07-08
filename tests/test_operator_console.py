@@ -2708,12 +2708,20 @@ def test_operator_console_safety_helper_negative_controls(
                 sock.close()
         with pytest.raises(OperatorConsoleSafetyViolation):
             subprocess.run(["python", "-c", "print('must-not-run')"], check=False)
+        with pytest.raises(OperatorConsoleSafetyViolation):
+            os.system("echo must-not-run")
+        with pytest.raises(OperatorConsoleSafetyViolation):
+            os.popen("echo must-not-run")
+        with pytest.raises(OperatorConsoleSafetyViolation):
+            os.spawnv(os.P_WAIT, "/bin/echo", ["echo", "must-not-run"])
 
     with operator_console_no_get_write_guard(monkeypatch):
         with pytest.raises(OperatorConsoleSafetyViolation):
             (tmp_path / "unauthorized.txt").write_text("must-not-write", encoding="utf-8")
         with pytest.raises(OperatorConsoleSafetyViolation):
             open(tmp_path / "unauthorized-open.txt", "w", encoding="utf-8")
+        with pytest.raises(OperatorConsoleSafetyViolation):
+            (tmp_path / "unauthorized-path-open.txt").open("x", encoding="utf-8")
 
 
 def test_operator_console_provider_and_model_canaries_raise(
@@ -2744,11 +2752,22 @@ def test_operator_console_v1_solve_canary_raises(monkeypatch: pytest.MonkeyPatch
     async def _boom(*_args: object, **_kwargs: object) -> None:
         raise OperatorConsoleSafetyViolation("blocked /v1/solve invocation")
 
+    route = next(route for route in app.routes if getattr(route, "path", None) == "/v1/solve")
     monkeypatch.setattr(service_app, "solve", _boom)
+    monkeypatch.setattr(route, "endpoint", _boom)
+    monkeypatch.setattr(route.dependant, "call", _boom)
     with pytest.raises(OperatorConsoleSafetyViolation):
         import anyio
 
         anyio.run(service_app.solve, object(), object())
+    with pytest.raises(OperatorConsoleSafetyViolation):
+        import anyio
+
+        anyio.run(route.endpoint, object(), object())
+    with pytest.raises(OperatorConsoleSafetyViolation):
+        import anyio
+
+        anyio.run(route.dependant.call, object(), object())
 
 
 def test_operator_console_render_status_under_reusable_safety_guard(
@@ -2768,7 +2787,10 @@ def test_operator_console_render_status_under_reusable_safety_guard(
     monkeypatch.setattr(openai_provider.OpenAIProviderClient, "__init__", _blocked)
     monkeypatch.setattr(openai_provider.OpenAIProviderClient, "execute", _blocked)
     monkeypatch.setattr(app.state, "provider_client_factory", _blocked, raising=False)
+    solve_route = next(route for route in app.routes if getattr(route, "path", None) == "/v1/solve")
     monkeypatch.setattr(service_app, "solve", _blocked_solve)
+    monkeypatch.setattr(solve_route, "endpoint", _blocked_solve)
+    monkeypatch.setattr(solve_route.dependant, "call", _blocked_solve)
 
     _login(client)
     with operator_console_no_execution_guard(monkeypatch), operator_console_no_get_write_guard(monkeypatch):
@@ -2799,7 +2821,10 @@ def test_operator_console_import_tree_under_safety_guard(monkeypatch: pytest.Mon
 
     monkeypatch.setattr(openai_provider.OpenAIProviderClient, "__init__", _blocked)
     monkeypatch.setattr(app.state, "provider_client_factory", _blocked, raising=False)
+    solve_route = next(route for route in app.routes if getattr(route, "path", None) == "/v1/solve")
     monkeypatch.setattr(service_app, "solve", _blocked_solve)
+    monkeypatch.setattr(solve_route, "endpoint", _blocked_solve)
+    monkeypatch.setattr(solve_route.dependant, "call", _blocked_solve)
 
     with operator_console_no_execution_guard(monkeypatch), operator_console_no_get_write_guard(monkeypatch):
         importlib.reload(artifacts)
@@ -2813,6 +2838,7 @@ def test_operator_console_write_chokepoint_source_allowlist() -> None:
     modules = (artifacts, operator_console, receipts)
     allowed_write_calls = {
         (Path(receipts.__file__).resolve(), "mkdir"),
+        (Path(receipts.__file__).resolve(), "open"),
         (Path(receipts.__file__).resolve(), "write_text"),
     }
     violations: list[str] = []
@@ -2827,9 +2853,16 @@ def test_operator_console_write_chokepoint_source_allowlist() -> None:
                 elif isinstance(node.func, ast.Name):
                     name = node.func.id
                 if name == "open":
-                    mode = node.args[1].value if len(node.args) > 1 and isinstance(node.args[1], ast.Constant) else "r"
+                    if isinstance(node.func, ast.Attribute):
+                        mode_arg = node.args[0] if node.args else None
+                    else:
+                        mode_arg = node.args[1] if len(node.args) > 1 else None
+                    mode_keyword = next((kw.value for kw in node.keywords if kw.arg == "mode"), None)
+                    mode_node = mode_keyword or mode_arg
+                    mode = mode_node.value if isinstance(mode_node, ast.Constant) else "r"
                     if any(flag in str(mode) for flag in ("w", "a", "x", "+")):
-                        violations.append(f"{module_path}:{node.lineno}: open({mode!r})")
+                        if (module_path, name) not in allowed_write_calls:
+                            violations.append(f"{module_path}:{node.lineno}: open({mode!r})")
                 if name in {"write_text", "write_bytes", "mkdir", "dump"}:
                     if (module_path, name) not in allowed_write_calls:
                         violations.append(f"{module_path}:{node.lineno}: {name}")

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import builtins
+import os
 import socket
 import subprocess
 from contextlib import contextmanager
@@ -52,6 +53,28 @@ def operator_console_no_execution_guard(monkeypatch: pytest.MonkeyPatch) -> Iter
     monkeypatch.setattr(subprocess, "call", _blocked_process)
     monkeypatch.setattr(subprocess, "check_call", _blocked_process)
     monkeypatch.setattr(subprocess, "check_output", _blocked_process)
+    for name in (
+        "execl",
+        "execle",
+        "execlp",
+        "execlpe",
+        "execv",
+        "execve",
+        "execvp",
+        "execvpe",
+        "popen",
+        "spawnl",
+        "spawnle",
+        "spawnlp",
+        "spawnlpe",
+        "spawnv",
+        "spawnve",
+        "spawnvp",
+        "spawnvpe",
+        "startfile",
+        "system",
+    ):
+        monkeypatch.setattr(os, name, _blocked_process, raising=False)
     yield
 
 
@@ -66,6 +89,7 @@ def operator_console_no_get_write_guard(
     """
 
     original_open = builtins.open
+    original_path_open = Path.open
     original_write_text = Path.write_text
     original_write_bytes = Path.write_bytes
     write_modes = {"w", "a", "x", "+"}
@@ -84,6 +108,11 @@ def operator_console_no_get_write_guard(
             raise OperatorConsoleSafetyViolation(f"blocked unauthorized filesystem write: {file!r}")
         return original_open(file, mode, *args, **kwargs)
 
+    def guarded_path_open(self: Path, mode: str = "r", *args: object, **kwargs: object) -> object:
+        if any(flag in mode for flag in write_modes) and not _is_allowed(self):
+            raise OperatorConsoleSafetyViolation(f"blocked unauthorized Path.open write: {self!s}")
+        return original_path_open(self, mode, *args, **kwargs)
+
     def guarded_write_text(self: Path, *_args: object, **_kwargs: object) -> int:
         if not _is_allowed(self):
             raise OperatorConsoleSafetyViolation(f"blocked unauthorized Path.write_text: {self!s}")
@@ -95,6 +124,7 @@ def operator_console_no_get_write_guard(
         return original_write_bytes(self, *_args, **_kwargs)
 
     monkeypatch.setattr(builtins, "open", guarded_open)
+    monkeypatch.setattr(Path, "open", guarded_path_open)
     monkeypatch.setattr(Path, "write_text", guarded_write_text)
     monkeypatch.setattr(Path, "write_bytes", guarded_write_bytes)
     yield
