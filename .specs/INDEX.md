@@ -77,6 +77,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 | `OUTPUT-DIFF-B1-LIFT-REPORTING-HARDENING-001.md` | OUTPUT-DIFF-B1-LIFT-REPORTING-HARDENING-001 · Output Differentiation Reporting Hardening | ✅ `SPEC_OK` |
 | `OUTPUT-DIFF-MEASUREMENT-HARDENING-001.md` | OUTPUT-DIFF-MEASUREMENT-HARDENING-001 · Output Differentiation Measurement Hardening | ✅ `SPEC_OK` |
 | `PR646-SUBSTANTIVE-LIFT-MANUAL-EVAL-PREP-001.md` | PR646-SUBSTANTIVE-LIFT-MANUAL-EVAL-PREP-001 · Substantive Lift Manual Eval Prep | ✅ `SPEC_OK` |
+| `PROCESS-HARDENING-NO-PROVIDER-CALL-TEST-HELPER-001.md` | PROCESS-HARDENING-NO-PROVIDER-CALL-TEST-HELPER-001 · Operator Console execution-boundary and write-chokepoint hardening | ✅ `SPEC_OK` |
 | `PROVIDER-BUDGET-001.md` | PROVIDER-BUDGET-001 · Post-call Provider Cost Accounting | ✅ `SPEC_OK` |
 | `PROVIDER-EXPERT-PASS-001.md` | PROVIDER-EXPERT-PASS-001 · Opt-in Expert Provider Pass | ✅ `SPEC_OK` |
 | `PROVIDER-OPENAI-001.md` | PROVIDER-OPENAI-001 · Real OpenAI Provider Execution | ✅ `SPEC_OK` |
