@@ -3214,3 +3214,258 @@ def test_progressive_disclosure_status_payload_shape_unchanged(client: TestClien
         assert section in payload
     assert payload["provider_gate"]["live_execution_gate"] == "blocked"
     assert payload["run_setup"]["live_run_button_enabled"] is False
+
+
+# ---------------------------------------------------------------------------
+# UI-ALPHA-OPERATOR-CONSOLE-FLOW-FIRST-ORIENTATION-001
+# A read-only flow-first orientation band above the existing card grid answers,
+# in the first few seconds: what the page is, its static safety posture, whether
+# anything needs attention, and what manual step happens outside the console. It
+# is presentation-only: no control, no route, no write path, no status field.
+# ---------------------------------------------------------------------------
+_EXPECTED_STATUS_KEYS = {
+    "console",
+    "portable_contract",
+    "run_setup",
+    "route_trace",
+    "provider_gate",
+    "dry_run_preview",
+    "chatgpt_copy_paste_capture",
+    "manual_next_step_guide",
+    "preflight_capture",
+    "evidence_receipt",
+    "local_artifacts",
+    "local_receipts",
+}
+
+# Non-readiness language guard. The band must not imply readiness, validation,
+# benchmark, winner, or superiority.
+_ORIENTATION_FORBIDDEN_LANGUAGE = (
+    "validated",
+    "ready",
+    "all clear",
+    "passed",
+    "healthy",
+    "production ready",
+    "benchmark",
+    "winner",
+    "superiority",
+)
+
+
+def _orientation_band_html(html_text: str) -> str:
+    start = html_text.index('id="orientation-band"')
+    end = html_text.index("</section>", start)
+    return html_text[start:end]
+
+
+def test_orientation_band_exists(client: TestClient) -> None:
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    assert 'id="orientation-band"' in html_text
+    assert 'class="orientation-band"' in html_text
+
+
+def test_orientation_band_appears_before_card_grid(client: TestClient) -> None:
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    assert html_text.index('id="orientation-band"') < html_text.index(
+        '<div class="cards">'
+    )
+
+
+def test_orientation_band_contains_one_line_purpose(client: TestClient) -> None:
+    _login(client)
+    band = _orientation_band_html(client.get(PAGE_ROUTE).text)
+    assert operator_console.ORIENTATION_PURPOSE_TEXT in band
+    # The purpose states plainly that the console does not execute anything.
+    assert "does not run, call, or execute anything" in band
+
+
+def test_orientation_band_shows_static_posture_chips(client: TestClient) -> None:
+    _login(client)
+    band = _orientation_band_html(client.get(PAGE_ROUTE).text)
+    for chip in (
+        "Local-first",
+        "Live provider calls: disabled",
+        "Non-executing / read-only",
+        "No API keys displayed",
+    ):
+        assert f'<span class="posture-chip">{chip}</span>' in band
+
+
+def test_orientation_posture_chips_are_non_interactive(client: TestClient) -> None:
+    _login(client)
+    band = _orientation_band_html(client.get(PAGE_ROUTE).text).lower()
+    # Chips are static labels: not buttons, links, forms, inputs, or toggles.
+    for interactive in (
+        "<button",
+        "<a ",
+        "<a>",
+        "<input",
+        "<select",
+        "<textarea",
+        "<form",
+        "onclick",
+        "onsubmit",
+        "onchange",
+        'role="button"',
+        'type="submit"',
+        'type="checkbox"',
+        "href=",
+        'method="post"',
+    ):
+        assert interactive not in band, interactive
+
+
+def test_orientation_band_includes_attention_summary(client: TestClient) -> None:
+    _login(client)
+    band = _orientation_band_html(client.get(PAGE_ROUTE).text)
+    assert "Attention summary" in band
+    assert '<ul class="orientation-attention">' in band
+    # With no local artifacts present, the band restates a condition already
+    # rendered by the Local Artifact Status card, without inventing readiness.
+    assert "Capture artifact missing." in band
+
+
+def test_orientation_attention_safe_default_when_nothing_needs_attention(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _write_all_four(tmp_path)
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+    band = _orientation_band_html(client.get(PAGE_ROUTE).text)
+    assert operator_console.ORIENTATION_ATTENTION_DEFAULT in band
+    assert "Capture artifact missing." not in band
+
+
+def test_orientation_band_includes_next_manual_action(client: TestClient) -> None:
+    _login(client)
+    band = _orientation_band_html(client.get(PAGE_ROUTE).text)
+    assert "Next manual action" in band
+    # The line is derived from existing manual next-step data and explicitly
+    # says the step happens outside the console.
+    assert operator_console.ORIENTATION_NEXT_ACTION_PREFIX in band
+    assert "outside the console" in band
+
+
+def test_orientation_band_uses_safe_non_readiness_language(client: TestClient) -> None:
+    _login(client)
+    band_lower = _orientation_band_html(client.get(PAGE_ROUTE).text).lower()
+    for forbidden in _ORIENTATION_FORBIDDEN_LANGUAGE:
+        assert forbidden not in band_lower, forbidden
+
+
+def test_orientation_band_keeps_existing_safety_boundary_strings(
+    client: TestClient,
+) -> None:
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    for text in (
+        operator_console.LOCAL_FIRST_TEXT,
+        operator_console.LIVE_DISABLED_TEXT,
+        operator_console.NO_KEYS_TEXT,
+        operator_console.CLAIM_BOUNDARY_TEXT,
+        operator_console.ARTIFACT_BOUNDARY_TEXT,
+    ):
+        assert text in html_text
+
+
+def test_orientation_band_preserves_all_card_ids(client: TestClient) -> None:
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    for card_id in (
+        "card-portable-contract",
+        "card-run-setup",
+        "card-dry-run-preview",
+        "card-route-trace",
+        "card-provider-gate",
+        "card-preflight-capture",
+        "card-manual-next-step-guide",
+        "card-chatgpt-copy-paste-capture",
+        "card-local-receipt-store",
+        "card-evidence-receipt",
+    ):
+        assert card_id in html_text
+
+
+def test_orientation_band_keeps_live_run_button_disabled(client: TestClient) -> None:
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    assert "Live run (disabled)" in html_text
+    assert 'class="disabled-btn" disabled' in html_text
+
+
+def test_orientation_band_adds_no_new_form(client: TestClient) -> None:
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    # The only form on the page remains the existing receipt-store form.
+    assert html_text.count("<form") == 1
+    assert f'action="{RECEIPTS_ROUTE}"' in html_text
+    # No new interactive text input beyond the pre-existing disabled prompt box,
+    # and none of it lives in the orientation band.
+    assert html_text.count("<textarea") == 1
+    assert "<textarea" not in _orientation_band_html(html_text)
+
+
+def test_orientation_band_adds_no_new_post_route() -> None:
+    post_paths = {
+        getattr(route, "path", None)
+        for route in app.routes
+        if "POST" in getattr(route, "methods", set())
+        and str(getattr(route, "path", "")).startswith("/dashboard/operator-console")
+    }
+    assert post_paths == {RECEIPTS_ROUTE}
+
+
+def test_orientation_band_status_json_shape_unchanged(client: TestClient) -> None:
+    _login(client)
+    payload = client.get(STATUS_ROUTE).json()
+    # No orientation field leaks into the status payload: the band is render-only.
+    assert set(payload.keys()) == _EXPECTED_STATUS_KEYS
+    assert payload["provider_gate"]["live_execution_gate"] == "blocked"
+    assert payload["provider_gate"]["live_provider_calls"] == "disabled"
+    assert payload["run_setup"]["live_run_button_enabled"] is False
+    for forbidden_field in ("orientation", "orientation_band", "attention_summary"):
+        assert forbidden_field not in payload
+
+
+def test_orientation_band_introduces_no_action_control_or_viewer(
+    client: TestClient,
+) -> None:
+    _login(client)
+    html_text = client.get(PAGE_ROUTE).text
+    band_lower = _orientation_band_html(html_text).lower()
+    for token in (
+        "contenteditable",
+        "<textarea",
+        "queue",
+        "runner",
+        "scheduler",
+        "worker",
+        "scoring",
+        "ranking",
+        "winner",
+        "dispatch",
+        "run selected",
+        "paste",
+        "raw prompt",
+        "raw output",
+    ):
+        assert token not in band_lower, token
+    # The console still refuses to store pasted output or write capture.
+    payload = client.get(STATUS_ROUTE).json()
+    assert payload["chatgpt_copy_paste_capture"]["console_stores_pasted_outputs"] is False
+    assert payload["chatgpt_copy_paste_capture"]["console_writes_capture"] is False
+
+
+def test_orientation_band_under_reusable_safety_guard(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _login(client)
+    with operator_console_no_execution_guard(monkeypatch), operator_console_no_get_write_guard(monkeypatch):
+        page = client.get(PAGE_ROUTE)
+        status = client.get(STATUS_ROUTE)
+    assert page.status_code == 200
+    assert status.status_code == 200
+    assert 'id="orientation-band"' in page.text
