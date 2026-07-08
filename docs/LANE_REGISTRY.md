@@ -1,7 +1,7 @@
 # Lane Registry
 
-> Source-of-truth lane lifecycle registry. Verification date **2026-06-18** for
-> console target-parity product pass.
+> Source-of-truth lane lifecycle registry. Verification date **2026-07-08** for
+> `AS-POST-676-NORTH-STAR-ROADMAP-RESET-001`.
 
 ## Lifecycle classes
 
@@ -11,13 +11,14 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Console HTML/diagram target-parity gap closure | **current control posture** | `ALPHA-SOLVER-CONSOLE-HTML-DIAGRAM-TARGET-PARITY-GAP-CLOSURE-001` adds preview-only catalog snapshot, built-now / next / future, difference, and review-only improvement-loop cards. Selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_CONSOLE_HTML_DIAGRAM_TARGET_PARITY_GAP_CLOSURE_001`. |
+| Post-#676 north-star roadmap reset | **current control posture** | `AS-POST-676-NORTH-STAR-ROADMAP-RESET-001` records the Operator Console sequence as adjacent/supporting work and selects `OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001`; no B012/B013 implementation, provider calls, `/v1/solve` exposure, scoring, unblinding, final interpretation, or broad claims are authorized. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_REVIEW_REQUIRED_AFTER_CONSOLE_HTML_DIAGRAM_TARGET_PARITY_GAP_CLOSURE_001`** | **operator-review selected next state** | Operator review is required after the narrow local-console HTML/diagram target-parity gap-closure lane. Provider/local-model/hosted-model/tool/web execution, runtime GitHub calls, `/v1/solve`, Sheets, scoring, unblinding, readiness/value/superiority claims, and model/tool quality claims remain unauthorized. |
+| **`OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001`** | **operator-review selected next state** | Operator product-direction selection is required before any next implementation lane. B012 and B013 are deferred; no provider execution, `/v1/solve` exposure, scoring, unblinding, final interpretation, value/readiness/superiority claim, provider/local-model validation claim, production/public claim, or security/privacy claim is authorized. |
+| `OPERATOR_REVIEW_REQUIRED_AFTER_CONSOLE_HTML_DIAGRAM_TARGET_PARITY_GAP_CLOSURE_001` | prior review-only selected next state | Operator review is required after the narrow local-console HTML/diagram target-parity gap-closure lane. Provider/local-model/hosted-model/tool/web execution, runtime GitHub calls, `/v1/solve`, Sheets, scoring, unblinding, readiness/value/superiority claims, and model/tool quality claims remain unauthorized. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_METADATA_DISPLAY_001` | prior review-only selected next state | Operator review was required after the local-console route-preview metadata display lane before this packet was prepared. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLINDED_SCORER_PACKET_CONSTRUCTION_001` | prior review-only selected next state | Blinded scorer packet construction was recorded before blind scoring authorization prep. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_PILOT_OUTPUTS_001` | prior review-only selected next state | Manual prompt-contract simulation outputs were recorded before blinded scorer packet construction. |

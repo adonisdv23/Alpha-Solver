@@ -1,5 +1,8 @@
 # Alpha Solver - Current State
 
+
+> Source-of-truth reset update **2026-07-08**: lane `AS-POST-676-NORTH-STAR-ROADMAP-RESET-001` records the post-#663 through post-#676 Operator Console sequence as adjacent/supporting work and selects `OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001`. No implementation lane is selected by this reset; B012/B013-style cockpit work is deferred pending operator product-direction selection. This update authorizes no provider calls, runtime changes, `/v1/solve` exposure, scoring, unblinding, final interpretation, value claim, readiness claim, provider/local-model validation claim, production/public claim, security/privacy claim, or Alpha-superiority claim.
+
 > Source-of-truth navigation doc. Last verified **2026-06-18** for console HTML/diagram target-parity gap closure.
 > This lane records local-console target-parity route UI build updates and deterministic no-call route preview reporting. It does not run Alpha runtime, invoke `/v1/solve`, call providers, run hosted or local models, execute tools, browse, unblind, inspect source identities, inspect route metadata, mutate Sheets, deploy, interpret final results, or make production/public/benchmark/provider/local-model/tool/security/privacy/autonomous-readiness/Alpha-superiority claims.
 
@@ -17,6 +20,10 @@ These are docs, gate, helper, static/research, blocked-attempt, scoring-only, se
 
 | Field | Value |
 |-------|-------|
+| Latest source-truth reset lane | **`AS-POST-676-NORTH-STAR-ROADMAP-RESET-001`** |
+| Current selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001`** |
+| Operator Console sequence status | PR #663 through PR #676 are recorded as adjacent/supporting local-first visibility and operator-status work, not automatic selection of a cockpit implementation lane |
+| B012/B013 posture | Deferred pending operator product-direction selection; no B012 implementation and no B013 real-run provider work are authorized by this reset |
 | Latest verified completed lane in this wave | **`ALPHA-SOLVER-CONSOLE-HTML-DIAGRAM-TARGET-PARITY-GAP-CLOSURE-001`** |
 | Source-of-truth sync | Current docs record the completed console HTML/diagram target-parity gap closure and operator-review selected next state |
 | Closed-unmerged superseded PR | **#561** - superseded by merged PR #562 |

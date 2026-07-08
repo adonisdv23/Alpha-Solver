@@ -1,6 +1,6 @@
 # Roadmap
 
-> Refreshed **2026-06-15** for the post-#568 blocked Value Read state.
+> Refreshed **2026-07-08** for `AS-POST-676-NORTH-STAR-ROADMAP-RESET-001`.
 > The old PR #91–#99 list below is **historical** and no longer the current
 > roadmap. Source of truth for current state:
 > [`CURRENT_STATE.md`](CURRENT_STATE.md). This roadmap makes **no** readiness,
@@ -8,13 +8,13 @@
 
 ## Current phase
 
-**Post-#568 blocked Value Read state.** Live GitHub verification on 2026-06-15 confirmed PRs #566, #567, and #568 are merged. PR #568 committed a manual Value Read artifact that stopped before output generation and scoring.
+**Post-#676 north-star roadmap reset.** The current selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001`. The post-#663 through post-#676 Operator Console sequence is recorded as adjacent/supporting local-first visibility and operator-status work. It does not automatically select B012, B013, a real-run cockpit, a provider execution lane, or any UI implementation lane.
 
-The prior infrastructure records no-echo gating, false-premise / hidden-constraint cases, claim-safety linting, calibrated-confidence vocabulary, needs-human protocol guidance, higher-headroom Value Read cases, prompt-contract simulation methodology, and a local Ollama singlepath scaffold. PR #568 does not add provider/model/value/readiness evidence; it records `VALUE_READ_BLOCKED` with no Alpha outputs, baseline outputs, blind scores, or discrimination-delta.
+Alpha Solver remains centered on reasoning/routing plus discrimination/evidence. B012/B013-style cockpit work is deferred pending operator product-direction selection. No provider calls, hosted/local model runs, `/v1/solve` exposure, scoring, unblinding, final interpretation, readiness/value/superiority claims, provider/local-model validation claims, production/public claims, or security/privacy claims are authorized by this roadmap reset.
 
-## Current next lane
+## Current next state
 
-**`ALPHA-SOLVER-VALUE-READ-EXECUTION-PACKET-AUTHORIZATION-001`** — create an explicitly authorized Value Read execution packet/lane with complete per-case prompts, raw-output preservation, blinding-map storage, output-generation boundary, and explicit operator authorization requirements. This is controlled authorization/design work only until a future authorization supplies execution boundaries; it does not authorize provider calls, token use, credential access, billing inspection, hosted model calls, local model calls, dashboard exposure, `/v1/solve` exposure, public API exposure, Google Sheets mutation, benchmark execution, or value/readiness claims by itself.
+**`OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001`** — operator review is required before choosing the next product direction. Candidate directions are recorded in `docs/evals/runs/as-post-676-north-star-roadmap-reset-001/product-direction-options.md`: bounded smoke-test cockpit, Value Read/discrimination workbench, route and expert-preview control surface, CLI/artifact operator companion, full real-run Operator Cockpit, and read-only status checkpoint.
 
 ## Active deferrals
 

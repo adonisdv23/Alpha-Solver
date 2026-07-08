@@ -1,6 +1,6 @@
 # Evidence Index - test console routing metadata operator review packet
 
-> Source-of-truth evidence ledger. Verification date **2026-06-18** after console HTML/diagram target-parity gap-closure lane `ALPHA-SOLVER-CONSOLE-HTML-DIAGRAM-TARGET-PARITY-GAP-CLOSURE-001`.
+> Source-of-truth evidence ledger. Verification date **2026-07-08** after `AS-POST-676-NORTH-STAR-ROADMAP-RESET-001`.
 
 ## How to read "evidence value"
 
@@ -10,6 +10,7 @@ The entries below are design, documentation, gate, helper, static-checking, meth
 
 | PR | Title | Merged / status | Primary artifact | Evidence value | Non-claims | Lifecycle |
 |----|-------|-----------------|------------------|----------------|------------|-----------|
+| post-#676 reset | `AS-POST-676-NORTH-STAR-ROADMAP-RESET-001` | current branch | `.specs/AS-POST-676-NORTH-STAR-ROADMAP-RESET-001.md`; `docs/evals/runs/as-post-676-north-star-roadmap-reset-001/` | Records operator-review-required source-truth reset after the Operator Console sequence; reclassifies B012/B013-style cockpit work as deferred pending product-direction selection. | No provider/runtime/local-model execution, `/v1/solve` exposure, scoring, unblinding, final interpretation, readiness/value/superiority claim, provider/local-model validation claim, production/public claim, or security/privacy claim. | current review gate |
 | #557 | Add post-552 no-echo substantive generation gate | ✅ merged 2026-06-15 | `.specs/ALPHA-SOLVER-NO-ECHO-SUBSTANTIVE-GENERATION-GATE-POST-552-SUCCESSOR-001.md`; `docs/evals/runs/alpha-solver-no-echo-substantive-generation-gate-post-552-successor-001/` | Records a substantive-generation / no-echo gate after the post-552 sequence. | Does not prove model quality, provider behavior, or value. | completed |
 | #558 | Add false-premise & hidden-constraint perturbation case set for Value Read | ✅ merged 2026-06-15 | `.specs/ALPHA-SOLVER-EVAL-FALSE-PREMISE-PERTURBATION-001.md` | Adds future Value Read perturbation material for false-premise and hidden-constraint handling. | Does not run an eval, call a model, or prove robustness. | completed |
 | #559 | Add narrative claim-safety linter | ✅ merged 2026-06-15 | `.specs/ALPHA-SOLVER-NARRATIVE-CLAIM-SAFETY-LINTER-001.md`; `docs/evals/runs/alpha-solver-narrative-claim-safety-linter-001/` | Adds claim-safety linting infrastructure for unsupported narrative claims. | Does not certify all docs, security/privacy, readiness, or claim safety globally. | completed |
