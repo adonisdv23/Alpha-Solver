@@ -1,27 +1,25 @@
 # Alpha Solver - Current State
 
-> Source-of-truth navigation doc. Last verified **2026-07-08** for `AS-B014-VALUE-READ-DISCRIMINATION-WORKBENCH-DESIGN-001`.
-> This update records the completed B014 design for `VALUE_READ_DISCRIMINATION_WORKBENCH` and recommends `AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001` for operator review.
+> Source-of-truth navigation doc. Last verified **2026-07-08** for `AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001`.
+> This update records the completed B015 source-map/static-prototype planning lane and recommends `AS-B016-VALUE-READ-WORKBENCH-STATIC-MOCKUP-001` for operator review.
 
 ## Current verified phase
 
-**B014 Value Read / discrimination workbench design completed for operator review.**
+**B015 Value Read workbench source-map/static-prototype planning completed for operator review.**
 
-The previous selected state was `OPERATOR_REVIEW_REQUIRED_AFTER_POST_677_PRODUCT_DIRECTION_SELECTION_001`. This lane completes the first design packet for the selected `VALUE_READ_DISCRIMINATION_WORKBENCH` direction. It does not implement UI, runtime behavior, B012, B013, scoring, unblinding, final interpretation, provider/model work, or broad claims.
-
-The workbench remains defined as a source-truth-grounded operator workbench for understanding whether Alpha Solver is producing differentiated, evidence-bounded, route-aware work compared with plain or baseline outputs.
+The previous selected state was `OPERATOR_REVIEW_REQUIRED_AFTER_B014_VALUE_READ_WORKBENCH_DESIGN_001`. This lane converts the B014 `VALUE_READ_DISCRIMINATION_WORKBENCH` design into exact source-map, field-inventory, status-taxonomy, data-readiness, claim-boundary, and text-only first-screen planning artifacts. It does not implement UI, runtime behavior, B012, B013, scoring, unblinding, final interpretation, provider/model work, or broad claims.
 
 ## At a glance
 
 | Field | Value |
 |-------|-------|
-| Latest completed design lane | **`AS-B014-VALUE-READ-DISCRIMINATION-WORKBENCH-DESIGN-001`** |
+| Latest completed planning lane | **`AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001`** |
 | Selected product direction | **`VALUE_READ_DISCRIMINATION_WORKBENCH`** |
-| Current selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_B014_VALUE_READ_WORKBENCH_DESIGN_001`** |
-| Recommended next lane | **`AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001`** |
+| Current selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_B015_VALUE_READ_WORKBENCH_SOURCE_MAP_STATIC_PROTOTYPE_001`** |
+| Recommended next lane | **`AS-B016-VALUE-READ-WORKBENCH-STATIC-MOCKUP-001`** |
 | B012/B013 posture | Deferred pending separate operator decision; not authorized by this lane |
-| Prior selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_POST_677_PRODUCT_DIRECTION_SELECTION_001` is historical prior context only |
-| Strategic boundary | This lane completes design only; it authorizes no implementation, runtime behavior, UI implementation, provider/model work, scoring, unblinding, final interpretation, readiness claim, value claim, or Alpha-superiority claim |
+| Prior selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_B014_VALUE_READ_WORKBENCH_DESIGN_001` is historical prior context only |
+| Strategic boundary | This lane completes source-map/static-prototype planning only; it authorizes no implementation, runtime behavior, live UI, provider/model work, scoring, unblinding, final interpretation, readiness claim, value claim, or Alpha-superiority claim |
 
 ## Product direction selection
 
@@ -39,12 +37,14 @@ This direction should focus on:
 
 ## Recommended next lane
 
-`AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001`
+`AS-B016-VALUE-READ-WORKBENCH-STATIC-MOCKUP-001`
 
-This follow-up should remain docs/design or static prototype planning only unless separately authorized. It should build the source map and static prototype plan for the workbench before runtime/UI implementation.
+This follow-up should create a static, non-runtime workbench mockup from the B015 source map and wireframe. It should remain static only unless separately authorized.
 
 ## Deferred directions
 
+- B012 implementation: deferred.
+- B013 real-run provider work: deferred.
 - Bounded smoke-test cockpit: deferred as support surface.
 - Route and expert-preview surface: deferred as component or later focused lane.
 - CLI/artifact operator companion: deferred as support infrastructure.
@@ -56,21 +56,23 @@ This follow-up should remain docs/design or static prototype planning only unles
 - B012 implementation.
 - B013 real-run provider work.
 - Runtime behavior changes.
-- UI implementation.
+- UI implementation or live UI behavior.
 - New routes or write paths.
 - Model work.
-- Score changes.
+- Provider calls.
+- `/v1/solve` exposure.
+- Score changes or scoring.
 - Unblinding or source identity reveal.
 - Final interpretation.
 - External ledger mutation.
 - Broad value, readiness, benchmark, production, public-readiness, security/privacy, or Alpha-superiority claims.
 
-## B014 completion boundary
+## B015 completion boundary
 
-The B014 design is complete for operator review. Implementation is not authorized. B012/B013 remain deferred. No provider calls, `/v1/solve` exposure, scoring, unblinding, final interpretation, or value/readiness/superiority claim is authorized.
+The B015 source map and static prototype plan are complete for operator review. Implementation is not authorized. B016 static mockup is recommended. B012/B013 remain deferred. No provider calls, `/v1/solve` exposure, scoring, unblinding, final interpretation, or value/readiness/superiority claim is authorized.
 
 ## Historical context
 
-PR #677 merged `AS-POST-676-NORTH-STAR-ROADMAP-RESET-001` and recorded the post-#663 through post-#676 Operator Console sequence as adjacent/supporting work. The reset selected `OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001`; `AS-POST-677-PRODUCT-DIRECTION-SELECTION-001` resolved that state into the `VALUE_READ_DISCRIMINATION_WORKBENCH` product-direction selection.
+PR #677 merged `AS-POST-676-NORTH-STAR-ROADMAP-RESET-001` and recorded the post-#663 through post-#676 Operator Console sequence as adjacent/supporting work. The reset selected `OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001`; `AS-POST-677-PRODUCT-DIRECTION-SELECTION-001` resolved that state into the `VALUE_READ_DISCRIMINATION_WORKBENCH` product-direction selection. PR #679 merged `AS-B014-VALUE-READ-DISCRIMINATION-WORKBENCH-DESIGN-001`, which recommended B015.
 
 Historical lanes remain preserved in `docs/EVIDENCE_INDEX.md` and `docs/LANE_REGISTRY.md`.
