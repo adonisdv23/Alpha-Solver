@@ -4,7 +4,6 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 
 > **Health status added 2026-06-13** by lane `ALPHA-SOLVER-SPEC-CONTAMINATION-RECONCILIATION-001`. **Updated 2026-06-14** by lane `ALPHA-SOLVER-SPEC-SOURCE-RECONSTRUCTION-001`: the 22 formerly contaminated specs are now marked `SPEC_RECONSTRUCTED_FROM_SOURCE` after replacement from committed code and tests only. See [`../docs/evals/runs/alpha-solver-spec-source-reconstruction-001/`](../docs/evals/runs/alpha-solver-spec-source-reconstruction-001/).
 
-
 | File | Title | Health |
 | --- | --- | --- |
 | `ALPHA-ANSWER-STRUCTURE-V2-001.md` | ALPHA-ANSWER-STRUCTURE-V2-001 | ✅ `SPEC_OK` |
@@ -27,6 +26,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 | `ALPHA-SOLVER-NO-ECHO-SUBSTANTIVE-GENERATION-GATE-POST-552-SUCCESSOR-001.md` | ALPHA-SOLVER-NO-ECHO-SUBSTANTIVE-GENERATION-GATE-POST-552-SUCCESSOR-001 · Post-552 No-Echo Substantive Generation Gate | ✅ `SPEC_OK` |
 | `ALPHA-SOLVER-SAFEOUT-CONFIDENCE-HONESTY-001.md` | ALPHA-SOLVER-SAFEOUT-CONFIDENCE-HONESTY-001 | ✅ `SPEC_OK` |
 | `AS-POST-676-NORTH-STAR-ROADMAP-RESET-001.md` | AS-POST-676-NORTH-STAR-ROADMAP-RESET-001 · Post-#676 North-Star Roadmap Reset | ✅ `SPEC_OK` |
+| `AS-POST-677-PRODUCT-DIRECTION-SELECTION-001.md` | AS-POST-677-PRODUCT-DIRECTION-SELECTION-001 - Product Direction Selection | ✅ `SPEC_OK` |
 | `AS-145.md` | CODE SPEC — AS-145 · Tool Adapters: Playwright + GSheets (MVP hardening) (RES_05) | ✅ `SPEC_RECONSTRUCTED_FROM_SOURCE` |
 | `AS-148.md` | CODE SPEC — AS-148 · Policy & PII Gateway (DR_TRACK_A) | ✅ `SPEC_OK` |
 | `AUTH-SESSION-001.md` | AUTH-SESSION-001 · Dashboard Login + Session | ✅ `SPEC_OK` |
