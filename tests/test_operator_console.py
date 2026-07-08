@@ -13,9 +13,13 @@ They mirror the wiring/auth style of ``tests/ui/test_expert_preview_real_app.py`
 
 from __future__ import annotations
 
+import ast
 import html
+import importlib
 import json
 import os
+import socket
+import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -25,14 +29,21 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+TEST_ROOT = Path(__file__).resolve().parent
+for import_root in (PROJECT_ROOT, TEST_ROOT):
+    if str(import_root) not in sys.path:
+        sys.path.insert(0, str(import_root))
 
 from alpha.webapp import operator_console_artifacts as artifacts  # noqa: E402
 from alpha.webapp import operator_console_receipts as receipts  # noqa: E402
 from alpha.webapp.routes import auth, operator_console  # noqa: E402
 from alpha.eval import operator_run_capture as capture_lib  # noqa: E402
 from service.app import app, _mount_dashboard  # noqa: E402
+from operator_console_safety import (  # noqa: E402
+    OperatorConsoleSafetyViolation,
+    operator_console_no_execution_guard,
+    operator_console_no_get_write_guard,
+)
 
 PAGE_ROUTE = operator_console.ROUTE
 STATUS_ROUTE = operator_console.STATUS_ROUTE
@@ -2679,3 +2690,190 @@ def test_chatgpt_source_scan_no_execution_imports() -> None:
     joined = "\n".join(import_lines).lower()
     for token in ("chatgpt", "provider", "mcp", "httpx", "requests", "subprocess", "socket", "urllib", "playwright", "selenium", "webdriver", "webbrowser", "pexpect", "solve"):
         assert token not in joined, token
+
+# ---------------------------------------------------------------------------
+# PROCESS-HARDENING-NO-PROVIDER-CALL-TEST-HELPER-001
+# ---------------------------------------------------------------------------
+def test_operator_console_safety_helper_negative_controls(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Canaries prove the reusable guard fails on forbidden actions."""
+
+    with operator_console_no_execution_guard(monkeypatch):
+        with pytest.raises(OperatorConsoleSafetyViolation):
+            sock = socket.socket()
+            try:
+                sock.connect(("203.0.113.10", 443))
+            finally:
+                sock.close()
+        with pytest.raises(OperatorConsoleSafetyViolation):
+            subprocess.run(["python", "-c", "print('must-not-run')"], check=False)
+        with pytest.raises(OperatorConsoleSafetyViolation):
+            os.system("echo must-not-run")
+        with pytest.raises(OperatorConsoleSafetyViolation):
+            os.popen("echo must-not-run")
+        with pytest.raises(OperatorConsoleSafetyViolation):
+            os.spawnv(os.P_WAIT, "/bin/echo", ["echo", "must-not-run"])
+
+    with operator_console_no_get_write_guard(monkeypatch):
+        with pytest.raises(OperatorConsoleSafetyViolation):
+            (tmp_path / "unauthorized.txt").write_text("must-not-write", encoding="utf-8")
+        with pytest.raises(OperatorConsoleSafetyViolation):
+            open(tmp_path / "unauthorized-open.txt", "w", encoding="utf-8")
+        with pytest.raises(OperatorConsoleSafetyViolation):
+            (tmp_path / "unauthorized-path-open.txt").open("x", encoding="utf-8")
+
+
+def test_operator_console_provider_and_model_canaries_raise(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Canaries prove provider/model guard patch points are effective."""
+
+    import alpha.providers.openai as openai_provider
+
+    def _boom(*_args: object, **_kwargs: object) -> None:
+        raise OperatorConsoleSafetyViolation("blocked provider/model invocation")
+
+    monkeypatch.setattr(openai_provider.OpenAIProviderClient, "__init__", _boom)
+    monkeypatch.setattr(openai_provider.OpenAIProviderClient, "execute", _boom)
+    monkeypatch.setattr(app.state, "provider_client_factory", _boom, raising=False)
+
+    with pytest.raises(OperatorConsoleSafetyViolation):
+        app.state.provider_client_factory()
+    with pytest.raises(OperatorConsoleSafetyViolation):
+        openai_provider.OpenAIProviderClient()
+
+
+def test_operator_console_v1_solve_canary_raises(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Canary proves a mocked /v1/solve invocation is observable by guard tests."""
+
+    import service.app as service_app
+
+    async def _boom(*_args: object, **_kwargs: object) -> None:
+        raise OperatorConsoleSafetyViolation("blocked /v1/solve invocation")
+
+    route = next(route for route in app.routes if getattr(route, "path", None) == "/v1/solve")
+    monkeypatch.setattr(service_app, "solve", _boom)
+    monkeypatch.setattr(route, "endpoint", _boom)
+    monkeypatch.setattr(route.dependant, "call", _boom)
+    with pytest.raises(OperatorConsoleSafetyViolation):
+        import anyio
+
+        anyio.run(service_app.solve, object(), object())
+    with pytest.raises(OperatorConsoleSafetyViolation):
+        import anyio
+
+        anyio.run(route.endpoint, object(), object())
+    with pytest.raises(OperatorConsoleSafetyViolation):
+        import anyio
+
+        anyio.run(route.dependant.call, object(), object())
+
+
+def test_operator_console_render_status_under_reusable_safety_guard(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """GET render/status paths stay inside no-execution and no-write guards."""
+
+    import alpha.providers.openai as openai_provider
+    import service.app as service_app
+
+    def _blocked(*_args: object, **_kwargs: object) -> None:
+        raise OperatorConsoleSafetyViolation("blocked execution boundary")
+
+    async def _blocked_solve(*_args: object, **_kwargs: object) -> None:
+        raise OperatorConsoleSafetyViolation("blocked /v1/solve boundary")
+
+    monkeypatch.setattr(openai_provider.OpenAIProviderClient, "__init__", _blocked)
+    monkeypatch.setattr(openai_provider.OpenAIProviderClient, "execute", _blocked)
+    monkeypatch.setattr(app.state, "provider_client_factory", _blocked, raising=False)
+    solve_route = next(route for route in app.routes if getattr(route, "path", None) == "/v1/solve")
+    monkeypatch.setattr(service_app, "solve", _blocked_solve)
+    monkeypatch.setattr(solve_route, "endpoint", _blocked_solve)
+    monkeypatch.setattr(solve_route.dependant, "call", _blocked_solve)
+
+    _login(client)
+    with operator_console_no_execution_guard(monkeypatch), operator_console_no_get_write_guard(monkeypatch):
+        page = client.get(PAGE_ROUTE)
+        status = client.get(STATUS_ROUTE)
+
+    assert page.status_code == 200
+    assert status.status_code == 200
+    payload = status.json()
+    assert payload["provider_gate"]["console_calls_providers"] is False
+    assert payload["run_setup"]["live_run_button_enabled"] is False
+    assert payload["provider_gate"]["live_provider_calls"] == "disabled"
+    assert payload["dry_run_preview"]["dry_run_execution"] == "not_enabled"
+    assert payload["chatgpt_copy_paste_capture"]["console_stores_pasted_outputs"] is False
+
+
+def test_operator_console_import_tree_under_safety_guard(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Import/reload of console modules must not start providers, network, solve, or subprocesses."""
+
+    import alpha.providers.openai as openai_provider
+    import service.app as service_app
+
+    def _blocked(*_args: object, **_kwargs: object) -> None:
+        raise OperatorConsoleSafetyViolation("blocked import-time execution boundary")
+
+    async def _blocked_solve(*_args: object, **_kwargs: object) -> None:
+        raise OperatorConsoleSafetyViolation("blocked import-time /v1/solve boundary")
+
+    monkeypatch.setattr(openai_provider.OpenAIProviderClient, "__init__", _blocked)
+    monkeypatch.setattr(app.state, "provider_client_factory", _blocked, raising=False)
+    solve_route = next(route for route in app.routes if getattr(route, "path", None) == "/v1/solve")
+    monkeypatch.setattr(service_app, "solve", _blocked_solve)
+    monkeypatch.setattr(solve_route, "endpoint", _blocked_solve)
+    monkeypatch.setattr(solve_route.dependant, "call", _blocked_solve)
+
+    with operator_console_no_execution_guard(monkeypatch), operator_console_no_get_write_guard(monkeypatch):
+        importlib.reload(artifacts)
+        importlib.reload(receipts)
+        importlib.reload(operator_console)
+
+
+def test_operator_console_write_chokepoint_source_allowlist() -> None:
+    """Operator Console writes remain limited to the authorized receipt helper."""
+
+    modules = (artifacts, operator_console, receipts)
+    allowed_write_calls = {
+        (Path(receipts.__file__).resolve(), "mkdir"),
+        (Path(receipts.__file__).resolve(), "open"),
+        (Path(receipts.__file__).resolve(), "write_text"),
+    }
+    violations: list[str] = []
+    for module in modules:
+        module_path = Path(module.__file__).resolve()
+        tree = ast.parse(module_path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Call):
+                name = ""
+                if isinstance(node.func, ast.Attribute):
+                    name = node.func.attr
+                elif isinstance(node.func, ast.Name):
+                    name = node.func.id
+                if name == "open":
+                    if isinstance(node.func, ast.Attribute):
+                        mode_arg = node.args[0] if node.args else None
+                    else:
+                        mode_arg = node.args[1] if len(node.args) > 1 else None
+                    mode_keyword = next((kw.value for kw in node.keywords if kw.arg == "mode"), None)
+                    mode_node = mode_keyword or mode_arg
+                    mode = mode_node.value if isinstance(mode_node, ast.Constant) else "r"
+                    if any(flag in str(mode) for flag in ("w", "a", "x", "+")):
+                        if (module_path, name) not in allowed_write_calls:
+                            violations.append(f"{module_path}:{node.lineno}: open({mode!r})")
+                if name in {"write_text", "write_bytes", "mkdir", "dump"}:
+                    if (module_path, name) not in allowed_write_calls:
+                        violations.append(f"{module_path}:{node.lineno}: {name}")
+
+    assert violations == []
+
+
+def test_operator_console_no_user_supplied_write_path_parameters() -> None:
+    """Receipt creation remains pathless from the request surface."""
+
+    route = next(route for route in app.routes if getattr(route, "path", None) == RECEIPTS_ROUTE)
+    dependant_names = [param.name for param in getattr(route, "dependant").body_params]
+    dependant_names += [param.name for param in getattr(route, "dependant").query_params]
+    assert dependant_names == []
