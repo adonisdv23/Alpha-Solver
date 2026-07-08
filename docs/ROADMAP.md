@@ -1,61 +1,63 @@
 # Roadmap
 
-> Refreshed **2026-06-15** for the post-#568 blocked Value Read state.
-> The old PR #91–#99 list below is **historical** and no longer the current
-> roadmap. Source of truth for current state:
-> [`CURRENT_STATE.md`](CURRENT_STATE.md). This roadmap makes **no** readiness,
-> provider-validation, or benchmark claims.
+> Refreshed **2026-07-08** for `AS-POST-676-NORTH-STAR-ROADMAP-RESET-001`.
+> Source of truth for current state: [`CURRENT_STATE.md`](CURRENT_STATE.md).
+> This roadmap makes no readiness, provider-validation, benchmark, production, or Alpha-superiority claims.
 
 ## Current phase
 
-**Post-#568 blocked Value Read state.** Live GitHub verification on 2026-06-15 confirmed PRs #566, #567, and #568 are merged. PR #568 committed a manual Value Read artifact that stopped before output generation and scoring.
+**Post-#676 north-star roadmap reset.** The current selected next state is `OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001`.
 
-The prior infrastructure records no-echo gating, false-premise / hidden-constraint cases, claim-safety linting, calibrated-confidence vocabulary, needs-human protocol guidance, higher-headroom Value Read cases, prompt-contract simulation methodology, and a local Ollama singlepath scaffold. PR #568 does not add provider/model/value/readiness evidence; it records `VALUE_READ_BLOCKED` with no Alpha outputs, baseline outputs, blind scores, or discrimination-delta.
+The post-#663 through post-#676 Operator Console sequence is recorded as adjacent/supporting local-first visibility and operator-status work. It does not automatically select B012, B013, a real-run cockpit, a provider execution lane, or any UI implementation lane.
 
-## Current next lane
+Alpha Solver remains centered on reasoning/routing plus discrimination/evidence. B012/B013-style cockpit work is deferred pending operator product-direction selection. This roadmap reset authorizes no runtime behavior change, `/v1/solve` exposure, scoring, unblinding, final interpretation, or broad project claims.
 
-**`ALPHA-SOLVER-VALUE-READ-EXECUTION-PACKET-AUTHORIZATION-001`** — create an explicitly authorized Value Read execution packet/lane with complete per-case prompts, raw-output preservation, blinding-map storage, output-generation boundary, and explicit operator authorization requirements. This is controlled authorization/design work only until a future authorization supplies execution boundaries; it does not authorize provider calls, token use, credential access, billing inspection, hosted model calls, local model calls, dashboard exposure, `/v1/solve` exposure, public API exposure, Google Sheets mutation, benchmark execution, or value/readiness claims by itself.
+## Current next state
+
+**`OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001`** - operator review is required before choosing the next product direction. Candidate directions are recorded in `docs/evals/runs/as-post-676-north-star-roadmap-reset-001/product-direction-options.md`.
+
+## Near-term roadmap after reset
+
+1. Operator chooses one product direction from the post-#676 reset options.
+2. If the operator chooses Value Read/discrimination workbench, create a separate scoped design or implementation lane.
+3. If the operator chooses route/expert-preview control surface, create a separate scoped design or implementation lane.
+4. If the operator chooses bounded smoke-test cockpit, first define execution, budget, receipt, and no-playground boundaries in a separate authorization lane.
+5. Keep B012/B013-style cockpit work deferred until the operator explicitly selects that path.
+6. Continue open deferrals only through their own scoped lanes.
+
+## Historical near-term roadmap before the post-#676 reset
+
+The prior roadmap item `ALPHA-SOLVER-VALUE-READ-EXECUTION-PACKET-AUTHORIZATION-001` is preserved as historical pre-reset context only. It is not the current selected next lane after `AS-POST-676-NORTH-STAR-ROADMAP-RESET-001`.
 
 ## Active deferrals
 
 See [`DEFERRAL_REGISTER.md`](DEFERRAL_REGISTER.md).
 
-- **DEF-001** — Self Operator execution evidence: advanced (local-only); not provider/runtime proof.
-- **DEF-002** — Security/privacy review: open.
-- **DEF-003** — Fable delta-audit custody/replacement: open.
-- **DEF-004** — Audit custody/provenance: open.
-
-## Near-term roadmap (docs-only governance / Value Read packet phase)
-
-1. Create the controlled Value Read execution authorization packet/lane: `ALPHA-SOLVER-VALUE-READ-EXECUTION-PACKET-AUTHORIZATION-001`.
-2. Keep no-echo, false-premise, hidden-constraint, confidence, needs-human, higher-headroom, and claim-safety boundaries explicit in any later packet.
-3. Keep local Ollama work as scaffold/design unless a future operator-managed lane separately authorizes a local run.
-4. Keep provider calls, hosted/local model runs, public surfaces, and Google Sheets mutation out of scope until separately authorized.
-5. Continue DEF-002/DEF-003/DEF-004 only through their own scoped lanes.
+- **DEF-001** - Self Operator execution evidence: advanced within local-only scope; not broad runtime proof.
+- **DEF-002** - Security/privacy review: open.
+- **DEF-003** - Fable delta-audit custody/replacement: open.
+- **DEF-004** - Audit custody/provenance: open.
 
 ---
 
-## Historical (pre-#100) — preserved, not current
+## Historical (pre-#100) - preserved, not current
 
-> ⚠️ **Stale links below.** These entries reference an old org path
-> `github.com/alpha-solver/alpha-solver` (wrong org; the repo is
-> `adonisdv23/Alpha-Solver`) and predate the current evidence chain. Preserved
-> for history only (ISS-002).
+The entries below reference the old org path `github.com/alpha-solver/alpha-solver` and predate the current evidence chain. Preserved for history only.
 
-### Done (MVP: P0 & P1) — historical
+### Done (MVP: P0 & P1) - historical
 
-- Metrics exporter and dashboards (PR #99) *(stale link)*
-- Prompt quality evaluator (PR #98) *(stale link)*
-- Replay CLI and diff utilities (PR #97) *(stale link)*
-- Budget guard and CLI (PR #96) *(stale link)*
-- Deterministic weight tuning harness (PR #95) *(stale link)*
-- Evidence pack store (PR #93) *(stale link)*
-- Clarify templates and trigger (PR #92) *(stale link)*
-- Determinism harness (PR #91) *(stale link)*
+- Metrics exporter and dashboards (PR #99)
+- Prompt quality evaluator (PR #98)
+- Replay CLI and diff utilities (PR #97)
+- Budget guard and CLI (PR #96)
+- Deterministic weight tuning harness (PR #95)
+- Evidence pack store (PR #93)
+- Clarify templates and trigger (PR #92)
+- Determinism harness (PR #91)
 
-### Next (P1/P2) — historical wishlist
+### Next (P1/P2) - historical wishlist
 
-- Rich MCP adapter library – expand tool coverage with tests.
-- Advanced budget modeling – per-route and per-token projections.
-- Policy engine v2 – granular gates with audit trail.
-- Scenario runner – compose multi-step evaluation flows.
+- Rich MCP adapter library - expand tool coverage with tests.
+- Advanced budget modeling - per-route and per-token projections.
+- Policy engine v2 - granular gates with audit trail.
+- Scenario runner - compose multi-step evaluation flows.
