@@ -101,6 +101,156 @@ GATE_BOUNDARY_TEXTS = (
 )
 
 
+
+# ---------------------------------------------------------------------------
+# Manual next-step guide boundary text. This clarity panel summarizes existing
+# safe surfaces only. It is display-only and non-executing; it adds no controls,
+# routes, persistence, provider calls, ChatGPT calls, or raw artifact views.
+# ---------------------------------------------------------------------------
+MANUAL_NEXT_STEP_TITLE = "Manual Next Step Guide"
+MANUAL_NEXT_STEP_SUBTITLE = (
+    "This console helps you review local evidence and decide what to do manually. "
+    "It does not run providers, call ChatGPT, execute commands, or store pasted "
+    "model output."
+)
+MANUAL_NEXT_STEP_BOUNDARY_TEXTS = (
+    "Manual Next Step Guide is display-only and non-executing.",
+    "Provider calls blocked.",
+    "ChatGPT calls blocked.",
+    "This guide does not call /v1/solve.",
+    "This guide does not run CLI, subprocess, shell, or browser automation.",
+    "This guide does not accept prompt input or store pasted model output.",
+    "This guide does not mutate capture, evidence, preflight, or receipt artifacts.",
+    "This guide adds no write path; the Local Receipt Store remains the only controlled write action.",
+)
+MANUAL_NEXT_STEP_SECTIONS = (
+    "Available for review",
+    "Manual-only steps",
+    "Blocked in this console",
+)
+MANUAL_NEXT_STEP_ITEMS = (
+    {
+        "label": "Local artifact status",
+        "section": "Available for review",
+        "status": "available_for_review",
+        "description": "Review surface only: fixed local artifact summaries, states, counts, ids, and digest labels.",
+        "source_surface": "local_artifacts",
+        "boundary": "summary_metadata_only",
+    },
+    {
+        "label": "Artifact freshness metadata",
+        "section": "Available for review",
+        "status": "available_for_review",
+        "description": "Review surface only: file presence, modified-time labels, age labels, and sequence-coherence metadata.",
+        "source_surface": "local_artifacts.freshness",
+        "boundary": "metadata_only_no_claim",
+    },
+    {
+        "label": "Provider and cost gate status",
+        "section": "Available for review",
+        "status": "available_for_review",
+        "description": "Review surface only: provider mode, categorical key presence, configured cap presence, and blockers.",
+        "source_surface": "provider_gate",
+        "boundary": "display_only_blocked",
+    },
+    {
+        "label": "Display-only dry-run preview",
+        "section": "Available for review",
+        "status": "available_for_review",
+        "description": "Review surface only: a preview of local metadata a future lane would require; it starts nothing.",
+        "source_surface": "dry_run_preview",
+        "boundary": "non_executing_preview",
+    },
+    {
+        "label": "Local receipt metadata",
+        "section": "Available for review",
+        "status": "available_for_review",
+        "description": "Review surface only: recent receipt ids, timestamps, states, and digest labels.",
+        "source_surface": "local_receipts",
+        "boundary": "receipt_metadata_only",
+    },
+    {
+        "label": "Manual ChatGPT copy/paste guidance",
+        "section": "Available for review",
+        "status": "available_for_review",
+        "description": "Review surface only: manual guidance, placeholders, and terminal text snippets; no pasted output is stored.",
+        "source_surface": "chatgpt_copy_paste_capture",
+        "boundary": "manual_guidance_only",
+    },
+    {
+        "label": "Route/trace placeholders",
+        "section": "Available for review",
+        "status": "placeholder_only",
+        "description": "Review surface only: placeholder labels shown until work happens outside this console.",
+        "source_surface": "route_trace",
+        "boundary": "placeholder_only",
+    },
+    {
+        "label": "Review local evidence outside the console",
+        "section": "Manual-only steps",
+        "status": "manual_only",
+        "description": "Manual-only: inspect operator-owned local files and evidence outside this protected page.",
+        "source_surface": "operator_docs",
+        "boundary": "outside_console",
+    },
+    {
+        "label": "Use documented harness commands from a terminal",
+        "section": "Manual-only steps",
+        "status": "manual_only",
+        "description": "Manual-only: follow existing docs and terminal snippets yourself; this guide does not start them.",
+        "source_surface": "preflight_capture",
+        "boundary": "terminal_manual_only",
+    },
+    {
+        "label": "Follow ChatGPT copy/paste guidance outside the console",
+        "section": "Manual-only steps",
+        "status": "manual_only",
+        "description": "Manual-only: collect and paste outputs in the operator-owned local capture workflow outside this page.",
+        "source_surface": "chatgpt_copy_paste_capture",
+        "boundary": "external_manual_capture",
+    },
+    {
+        "label": "Create a local receipt only through the existing receipt-store card",
+        "section": "Manual-only steps",
+        "status": "receipt_only",
+        "description": "Manual-only: use the existing Local Receipt Store card if a safe status snapshot is needed.",
+        "source_surface": "local_receipts",
+        "boundary": "existing_receipt_store_only",
+    },
+    {
+        "label": "Provider calls blocked",
+        "section": "Blocked in this console",
+        "status": "blocked_in_console",
+        "description": "Blocked: provider calls, model SDK calls, and live-provider paths are not available here.",
+        "source_surface": "provider_gate",
+        "boundary": "blocked_non_executable",
+    },
+    {
+        "label": "ChatGPT API calls and browser automation blocked",
+        "section": "Blocked in this console",
+        "status": "blocked_in_console",
+        "description": "Blocked: ChatGPT API calls, browser automation, prompt intake, paste storage, and capture editing are not available here.",
+        "source_surface": "chatgpt_copy_paste_capture",
+        "boundary": "blocked_non_executable",
+    },
+    {
+        "label": "/v1/solve and command paths blocked",
+        "section": "Blocked in this console",
+        "status": "blocked_in_console",
+        "description": "Blocked: /v1/solve, CLI, subprocess, shell, dry-run starts, and live-provider starts are not available here.",
+        "source_surface": "run_setup",
+        "boundary": "blocked_non_executable",
+    },
+    {
+        "label": "Raw prompt/output viewers and claim surfaces blocked",
+        "section": "Blocked in this console",
+        "status": "blocked_in_console",
+        "description": "Blocked: raw prompt viewers, raw output viewers, quality-comparison selectors, and launch-claim surfaces are not available here.",
+        "source_surface": "claim_boundary",
+        "boundary": "blocked_non_claiming",
+    },
+)
+
 # ---------------------------------------------------------------------------
 # ChatGPT copy/paste capture boundary text. This panel is manual guidance only:
 # it summarizes existing safe artifact metadata and never stores pasted content,
@@ -797,6 +947,19 @@ def _build_chatgpt_copy_paste_capture(
     }
 
 
+def _build_manual_next_step_guide() -> Dict[str, Any]:
+    """Assemble bounded display-only next-step clarity labels."""
+
+    return {
+        "title": MANUAL_NEXT_STEP_TITLE,
+        "mode": "display_only",
+        "execution": "non_executing",
+        "sections": list(MANUAL_NEXT_STEP_SECTIONS),
+        "items": [dict(item) for item in MANUAL_NEXT_STEP_ITEMS],
+        "boundary_notes": list(MANUAL_NEXT_STEP_BOUNDARY_TEXTS),
+    }
+
+
 def build_console_status() -> Dict[str, Any]:
     """Assemble the read-only operator console status payload.
 
@@ -853,6 +1016,7 @@ def build_console_status() -> Dict[str, Any]:
     chatgpt_copy_paste_capture = _build_chatgpt_copy_paste_capture(
         local_artifacts, preflight_capture
     )
+    manual_next_step_guide = _build_manual_next_step_guide()
 
     return {
         "console": {
@@ -905,6 +1069,7 @@ def build_console_status() -> Dict[str, Any]:
         "provider_gate": provider_gate,
         "dry_run_preview": dry_run_preview,
         "chatgpt_copy_paste_capture": chatgpt_copy_paste_capture,
+        "manual_next_step_guide": manual_next_step_guide,
         "preflight_capture": preflight_capture,
         "evidence_receipt": {
             "receipt_id": "not generated yet",
@@ -948,6 +1113,7 @@ def _render_page(status: Mapping[str, Any]) -> str:
     gate = status["provider_gate"]
     dry_run = status["dry_run_preview"]
     chatgpt_capture = status["chatgpt_copy_paste_capture"]
+    manual_next_step = status["manual_next_step_guide"]
     capture = status["preflight_capture"]
     receipt = status["evidence_receipt"]
     receipt_store = status["local_receipts"]
@@ -1163,6 +1329,23 @@ def _render_page(status: Mapping[str, Any]) -> str:
     chatgpt_unsafe_html = _list_items(chatgpt_capture["unsafe_actions_blocked"])
     chatgpt_boundary_html = _list_items(chatgpt_capture["boundary_notes"])
 
+    def _manual_items(section: str) -> str:
+        return "".join(
+            "<li>"
+            f"<strong>{_escape(item['label'])}</strong> "
+            f'<span class="badge muted">{_escape(item["status"])}</span>'
+            f"<br />{_escape(item['description'])}"
+            f'<br /><span class="note">source: {_escape(item["source_surface"])} · boundary: {_escape(item["boundary"])}</span>'
+            "</li>"
+            for item in manual_next_step["items"]
+            if item["section"] == section
+        )
+
+    manual_review_html = _manual_items("Available for review")
+    manual_only_html = _manual_items("Manual-only steps")
+    manual_blocked_html = _manual_items("Blocked in this console")
+    manual_boundary_html = _list_items(manual_next_step["boundary_notes"])
+
     receipt_items = receipt_store["recent"]
     receipt_rows = (
         "".join(
@@ -1346,6 +1529,25 @@ def _render_page(status: Mapping[str, Any]) -> str:
           {preflight_artifact_html}
         </article>
 
+
+        <article class="card" id="card-manual-next-step-guide">
+          <h2>{_escape(manual_next_step["title"])}</h2>
+          <p class="note">{_escape(MANUAL_NEXT_STEP_SUBTITLE)}</p>
+          {_kv_rows({
+              "mode": manual_next_step["mode"],
+              "execution": manual_next_step["execution"],
+              "write path": "no new write path",
+              "controlled write": "Local Receipt Store only",
+          })}
+          <h3 class="subhead">Available for review</h3>
+          <ul class="surfaces">{manual_review_html}</ul>
+          <h3 class="subhead">Manual-only steps</h3>
+          <ul class="surfaces">{manual_only_html}</ul>
+          <h3 class="subhead">Blocked in this console</h3>
+          <ul class="surfaces">{manual_blocked_html}</ul>
+          <p class="note">Boundary reminders:</p>
+          <ul class="surfaces">{manual_boundary_html}</ul>
+        </article>
 
 
         <article class="card" id="card-chatgpt-copy-paste-capture">
