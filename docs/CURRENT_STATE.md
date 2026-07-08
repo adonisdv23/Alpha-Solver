@@ -1,112 +1,72 @@
 # Alpha Solver - Current State
 
-> Source-of-truth navigation doc. Last verified **2026-07-08** for `AS-POST-676-NORTH-STAR-ROADMAP-RESET-001`.
-> This reset records the post-#663 through post-#676 Operator Console sequence as adjacent/supporting local-first visibility and operator-status work. It selects `OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001` and authorizes no provider calls, runtime changes, `/v1/solve` exposure, scoring, unblinding, final interpretation, value claim, readiness claim, provider/local-model validation claim, production/public claim, security/privacy claim, or Alpha-superiority claim.
+> Source-of-truth navigation doc. Last verified **2026-07-08** for `AS-POST-677-PRODUCT-DIRECTION-SELECTION-001`.
+> This selection records `VALUE_READ_DISCRIMINATION_WORKBENCH` as the product direction after the post-676 reset and recommends `AS-B014-VALUE-READ-DISCRIMINATION-WORKBENCH-DESIGN-001` as the first follow-up design lane.
 
 ## Current verified phase
 
-**Post-#676 north-star roadmap reset completed: operator review is required before choosing the next product direction.**
+**Post-677 product-direction selection completed: Value Read / discrimination workbench selected for operator review.**
 
-The merged PR #663 through PR #676 Operator Console sequence improved local-first visibility, artifact/status review, provider/cost gate visibility, local receipt snapshots, manual copy/paste guidance, process hardening, first-use documentation, progressive disclosure, and flow-first orientation. Human operator validation still left the product job-to-be-done unresolved, so this reset records those console lanes as adjacent/supporting work rather than automatic selection of B012, B013, or any real-run cockpit implementation.
+The previous selected state was `OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001`. This lane resolves that review state into one product direction. It does not implement B014, UI, runtime behavior, B012, B013, scoring, unblinding, final interpretation, or broad claims.
 
-The previous console HTML/diagram target-parity selected state `OPERATOR_REVIEW_REQUIRED_AFTER_CONSOLE_HTML_DIAGRAM_TARGET_PARITY_GAP_CLOSURE_001` remains historical context only. It is not the current selected next state.
-
-These are docs, gate, helper, static/research, blocked-attempt, scoring-only, selector, authorization-preparation, bounded interpretation, local-console, and source-truth reset artifacts. They do not prove provider behavior, model quality, broad value, readiness, benchmark success, security/privacy completion, local Ollama validation, `/v1/solve` readiness, production/public readiness, or Alpha superiority.
+The selected direction is `VALUE_READ_DISCRIMINATION_WORKBENCH` because it best preserves Alpha Solver as a reasoning, routing, comparison, evidence, and operator-control system rather than a generic prompt-runner cockpit.
 
 ## At a glance
 
 | Field | Value |
 |-------|-------|
-| Latest source-truth reset lane | **`AS-POST-676-NORTH-STAR-ROADMAP-RESET-001`** |
-| Current selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001`** |
-| Operator Console sequence status | PR #663 through PR #676 are recorded as adjacent/supporting local-first visibility and operator-status work, not automatic selection of a cockpit implementation lane |
-| B012/B013 posture | Deferred pending operator product-direction selection; no B012 implementation and no B013 real-run provider work are authorized by this reset |
-| Prior selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_CONSOLE_HTML_DIAGRAM_TARGET_PARITY_GAP_CLOSURE_001` is historical prior context only |
-| Strategic boundary | This reset selects no implementation lane and authorizes no runtime, `/v1/solve`, provider, hosted-model, local-model, tool, web, benchmark, production/public readiness, security/privacy, quality, autonomous-readiness, value, or Alpha-superiority claim |
+| Latest product-direction lane | **`AS-POST-677-PRODUCT-DIRECTION-SELECTION-001`** |
+| Selected product direction | **`VALUE_READ_DISCRIMINATION_WORKBENCH`** |
+| Current selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_POST_677_PRODUCT_DIRECTION_SELECTION_001`** |
+| Recommended first follow-up lane | **`AS-B014-VALUE-READ-DISCRIMINATION-WORKBENCH-DESIGN-001`** |
+| B012/B013 posture | Deferred pending separate operator decision; not authorized by this lane |
+| Prior selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001` is historical prior context only |
+| Strategic boundary | This lane selects a product direction only; it authorizes no runtime behavior, UI implementation, model work, scoring, unblinding, final interpretation, readiness claim, value claim, or Alpha-superiority claim |
 
-## Completed post-552 / post-565 / post-568 infrastructure lanes
+## Product direction selection
 
-| PR | Lane / artifact | Evidence value |
-|----|-----------------|----------------|
-| #557 | `ALPHA-SOLVER-NO-ECHO-SUBSTANTIVE-GENERATION-GATE-POST-552-SUCCESSOR-001` | Defines the no-echo substantive generation gate after the post-552 fixes. |
-| #558 | `ALPHA-SOLVER-EVAL-FALSE-PREMISE-PERTURBATION-001` | Adds a false-premise / hidden-constraint perturbation set for future Value Read design. |
-| #559 | `ALPHA-SOLVER-NARRATIVE-CLAIM-SAFETY-LINTER-001` | Adds a narrative claim-safety linter artifact for unsupported claim detection. |
-| #560 | `ALPHA-SOLVER-CALIBRATED-CONFIDENCE-OUTPUT-CONTRACT-001` | Defines the calibrated-confidence and non-claim output contract. |
-| #562 | `ALPHA-SOLVER-ESCALATION-NEEDS-HUMAN-PROTOCOL-001` | Records the needs-human escalation protocol; supersedes closed-unmerged #561. |
-| #563 | `ALPHA-SOLVER-EVAL-HIGHER-HEADROOM-CASESET-001` | Adds higher-headroom Value Read cases for later bounded simulations/evals. |
-| #564 | `ALPHA-SOLVER-PROMPT-CONTRACT-SIMULATION-METHODOLOGY-001` | Records prompt-contract simulation methodology. |
-| #565 | `ALPHA-SOLVER-LOCAL-MODEL-LAB-OLLAMA-SINGLEPATH-001` | Records a local Ollama singlepath lab lane scaffold; no local model run is implied. |
-| #566-#568 | `ALPHA-SOLVER-VALUE-READ-SIMULATION-PACKET-REFRESH-POST-565-001` | Refreshes the Value Read packet and records `VALUE_READ_BLOCKED`; no Alpha/baseline outputs or scores. |
-| #569 | Post-#568 current-state sync | Updates source-of-truth docs and MVP scorecard to the blocked Value Read state. |
-| #570 | Founder memo refresh | Updates narrative positioning for the post-#568 blocked state. |
-| #571 | `14 - V1 Solve Exposure Gate Packet` | Records `/v1/solve` exposure as `BLOCKED`; route existence is not public readiness. |
-| #572 | Local Ollama singlepath operator helper | Adds an operator helper script for the local-only lane; helper existence is not a successful run. |
-| #573 | Local Ollama singlepath blocked attempt | Records exact-model preflight success and failed-closed timeout/backend error; no local answer or quality evidence. |
-| #574 | `18 - PI.DEV-HARNESS-FEASIBILITY` | Records `BORROW_PATTERNS_ONLY_NO_INTEGRATION` for Pi.dev harness research. |
-| #576 | Superseded local operator harness design note PR | Superseded by PR #577; should be closed unmerged and not cited as the completion artifact. |
-| #577 | `ALPHA-SOLVER-LOCAL-OPERATOR-HARNESS-DESIGN-NOTE-001` | Completes the docs-only Alpha-native local operator harness design note; no implementation or execution authorization. |
-| post-577 lane | `ALPHA-SOLVER-VALUE-READ-EXECUTION-AUTHORIZATION-DECISION-POST-577-001` | Completes a docs-only authorization-decision packet for returning to Value Read execution authorization review. |
-| post-578 lane | `ALPHA-SOLVER-VALUE-READ-MANUAL-OUTPUT-GENERATION-PILOT-POST-578-001` | Completes a bounded manual no-provider prompt-contract simulation output-generation pilot for 10 synthetic Value Read cases; raw Alpha and baseline outputs are documentation artifacts only, with no scoring, unblinding, provider/local-model call, endpoint exposure, or value/readiness claim. |
-| post-579 lane | `ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PACKET-CONSTRUCTION-POST-579-001` | Completes docs-only blind scorer packet construction for the 10-case manual no-provider pilot; all scoring fields remain blank, the unblinding map is not committed, and no scoring, unblinding, provider/local-model call, endpoint exposure, or value/readiness claim occurs. |
-| post-blind-packet lane | `ALPHA-SOLVER-VALUE-READ-SCORING-REVIEW-AUTHORIZATION-POST-BLIND-PACKET-001` | Completes docs-only scoring-review authorization preparation; scoring authorization language and blank score-output structure exist, but scoring, unblinding, final interpretation, provider/local-model calls, endpoint exposure, and value/readiness claims have not occurred. |
-| post-581 lane | `ALPHA-SOLVER-VALUE-READ-BLIND-SCORING-PASS-POST-581-001` | Completes scoring-only review of the blinded scorer packet; case-level blind scores, notes, contested-score flags, scorer identity/tool, scoring method, timestamp, and score-lock confirmation are recorded, with no unblinding, final interpretation, provider/local-model call, endpoint exposure, or value/readiness claim. |
-| scorecard-after-score lane | `ALPHA-SOLVER-MVP-SCORECARD-AFTER-VALUE-READ-SCORE-001` | Updates the docs-only MVP scorecard posture to record that locked blind scores exist while preserving the no-unblinding, no-final-interpretation, no-source-identity, and no-value/readiness/superiority-claim boundary. |
-| PR #584 lane | `ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-VALUE-READ-001` | Completes a docs-only next-release selection gate with verdict `NEXT_RELEASE_SELECTION_BLOCKED_PENDING_VALUE_READ_UNBLINDING_AND_FINAL_INTERPRETATION`; selects no implementation lane because locked blind scores remain blinded and uninterpreted. |
-| authorization-preparation lane | `ALPHA-SOLVER-VALUE-READ-UNBLINDING-FINAL-INTERPRETATION-AUTHORIZATION-001` | Completes a docs-only authorization-decision packet for a future unblinding/source-identity review and final interpretation pass. |
-| unblinding-final-interpretation lane | `ALPHA-SOLVER-VALUE-READ-UNBLINDING-FINAL-INTERPRETATION-PASS-001` | Completes source-identity review using the operator-provided map and final bounded interpretation; locked scores were not changed, claims remain bounded to the manual no-provider prompt-contract simulation, and no release implementation lane is selected. |
-| PR #587 lane | `ALPHA-SOLVER-DISCRIMINATION-TASK-BANK-ASSET-001` | Completes a docs-only discrimination task-bank asset feasibility packet with verdict `FEASIBLE_WITH_GUARDED_NEXT_STEP`; no task execution, output generation, scoring, runtime/provider/local-model/API/Sheet work, benchmark, readiness, value, or superiority claim occurs. |
-| PR #588 lane | `ALPHA-SOLVER-DEMO-EVIDENCE-PACKET-TO-DEMO-001` | Completes a docs-only claim-safe demo evidence packet feasibility packet with verdict `FEASIBLE_WITH_STRICT_EVIDENCE_BOUNDARIES`; no runtime demo, provider/local-model/API/Sheet work, product proof, value/readiness/superiority claim, or external-use approval occurs. |
-| group-sync lane | `ALPHA-SOLVER-PARALLEL-FEASIBILITY-GROUP-SYNC-001` | Completes a preservation-only source-of-truth sync after the tabs 13-16 feasibility group settled; PR #581, PR #587, and PR #588 are merged, no open PR is editing the same source-of-truth docs, and deferred follow-up choices require a single operator decision. |
-| selector-after-final-interpretation lane | `ALPHA-SOLVER-NEXT-RELEASE-SELECTOR-AFTER-FINAL-INTERPRETATION-001` | Completes a docs-only selector after final interpretation and the parallel feasibility group sync; selects `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` for operator review and does not create or implement that lane. |
-| derivation-check lane | `ALPHA-SOLVER-GATE-SUBSTANTIVE-DERIVATION-CHECK-001` | Completes a docs-first review-only substantive derivation / no-echo gate packet that defines criteria, fixture planning, heuristic review aids, stop conditions, non-actions, and non-claims; no implementation, provider/local-model/runtime/API/Sheet/scoring/unblinding/source-map/raw-output/release work or broad claims occur. |
-| cheap-test packet lane | `ALPHA-SOLVER-DISCRIMINATION-TASK-BANK-FIRST-CHEAP-TEST-001` | Completes a docs-only first cheap-test packet with five representative taxonomy task cards for discrimination task-bank preparation, grounded in the derivation / no-echo gate and task-bank asset; no task execution, Alpha or baseline output generation, scoring, raw output inspection, unblinding, source-map work, provider/local-model/runtime/API/Sheet work, dependency addition, release implementation, or broad claims occur. |
-| smoke-runner lane | `ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RUNNER-001` | Adds `tools/operator_smoke_runner.py` and the operator packet for explicit local/Ollama or OpenAI smoke checks; the merged runner lane did not run either smoke and proves no provider quality, local model quality, readiness, benchmark success, production readiness, public readiness, or Alpha superiority. |
-| smoke-results-import lane | `ALPHA-SOLVER-LOCAL-OPENAI-SMOKE-RESULTS-IMPORT-001` | Imports Operator-provided, redacted smoke-only results showing local/Ollama passed using `qwen2.5:3b` and OpenAI passed using `gpt-4.1-mini-2025-04-14`; proves no behavior quality, provider quality, local-model quality, readiness, benchmark success, production/public readiness, or Alpha superiority. |
-| test-console lane | `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-001` | Adds a local-only Operator console for bounded local/Ollama and OpenAI smoke checks through the existing smoke runner path; proves no behavior quality, provider quality, local-model quality, readiness, benchmark success, production/public readiness, security/privacy completion, or Alpha superiority. |
-| test-console-ux-redaction lane | `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UX-REDUCTION-001` | Preserves submitted form state after console runs and avoids over-redacting safe numeric usage token counts; proves no behavior quality, provider quality, local-model quality, readiness, benchmark success, production/public readiness, security/privacy completion, or Alpha superiority. |
-| model-catalog-routing-preview lane | `ALPHA-SOLVER-MODEL-CATALOG-ROUTING-PREVIEW-001` | Adds configurable backend model catalog metadata and deterministic routing preview; performs no provider/local-model calls and proves no quality, readiness, benchmark, production/public, security/privacy, or Alpha-superiority claim. |
-| tool-catalog-routing-registry lane | `ALPHA-SOLVER-TOOL-CATALOG-ROUTING-REGISTRY-001` | Adds metadata-only tool catalog and deterministic recommendation preview; performs no tool execution, browsing, provider/local-model calls, runtime GitHub calls, dependency addition, endpoint exposure, scoring, unblinding, source-map work, raw-output inspection, readiness/quality/security/privacy/production/public/provider/local-model/tool-quality/Alpha-superiority claim. |
-| model-catalog-expansion lane | `ALPHA-SOLVER-MODEL-CATALOG-EXPANSION-COST-TIERS-001` | Expands metadata-only model catalog fields and deterministic routing preview warnings/fallbacks; performs no provider/local-model execution and proves no quality, readiness, benchmark, production/public, security/privacy, or Alpha superiority. |
-| test-console-ui-polish lane | `ALPHA-SOLVER-LOCAL-OPENAI-TEST-CONSOLE-UI-POLISH-001` | Polishes the local-only console UI with mode and model dropdowns, a prompt counter and 500-character limit warning, a friendly result display, and a copyable sanitized JSON panel; modifies no model catalog or tool catalog logic and proves no behavior quality, provider quality, local-model quality, readiness, benchmark success, production/public readiness, security/privacy completion, or Alpha superiority. |
-| test-console-routing-preview lane | `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-PREVIEW-INTEGRATION-001` | Wires the local-only Operator console to metadata-only model/tool route preview before separate smoke execution; creates no provider/local-model/tool quality, readiness, benchmark, production/public, security/privacy, or Alpha superiority. |
-| test-console-routing-metadata-display lane | `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-METADATA-DISPLAY-001` | Surfaces expanded model route metadata and existing metadata-only tool recommendation preview in the local-only Operator console; creates no provider/local-model/tool quality, readiness, benchmark, production/public, security/privacy, value, or Alpha superiority. |
-| console target-parity product pass | `ALPHA-SOLVER-CONSOLE-TARGET-PARITY-PRODUCT-PASS-001` | Adds five-step route-flow, task-interpretation, model-route, tool-route, manual-override, and evidence-boundary cards to the local console while keeping preview separate from bounded smoke execution. |
-| console best-path recommendation summary | `ALPHA-SOLVER-CONSOLE-BEST-PATH-RECOMMENDATION-SUMMARY-001` | Adds a preview-only, metadata-only Best Path Summary above detailed local-console route cards, including safe next action, risk flags, fallbacks, and evidence boundary. |
-| console HTML/diagram target-parity gap closure | `ALPHA-SOLVER-CONSOLE-HTML-DIAGRAM-TARGET-PARITY-GAP-CLOSURE-001` | Adds preview-only target-parity context cards for catalog snapshot, built-now / next / future status, target difference, and review-only improvement loop. |
-| operator-review-packet lane | `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-METADATA-OPERATOR-REVIEW-PACKET-001` | Historical docs/test-support packet for future manual operator review of route-preview understandability and evidence-boundary safety; it did not perform the review or run the console. |
-| routed-vs-plain pilot packet lane | `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-PACKET-001` | Creates a docs-only routed-vs-plain pilot packet with task cards, rubric, comparison protocol, blank result template, runbook, stop conditions, non-actions, and non-claims; runs no pilot and generates no outputs or scores. |
-| MVP cutover review lane | `ALPHA-SOLVER-MVP-CUTOVER-REVIEW-001` | Records a STOP / go-no-go review with verdict `LOCAL_OPERATOR_MVP_CANDIDATE_READY_FOR_MANUAL_REVIEW`; creates no provider/local-model/tool/pilot execution, output generation, scoring, readiness, benchmark, production/public, security/privacy completion, tool-quality, autonomous-readiness, or Alpha-superiority evidence. |
-| local MVP manual review lane | `ALPHA-SOLVER-LOCAL-MVP-MANUAL-REVIEW-001` | Records operator-provided screenshot-only partial manual review evidence with verdict `LOCAL_MVP_MANUAL_REVIEW_PARTIAL_NEEDS_OPERATOR_TEST`; full manual UI testing remains deferred, and no provider/local-model/tool/pilot execution or quality/readiness claim occurs. |
-| routed-vs-plain pilot authorization lane | `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-AUTHORIZATION-001` | Completes a docs-only authorization packet for a future routed-vs-plain output-collection lane; it defines the task set, output collection method, plain baseline identity, routed Alpha identity, execution permission boundaries, task-id preservation, route metadata capture, blinding, scoring authorization gate, stop conditions, evidence boundaries, non-actions, and non-claims. Provider calls, hosted-model calls, local-model calls, tool execution, and web/current research are not authorized by this packet; later collection must use operator-provided outputs unless separately authorized. |
-| routed-vs-plain pilot output collection prep lane | `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUT-COLLECTION-PREP-001` | Records 12 blank operator-fillable capture templates for `RVP-001` through `RVP-012`, including blank fields for plain baseline outputs, routed Alpha outputs, and route metadata. This is not Alpha runtime, `/v1/solve`, provider, hosted-model, local-model, tool-execution, web/current research, scoring, unblinding, benchmark, readiness, quality, or superiority evidence. |
-| routed-vs-plain pilot manual output collection lane | `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001` | Records manual prompt-contract simulation outputs for all 12 routed-vs-plain pilot tasks, with one plain output, one routed output, and one metadata record per task. This is not runtime, `/v1/solve`, provider, hosted/local-model, tool, web/current research, scoring, unblinding, benchmark, readiness, quality, or superiority evidence. |
-| routed-vs-plain blinded scorer packet construction lane | `ALPHA-SOLVER-ROUTED-VS-PLAIN-BLINDED-SCORER-PACKET-CONSTRUCTION-001` | Constructs a source-neutral scorer-facing blinded packet for all 12 routed-vs-plain tasks, freezes blank scoring/preference/rationale fields, and keeps the A/B identity key out of the repository. This is not scoring, unblinding, runtime, `/v1/solve`, provider/local-model/tool/web execution, benchmark, readiness, quality, or superiority evidence. |
-| routed-vs-plain blind scoring pass authorization lane | `ALPHA-SOLVER-ROUTED-VS-PLAIN-BLIND-SCORING-PASS-AUTHORIZATION-001` | Completes a docs-only authorization/prep packet for a future blind scoring pass using the PR #619 scorer-facing packet; scoring remains unauthorized until a later operator-authorized scoring lane. |
+`VALUE_READ_DISCRIMINATION_WORKBENCH` is selected as the next product direction.
 
-See [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md) for the PR status ledger and [`LANE_REGISTRY.md`](LANE_REGISTRY.md) for lifecycle classification.
+This direction should focus on:
 
-## Selected next state
+- case packets
+- captured outputs
+- comparison state
+- route/expert context
+- SAFE-OUT and confidence boundaries
+- evidence and receipt boundaries
+- operator understanding and next safe action
 
-**`OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001`** is the current global selected next state.
+## Recommended first follow-up
 
-This is an operator-review-required state after `AS-POST-676-NORTH-STAR-ROADMAP-RESET-001`. The lane records that more UI polish or real-run cockpit work is blocked until the operator selects a product direction. It does not implement UI, perform operator review, run Alpha runtime, invoke `/v1/solve`, call providers, run hosted or local models, execute tools, browse, use current external research, mutate Sheets, add dependencies, score, unblind, inspect answer identities, interpret final results, inspect or commit an A/B key, inspect or commit source maps, deploy, or make readiness, value, benchmark, production/public, provider-quality, local-model-quality, tool-quality, security/privacy, autonomous-readiness, or Alpha-superiority claims.
+`AS-B014-VALUE-READ-DISCRIMINATION-WORKBENCH-DESIGN-001`
 
-The console HTML/diagram target-parity gap-closure state remains historical context only. It is not the current selected state.
+This follow-up should be design-only. It should define what the workbench is, what artifacts it reads, what workflows it supports, what the operator should understand in 30 seconds, and what implementation lane, if any, should follow.
 
-## Open deferrals (see [`DEFERRAL_REGISTER.md`](DEFERRAL_REGISTER.md))
+## Deferred directions
 
-- **DEF-001** - Self Operator execution evidence: substantially advanced within local-only scope; does not prove provider/runtime readiness.
-- **DEF-002** - Product security/privacy review: open; `/v1/solve` exposure remains blocked by PR #571.
-- **DEF-003** - Prior Fable delta-audit custody/replacement: open.
-- **DEF-004** - Audit custody/provenance: open unless repo evidence shows otherwise.
+- Bounded smoke-test cockpit: deferred as support surface.
+- Route and expert-preview surface: deferred as component or later focused lane.
+- CLI/artifact operator companion: deferred as support infrastructure.
+- Full real-run Operator Cockpit: deferred until separate product and execution boundaries exist.
+- Read-only status checkpoint: not selected as next.
 
 ## What is blocked / not authorized
 
-- New provider calls, hosted model calls, local model calls, token use, credential access, billing inspection, dashboard exposure, `/v1/solve` exposure, public API exposure, Pi.dev installation/execution/integration, package-install experiments, and Google Sheets mutation.
-- B012 implementation, B013 real-run provider work, release implementation lanes, and broad Alpha-vs-baseline claims. The earlier Value Read bounded manual no-provider pilot has locked blind scores and a final interpretation, but this reset selects no release implementation lane and does not support claims beyond the bounded manual no-provider prompt-contract simulations already recorded in source truth.
-- Local Ollama validation claims. PR #573 records a failed-closed local timeout/backend error and no local model answer.
-- Not authorized: security/privacy completion, production readiness, public MVP readiness, benchmark validation/superiority, broad-user readiness, autonomous readiness, provider validation, local Ollama validation, `/v1/solve` readiness, dashboard readiness, or Alpha superiority.
+- B012 implementation.
+- B013 real-run provider work.
+- Runtime behavior changes.
+- UI implementation.
+- New routes or write paths.
+- Model work.
+- Score changes.
+- Unblinding or source identity reveal.
+- Final interpretation.
+- External ledger mutation.
+- Broad value, readiness, benchmark, production, public-readiness, security/privacy, or Alpha-superiority claims.
 
-## What must not be claimed
+## Historical context
 
-This phase does **not** support claims of broad value, OpenAI validation, provider validation, local Ollama validation, Pi.dev integration, runtime readiness, production readiness, public MVP readiness, security/privacy completion, DEF-002 resolved, DEF-003 resolved, benchmark validation, benchmark superiority, broad-user readiness, autonomous readiness, `/v1/solve` readiness, dashboard readiness, Google Sheets synchronization, or Alpha superiority.
+PR #677 merged `AS-POST-676-NORTH-STAR-ROADMAP-RESET-001` and recorded the post-#663 through post-#676 Operator Console sequence as adjacent/supporting work. The reset selected `OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001`, which this lane now resolves into a product-direction selection.
+
+Historical lanes remain preserved in `docs/EVIDENCE_INDEX.md` and `docs/LANE_REGISTRY.md`.

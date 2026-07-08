@@ -1,7 +1,7 @@
 # Lane Registry
 
 > Source-of-truth lane lifecycle registry. Verification date **2026-07-08** for
-> `AS-POST-676-NORTH-STAR-ROADMAP-RESET-001`.
+> `AS-POST-677-PRODUCT-DIRECTION-SELECTION-001`.
 
 ## Lifecycle classes
 
@@ -11,13 +11,14 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| Post-#676 north-star roadmap reset | **current control posture** | `AS-POST-676-NORTH-STAR-ROADMAP-RESET-001` records the Operator Console sequence as adjacent/supporting work and selects `OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001`; no B012/B013 implementation, provider calls, `/v1/solve` exposure, scoring, unblinding, final interpretation, or broad claims are authorized. |
+| Post-#677 product direction selection | **current control posture** | `AS-POST-677-PRODUCT-DIRECTION-SELECTION-001` selects `VALUE_READ_DISCRIMINATION_WORKBENCH`, keeps B012/B013 deferred, records `OPERATOR_REVIEW_REQUIRED_AFTER_POST_677_PRODUCT_DIRECTION_SELECTION_001`, and recommends `AS-B014-VALUE-READ-DISCRIMINATION-WORKBENCH-DESIGN-001` as the first follow-up design lane; no runtime, UI implementation, provider/model work, scoring, unblinding, final interpretation, value/readiness/superiority claim, or Roadmap HP repo module is authorized. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001`** | **operator-review selected next state** | Operator product-direction selection is required before any next implementation lane. B012 and B013 are deferred; no provider execution, `/v1/solve` exposure, scoring, unblinding, final interpretation, value/readiness/superiority claim, provider/local-model validation claim, production/public claim, or security/privacy claim is authorized. |
+| **`OPERATOR_REVIEW_REQUIRED_AFTER_POST_677_PRODUCT_DIRECTION_SELECTION_001`** | **operator-review selected next state** | Operator review is required before implementing B014 or any workbench lane. B012 and B013 remain deferred. No runtime, UI implementation, provider/model work, scoring, unblinding, final interpretation, value/readiness/superiority claim, or Roadmap HP repo module is authorized. Recommended follow-up is `AS-B014-VALUE-READ-DISCRIMINATION-WORKBENCH-DESIGN-001` as a design lane only. |
+| `OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001` | historical prior review-only selected next state | Product-direction selection was required before any next implementation lane after `AS-POST-676-NORTH-STAR-ROADMAP-RESET-001`; `AS-POST-677-PRODUCT-DIRECTION-SELECTION-001` resolves that state. B012 and B013 remain deferred; no provider execution, `/v1/solve` exposure, scoring, unblinding, final interpretation, value/readiness/superiority claim, provider/local-model validation claim, production/public claim, or security/privacy claim is authorized by that prior state. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_CONSOLE_HTML_DIAGRAM_TARGET_PARITY_GAP_CLOSURE_001` | prior review-only selected next state | Operator review is required after the narrow local-console HTML/diagram target-parity gap-closure lane. Provider/local-model/hosted-model/tool/web execution, runtime GitHub calls, `/v1/solve`, Sheets, scoring, unblinding, readiness/value/superiority claims, and model/tool quality claims remain unauthorized. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_TEST_CONSOLE_ROUTING_METADATA_DISPLAY_001` | prior review-only selected next state | Operator review was required after the local-console route-preview metadata display lane before this packet was prepared. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLINDED_SCORER_PACKET_CONSTRUCTION_001` | prior review-only selected next state | Blinded scorer packet construction was recorded before blind scoring authorization prep. |
@@ -73,6 +74,8 @@
 - `ALPHA-SOLVER-TEST-CONSOLE-ROUTING-METADATA-OPERATOR-REVIEW-PACKET-001` (prior state) - docs/test-support operator review packet; no console execution, operator review performance, provider/local-model/tool execution, or quality/readiness/value/superiority claim.
 - `ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001` (stable prior state) - docs-only manual prompt-contract simulation outputs for all 12 routed-vs-plain pilot tasks; no runtime, provider/local-model/tool/web execution, scoring, unblinding, readiness, quality, benchmark, or superiority claim.
 - `ALPHA-SOLVER-ROUTED-VS-PLAIN-BLINDED-SCORER-PACKET-CONSTRUCTION-001` (stable prior state) - docs-only blinded scorer packet construction; no scoring, unblinding, source identity map commit, runtime, provider/local-model/tool/web execution, readiness, quality, benchmark, or superiority claim.
+- `AS-POST-676-NORTH-STAR-ROADMAP-RESET-001` (PR #677) - post-676 north-star roadmap reset; records the Operator Console sequence as adjacent/supporting work, selects operator review before product-direction selection, and keeps B012/B013 deferred with no runtime/provider/UI/scoring/claim authorization.
+- `AS-POST-677-PRODUCT-DIRECTION-SELECTION-001` (current branch) - docs/source-truth product-direction selection packet choosing `VALUE_READ_DISCRIMINATION_WORKBENCH`, keeping B012/B013 deferred, selecting `OPERATOR_REVIEW_REQUIRED_AFTER_POST_677_PRODUCT_DIRECTION_SELECTION_001`, and recommending `AS-B014-VALUE-READ-DISCRIMINATION-WORKBENCH-DESIGN-001` as a design-only follow-up.
 
 ## Superseded
 
@@ -248,7 +251,19 @@ ALPHA-SOLVER-ROUTED-VS-PLAIN-PILOT-OUTPUTS-001 ← manual prompt-contract simula
 ALPHA-SOLVER-ROUTED-VS-PLAIN-BLINDED-SCORER-PACKET-CONSTRUCTION-001 ← blinded scorer packet constructed; no scoring/unblinding/source-map commit
         │
         ▼
-OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLINDED_SCORER_PACKET_CONSTRUCTION_001 ← current review-only selected next state after packet construction
+OPERATOR_REVIEW_REQUIRED_AFTER_ROUTED_VS_PLAIN_BLINDED_SCORER_PACKET_CONSTRUCTION_001 ← prior review-only selected next state after packet construction
+        │
+        ▼
+AS-POST-676-NORTH-STAR-ROADMAP-RESET-001 / PR #677 ← B012/B013 deferred; product-direction selection required
+        │
+        ▼
+OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001 ← historical prior review-only selected next state
+        │
+        ▼
+AS-POST-677-PRODUCT-DIRECTION-SELECTION-001 ← selects VALUE_READ_DISCRIMINATION_WORKBENCH; recommends AS-B014 design-only follow-up
+        │
+        ▼
+OPERATOR_REVIEW_REQUIRED_AFTER_POST_677_PRODUCT_DIRECTION_SELECTION_001 ← current review-only selected next state
 ```
 
 This registry does not authorize production/public UI exposure, dashboard readiness, public provider exposure, local model validation claims, further task execution outside this manual simulation packet, scoring, score change, unblinding, source-map work, raw output inspection, Pi.dev install/run/integration, runtime endpoint exposure, public API exposure, `/v1/solve` exposure, Google Sheets mutation, benchmark, dependency addition, release implementation lane, or readiness/broad-value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
