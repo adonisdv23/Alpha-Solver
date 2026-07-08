@@ -2877,3 +2877,157 @@ def test_operator_console_no_user_supplied_write_path_parameters() -> None:
     dependant_names = [param.name for param in getattr(route, "dependant").body_params]
     dependant_names += [param.name for param in getattr(route, "dependant").query_params]
     assert dependant_names == []
+
+# ---------------------------------------------------------------------------
+# UI-ALPHA-OPERATOR-CONSOLE-MANUAL-NEXT-STEP-GUIDE-001
+# ---------------------------------------------------------------------------
+def _manual_next_step_card_html(html_text: str) -> str:
+    start = html_text.index('id="card-manual-next-step-guide"')
+    end = html_text.index("</article>", start)
+    return html_text[start:end]
+
+
+def test_manual_next_step_guide_status_payload(client: TestClient) -> None:
+    _login(client)
+    payload = client.get(STATUS_ROUTE).json()
+    assert "manual_next_step_guide" in payload
+    guide = payload["manual_next_step_guide"]
+    assert guide["title"] == "Manual Next Step Guide"
+    assert guide["mode"] == "display_only"
+    assert guide["execution"] == "non_executing"
+    assert guide["sections"] == [
+        "Available for review",
+        "Manual-only steps",
+        "Blocked in this console",
+    ]
+    assert {item["section"] for item in guide["items"]} == set(guide["sections"])
+    assert "Provider calls blocked." in guide["boundary_notes"]
+
+
+def test_manual_next_step_guide_card_copy_and_sections(client: TestClient) -> None:
+    _login(client)
+    card = _manual_next_step_card_html(client.get(PAGE_ROUTE).text)
+    for required in (
+        "Manual Next Step Guide",
+        "Available for review",
+        "Manual-only steps",
+        "Blocked in this console",
+        "display-only",
+        "Provider calls blocked",
+        "Local Receipt Store only",
+    ):
+        assert required in card
+    assert "manual-only" in card.lower()
+    assert "does not run providers" in card
+    assert "does not call /v1/solve" in card
+    assert "does not accept prompt input or store pasted model output" in card
+
+
+def test_manual_next_step_guide_has_no_action_controls(client: TestClient) -> None:
+    _login(client)
+    card = _manual_next_step_card_html(client.get(PAGE_ROUTE).text)
+    assert "<button" not in card
+    assert "<form" not in card
+    assert "<textarea" not in card
+    assert "method=\"post\"" not in card.lower()
+    control_fragments = (
+        "run selected",
+        "dispatch",
+        "submit",
+        "send",
+        "process",
+        "retry",
+        "schedule",
+        "approve",
+    )
+    lowered = card.lower()
+    for word in control_fragments:
+        assert f">{word}<" not in lowered, word
+        assert f'aria-label="{word}"' not in lowered, word
+        assert f'value="{word}"' not in lowered, word
+
+
+def test_manual_next_step_guide_no_new_post_route_and_receipt_only() -> None:
+    post_paths = {
+        getattr(route, "path", None)
+        for route in app.routes
+        if "POST" in getattr(route, "methods", set())
+        and str(getattr(route, "path", "")).startswith("/dashboard/operator-console")
+    }
+    assert post_paths == {RECEIPTS_ROUTE}
+
+
+def test_manual_next_step_guide_no_raw_or_secret_leak(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", FAKE_SECRET)
+    capture = _capture_with_sensitive_metadata()
+    _write(tmp_path, "capture.json", capture)
+    _write(tmp_path, "evidence_packet.json", capture_lib.build_evidence_packet(capture))
+    _use_root(monkeypatch, tmp_path)
+    _login(client)
+    status_text = client.get(STATUS_ROUTE).text
+    card = _manual_next_step_card_html(client.get(PAGE_ROUTE).text)
+    for raw in (
+        RAW_PROMPT,
+        RAW_BASELINE,
+        RAW_ROUTED,
+        RAW_ROUTE_META,
+        RAW_SYS_PROMPT,
+        RAW_PROVIDER_PAYLOAD,
+        FAKE_SECRET,
+        "sk-",
+    ):
+        assert raw not in status_text
+        assert raw not in card
+
+
+def test_manual_next_step_guide_preserves_existing_boundaries(client: TestClient) -> None:
+    _login(client)
+    payload = client.get(STATUS_ROUTE).json()
+    assert payload["provider_gate"]["live_execution_gate"] == "blocked"
+    assert payload["provider_gate"]["live_provider_calls"] == "disabled"
+    assert payload["dry_run_preview"]["preview_mode"] == "display_only"
+    assert payload["dry_run_preview"]["dry_run_execution"] == "not_enabled"
+    assert payload["chatgpt_copy_paste_capture"]["mode"] == "manual_only"
+    assert payload["chatgpt_copy_paste_capture"]["console_stores_pasted_outputs"] is False
+    assert payload["run_setup"]["live_run_button_enabled"] is False
+    assert payload["route_trace"]["note"] == "No solve has run from this console; fields are placeholders."
+
+
+def test_manual_next_step_guide_forbidden_claim_language_absent(client: TestClient) -> None:
+    _login(client)
+    card = _manual_next_step_card_html(client.get(PAGE_ROUTE).text).lower()
+    for forbidden in (
+        "safe action queue",
+        "action queue",
+        "task queue",
+        "job queue",
+        "worker",
+        "run selected",
+        "schedule",
+        "retry",
+        "priority",
+        "winner",
+        "score",
+        "rank",
+        "production-ready",
+        "benchmark passed",
+        "validated output",
+        "readiness",
+        "superiority",
+    ):
+        assert forbidden not in card, forbidden
+
+
+def test_manual_next_step_guide_under_reusable_safety_guard(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _login(client)
+    with operator_console_no_execution_guard(monkeypatch), operator_console_no_get_write_guard(monkeypatch):
+        page = client.get(PAGE_ROUTE)
+        status = client.get(STATUS_ROUTE)
+    assert page.status_code == 200
+    assert status.status_code == 200
+    assert "Manual Next Step Guide" in page.text
+    assert "manual_next_step_guide" in status.json()

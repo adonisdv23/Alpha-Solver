@@ -578,3 +578,15 @@ The card repeats the existing local harness command snippets for anchor prefligh
 ChatGPT copy/paste capture is manual-only. This console does not call ChatGPT. This console does not call providers, models, `/v1/solve`, MCP, browser automation, network, CLI, or subprocesses. This console does not automate a browser. This console does not submit prompts. This console does not store pasted model outputs in this lane. This console does not create, edit, delete, upload, save, or mutate `capture.json`, evidence packets, preflight reports, or receipts from this panel.
 
 The capture harness remains a local lab notebook, not a runner. Receipts may be saved separately through the existing local receipt store, but the ChatGPT Copy/Paste Capture card does not auto-save receipts and does not mutate receipts. Any future paste-storage, capture-editor, browser-automation, or API-automation behavior must be separately authorized.
+
+## Manual Next Step Guide
+
+Lane: `AOC-B008A-OPERATOR-NEXT-STEP-CLARITY-001`
+
+The **Manual Next Step Guide** is a display-only clarity panel in the protected Operator Console. It summarizes safe labels for what the operator can review now, what remains manual-only outside the console, and what is blocked inside the console.
+
+The panel is not a queue, not a runner, and not a workbench. It does not execute anything, call providers, call ChatGPT, call `/v1/solve`, automate a browser, run CLI/subprocess commands, submit prompts, or mutate capture/evidence/preflight artifacts.
+
+The guide does not add write paths. The existing Local Receipt Store remains the only controlled local write action on the Operator Console surface. The guide does not store pasted output and does not add a paste editor, capture editor, raw prompt viewer, raw output viewer, or raw route metadata viewer.
+
+The guide also makes no readiness, validation, benchmark, production, scoring, ranking, winner, or superiority claims. Its labels are operator-safety labels only; they are not evidence of output quality, provider availability, billing accuracy, or launch suitability.
