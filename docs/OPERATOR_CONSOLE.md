@@ -191,6 +191,107 @@ The console does not prove:
 - display raw prompts or outputs
 - score, rank, or select winners
 
+
+## Operator Console Daily-Use Walkthrough
+
+Use this walkthrough as a manual operator comprehension check. It helps an
+operator confirm they can use the current console and docs without confusing
+metadata, manual steps, and blocked behavior. It does not run Alpha Solver, call
+providers, validate outputs, or show readiness.
+
+Time box: about 5 to 10 minutes. Stop if this is confusing and record the first
+confusion point outside the console.
+
+### Before you start
+
+- You can access the protected `/dashboard/operator-console` page.
+- You have read the **Operator Console First 5 Minutes** section above.
+- You understand the console is local-first and non-executing.
+- You have local artifacts only if you want to inspect artifact-dependent
+  states. Missing local artifacts are still useful for seeing how the console
+  describes absent metadata.
+
+### Walkthrough steps
+
+1. Open `/dashboard/operator-console`.
+2. Confirm the page says local-first and live provider calls are disabled.
+3. Read the First 5 Minutes checklist in `docs/OPERATOR_CONSOLE.md`.
+4. Inspect **Local Artifact Status** and write down what is present, missing, or
+   stale. Look at this first when you need to understand the local evidence
+   surface.
+5. Inspect **Freshness and Sequence Coherence** and identify whether there are
+   warnings. This is only metadata.
+6. Inspect **Provider, Model, and Cost Gate** and confirm provider use remains
+   blocked in the console.
+7. Inspect **Dry-Run Preview** and state whether you are reading it as
+   metadata-only or mistaking it for execution readiness. It is metadata-only.
+8. Inspect **Manual Next Step Guide** and identify one reviewable item, one
+   manual-only item, and one blocked item.
+9. Inspect **ChatGPT Copy/Paste Capture** and confirm output collection happens
+   outside the console. This must be done manually.
+10. Decide whether a **Local Receipt** is useful. If it is not useful, explicitly
+    skip it. A receipt is local metadata, not proof of answer quality.
+11. Confirm the console did not run providers, call ChatGPT, run `/v1/solve`,
+    execute commands, edit capture files, or store pasted outputs. These are
+    blocked in the console.
+12. Record the first point of confusion, if any, outside the console.
+
+### Expected operator-understanding outcomes
+
+- The operator can name the first thing to inspect.
+- The operator can separate reviewable, manual-only, and blocked behavior.
+- The operator does not interpret receipt metadata as validation.
+- The operator does not interpret Dry-Run Preview as execution readiness.
+- The operator knows when to stop instead of asking the console to perform work.
+
+### Failure signals
+
+These signals mean the docs or UI may need future refinement:
+
+- The operator cannot identify what to inspect first.
+- The operator thinks the console can run a dry-run.
+- The operator thinks provider calls are enabled.
+- The operator thinks a receipt proves quality.
+- The operator thinks route/trace placeholders are hidden results.
+- The operator expects a queue, runner, scheduler, or action button; those are
+  not console behavior.
+- The operator wants to paste model output into the console.
+- The operator cannot explain what is blocked.
+
+### Manual notes template
+
+Fill out this template outside the console. The console must not store this
+manual note.
+
+```text
+Date:
+Operator:
+Console state summary:
+First thing inspected:
+Reviewable item found:
+Manual-only item found:
+Blocked item found:
+Receipt created: yes/no
+Dry-Run Preview interpretation:
+Confusion point:
+Stop condition triggered: yes/no
+Follow-up needed:
+```
+
+### What this walkthrough does not prove
+
+This walkthrough does not prove:
+
+- answer quality
+- route correctness
+- model superiority
+- provider readiness
+- billing accuracy
+- benchmark validity
+- production readiness
+- validation success
+- execution safety beyond the currently documented console boundaries
+
 ## Cards
 
 1. **Operator Console Header** — title, `local-first` mode, live provider calls
