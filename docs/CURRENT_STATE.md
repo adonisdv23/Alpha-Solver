@@ -7,7 +7,7 @@
 
 **B016 Value Read workbench static mockup completed for operator review.**
 
-The previous selected state was `OPERATOR_REVIEW_REQUIRED_AFTER_B014_VALUE_READ_WORKBENCH_DESIGN_001`. B016 converts the B015 source map and first-screen wireframe into a static Markdown mockup with field-to-source tracing, placeholder safety documentation, blocked actions, and operator comprehension notes. It does not implement UI, runtime behavior, B012, B013, scoring, unblinding, final interpretation, provider/model work, or broad claims.
+The previous selected state was `OPERATOR_REVIEW_REQUIRED_AFTER_B015_VALUE_READ_WORKBENCH_SOURCE_MAP_STATIC_PROTOTYPE_001`. B016 converts the B015 source map and first-screen wireframe into a static Markdown mockup with field-to-source tracing, placeholder safety documentation, blocked actions, and operator comprehension notes. It does not implement UI, runtime behavior, B012, B013, scoring, unblinding, final interpretation, provider/model work, or broad claims.
 
 ## At a glance
 
@@ -18,7 +18,7 @@ The previous selected state was `OPERATOR_REVIEW_REQUIRED_AFTER_B014_VALUE_READ_
 | Current selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_B016_VALUE_READ_WORKBENCH_STATIC_MOCKUP_001`** |
 | Recommended next lane | **No implementation lane selected; operator review must decide stop/defer, revise mockup, or separately authorize future planning** |
 | B012/B013 posture | Deferred pending separate operator decision; not authorized by this lane |
-| Prior selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_B014_VALUE_READ_WORKBENCH_DESIGN_001` is historical prior context only |
+| Prior selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_B015_VALUE_READ_WORKBENCH_SOURCE_MAP_STATIC_PROTOTYPE_001` is historical prior context only |
 | Strategic boundary | This lane completes static mockup documentation only; it authorizes no implementation, runtime behavior, live UI, provider/model work, scoring, unblinding, final interpretation, readiness claim, value claim, or Alpha-superiority claim |
 
 ## Product direction selection

@@ -4,11 +4,11 @@
 
 ## 1. Header
 
-**Workbench:** `VALUE_READ_DISCRIMINATION_WORKBENCH`  
-**Mockup packet:** `AS-B016-VALUE-READ-WORKBENCH-STATIC-MOCKUP-001`  
-**Source-map baseline:** `AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001`  
-**Current selected state shown in mockup:** `OPERATOR_REVIEW_REQUIRED_AFTER_B015_VALUE_READ_WORKBENCH_SOURCE_MAP_STATIC_PROTOTYPE_001`  
-**Mockup status:** `review_only_static_mockup`  
+**Workbench:** `VALUE_READ_DISCRIMINATION_WORKBENCH`
+**Mockup packet:** `AS-B016-VALUE-READ-WORKBENCH-STATIC-MOCKUP-001`
+**Source-map baseline:** `AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001`
+**Current selected state shown in mockup:** `OPERATOR_REVIEW_REQUIRED_AFTER_B015_VALUE_READ_WORKBENCH_SOURCE_MAP_STATIC_PROTOTYPE_001`
+**Mockup status:** `review_only_static_mockup`
 **Safety banner:** `docs/source-truth review only; not a functioning UI`
 
 ## 2. Current packet card — What am I reviewing?
