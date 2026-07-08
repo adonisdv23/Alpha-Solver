@@ -1,31 +1,31 @@
 # Alpha Solver - Current State
 
-> Source-of-truth navigation doc. Last verified **2026-07-08** for `AS-POST-677-PRODUCT-DIRECTION-SELECTION-001`.
-> This selection records `VALUE_READ_DISCRIMINATION_WORKBENCH` as the product direction after the post-676 reset and recommends `AS-B014-VALUE-READ-DISCRIMINATION-WORKBENCH-DESIGN-001` as the first follow-up design lane.
+> Source-of-truth navigation doc. Last verified **2026-07-08** for `AS-B014-VALUE-READ-DISCRIMINATION-WORKBENCH-DESIGN-001`.
+> This update records the completed B014 design for `VALUE_READ_DISCRIMINATION_WORKBENCH` and recommends `AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001` for operator review.
 
 ## Current verified phase
 
-**Post-677 product-direction selection completed: Value Read / discrimination workbench selected for operator review.**
+**B014 Value Read / discrimination workbench design completed for operator review.**
 
-The previous selected state was `OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001`. This lane resolves that review state into one product direction. It does not implement B014, UI, runtime behavior, B012, B013, scoring, unblinding, final interpretation, or broad claims.
+The previous selected state was `OPERATOR_REVIEW_REQUIRED_AFTER_POST_677_PRODUCT_DIRECTION_SELECTION_001`. This lane completes the first design packet for the selected `VALUE_READ_DISCRIMINATION_WORKBENCH` direction. It does not implement UI, runtime behavior, B012, B013, scoring, unblinding, final interpretation, provider/model work, or broad claims.
 
-The selected direction is `VALUE_READ_DISCRIMINATION_WORKBENCH` because it best preserves Alpha Solver as a reasoning, routing, comparison, evidence, and operator-control system rather than a generic prompt-runner cockpit.
+The workbench remains defined as a source-truth-grounded operator workbench for understanding whether Alpha Solver is producing differentiated, evidence-bounded, route-aware work compared with plain or baseline outputs.
 
 ## At a glance
 
 | Field | Value |
 |-------|-------|
-| Latest product-direction lane | **`AS-POST-677-PRODUCT-DIRECTION-SELECTION-001`** |
+| Latest completed design lane | **`AS-B014-VALUE-READ-DISCRIMINATION-WORKBENCH-DESIGN-001`** |
 | Selected product direction | **`VALUE_READ_DISCRIMINATION_WORKBENCH`** |
-| Current selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_POST_677_PRODUCT_DIRECTION_SELECTION_001`** |
-| Recommended first follow-up lane | **`AS-B014-VALUE-READ-DISCRIMINATION-WORKBENCH-DESIGN-001`** |
+| Current selected next state | **`OPERATOR_REVIEW_REQUIRED_AFTER_B014_VALUE_READ_WORKBENCH_DESIGN_001`** |
+| Recommended next lane | **`AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001`** |
 | B012/B013 posture | Deferred pending separate operator decision; not authorized by this lane |
-| Prior selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001` is historical prior context only |
-| Strategic boundary | This lane selects a product direction only; it authorizes no runtime behavior, UI implementation, model work, scoring, unblinding, final interpretation, readiness claim, value claim, or Alpha-superiority claim |
+| Prior selected next state | `OPERATOR_REVIEW_REQUIRED_AFTER_POST_677_PRODUCT_DIRECTION_SELECTION_001` is historical prior context only |
+| Strategic boundary | This lane completes design only; it authorizes no implementation, runtime behavior, UI implementation, provider/model work, scoring, unblinding, final interpretation, readiness claim, value claim, or Alpha-superiority claim |
 
 ## Product direction selection
 
-`VALUE_READ_DISCRIMINATION_WORKBENCH` is selected as the next product direction.
+`VALUE_READ_DISCRIMINATION_WORKBENCH` remains the selected product direction.
 
 This direction should focus on:
 
@@ -37,11 +37,11 @@ This direction should focus on:
 - evidence and receipt boundaries
 - operator understanding and next safe action
 
-## Recommended first follow-up
+## Recommended next lane
 
-`AS-B014-VALUE-READ-DISCRIMINATION-WORKBENCH-DESIGN-001`
+`AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001`
 
-This follow-up should be design-only. It should define what the workbench is, what artifacts it reads, what workflows it supports, what the operator should understand in 30 seconds, and what implementation lane, if any, should follow.
+This follow-up should remain docs/design or static prototype planning only unless separately authorized. It should build the source map and static prototype plan for the workbench before runtime/UI implementation.
 
 ## Deferred directions
 
@@ -65,8 +65,12 @@ This follow-up should be design-only. It should define what the workbench is, wh
 - External ledger mutation.
 - Broad value, readiness, benchmark, production, public-readiness, security/privacy, or Alpha-superiority claims.
 
+## B014 completion boundary
+
+The B014 design is complete for operator review. Implementation is not authorized. B012/B013 remain deferred. No provider calls, `/v1/solve` exposure, scoring, unblinding, final interpretation, or value/readiness/superiority claim is authorized.
+
 ## Historical context
 
-PR #677 merged `AS-POST-676-NORTH-STAR-ROADMAP-RESET-001` and recorded the post-#663 through post-#676 Operator Console sequence as adjacent/supporting work. The reset selected `OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001`, which this lane now resolves into a product-direction selection.
+PR #677 merged `AS-POST-676-NORTH-STAR-ROADMAP-RESET-001` and recorded the post-#663 through post-#676 Operator Console sequence as adjacent/supporting work. The reset selected `OPERATOR_REVIEW_REQUIRED_AFTER_POST_676_NORTH_STAR_ROADMAP_RESET_001`; `AS-POST-677-PRODUCT-DIRECTION-SELECTION-001` resolved that state into the `VALUE_READ_DISCRIMINATION_WORKBENCH` product-direction selection.
 
 Historical lanes remain preserved in `docs/EVIDENCE_INDEX.md` and `docs/LANE_REGISTRY.md`.
