@@ -1,24 +1,25 @@
-# Evidence Index - B017 Value Read workbench static review and next decision
+# Evidence Index - Post-682 roadmap lock and future phases
 
-> Source-of-truth evidence ledger. Verification date **2026-07-08** after `AS-B017-VALUE-READ-WORKBENCH-STATIC-REVIEW-AND-NEXT-DECISION-001`.
+> Source-of-truth evidence ledger. Verification date **2026-07-09** after `AS-POST-682-ROADMAP-LOCK-AND-FUTURE-PHASES-001`.
 
 ## How to read evidence value
 
 Entries in this file are design, documentation, gate, helper, static-checking, methodology, blocked-attempt, or research evidence unless explicitly stated otherwise. They do not create broad value, readiness, benchmark, production, security/privacy, public exposure, or Alpha-superiority evidence.
 
-## Current selected next state
+## Current selected lock state
 
-`OPERATOR_REVIEW_REQUIRED_AFTER_B017_VALUE_READ_WORKBENCH_STATIC_REVIEW_NEXT_DECISION_001` is the selected next state.
+`ROADMAP_LOCKED_AFTER_POST_682_ROADMAP_LOCK_AND_FUTURE_PHASES_001` is the current roadmap lock state.
 
-This is an operator-review-required state after completing the B017 static review and next-decision packet for `VALUE_READ_DISCRIMINATION_WORKBENCH`. It does not select an implementation lane. It does not implement UI, select B012, select B013, run model work, change scores, unblind, reveal source identities, interpret final results, mutate external ledgers, add dependencies, deploy, or make broad project claims.
+This is a lock/stop state after completing the B017 static review and next-decision packet for `VALUE_READ_DISCRIMINATION_WORKBENCH`. The active roadmap is empty/locked. It does not select an implementation lane or planning lane. It does not implement UI, select B012, select B013, run model work, change scores, unblind, reveal source identities, interpret final results, mutate external ledgers, add dependencies, deploy, or make broad project claims.
 
-The prior B016 review state `OPERATOR_REVIEW_REQUIRED_AFTER_B016_VALUE_READ_WORKBENCH_STATIC_MOCKUP_001`, B015 review state `OPERATOR_REVIEW_REQUIRED_AFTER_B015_VALUE_READ_WORKBENCH_SOURCE_MAP_STATIC_PROTOTYPE_001`, and B014 review state `OPERATOR_REVIEW_REQUIRED_AFTER_B014_VALUE_READ_WORKBENCH_DESIGN_001` remain historical context only. They are not the current selected state.
+The prior B017 selected state `OPERATOR_REVIEW_REQUIRED_AFTER_B017_VALUE_READ_WORKBENCH_STATIC_REVIEW_NEXT_DECISION_001` is now historical completed review/decision context. The prior B016 review state `OPERATOR_REVIEW_REQUIRED_AFTER_B016_VALUE_READ_WORKBENCH_STATIC_MOCKUP_001`, B015 review state `OPERATOR_REVIEW_REQUIRED_AFTER_B015_VALUE_READ_WORKBENCH_SOURCE_MAP_STATIC_PROTOTYPE_001`, and B014 review state `OPERATOR_REVIEW_REQUIRED_AFTER_B014_VALUE_READ_WORKBENCH_DESIGN_001` remain historical context only. They are not the current selected state.
 
 ## PR table
 
 | PR | Title | Merged / status | Primary artifact | Evidence value | Non-claims | Lifecycle |
 |----|-------|-----------------|------------------|----------------|------------|-----------|
-| post-B017 static review | `AS-B017-VALUE-READ-WORKBENCH-STATIC-REVIEW-AND-NEXT-DECISION-001` | current branch | `.specs/AS-B017-VALUE-READ-WORKBENCH-STATIC-REVIEW-AND-NEXT-DECISION-001.md`; `docs/evals/runs/as-b017-value-read-workbench-static-review-and-next-decision-001/` | Reviews B016 first-screen clarity, field trace coverage, placeholder safety, blocked actions, source-truth consistency, and operator decision options. | No implementation, runtime, live UI, provider/model work, scoring, unblinding, source identity reveal, final interpretation, readiness/value claim, or Alpha-superiority claim. | current review/decision gate |
+| post-682 roadmap lock | `AS-POST-682-ROADMAP-LOCK-AND-FUTURE-PHASES-001` | current branch | `.specs/AS-POST-682-ROADMAP-LOCK-AND-FUTURE-PHASES-001.md`; `docs/evals/runs/as-post-682-roadmap-lock-and-future-phases-001/` | Records the current roadmap lock state after B017, an empty/locked active roadmap, no selected implementation lane, no selected planning lane, and parked future phases. | No implementation, runtime, live UI, provider/model work, scoring, unblinding, source identity reveal, final interpretation, readiness/value claim, or Alpha-superiority claim. | current roadmap lock state |
+| post-B017 static review | `AS-B017-VALUE-READ-WORKBENCH-STATIC-REVIEW-AND-NEXT-DECISION-001` | merged by PR #682 | `.specs/AS-B017-VALUE-READ-WORKBENCH-STATIC-REVIEW-AND-NEXT-DECISION-001.md`; `docs/evals/runs/as-b017-value-read-workbench-static-review-and-next-decision-001/` | Reviews B016 first-screen clarity, field trace coverage, placeholder safety, blocked actions, source-truth consistency, and operator decision options. | No implementation, runtime, live UI, provider/model work, scoring, unblinding, source identity reveal, final interpretation, readiness/value claim, or Alpha-superiority claim. | historical completed review/decision context |
 | post-B016 static mockup | `AS-B016-VALUE-READ-WORKBENCH-STATIC-MOCKUP-001` | merged by PR #681 | `.specs/AS-B016-VALUE-READ-WORKBENCH-STATIC-MOCKUP-001.md`; `docs/evals/runs/as-b016-value-read-workbench-static-mockup-001/` | Records a static Markdown first-screen mockup, field-to-source trace, placeholder safety ledger, operator comprehension check, blocked actions, and implementation-follow-up boundaries. After B017 selection, this is historical completed static mockup context rather than the current review gate. | No implementation, runtime, live UI, provider/model work, scoring, unblinding, final interpretation, readiness/value claim, or Alpha-superiority claim. | historical completed static mockup context |
 | post-B015 source map | `AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001` | merged by PR #680 | `.specs/AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001.md`; `docs/evals/runs/as-b015-value-read-workbench-source-map-and-static-prototype-001/` | Records the exact-source map, field inventory, status taxonomy, data-readiness rules, claim-boundary map, static prototype plan, first-screen wireframe, and B016 static-mockup recommendation. After B016 selection, this is historical completed context rather than the current review gate. | No implementation, runtime, live UI, provider/model work, scoring, unblinding, final interpretation, readiness/value claim, or Alpha-superiority claim. | historical completed context |
 | post-B014 design | `AS-B014-VALUE-READ-DISCRIMINATION-WORKBENCH-DESIGN-001` | merged by PR #679 | `.specs/AS-B014-VALUE-READ-DISCRIMINATION-WORKBENCH-DESIGN-001.md`; `docs/evals/runs/as-b014-value-read-discrimination-workbench-design-001/` | Defines the source-truth-grounded Value Read / discrimination workbench, artifact inputs, workflows, route/expert preview role, claim boundaries, first-screen test, and B015 recommendation. | No implementation, runtime, UI, provider/model work, scoring, unblinding, final interpretation, readiness/value claim, or Alpha-superiority claim. | historical design context |
@@ -31,8 +32,8 @@ The prior B016 review state `OPERATOR_REVIEW_REQUIRED_AFTER_B016_VALUE_READ_WORK
 
 ## Evidence boundary
 
-The current operator-review-required state supports only bounded statements that the repository contains a B017 static review and next-decision packet reviewing the B016 static mockup and that operator review is required before any follow-up.
+The current roadmap lock state supports only bounded statements that the repository contains a post-682 roadmap lock packet, the active roadmap is empty/locked, B016 is locked as sufficient for now, B017 is historical completed review/decision context, and no implementation or planning lane is selected.
 
 It does not include implementation, console-run evidence, provider output, hosted-model output, local-model output, tool output, new score output, new unblinding output, new final interpretation, source-arm mapping, Google Sheets mutation, dependency changes, runtime validation, `/v1/solve` evidence, dashboard/public API evidence, readiness evidence, benchmark evidence, quality evidence, value evidence, security/privacy completion, autonomous-readiness evidence, or Alpha-superiority evidence.
 
-Historical lanes remain preserved as historical context only. Those historical artifacts do not override the current selected state, which is `OPERATOR_REVIEW_REQUIRED_AFTER_B017_VALUE_READ_WORKBENCH_STATIC_REVIEW_NEXT_DECISION_001`.
+Historical lanes remain preserved as historical context only. Those historical artifacts do not override the current selected lock state, which is `ROADMAP_LOCKED_AFTER_POST_682_ROADMAP_LOCK_AND_FUTURE_PHASES_001`.
