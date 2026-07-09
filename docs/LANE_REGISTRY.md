@@ -1,7 +1,7 @@
 # Lane Registry
 
-> Source-of-truth lane lifecycle registry. Verification date **2026-07-08** for
-> `AS-B017-VALUE-READ-WORKBENCH-STATIC-REVIEW-AND-NEXT-DECISION-001`.
+> Source-of-truth lane lifecycle registry. Verification date **2026-07-09** for
+> `AS-POST-682-ROADMAP-LOCK-AND-FUTURE-PHASES-001`.
 
 ## Lifecycle classes
 
@@ -11,13 +11,14 @@
 
 | Lane | State | Evidence |
 |------|-------|----------|
-| B017 Value Read workbench static review and next decision | **current control posture** | `AS-B017-VALUE-READ-WORKBENCH-STATIC-REVIEW-AND-NEXT-DECISION-001` reviews the B016 static mockup for first-screen clarity, field-trace coverage, placeholder safety, blocked actions, source-truth consistency, and operator decision options for `VALUE_READ_DISCRIMINATION_WORKBENCH`; keeps B012/B013 deferred; records `OPERATOR_REVIEW_REQUIRED_AFTER_B017_VALUE_READ_WORKBENCH_STATIC_REVIEW_NEXT_DECISION_001`; selects no implementation lane; no runtime, UI implementation, provider/model work, scoring, unblinding, source identity reveal, final interpretation, value/readiness/superiority claim, or Roadmap HP repo module is authorized. |
+| Post-682 roadmap lock and future phases | **current roadmap lock posture** | `AS-POST-682-ROADMAP-LOCK-AND-FUTURE-PHASES-001` records `ROADMAP_LOCKED_AFTER_POST_682_ROADMAP_LOCK_AND_FUTURE_PHASES_001`; active roadmap is empty/locked; active implementation lane is none; active planning lane is none; future phases are parked, not authorized; B012/B013 remain deferred; no runtime, UI implementation, provider/model work, scoring, unblinding, source identity reveal, final interpretation, value/readiness/superiority claim, or Roadmap HP repo module is authorized. |
 
 ## Next ready / current selected state
 
 | State | Lifecycle | Notes |
 |-------|-----------|-------|
-| **`OPERATOR_REVIEW_REQUIRED_AFTER_B017_VALUE_READ_WORKBENCH_STATIC_REVIEW_NEXT_DECISION_001`** | **operator-review selected next state** | Operator review is required after B017 before any follow-up lane. B012 and B013 remain deferred. No runtime, UI implementation, provider/model work, scoring, unblinding, source identity reveal, final interpretation, value/readiness/superiority claim, or Roadmap HP repo module is authorized. No implementation lane is selected by B017. |
+| **`ROADMAP_LOCKED_AFTER_POST_682_ROADMAP_LOCK_AND_FUTURE_PHASES_001`** | **current roadmap lock state** | Active roadmap is empty/locked. Active implementation lane is none. Active planning lane is none. Future phases are parked, not authorized. B012 and B013 remain deferred. No runtime, UI implementation, provider/model work, scoring, unblinding, source identity reveal, final interpretation, value/readiness/superiority claim, or Roadmap HP repo module is authorized. |
+| `OPERATOR_REVIEW_REQUIRED_AFTER_B017_VALUE_READ_WORKBENCH_STATIC_REVIEW_NEXT_DECISION_001` | historical completed review/decision selected state | Operator review was required after B017 before the post-682 lock packet. B012 and B013 remain deferred. No runtime, UI implementation, provider/model work, scoring, unblinding, source identity reveal, final interpretation, value/readiness/superiority claim, or Roadmap HP repo module was authorized. No implementation lane was selected by B017. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_B016_VALUE_READ_WORKBENCH_STATIC_MOCKUP_001` | historical prior review-only selected next state | Operator review was required after B016 before B017 or any follow-up lane. B012 and B013 remain deferred. No runtime, UI implementation, provider/model work, scoring, unblinding, final interpretation, value/readiness/superiority claim, or Roadmap HP repo module is authorized. No implementation lane was selected by B016. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_B015_VALUE_READ_WORKBENCH_SOURCE_MAP_STATIC_PROTOTYPE_001` | historical prior review-only selected next state | Operator review was required after B015 before B016 or any implementation lane. B012 and B013 remain deferred. No runtime, UI implementation, provider/model work, scoring, unblinding, final interpretation, value/readiness/superiority claim, or Roadmap HP repo module is authorized. Recommended follow-up is `AS-B016-VALUE-READ-WORKBENCH-STATIC-MOCKUP-001` as a static mockup lane only unless separately authorized. |
 | `OPERATOR_REVIEW_REQUIRED_AFTER_B014_VALUE_READ_WORKBENCH_DESIGN_001` | historical prior review-only selected next state | Operator review is required after B014 before B015 or any implementation lane. B012 and B013 remain deferred. No runtime, UI implementation, provider/model work, scoring, unblinding, final interpretation, value/readiness/superiority claim, or Roadmap HP repo module is authorized. Recommended follow-up is `AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001` as docs/design or static prototype planning only unless separately authorized. |
@@ -34,7 +35,8 @@
 
 ## Completed (kept as evidence)
 
-- `AS-B017-VALUE-READ-WORKBENCH-STATIC-REVIEW-AND-NEXT-DECISION-001` (current branch) - docs/source-truth review and decision-support packet for B016; recommends stop/defer and lock B016 as sufficient for now; no implementation/runtime/provider/scoring/unblinding/source-identity-reveal/final-interpretation or broad claims.
+- `AS-POST-682-ROADMAP-LOCK-AND-FUTURE-PHASES-001` (current branch) - docs/source-truth roadmap lock packet after PR #682; active roadmap empty/locked; active implementation lane none; active planning lane none; future phases parked, not authorized; B012/B013 deferred; no implementation/runtime/provider/scoring/unblinding/source-identity-reveal/final-interpretation or broad claims.
+- `AS-B017-VALUE-READ-WORKBENCH-STATIC-REVIEW-AND-NEXT-DECISION-001` (PR #682) - docs/source-truth review and decision-support packet for B016; recommends stop/defer and lock B016 as sufficient for now; no implementation/runtime/provider/scoring/unblinding/source-identity-reveal/final-interpretation or broad claims.
 - `AS-B016-VALUE-READ-WORKBENCH-STATIC-MOCKUP-001` (PR #681) - docs-only static mockup packet derived from B015; no implementation/runtime/provider/scoring/unblinding/final-interpretation or broad claims.
 - `AS-B015-VALUE-READ-WORKBENCH-SOURCE-MAP-AND-STATIC-PROTOTYPE-001` (PR #680) - docs/source-map/static-prototype planning packet; recommended B016 static mockup; no implementation/runtime/provider/scoring/unblinding/final-interpretation or broad claims.
 - `ALPHA-SOLVER-NO-ECHO-SUBSTANTIVE-GENERATION-GATE-POST-552-SUCCESSOR-001` (PR #557) - no-echo substantive generation gate.
@@ -286,7 +288,13 @@ OPERATOR_REVIEW_REQUIRED_AFTER_B016_VALUE_READ_WORKBENCH_STATIC_MOCKUP_001 ← h
 AS-B017-VALUE-READ-WORKBENCH-STATIC-REVIEW-AND-NEXT-DECISION-001 ← static review and decision-support packet completed; no implementation/runtime/provider/scoring/unblinding/source-identity-reveal/final-interpretation authorized
         │
         ▼
-OPERATOR_REVIEW_REQUIRED_AFTER_B017_VALUE_READ_WORKBENCH_STATIC_REVIEW_NEXT_DECISION_001 ← current review-only selected next state; no implementation lane selected
+OPERATOR_REVIEW_REQUIRED_AFTER_B017_VALUE_READ_WORKBENCH_STATIC_REVIEW_NEXT_DECISION_001 ← historical review-only selected next state; no implementation lane selected
+        │
+        ▼
+AS-POST-682-ROADMAP-LOCK-AND-FUTURE-PHASES-001 ← roadmap lock packet; active roadmap empty/locked; future phases parked, not authorized
+        │
+        ▼
+ROADMAP_LOCKED_AFTER_POST_682_ROADMAP_LOCK_AND_FUTURE_PHASES_001 ← current lock state; no implementation or planning lane selected
 ```
 
 This registry does not authorize production/public UI exposure, dashboard readiness, public provider exposure, local model validation claims, further task execution outside this manual simulation packet, scoring, score change, unblinding, source-map work, raw output inspection, Pi.dev install/run/integration, runtime endpoint exposure, public API exposure, `/v1/solve` exposure, Google Sheets mutation, benchmark, dependency addition, release implementation lane, or readiness/broad-value/security/privacy/provider/local-Ollama/Alpha-superiority claim.
