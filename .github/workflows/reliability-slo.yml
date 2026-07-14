@@ -1,12 +1,19 @@
 name: reliability-slo
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
     paths:
       - "alpha/**"
       - "tests/**"
       - ".github/workflows/**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   reliability-slo:
+    if: ${{ github.event.pull_request.draft == false }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -19,18 +26,16 @@ jobs:
           pip install -r requirements.txt pytest-json-report
       - name: Start deps
         run: docker run -d --name redis -p 6379:6379 redis:7
-      - name: Run failure-injection suite (placeholder)
+      - name: Run reliability suite
         run: |
           mkdir -p artifacts
-          pytest -q tests/reliability --json-report --json-report-file=artifacts/reliability.json || true
-      - name: Enforce SLOs (placeholder; Codex will upgrade)
-        run: |
-          python - << 'PY'
-          import json, pathlib, sys
-          p = pathlib.Path("artifacts/reliability.json")
-          if not p.exists():
-            print("no report; skipping fail"); sys.exit(0)
-          data = json.loads(p.read_text() or "{}")
-          # Codex will implement p95 checks here
-          print("SLO gate placeholder (pass)")
-          PY
+          pytest -q tests/reliability \
+            --json-report --json-report-file=artifacts/reliability.json
+      - name: Enforce reliability SLOs
+        run: python -m alpha.reliability.slo artifacts/reliability.json
+      - name: Upload reliability artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: reliability
+          path: artifacts/
