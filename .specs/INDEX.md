@@ -6,6 +6,7 @@ Simple registry of the Markdown specs stored in `.specs/`. File names are canoni
 
 | File | Title | Health |
 | --- | --- | --- |
+| `ACTIONS-COST-CONTAINMENT-ALPHA-001.md` | ACTIONS-COST-CONTAINMENT-ALPHA-001 · GitHub Actions Cost Containment | ✅ `SPEC_OK` |
 | `ALPHA-ANSWER-STRUCTURE-V2-001.md` | ALPHA-ANSWER-STRUCTURE-V2-001 | ✅ `SPEC_OK` |
 | `ALPHA-SOLVER-EVAL-FALSE-PREMISE-PERTURBATION-001.md` | ALPHA-SOLVER-EVAL-FALSE-PREMISE-PERTURBATION-001 · False-Premise and Hidden-Constraint Perturbation Case Set | ✅ `SPEC_OK` |
 | `ALPHA-SOLVER-EVAL-HIGHER-HEADROOM-CASESET-001.md` | ALPHA-SOLVER-EVAL-HIGHER-HEADROOM-CASESET-001 · Higher-Headroom Value Read Case Set | ✅ `SPEC_OK` |
